@@ -1,0 +1,43 @@
+# 鎖定版本清單：每一行 = 從上游某個 commit 複製一個路徑進本 repo
+# 欄位：名稱  上游repo  commit  上游路徑  本repo路徑
+# 改版流程：scripts/review-updates.sh 產出差異報告 → 審過後改這裡的 commit → scripts/vendor.sh → commit → scripts/install.sh
+
+# ---- 前端（全域常駐）----
+impeccable-plugin        pbakaus/impeccable          687bc381bc9091bf252c0a05303640561014a425  plugin                                   plugins/impeccable
+gsap-core                greensock/gsap-skills       aed9cfd3277740755f6bfc1155c7aa645403b760  skills/gsap-core                         skills/gsap-core
+gsap-timeline            greensock/gsap-skills       aed9cfd3277740755f6bfc1155c7aa645403b760  skills/gsap-timeline                     skills/gsap-timeline
+gsap-scrolltrigger       greensock/gsap-skills       aed9cfd3277740755f6bfc1155c7aa645403b760  skills/gsap-scrolltrigger                skills/gsap-scrolltrigger
+gsap-plugins             greensock/gsap-skills       aed9cfd3277740755f6bfc1155c7aa645403b760  skills/gsap-plugins                      skills/gsap-plugins
+gsap-react               greensock/gsap-skills       aed9cfd3277740755f6bfc1155c7aa645403b760  skills/gsap-react                        skills/gsap-react
+gsap-frameworks          greensock/gsap-skills       aed9cfd3277740755f6bfc1155c7aa645403b760  skills/gsap-frameworks                   skills/gsap-frameworks
+gsap-performance         greensock/gsap-skills       aed9cfd3277740755f6bfc1155c7aa645403b760  skills/gsap-performance                  skills/gsap-performance
+gsap-utils               greensock/gsap-skills       aed9cfd3277740755f6bfc1155c7aa645403b760  skills/gsap-utils                        skills/gsap-utils
+
+# ---- 後端與流程（全域常駐）----
+ponytail-manifest        dietrichgebert/ponytail     96608e078b2d5ea607c5c3b8b5a54d1c1fba6846  .claude-plugin/plugin.json               plugins/ponytail/.claude-plugin/plugin.json
+ponytail-hooks           dietrichgebert/ponytail     96608e078b2d5ea607c5c3b8b5a54d1c1fba6846  hooks                                    plugins/ponytail/hooks
+ponytail-skills          dietrichgebert/ponytail     96608e078b2d5ea607c5c3b8b5a54d1c1fba6846  skills                                   plugins/ponytail/skills
+mp-setup                 mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/setup-matt-pocock-skills  skills/setup-matt-pocock-skills
+mp-to-spec               mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/to-spec               skills/to-spec
+mp-to-tickets            mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/to-tickets            skills/to-tickets
+mp-implement             mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/implement             skills/implement
+mp-implement-spec        mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/implement-spec        skills/implement-spec
+mp-tdd                   mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/tdd                   skills/tdd
+mp-codebase-design       mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/codebase-design       skills/codebase-design
+mp-code-review           mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/code-review           skills/code-review
+mp-diagnosing-bugs       mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/diagnosing-bugs       skills/diagnosing-bugs
+mp-grill-with-docs       mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/grill-with-docs       skills/grill-with-docs
+mp-domain-modeling       mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/engineering/domain-modeling       skills/domain-modeling
+mp-grilling              mattpocock/skills           4ae2317ddb22b046e26455e4f9c9b3aaaf62212d  skills/productivity/grilling            skills/grilling
+sp-verification          obra/superpowers            22f0b463e7a5e579904dd6211a520321035526f7  skills/verification-before-completion   skills/verification-before-completion
+
+# ---- 資安（全域常駐）----
+security-audit           cloudflare/security-audit-skill  c1c8a8c1471069fb0e188eeaff69b8e8db6564a8  skills/security-audit           skills/security-audit
+
+# ---- 工具（全域常駐）----
+scrapling                d4vinci/Scrapling           bc602488b44e978da3266841e913af17577ec0fd  agent-skill/Scrapling-Skill              skills/scrapling-official
+graphify-skill           Graphify-Labs/graphify      16218bfc80d4ca2799734d045039f7ed1a5fa9fb  graphify/skill.md                        skills/graphify/SKILL.md
+graphify-refs            Graphify-Labs/graphify      16218bfc80d4ca2799734d045039f7ed1a5fa9fb  graphify/skills/claude/references        skills/graphify/references
+
+# ---- 加掛（不自動安裝，用 scripts/add-addon.sh 放進個別專案）----
+hallmark                 nutlope/hallmark            407fa689f4a276f2fd389208d271d0fef08f5058  skills/hallmark                          addons/hallmark

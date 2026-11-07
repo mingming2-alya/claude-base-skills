@@ -1,0 +1,24 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "claude-base-skills",
+  "owner": {
+    "name": "Alyanna"
+  },
+  "metadata": {
+    "description": "Pinned, reviewed copies of the plugins that need hooks (ponytail, impeccable). Local marketplace: nothing updates unless this repo changes."
+  },
+  "plugins": [
+    {
+      "name": "ponytail",
+      "description": "Lazy senior dev mode, pinned at dietrichgebert/ponytail@96608e0.",
+      "source": "./plugins/ponytail",
+      "category": "productivity"
+    },
+    {
+      "name": "impeccable",
+      "description": "Design skill and anti-pattern detector hook, pinned at pbakaus/impeccable@687bc38.",
+      "source": "./plugins/impeccable",
+      "category": "design"
+    }
+  ]
+}
