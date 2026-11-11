@@ -1,0 +1,17 @@
+/* signal：瑞士風、白底、大字、紅色重點、俐落。適合提案、會議、客戶洽談、數據型簡報。 */
+:root {
+  --bg: #FFFFFF;
+  --fg: #111111;
+  --muted: #8C8C8C;
+  --accent: #D7000F;
+  --accent-ink: #FFFFFF;
+  --line: #111111;
+  --shock-bg: #D7000F;
+  --shock-fg: #FFFFFF;
+  --font-head: "Inter", "Helvetica Neue", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "WenQuanYi Zen Hei", sans-serif;
+  --font-body: "Inter", "Helvetica Neue", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "WenQuanYi Zen Hei", sans-serif;
+  --head-weight: 800;
+  --key-weight: 900;
+  --radius: 0px;
+  --texture: none;
+}

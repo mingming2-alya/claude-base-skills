@@ -1,0 +1,17 @@
+meta: {title: 為什麼你的店需要 AI, theme: signal}
+structure: {start: 店長覺得 AI 跟自己無關, destination: 願意試用三個月, axis: distance, direction: 遠 → 近, sensitivity: false}
+chapters:
+  - {id: a, label: 全球}
+  - {id: b, label: 台灣}
+  - {id: c, label: 同業}
+  - {id: d, label: 你的店}
+slides:
+  - type: cover
+  - {chapter: a, title: 全球零售, layout: number, value: "==72%==", label: 零售商已導入 AI}
+  - {chapter: b, title: 台灣市場, layout: point, key: 台灣只有 18% 的小店開始用}
+  - {chapter: c, title: 隔壁那家店, layout: bullets, items: [排班時間少一半, 庫存誤差降到 3%]}
+  - type: shock
+    text: 你的店，是最後一家
+  - {chapter: d, title: 下一步, layout: steps, items: [免費試用, 每週檢討, 三個月後決定]}
+  - type: closing
+    text: 謝謝

@@ -1,0 +1,17 @@
+/* paper：溫暖、編輯感、米白紙張、襯線標題。適合經驗分享、科普、個人成長、年度成果。 */
+:root {
+  --bg: #F4EFE6;
+  --fg: #2A2622;
+  --muted: #9B9187;
+  --accent: #B8400B;
+  --accent-ink: #FFFFFF;
+  --line: #DCD3C4;
+  --shock-bg: #1E1A16;
+  --shock-fg: #F4EFE6;
+  --font-head: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU", "WenQuanYi Zen Hei", serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "WenQuanYi Zen Hei", sans-serif;
+  --head-weight: 700;
+  --key-weight: 800;
+  --radius: 6px;
+  --texture: radial-gradient(1200px 800px at 85% -10%, rgba(184,64,11,.06), transparent 60%), radial-gradient(900px 700px at -10% 110%, rgba(42,38,34,.05), transparent 60%);
+}

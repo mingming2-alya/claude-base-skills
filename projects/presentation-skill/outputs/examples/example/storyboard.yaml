@@ -1,0 +1,104 @@
+# storyboard.yaml：整份簡報唯一的內容來源。
+# 修改內容一律改這個檔，再執行 build.py 重建；不要直接改 deck.html。
+# 這份範本本身就是一份可建置的範例，複製後替換內容即可。
+
+meta:
+  title: 2026 年度回顧              # 封面主標
+  subtitle: 從困境到轉型的一年      # 封面副標（可省略）
+  presenter: 王小明 · 產品部        # 封面講者（可省略）
+  date: 2026.12                     # 封面日期（可省略）
+  theme: paper                      # paper / signal / ink，或自訂主題的相對路徑 ./theme.css
+  lang: zh-Hant
+
+structure:
+  start: 主管們知道今年營收持平，但不清楚團隊做了什麼轉型   # 聽眾的起點
+  destination: 支持明年擴編兩人                              # 你要帶聽眾去的終點
+  axis: time            # time / process / causal / abstraction / importance / scale / distance / intensity / custom
+  direction: 過去 → 未來  # 從起點那端往終點那端
+  axis_note: ""          # axis 為 custom 時，說明兩端是什麼
+  sensitivity: false     # 有人際顧慮（不想讓人被比較）時設 true，lint 會阻擋價值軸
+
+# 章節：導航（章節列、目錄、頁籤）全部由這裡自動產生。
+# 2–4 個，命名平行、簡短，用這次內容自己的話。
+chapters:
+  - id: past
+    label: 年初的困境
+  - id: shift
+    label: 轉型的半年
+  - id: next
+    label: 明年的方向
+
+# 逐頁內容。
+# type:   cover（封面，自動用 meta）/ content（預設）/ shock（震撼頁）/ closing（結尾）
+# layout（content 才需要）：
+#   point   整頁只為一個重點服務：key（重點）+ support（一行補充，可省略）
+#   bullets 條列：items（最多 5 條）
+#   number  大數字：value + label + note（可省略）
+#   compare 左右比較：left/right 各有 heading + items
+#   steps   有順序的步驟：items（最多 5 步）
+#   quote   引言：text + source
+#   image   圖片：src（相對於 storyboard 的路徑）+ caption；圖只是氣氛，重點仍要寫在文字裡
+# 共用欄位：
+#   chapter 屬於哪一章（content 必填，填 chapters 的 id）
+#   title   這頁在講什麼（路標，不寫結論，≤12 字）
+#   tab     頁籤上的短名稱（可省略，預設用 title）
+#   notes   講者備註（按 N 顯示）
+# 重點標記：在文字中用 ==重點== 標出，每頁最多一處。point 的 key 沒有標記時，整句視為重點。
+
+slides:
+  - type: cover
+
+  - chapter: past
+    title: 年初的處境
+    layout: number
+    value: "0%"
+    label: 上半年營收成長
+    note: 連續兩季持平，三個主要客戶續約延後
+    notes: 先讓大家回到年初的感覺，不要急著解釋原因。
+
+  - chapter: past
+    title: 問題出在哪
+    layout: point
+    key: 客戶要的不是更多功能，是==更快上手==
+    support: 訪談 24 位客戶，19 位提到導入太慢
+
+  - chapter: shift
+    title: 我們做了什麼
+    layout: steps
+    items:
+      - 砍掉 40% 的設定步驟
+      - 每個新客戶配一位導入專員
+      - 把教學影片改成 3 分鐘以內
+
+  - chapter: shift
+    title: 導入時間
+    layout: compare
+    left:
+      heading: 轉型前
+      items: [平均 45 天上線, 客戶要自己讀文件]
+    right:
+      heading: 轉型後
+      items: [平均 ==12 天==上線, 專員陪跑兩週]
+
+  - chapter: shift
+    title: 客戶怎麼說
+    layout: quote
+    text: 這是我們第一次在一個月內讓全公司都用起來的系統。
+    source: 某製造業客戶 IT 主管
+
+  - type: shock
+    text: 下半年，營收成長 38%
+    sub: 而且沒有增加任何一位業務
+    notes: 停兩秒再說話。
+
+  - chapter: next
+    title: 明年需要的支持
+    layout: bullets
+    items:
+      - 導入專員從 2 人擴編到 ==4 人==
+      - 目標：新客戶 30 天內完成導入
+      - 預估多承接 15 個客戶
+
+  - type: closing
+    text: 謝謝
+    sub: 歡迎提問
