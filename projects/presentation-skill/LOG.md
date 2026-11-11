@@ -82,3 +82,4 @@
   - `.claude/settings.json`＋`.claude/hooks/check-sync.sh`：有未 commit 或未推送的變更就擋下結束；`stop_hook_active` 時放行，避免無限迴圈
   - `projects/presentation-skill/`：STATUS、LOG、inputs、outputs
 - deck-architect 放在 `projects/` 而不是 `skills/`，所以 install.sh 不會把 v0 裝到全域。
+- 驗證時發現 hook 的 bug：淺複製只追蹤 main，推送後本機沒有 `origin/presentation-skill-generation`，hook 誤判成「還沒推送」。修正為先看 upstream，沒有時用 `git ls-remote` 向遠端確認。已測試三種狀態：未 commit 會擋、已 commit 未推送會擋、推送後放行。
