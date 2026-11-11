@@ -11,7 +11,13 @@ dirty=$(git status --porcelain)
 if [ -n "$dirty" ]; then
   msg+="尚未 commit 的變更："$'\n'"$(printf '%s\n' "$dirty" | head -20)"$'\n'
 fi
+branch=$(git branch --show-current)
 unpushed=$(git rev-list --count HEAD --not --remotes 2>/dev/null || echo 0)
+# 淺克隆或單分支克隆推送後可能沒有本地追蹤參考，向遠端再確認一次
+if [ "${unpushed:-0}" -gt 0 ] && [ -n "$branch" ]; then
+  remote_sha=$(timeout 15 git ls-remote origin "refs/heads/$branch" 2>/dev/null | cut -f1)
+  [ "$remote_sha" = "$(git rev-parse HEAD)" ] && unpushed=0
+fi
 if [ "${unpushed:-0}" -gt 0 ]; then
   msg+="尚未推送的 commit：${unpushed} 個（分支 $(git branch --show-current)）"$'\n'
 fi

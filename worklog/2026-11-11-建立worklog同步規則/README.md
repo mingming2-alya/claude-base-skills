@@ -14,11 +14,13 @@
    - 回溯補齊先前所有成果
 3. 新增 `CLAUDE.md`（規則）、`.claude/settings.json` 與 `.claude/hooks/check-sync.sh`（Stop hook）、`worklog/`（含三筆回溯紀錄）。
 4. Hook 以模擬輸入測試：有變更時 exit 2 擋下；`stop_hook_active=true` 時 exit 1 只提醒。
+5. 第一次推送後發現誤判：淺克隆只追蹤 main，推送後本地沒有遠端分支參考，hook 以為還有 1 個未推送。已修正：本地判斷有未推送時，用 `git ls-remote` 向 GitHub 確認遠端分支是否已等於 HEAD；本機 clone 也補上該分支的 fetch 設定。
 
 ## 決策紀錄
 - 規則放 repo 根目錄 `CLAUDE.md`（專案記憶），未放進 `rules/CLAUDE.base.md`，所以只在這個 repo 生效。使用者未另行指定範圍，採推薦做法。
 - Hook 同一輪只擋一次，避免推送失敗時無限迴圈。
 - Hook 不依賴 jq，用 exit code 與 stderr 回報，換機器也能跑。
+- Hook 的遠端確認有 15 秒逾時，網路不通時保守地視為未推送（會提醒，不會漏報）。
 - 規則與紀錄都在 `brainstorming-for-learning` 分支；新會話需切到此分支（或合併進 main 後）才會載入 `CLAUDE.md` 與 hook。
 
 ## 產出物
