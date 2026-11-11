@@ -22,11 +22,18 @@ if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
 fi
 
 if [ -n "$branch" ]; then
-  if git rev-parse --verify --quiet "origin/$branch" >/dev/null; then
-    ahead="$(git rev-list --count "origin/$branch..HEAD" 2>/dev/null || echo 0)"
-    [ "$ahead" -gt 0 ] && problems="$problems 有 $ahead 個 commit 尚未推送到 origin/$branch。"
-  elif [ "$branch" != "main" ] && [ -n "$(git log --oneline origin/main..HEAD 2>/dev/null | head -1)" ]; then
-    problems="$problems 分支 $branch 還沒推送到遠端。"
+  # Shallow single-branch clones may have no local origin/<branch> ref even after a push,
+  # so fall back to asking the remote directly.
+  if git rev-parse --verify --quiet "@{u}" >/dev/null 2>&1; then
+    remote_sha="$(git rev-parse "@{u}")"
+  else
+    remote_sha="$(timeout 20 git ls-remote origin "refs/heads/$branch" 2>/dev/null | cut -f1)"
+  fi
+  head_sha="$(git rev-parse HEAD)"
+  if [ -z "$remote_sha" ]; then
+    [ "$branch" != "main" ] && problems="$problems 分支 $branch 還沒推送到遠端。"
+  elif [ "$remote_sha" != "$head_sha" ] && ! git merge-base --is-ancestor HEAD "$remote_sha" 2>/dev/null; then
+    problems="$problems 有 commit 尚未推送到 origin/$branch。"
   fi
 fi
 
