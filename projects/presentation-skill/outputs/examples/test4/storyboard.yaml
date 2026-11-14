@@ -1,4 +1,4 @@
-meta: {title: 為什麼你的店需要 AI, theme: signal}
+meta: {title: 為什麼你的店需要 AI, theme: broadsheet}
 structure: {start: 店長覺得 AI 跟自己無關, destination: 願意試用三個月, axis: distance, direction: 遠 → 近, sensitivity: false}
 chapters:
   - {id: a, label: 全球}

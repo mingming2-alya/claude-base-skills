@@ -23,11 +23,22 @@ from deck_model import AXES, EMPH_RE, StoryboardError, load, main_slides, toc_mo
 from lint import lint  # noqa: E402
 
 THEMES_DIR = HERE.parent / "themes"
-FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
-         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900'
-         '&family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@500;700;900'
-         '&display=swap" rel="stylesheet">')
+FONT_BASE = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
+             '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>')
+THEME_ALIASES = {"paper": "editorial", "signal": "swiss", "ink": "midnight"}
+
+
+def fonts_link(*css_texts):
+    """Google Fonts <link> built from the '@fonts family=...' line(s) in theme files."""
+    fams = []
+    for css in css_texts:
+        for m in re.finditer(r"@fonts\s+([^\n*]+)", css):
+            for part in m.group(1).strip().split("&"):
+                if part.startswith("family=") and part not in fams:
+                    fams.append(part)
+    if not fams:
+        return FONT_BASE
+    return FONT_BASE + f'<link href="https://fonts.googleapis.com/css2?{"&".join(fams)}&display=swap" rel="stylesheet">'
 
 
 # ----------------------------------------------------------------------------- text helpers
@@ -45,14 +56,15 @@ def rich(s):
 # ----------------------------------------------------------------------------- theme
 def theme_css(theme, base_dir):
     if not theme:
-        theme = "paper"
+        theme = "editorial"
+    theme = THEME_ALIASES.get(theme, theme)
     p = Path(theme)
     candidates = [base_dir / p] if (theme.endswith(".css") or "/" in theme) else []
     candidates.append(THEMES_DIR / f"{theme}.css")
     for c in candidates:
         if c.exists():
             return c.read_text(encoding="utf-8"), c.stem
-    sys.exit(f"找不到主題「{theme}」。內建主題：{', '.join(x.stem for x in THEMES_DIR.glob('*.css'))}")
+    sys.exit(f"找不到主題「{theme}」。內建主題：{', '.join(sorted(x.stem for x in THEMES_DIR.glob('*.css')))}")
 
 
 # ----------------------------------------------------------------------------- motion
@@ -131,7 +143,7 @@ def render_pillars(s, motion):
     for i, p in enumerate(pillars):
         k = i if stagger == "down" else (len(pillars) - 1 - i if stagger == "up" else 0)
         items = "".join(f"<li>{rich(x)}</li>" for x in p.get("items", []))
-        stats = "".join(f'<div class="stat"><div class="sv">{rich(st.get("value"))}</div>'
+        stats = "".join(f'<div class="stat"><div class="sv">{number_html(st.get("value"))}</div>'
                         f'<div class="sl">{rich(st.get("label"))}</div></div>' for st in p.get("stats", []))
         link = f' data-link="{esc(p["link"])}"' if p.get("link") else ""
         more = '<span class="more">看細節 →</span>' if p.get("link") else ""
@@ -179,6 +191,23 @@ def render_status_table(s):
     return f"{summary}<table class='status-table'><thead>{head}</thead><tbody>{''.join(body)}</tbody></table>"
 
 
+NUM_RE = re.compile(r"^(?P<pre>[^\d]*?)(?P<num>[\d][\d.,]*)(?P<post>.*)$")
+
+
+def number_html(value):
+    """Big figure with a small unit: '38%' -> <span class=num>38</span><span class=unit>%</span>.
+    A value fully wrapped in ==...== keeps the accent."""
+    raw = str(value if value is not None else "")
+    em = raw.startswith("==") and raw.endswith("==") and len(raw) > 4
+    inner = raw[2:-2] if em else raw
+    m = NUM_RE.match(inner)
+    if not m or EMPH_RE.search(inner):
+        return rich(raw)
+    out = (esc(m.group("pre")) + f'<span class="num">{esc(m.group("num"))}</span>'
+           + (f'<span class="unit">{esc(m.group("post").strip())}</span>' if m.group("post").strip() else ""))
+    return f'<mark class="em">{out}</mark>' if em else out
+
+
 def source_line(s):
     return f'<p class="source">資料來源：{esc(s["source"])}</p>' if s.get("source") else ""
 
@@ -192,7 +221,7 @@ def render_layout(s, base_dir):
         return f'<div class="point"><p class="key rv{whole}">{rich(key)}</p>{sup}</div>'
     if lay == "number":
         note = f'<p class="note rv">{rich(s["note"])}</p>' if s.get("note") else ""
-        return (f'<div class="number"><div class="value rv">{rich(s.get("value"))}</div>'
+        return (f'<div class="number"><div class="value rv">{number_html(s.get("value"))}</div>'
                 f'<div class="label rv">{rich(s.get("label"))}</div>{note}</div>')
     if lay == "bullets":
         lis = "".join(f'<li class="rv">{rich(x)}</li>' for x in s.get("items", []))
@@ -209,7 +238,7 @@ def render_layout(s, base_dir):
             return f'<div class="col rv"><h3>{rich(v.get("heading"))}</h3><ul>{lis}</ul></div>'
         return f'<div class="compare">{col("left")}<div class="divider"></div>{col("right")}</div>'
     if lay == "quote":
-        src = f'<cite class="rv">— {rich(s["source"])}</cite>' if s.get("source") else ""
+        src = f'<cite class="rv">{rich(s["source"])}</cite>' if s.get("source") else ""
         return f'<blockquote class="quote"><p class="rv">{rich(s.get("text"))}</p>{src}</blockquote>'
     if lay == "image":
         cap = f'<p class="caption rv">{rich(s["caption"])}</p>' if s.get("caption") else ""
@@ -239,12 +268,16 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
         attrs += f' data-appendix="1" data-id="{esc(s.get("id"))}"'
         back = '<button class="back" type="button">← 返回</button>'
     pageno = f'<div class="pageno">{"附件" if rec.get("appendix") else f"{idx:02d}"}</div>'
+    frame = '<i class="frame-line"></i>'
+    deck_name = esc(re.sub(r"==", "", str(meta.get("short") or meta.get("title") or "")))
+    foot = (f'<footer class="foot"><span>{deck_name}</span>'
+            f'<span class="pg">{"附件" if rec.get("appendix") else f"{idx:02d} / {total:02d}"}</span></footer>')
     more = (f'<button class="more-btn" type="button" data-link="{esc(s["link"])}">看細節 →</button>'
             if s.get("link") else "")
 
     if kind == "status":
         cont = "（續）" if s.get("continued") else ""
-        return (f'<section class="slide status" {attrs}>{back}<header class="st-head">'
+        return (f'<section class="slide status" {attrs}>{frame}{back}<header class="st-head">'
                 f'<h2 class="title">{esc(s.get("title"))}{cont}</h2>'
                 f'<div class="legend"><span><i class="st-done"></i>已完成</span><span><i class="st-doing"></i>進行中</span>'
                 f'<span><i class="st-target"></i>目標</span><span class="dot dot-red"></span>需介入'
@@ -254,41 +287,47 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
     if kind == "overview":
         motion = motion_for(data["structure"])
         kicker = f'<div class="ov-kicker rv">{esc(s.get("title"))}</div>' if s.get("title") else ""
-        return (f'<section class="slide overview" {attrs}>{back}<header class="ov-head">{kicker}'
+        return (f'<section class="slide overview" {attrs}>{frame}{back}<header class="ov-head">{kicker}'
                 f'<h2 class="ov-headline rv">{rich(s.get("headline"))}</h2></header>'
                 f'{render_pillars(s, motion)}{source_line(s)}{more}</section>')
 
     if kind == "cover":
-        route = "".join(f'<span>{esc(c["label"])}</span>' for c in chapters)
-        parts = [f'<div class="kicker rv">{esc(meta.get("date", ""))}</div>' if meta.get("date") else "",
-                 f'<h1 class="cover-title rv">{rich(meta.get("title"))}</h1>',
-                 f'<p class="cover-sub rv">{rich(meta.get("subtitle"))}</p>' if meta.get("subtitle") else "",
-                 f'<p class="cover-meta rv">{esc(meta.get("presenter"))}</p>' if meta.get("presenter") else ""]
-        return (f'<section class="slide cover" {attrs}><div class="cover-inner">{"".join(parts)}</div>'
-                f'<div class="route rv">{route}</div></section>')
+        who = esc(meta.get("presenter") or "")
+        has_who = bool(who or meta.get("date"))
+        route = ((f'<div class="who"><i>{esc(meta.get("date", ""))}</i>{who}</div>' if has_who else "")
+                 + "".join(f'<div><i>{i + 1:02d}</i>{esc(c["label"])}</div>' for i, c in enumerate(chapters)))
+        parts = [f'<h1 class="cover-title rv">{rich(meta.get("title"))}</h1>',
+                 f'<p class="cover-sub rv">{rich(meta.get("subtitle"))}</p>' if meta.get("subtitle") else ""]
+        kicker = f'<div class="kicker rv">{esc(meta.get("kicker"))}</div>' if meta.get("kicker") else ""
+        return (f'<section class="slide cover" {attrs}>{frame}{kicker}<div class="cover-inner">{"".join(parts)}</div>'
+                f'<div class="route rv{"" if has_who else " no-who"}" style="--n:{len(chapters)}">{route}</div></section>')
 
     if kind == "toc":
         lis = "".join(f'<li class="{"on" if rec["chi"] in (-1, i) else "off"}"><span class="i">{i + 1:02d}</span>'
                       f'<span class="l">{esc(c["label"])}</span></li>' for i, c in enumerate(chapters))
-        return f'<section class="slide toc" {attrs}><ol class="toc-list">{lis}</ol>{pageno}</section>'
+        return f'<section class="slide toc" {attrs}>{frame}<ol class="toc-list">{lis}</ol></section>'
 
     if kind == "shock":
         sub = f'<p class="shock-sub">{rich(s["sub"])}</p>' if s.get("sub") else ""
-        return (f'<section class="slide shock" {attrs}><div class="shock-inner">'
+        return (f'<section class="slide shock" {attrs}>{frame}<div class="shock-inner">'
                 f'<p class="shock-text">{rich(s.get("text"))}</p>{sub}</div>{source_line(s)}</section>')
 
     if kind == "closing":
         sub = f'<p class="closing-sub rv">{rich(s["sub"])}</p>' if s.get("sub") else ""
-        return (f'<section class="slide closing" {attrs}><div class="closing-inner">'
+        return (f'<section class="slide closing" {attrs}>{frame}<div class="closing-inner">'
                 f'<p class="closing-text rv">{rich(s.get("text", ""))}</p>{sub}</div></section>')
 
     # content
     snav = static_nav(chapters, rec["chi"], rec["tab"], rec["tabs"], ch_sources[rec["chi"]])
     tabbed = " tabbed" if rec["tabs"] > 2 else ""
     attrs += f' data-tab="{rec["tab"]}" data-tabs="{rec["tabs"]}"'
-    return (f'<section class="slide content layout-{esc(s.get("layout"))}{tabbed}" {attrs}>{back}{snav}'
+    ghost = ""
+    if rec["tab"] == 0 and not rec.get("appendix") and 0 <= rec["chi"] < len(chapters):
+        ghost = f'<div class="ghost" aria-hidden="true">{esc(chapters[rec["chi"]]["label"])}</div>'
+    return (f'<section class="slide content layout-{esc(s.get("layout"))}{tabbed}" {attrs}>{frame}{ghost}{back}{snav}'
             f'<header class="slide-head"><h2 class="title">{esc(s.get("title"))}</h2></header>'
-            f'<div class="body">{render_layout(s, base_dir)}</div>{source_line(s)}{more}{pageno}</section>')
+            f'<div class="body">{render_layout(s, base_dir)}</div>'
+            f'{"" if s.get("layout") == "quote" else source_line(s)}{more}{foot}</section>')
 
 
 def render_slides(data, base_dir, records):
@@ -301,6 +340,7 @@ def render_slides(data, base_dir, records):
 # ----------------------------------------------------------------------------- page assembly
 def deck_html(data, base_dir):
     css_theme, _ = theme_css(data["meta"].get("theme"), base_dir)
+    fonts = fonts_link(css_theme)
     records = expand(data)
     slides = render_slides(data, base_dir, records)
     motion = motion_for(data["structure"])
@@ -316,7 +356,7 @@ def deck_html(data, base_dir):
         fmt=esc(data["meta"].get("format", "deck")),
         lang=esc(data["meta"].get("lang", "zh-Hant")),
         title=esc(re.sub(r"==", "", str(data["meta"].get("title", "Deck")))),
-        fonts=FONTS, theme=css_theme, base=BASE_CSS,
+        fonts=fonts, theme=css_theme, base=BASE_CSS,
         motion=motion, shape=toc_shape(motion),
         slides="\n".join(slides), deck=json.dumps(deck_json, ensure_ascii=False), runtime=RUNTIME_JS)
 
@@ -341,13 +381,30 @@ def samples_html(data, base_dir, themes):
     for n, th in enumerate(themes):
         css, stem = theme_css(th, base_dir)
         cls = f"t-{re.sub(r'[^a-z0-9]+', '-', stem.lower())}"
-        css_all.append(css.replace(":root", f".{cls}"))
+        css_all.append(scope_theme(css, cls))
         frames = "".join(f'<div class="frame"><div class="frame-inner {cls}">{slides[i]}</div></div>' for i in pick)
         blocks.append(f'<section class="sample"><h2><b>{roles[n]}</b> {esc(stem)}</h2><div class="row">{frames}</div></section>')
     return SAMPLES_PAGE.format(
-        lang=esc(data["meta"].get("lang", "zh-Hant")), fonts=FONTS, base=BASE_CSS,
+        lang=esc(data["meta"].get("lang", "zh-Hant")), fonts=fonts_link(*css_all), base=BASE_CSS,
         themes="\n".join(css_all), motion=motion, shape=toc_shape(motion),
         title=esc(re.sub(r"==", "", str(data["meta"].get("title", "")))), blocks="\n".join(blocks))
+
+
+def scope_theme(css, cls):
+    """Scope a theme file to one sample column: ':root' becomes '.cls', other rules get a '.cls ' prefix.
+    The '@fonts' line is kept (as a comment) so the samples page can still load the theme's fonts."""
+    fonts = "\n".join(f"/* @fonts {m} */" for m in re.findall(r"@fonts\s+([^\n*]+)", css))
+    body_css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    out = []
+    for sel, body in re.findall(r"([^{}]+)\{([^{}]*)\}", body_css):
+        sel = sel.strip()
+        if not sel:
+            continue
+        if sel == ":root":
+            out.append(f".{cls}{{{body}}}")
+        else:
+            out.append(",".join(f".{cls} {x.strip()}" for x in sel.split(",")) + f"{{{body}}}")
+    return fonts + "\n" + "\n".join(out)
 
 
 def r_src(rec):
@@ -355,342 +412,9 @@ def r_src(rec):
 
 
 # ----------------------------------------------------------------------------- templates
-BASE_CSS = r"""
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#000;overflow:hidden}
-#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
-#stage{position:relative;width:1920px;height:1080px;flex:none;transform-origin:center center;overflow:hidden;background:var(--bg)}
-.slide{position:absolute;inset:0;background:var(--bg);background-image:var(--texture);color:var(--fg);
-  font-family:var(--font-body);visibility:hidden;overflow:hidden}
-.slide.active{visibility:visible}
-mark.em{background:none;color:var(--accent);font-weight:var(--key-weight)}
-.source{position:absolute;left:140px;bottom:56px;font:400 22px/1.3 var(--font-body);color:var(--muted);max-width:1400px}
-.shock .source{color:inherit;opacity:.55}
-.pageno{position:absolute;right:120px;bottom:56px;font:500 22px/1 var(--font-body);color:var(--muted);letter-spacing:.08em}
+BASE_CSS = (HERE.parent / "assets" / "base.css").read_text(encoding="utf-8")
 
-/* persistent navigation (screen) */
-#nav{position:absolute;left:140px;right:140px;top:64px;z-index:5;display:flex;gap:56px;align-items:flex-end;
-  font:500 26px/1 var(--font-body);color:var(--muted);transition:opacity .3s}
-#nav span{position:relative;padding-bottom:16px;transition:color .4s}
-#nav span.on{color:var(--fg);font-weight:700}
-#nav .ind{position:absolute;bottom:0;height:3px;background:var(--fg);transition:left .55s cubic-bezier(.65,0,.35,1),width .55s cubic-bezier(.65,0,.35,1)}
-#nav::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--line);opacity:.6}
-#tabs{position:absolute;left:140px;top:128px;z-index:5;display:flex;gap:10px;font:500 20px/1 var(--font-body);color:var(--muted);transition:opacity .3s}
-#tabs span{padding:10px 18px;border:1px solid var(--line);border-radius:999px;transition:all .4s}
-#tabs span.on{color:var(--bg);background:var(--fg);border-color:var(--fg)}
-#stage.hide-nav #nav,#stage.hide-nav #tabs{opacity:0}
-#stage.no-trans *,#stage.no-trans{transition:none!important}
-.snav{display:none}
-
-/* content slides */
-.slide-head{position:absolute;left:140px;right:140px;top:170px}
-.content.tabbed .slide-head{top:210px}
-.title{font:var(--head-weight) 56px/1.2 var(--font-head);letter-spacing:.01em}
-.body{position:absolute;left:140px;right:140px;top:290px;bottom:130px;display:flex;flex-direction:column;justify-content:center}
-.content.tabbed .body{top:330px}
-
-.point .key{font:var(--key-weight) 104px/1.25 var(--font-head);letter-spacing:-.01em;max-width:1500px;text-wrap:balance}
-.point .key.whole{color:var(--accent)}
-.point .support{margin-top:48px;font:400 38px/1.5 var(--font-body);color:var(--muted);max-width:1400px}
-
-.number{display:grid;grid-template-columns:auto 1fr;column-gap:72px;align-items:end}
-.number .value{grid-row:1/3;font:var(--key-weight) 280px/0.9 var(--font-head);letter-spacing:-.04em}
-.number .label{font:700 52px/1.3 var(--font-head);align-self:end}
-.number .note{font:400 34px/1.5 var(--font-body);color:var(--muted);margin-top:16px;align-self:start;max-width:820px}
-
-.bullets{list-style:none;display:flex;flex-direction:column;gap:40px}
-.bullets li{font:500 50px/1.4 var(--font-body);padding-left:56px;position:relative}
-.bullets li::before{content:"";position:absolute;left:0;top:.62em;width:22px;height:3px;background:var(--fg)}
-
-.steps{list-style:none;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:48px;position:relative}
-.steps::before{content:"";position:absolute;left:0;right:0;top:44px;height:2px;background:var(--line)}
-.steps li{position:relative;padding-top:120px}
-.steps .n{position:absolute;top:0;left:0;width:88px;height:88px;border-radius:50%;background:var(--bg);border:2px solid var(--fg);
-  display:flex;align-items:center;justify-content:center;font:700 32px/1 var(--font-body)}
-.steps .t{font:500 44px/1.4 var(--font-body);display:block}
-
-.compare{display:grid;grid-template-columns:1fr 2px 1fr;gap:96px;align-items:stretch}
-.compare .divider{background:var(--line)}
-.compare h3{font:700 44px/1.2 var(--font-head);color:var(--muted);margin-bottom:44px}
-.compare .col:last-child h3{color:var(--fg)}
-.compare ul{list-style:none;display:flex;flex-direction:column;gap:32px}
-.compare li{font:500 46px/1.4 var(--font-body)}
-
-.quote{max-width:1500px}
-.quote p{font:var(--head-weight) 76px/1.4 var(--font-head);text-wrap:balance}
-.quote::before{content:"“";display:block;font:700 200px/1 var(--font-head);height:110px;color:var(--muted);opacity:.45}
-.quote cite{display:block;margin-top:56px;font:400 34px/1.4 var(--font-body);color:var(--muted);font-style:normal}
-
-.image{display:grid;grid-template-columns:3fr 2fr;gap:80px;align-items:center;height:100%}
-.image .img{height:100%;border-radius:var(--radius);overflow:hidden;background:var(--line)}
-.image img{width:100%;height:100%;object-fit:cover;display:block}
-.image .caption{font:500 44px/1.45 var(--font-body)}
-
-/* overview: one-page summary with pillars; column height encodes the axis */
-.ov-head{position:absolute;left:140px;right:140px;top:84px}
-.ov-kicker{font:600 26px/1.2 var(--font-body);color:var(--muted);letter-spacing:.08em;margin-bottom:20px}
-.ov-headline{font:var(--key-weight) 96px/1.15 var(--font-head);letter-spacing:-.01em;text-wrap:balance}
-.pillars{position:absolute;left:140px;right:140px;top:330px;bottom:96px;display:grid;
-  grid-template-columns:repeat(var(--n),1fr);gap:40px;align-items:start}
-.pillar{margin-top:calc(var(--k) * 64px);padding:34px 36px 38px;border-top:4px solid var(--fg);
-  background:color-mix(in srgb,var(--fg) 4%,transparent);border-radius:0 0 var(--radius) var(--radius);position:relative}
-.pillar[data-link]{cursor:pointer}
-.pillar[data-link]:hover{background:color-mix(in srgb,var(--fg) 7%,transparent)}
-.pk{font:600 22px/1.2 var(--font-body);color:var(--muted);letter-spacing:.06em;margin-bottom:14px}
-.pillar h3{font:var(--head-weight) 46px/1.2 var(--font-head)}
-.psub{margin-top:14px;font:400 26px/1.45 var(--font-body);color:var(--muted)}
-.pillar ul{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:10px}
-.pillar li{font:500 26px/1.4 var(--font-body);padding-left:22px;position:relative}
-.pillar li::before{content:"";position:absolute;left:0;top:.65em;width:10px;height:2px;background:var(--fg)}
-.stats{display:flex;flex-wrap:wrap;gap:22px 40px;margin-top:28px}
-.sv{font:var(--key-weight) 64px/1 var(--font-head);letter-spacing:-.02em}
-.sl{margin-top:8px;font:400 22px/1.3 var(--font-body);color:var(--muted)}
-.more{display:inline-block;margin-top:24px;font:600 22px/1 var(--font-body);color:var(--muted)}
-.more-btn{position:absolute;right:240px;bottom:44px;font:600 22px/1 var(--font-body);color:var(--fg);background:none;
-  border:1px solid var(--line);border-radius:999px;padding:12px 22px;cursor:pointer;z-index:6}
-.back{position:absolute;right:120px;top:48px;font:600 22px/1 var(--font-body);color:var(--fg);background:var(--bg);
-  border:1px solid var(--line);border-radius:999px;padding:12px 22px;cursor:pointer;z-index:6}
-[data-format=section] .pageno{display:none}
-
-/* status overview: grouped table with shared lifecycle stages, risk and support */
-.st-head{position:absolute;left:80px;right:80px;top:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
-.legend{display:flex;align-items:center;gap:14px;font:500 20px/1 var(--font-body);color:var(--muted);white-space:nowrap}
-.legend span{display:inline-flex;align-items:center;gap:8px}
-.legend i{width:14px;height:14px;border-radius:50%;display:inline-block}
-.st-body{position:absolute;left:80px;right:80px;top:140px;bottom:90px;overflow:hidden}
-.st-summary{list-style:none;margin-bottom:18px;padding:16px 22px;border-left:4px solid var(--fg);
-  background:color-mix(in srgb,var(--fg) 4%,transparent);display:grid;gap:6px}
-.st-summary li{font:500 22px/1.4 var(--font-body)}
-.status-table{width:100%;border-collapse:collapse;font:400 20px/1.25 var(--font-body)}
-.status-table th{font:600 20px/1.2 var(--font-body);color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--line)}
-.status-table td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-.status-table tr.grp td{font:700 21px/1.2 var(--font-body);padding-top:14px;border-bottom:2px solid var(--fg)}
-.g-note{margin-left:14px;font-weight:400;color:var(--muted)}
-.c-name{font-weight:600;min-width:280px}
-.c-owner{color:var(--muted);white-space:nowrap}
-.st{white-space:nowrap;color:var(--muted)}
-.st i,.legend i{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:middle}
-.st-done i,.legend .st-done{background:var(--fg)}
-.st-done{color:var(--fg)}
-.st-doing i,.legend .st-doing{background:var(--accent)}
-.st-doing{color:var(--fg);font-weight:600}
-.st-target i,.legend .st-target{background:transparent;border:2px solid var(--muted)}
-.st-na i{display:none}
-.c-prog{white-space:nowrap;font-weight:600}
-.bar{display:inline-block;width:90px;height:10px;border-radius:5px;background:var(--line);margin-right:10px;vertical-align:middle;overflow:hidden}
-.bar span{display:block;height:100%;background:var(--fg)}
-.c-risk{white-space:nowrap}
-.dot{display:inline-block;width:16px;height:16px;border-radius:50%;margin-right:8px;vertical-align:middle}
-.dot-red{background:#D7262E}.dot-yellow{background:#E8A317}.dot-green{background:#2E9D5B}
-tr.rk-red td.c-name{box-shadow:inset 6px 0 0 #D7262E;padding-left:16px}
-.c-sup{color:var(--fg);max-width:420px}
-.status .source{left:80px}
-
-/* cover / closing */
-.cover-inner{position:absolute;left:140px;right:140px;top:0;bottom:200px;display:flex;flex-direction:column;justify-content:center}
-.kicker{font:600 28px/1 var(--font-body);color:var(--muted);letter-spacing:.2em;margin-bottom:48px}
-.cover-title{font:var(--key-weight) 132px/1.12 var(--font-head);letter-spacing:-.01em;max-width:1600px;text-wrap:balance}
-.cover-sub{margin-top:44px;font:400 48px/1.4 var(--font-body);color:var(--muted)}
-.cover-meta{margin-top:72px;font:500 30px/1.4 var(--font-body)}
-.route{position:absolute;left:140px;right:140px;bottom:96px;display:flex;gap:0;font:500 26px/1 var(--font-body);color:var(--muted);
-  border-top:1px solid var(--line);padding-top:32px}
-.route span{flex:1}
-.route span+span{padding-left:32px}
-.closing-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.closing-text{font:var(--key-weight) 140px/1.1 var(--font-head)}
-.closing-sub{margin-top:40px;font:400 40px/1.4 var(--font-body);color:var(--muted)}
-
-/* TOC highlight pages: shape follows the axis */
-.toc .toc-list{list-style:none;position:absolute;inset:0;display:flex;padding:0 140px}
-.toc li{transition:opacity .6s}
-.toc li.off{opacity:.28}
-.toc .i{font:600 30px/1 var(--font-body);color:var(--muted);display:block;margin-bottom:24px;letter-spacing:.1em}
-.toc .l{font:var(--head-weight) 72px/1.15 var(--font-head)}
-.toc li.on .l{font-weight:var(--key-weight)}
-[data-shape=row] .toc .toc-list{align-items:center;gap:0}
-[data-shape=row] .toc li{flex:1;border-top:3px solid var(--line);padding-top:40px;margin-right:48px}
-[data-shape=row] .toc li.on{border-top-color:var(--fg)}
-[data-shape=column] .toc .toc-list{flex-direction:column;justify-content:center;gap:44px}
-[data-shape=column] .toc li{display:flex;align-items:baseline;gap:40px;border-left:4px solid transparent;padding-left:40px}
-[data-shape=column] .toc li.on{border-left-color:var(--fg)}
-[data-shape=column] .toc .i{margin:0}
-[data-shape=rings] .toc .toc-list{align-items:center;justify-content:center}
-[data-shape=rings] .toc li{position:absolute;left:50%;top:50%;border:2px solid var(--line);border-radius:50%;transform:translate(-50%,-50%);
-  width:calc(var(--r) * 1px);height:calc(var(--r) * 1px);display:flex;align-items:flex-start;justify-content:center;padding-top:36px}
-[data-shape=rings] .toc li.on{border-color:var(--fg);border-width:3px}
-[data-shape=rings] .toc .i{display:none}
-[data-shape=rings] .toc .l{font-size:44px}
-[data-shape=rings] .toc li.off{opacity:.35}
-
-/* shock pages: break every rule */
-.shock{background:var(--shock-bg);background-image:none;color:var(--shock-fg)}
-.shock-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 160px}
-.shock-text{font:var(--key-weight) 132px/1.18 var(--font-head);letter-spacing:-.01em;text-wrap:balance}
-.shock-text mark.em{color:inherit;text-decoration:underline;text-decoration-thickness:.06em;text-underline-offset:.16em}
-.shock-sub{margin-top:48px;font:400 40px/1.4 var(--font-body);opacity:.7}
-#curtain{position:absolute;inset:0;background:#000;z-index:20;opacity:0;pointer-events:none}
-
-#notes{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(0,0,0,.86);color:#eee;font:400 20px/1.6 system-ui,sans-serif;
-  padding:18px 28px;display:none;max-height:30vh;overflow:auto;white-space:pre-wrap}
-#notes.show{display:block}
-#hint{position:fixed;right:16px;bottom:12px;z-index:31;color:#888;font:12px/1.4 system-ui,sans-serif;opacity:.0;transition:opacity .4s}
-body:hover #hint{opacity:.7}
-
-/* static mode: samples and print */
-.static .slide{position:relative;visibility:visible;width:1920px;height:1080px}
-.static .snav{display:block;position:absolute;left:140px;right:140px;top:64px}
-.static .slabels{display:flex;gap:56px;font:500 26px/1 var(--font-body);color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:16px}
-.static .slabels span.on{color:var(--fg);font-weight:700;box-shadow:0 19px 0 -16px var(--fg)}
-.static .stabs{display:flex;gap:10px;margin-top:32px;font:500 20px/1 var(--font-body);color:var(--muted)}
-.static .stabs span{padding:10px 18px;border:1px solid var(--line);border-radius:999px}
-.static .stabs span.on{color:var(--bg);background:var(--fg);border-color:var(--fg)}
-
-@media print{
-  @page{size:1920px 1080px;margin:0}
-  html,body{height:auto;overflow:visible;background:none}
-  #viewport{position:static;display:block}
-  #stage{transform:none!important;width:1920px;height:auto;overflow:visible}
-  #nav,#tabs,#curtain,#notes,#hint,.back,.more-btn{display:none!important}
-  .slide{position:relative;visibility:visible!important;width:1920px;height:1080px;break-after:page;opacity:1!important;transform:none!important}
-  .slide *{opacity:1!important;transform:none!important}
-  .snav{display:block;position:absolute;left:140px;right:140px;top:64px}
-  .slabels{display:flex;gap:56px;font:500 26px/1 var(--font-body);color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:16px}
-  .slabels span.on{color:var(--fg);font-weight:700}
-  .stabs{display:flex;gap:10px;margin-top:32px;font:500 20px/1 var(--font-body);color:var(--muted)}
-  .stabs span{padding:10px 18px;border:1px solid var(--line);border-radius:999px}
-  .stabs span.on{color:var(--bg);background:var(--fg)}
-  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
-"""
-
-RUNTIME_JS = r"""
-(function(){
-const stage=document.getElementById('stage'), slides=[...document.querySelectorAll('.slide')];
-const nav=document.getElementById('nav'), tabsEl=document.getElementById('tabs'), curtain=document.getElementById('curtain');
-const notesEl=document.getElementById('notes');
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const M=DECK.motion; let cur=-1, busy=false, returnTo=[];
-const isApp=i=>slides[i] && slides[i].dataset.appendix==='1';
-function step(d){
-  if(isApp(cur)){ back(); return; }
-  let n=cur+d; while(n>=0 && n<slides.length && isApp(n)) n+=d;
-  if(n>=0 && n<slides.length) go(n);
-}
-function openLink(id){
-  const n=slides.findIndex(s=>s.dataset.appendix==='1' && s.dataset.id===id);
-  if(n<0) return;
-  if(!isApp(cur)) returnTo.push(cur);
-  go(n);
-}
-function back(){ const n=returnTo.length?returnTo.pop():0; go(n); }
-
-// rings TOC radii
-document.querySelectorAll('[data-shape=rings] .toc-list').forEach(ol=>{
-  const lis=[...ol.children], n=lis.length;
-  const big=M==='zoom-in';
-  lis.forEach((li,i)=>{const k=big? i : n-1-i; li.style.setProperty('--r', 940-k*(700/Math.max(1,n-1)));});
-});
-
-function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform='scale('+s+')';}
-addEventListener('resize',fit);fit();
-
-// persistent navigation: one object that lives across the whole deck
-nav.innerHTML=DECK.chapters.map(l=>'<span>'+l.replace(/</g,'&lt;')+'</span>').join('')+'<i class="ind"></i>';
-const labels=[...nav.querySelectorAll('span')], ind=nav.querySelector('.ind');
-function setNav(sl){
-  const kind=sl.dataset.kind, chi=+sl.dataset.chi;
-  const hide=!(kind==='content');
-  stage.classList.toggle('hide-nav',hide);
-  if(hide){tabsEl.style.opacity=0;return;}
-  labels.forEach((l,i)=>l.classList.toggle('on',i===chi));
-  const on=labels[chi]; ind.style.left=on.offsetLeft+'px'; ind.style.width=on.offsetWidth+'px';
-  const tabs=+sl.dataset.tabs, tab=+sl.dataset.tab;
-  if(tabs>2){
-    if(tabsEl.dataset.chi!=chi){tabsEl.innerHTML=DECK.tabs[chi].map(t=>'<span>'+String(t).replace(/</g,'&lt;')+'</span>').join('');tabsEl.dataset.chi=chi;}
-    [...tabsEl.children].forEach((t,i)=>t.classList.toggle('on',i===tab));
-    tabsEl.style.opacity=1;
-  } else {tabsEl.style.opacity=0;}
-}
-
-function vec(dir){ // enter transform for the incoming slide on a chapter change
-  const s=dir;
-  if(M==='vertical') return ['translateY('+(8*s)+'%)','translateY('+(-8*s)+'%)'];
-  if(M==='zoom-in') return s>0?['scale(.88)','scale(1.14)']:['scale(1.14)','scale(.88)'];
-  if(M==='zoom-out') return s>0?['scale(1.14)','scale(.88)']:['scale(.88)','scale(1.14)'];
-  return ['translateX('+(8*s)+'%)','translateX('+(-8*s)+'%)'];
-}
-function reveal(sl,delay){
-  if(reduce) return;
-  sl.querySelectorAll('.rv').forEach((el,i)=>el.animate(
-    [{opacity:0,transform:'translateY(14px)'},{opacity:1,transform:'none'}],
-    {duration:520,delay:delay+i*70,easing:'cubic-bezier(.2,.7,.2,1)',fill:'backwards'}));
-}
-function showNotes(sl){notesEl.textContent=sl.dataset.notes||'（這頁沒有講者備註）';}
-
-async function go(n,instant){
-  n=Math.max(0,Math.min(slides.length-1,n));
-  if(n===cur||busy) return;
-  const prev=slides[cur], next=slides[n], dir=n>cur?1:-1;
-  busy=true;
-  const instantly=instant||reduce||!prev;
-  const chapterChange=prev && (next.dataset.kind==='toc' || prev.dataset.kind==='toc' ||
-     (next.dataset.chi!==prev.dataset.chi && +next.dataset.chi>=0 && +prev.dataset.chi>=0));
-  if(instantly){
-    stage.classList.add('no-trans');
-    if(prev) prev.classList.remove('active');
-    next.classList.add('active'); setNav(next);
-    stage.offsetWidth; requestAnimationFrame(()=>requestAnimationFrame(()=>stage.classList.remove('no-trans')));
-  } else if(next.dataset.kind==='shock' && dir>0){
-    // cut to black, hold (the speaker's pause), then let the line surface
-    stage.classList.add('hide-nav');
-    await curtain.animate([{opacity:0},{opacity:1}],{duration:260,fill:'forwards'}).finished;
-    prev.classList.remove('active'); next.classList.add('active');
-    await new Promise(r=>setTimeout(r,520));
-    curtain.animate([{opacity:1},{opacity:0}],{duration:380,fill:'forwards'});
-    next.querySelector('.shock-text').animate([{opacity:0,transform:'translateY(24px)',filter:'blur(6px)'},{opacity:1,transform:'none',filter:'none'}],
-      {duration:1100,delay:200,easing:'cubic-bezier(.2,.7,.2,1)',fill:'backwards'});
-    const sub=next.querySelector('.shock-sub');
-    if(sub) sub.animate([{opacity:0},{opacity:.7}],{duration:700,delay:1300,fill:'backwards'});
-    setNav(next);
-  } else if(chapterChange){
-    const [inT,outT]=vec(dir);
-    await prev.animate([{opacity:1,transform:'none'},{opacity:0,transform:outT}],{duration:380,easing:'cubic-bezier(.55,0,.75,.2)'}).finished;
-    prev.classList.remove('active'); next.classList.add('active'); setNav(next);
-    next.animate([{opacity:0,transform:inT},{opacity:1,transform:'none'}],{duration:620,easing:'cubic-bezier(.2,.7,.2,1)'});
-    reveal(next,200);
-  } else {
-    // nothing crossfades on top of anything: the old page leaves first, fast
-    await prev.animate([{opacity:1},{opacity:0}],{duration:160}).finished;
-    prev.classList.remove('active'); next.classList.add('active'); setNav(next);
-    next.animate([{opacity:0},{opacity:1}],{duration:280});
-    reveal(next,60);
-  }
-  cur=n; showNotes(next);
-  history.replaceState(null,'','#'+(n+1));
-  busy=false;
-}
-
-addEventListener('keydown',e=>{
-  const k=e.key;
-  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)){e.preventDefault();step(1);}
-  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();step(-1);}
-  else if(k==='Escape' && isApp(cur)){e.preventDefault();back();}
-  else if(k==='Home') go(0); else if(k==='End') go(slides.length-1);
-  else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
-  else if(k==='n'||k==='N') notesEl.classList.toggle('show');
-  else if(k==='p'||k==='P') print();
-});
-addEventListener('click',e=>{
-  if(e.target.closest('#notes')) return;
-  const b=e.target.closest('.back'); if(b){ back(); return; }
-  const l=e.target.closest('[data-link]'); if(l){ openLink(l.dataset.link); return; }
-  step(e.clientX>innerWidth/3?1:-1);
-});
-const start=parseInt((location.hash||'#1').slice(1),10)||1;
-go(start-1,true);
-window.__deck={go:(n)=>go(n,true),count:slides.length,get index(){return cur;}};
-})();
-"""
+RUNTIME_JS = (HERE.parent / "assets" / "runtime.js").read_text(encoding="utf-8")
 
 PAGE = """<!doctype html>
 <html lang="{lang}" data-shape="{shape}" data-motion="{motion}" data-format="{fmt}">

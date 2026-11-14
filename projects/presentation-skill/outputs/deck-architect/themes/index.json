@@ -1,0 +1,18 @@
+{
+  "_note": "Theme metadata for choosing three genuinely different sample directions. Match on tone, not industry.",
+  "editorial": {"name": "編輯", "mood": ["知性", "沉穩", "雜誌感"], "formality": "medium-high", "scheme": "light", "density": "medium",
+    "best_for": "年度成果、經驗分享、科普、策略說明、需要被認真閱讀的簡報",
+    "avoid_for": "需要強烈科技感或極度活潑的場合"},
+  "swiss": {"name": "瑞士", "mood": ["理性", "俐落", "可信"], "formality": "high", "scheme": "light", "density": "medium-high",
+    "best_for": "會議簡報、提案、客戶洽談、數據與進度回報",
+    "avoid_for": "情感型、溫柔、需要人味的主題"},
+  "midnight": {"name": "深夜", "mood": ["高級", "沉穩", "有份量"], "formality": "high", "scheme": "dark", "density": "low",
+    "best_for": "發表會、活動開場、高階主管場合、品牌型簡報",
+    "avoid_for": "白天明亮會議室長時間閱讀、資訊密度高的會議"},
+  "broadsheet": {"name": "號外", "mood": ["大膽", "直接", "新聞感"], "formality": "medium", "scheme": "dark", "density": "low",
+    "best_for": "要被記住的提案、內部推廣、活動、觀點分享",
+    "avoid_for": "正式財報、需要低調的場合"},
+  "washi": {"name": "和紙", "mood": ["溫暖", "手作", "有人味"], "formality": "low-medium", "scheme": "light", "density": "low",
+    "best_for": "經驗分享、個人成長、科普、文化與教育",
+    "avoid_for": "數據密集的會議、需要極度正式的場合"}
+}

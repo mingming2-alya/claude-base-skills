@@ -7,7 +7,7 @@ meta:
   subtitle: 從困境到轉型的一年      # 封面副標（可省略）
   presenter: 王小明 · 產品部        # 封面講者（可省略）
   date: 2026.12                     # 封面日期（可省略）
-  theme: paper                      # paper / signal / ink，或自訂主題的相對路徑 ./theme.css
+  theme: editorial                  # editorial / swiss / midnight / broadsheet / washi，或自訂主題 ./theme.css
   minutes: 15                       # 總時長（分鐘），lint 會檢查頁數與各章時間
   pages: 12                         # 頁數上限（含封面與自動目錄頁），可省略
   lang: zh-Hant

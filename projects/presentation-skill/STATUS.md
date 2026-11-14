@@ -6,7 +6,8 @@ _最後更新：2026-11-14_
 
 ## 目前在哪
 
-- **deck-architect v1.0**（2026-11-14）：v1 四次迭代的修正全部套用完成，見下方 v1 進度。
+- **deck-architect v2.0**（2026-11-14）：階段 2 設計系統重建，見 ROADMAP 與 LOG。
+- deck-architect v1.0（2026-11-14）：v1 四次迭代的修正全部套用完成，見下方 v1 進度。
 - deck-architect v0 已完成：流程骨架、lint、HTML 簡報產生器、三種主題、樣張頁、品管腳本。原始碼在 `outputs/deck-architect/`，安裝包 `outputs/deck-architect.skill`，範例在 `outputs/examples/`。
 - 專案同步規則已建立：根目錄 `CLAUDE.md`＋Stop hook（`.claude/hooks/check-sync.sh`）。
 
@@ -54,7 +55,8 @@ _最後更新：2026-11-14_
 
 > 主軸以 `ROADMAP.md` 為準。
 
-1. **階段 2：設計美感**（使用者決定）。深讀頂尖 Skill 的設計檔與參考檔，先確認授權，再重建設計系統、主題、版型。
+1. **階段 2 待使用者驗收**：deck-architect v2 設計系統（5 套主題、新版型、對比檢查）。對照圖在 `outputs/examples/before-after-v2.png`。
+2. 驗收後進入階段 3：畫面活起來（動態背景、元素跨頁延續、滾動數字、插畫流程）。
 
 ## 待使用者決定
 

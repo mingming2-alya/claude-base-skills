@@ -2,7 +2,7 @@
 # 內容為虛構示意，非真實資料。
 meta:
   title: 年度成果（示範）
-  theme: signal
+  theme: swiss
   format: section          # section：作為大簡報的一章，不需要封面、不顯示頁碼
   minutes: 5
 

@@ -6,53 +6,78 @@
 
 ## 怎麼挑三個方向
 
-三個方向要真的不同，不要給三個只差顏色的版本：
+三個方向要**真的不同**：不同的明暗、不同的字體聲音、不同的突出色用法。不要給三個只差顏色的版本。
 
-- **穩健**：最符合 brief 調性、最不會出錯的
+- **穩健**：最符合 brief 調性、最不會出錯
 - **大膽**：同樣適合內容，但更有個性、更搶眼
-- **驚喜**：使用者可能沒想過、但說得出理由的
+- **驚喜**：使用者可能沒想過、但說得出理由
 
-內建主題：
+依**調性**挑，不要依產業挑。完整的調性資料在 `themes/index.json`（mood、formality、scheme、density、best_for、avoid_for）。
 
 | 主題 | 調性 | 適合 | 避免用在 |
 |---|---|---|---|
-| `paper` | 溫暖、編輯感、米白紙張、襯線標題 | 經驗分享、科普、個人成長、年度成果 | 需要強烈科技感或極度正式的場合 |
-| `signal` | 瑞士風、白底、大字、紅色重點、俐落 | 提案、會議、客戶洽談、數據型簡報 | 情感型、溫柔的主題 |
-| `ink` | 深色、沉穩、高級、金色重點 | 發表會、活動開場、高階主管、品牌型 | 白天會議室投影（深色在亮環境會灰掉）、長時間閱讀 |
+| `editorial` 編輯 | 知性、沉穩、雜誌感。襯線展示字、米灰紙色、故宮朱 | 年度成果、經驗分享、科普、策略說明 | 需要強烈科技感或極度活潑的場合 |
+| `swiss` 瑞士 | 理性、俐落、可信。大字變細、髮絲線、12 欄網格紋理、克萊因藍 | 會議、提案、客戶洽談、數據與進度回報 | 情感型、需要人味的主題 |
+| `midnight` 深夜 | 高級、有份量。深墨底、地平線光暈、內縮髮絲框、暖金 | 發表會、活動開場、高階主管場合 | 明亮會議室長時間閱讀、資訊密度高的會議 |
+| `broadsheet` 號外 | 大膽、直接、新聞感。超大粗黑體，封面與結尾整頁換成火橘 | 要被記住的提案、內部推廣、觀點分享 | 正式財報、需要低調的場合 |
+| `washi` 和紙 | 溫暖、手作、有人味。楷體、剪紙卡片、逐格貼上的進場、藍染靛 | 經驗分享、個人成長、科普、文化與教育 | 數據密集的會議、極度正式的場合 |
 
-依 brief 從內建主題挑三個並決定各自扮演的角色。如果內建主題都不適合「驚喜」這個角色，可以寫一個自訂主題。
+舊名稱仍可使用：`paper` → editorial、`signal` → swiss、`ink` → midnight。
 
 ## 產生樣張
 
 ```bash
-python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples paper,signal,ink
+python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples editorial,swiss,broadsheet
 ```
 
-樣張使用使用者真實的標題與內容：封面、第一個有重點的內容頁、震撼頁（若有）。打開 `samples.html` 給使用者看，請他選一個，或告訴你要怎麼混搭。
+樣張用使用者真實的標題與內容，每個方向各一張：封面、第一個有重點的內容頁、震撼頁（若有）。打開 `samples.html` 給使用者看，請他選一個，或說明要怎麼混搭。
 
 ## 自訂主題
 
-主題是一個 CSS 檔，只定義變數。複製 `themes/paper.css` 到 `decks/<name>/theme.css`，修改變數，然後在 storyboard 寫 `meta.theme: ./theme.css`（相對於 storyboard 的路徑）。
+主題是一個 CSS 檔，主要是變數，另可附少量招牌樣式（例如 washi 的剪紙卡片）。做法：
+1. 複製最接近的主題到 `decks/<name>/theme.css`
+2. 修改變數
+3. 在 storyboard 寫 `meta.theme: ./theme.css`（相對於 storyboard 的路徑）
+
+**第一行註解要寫 `@fonts family=...`**（Google Fonts 的 family 參數），build 會自動載入這些字體。也要寫一句**色彩理由**：為什麼是這個顏色？寫不出來，代表你在套公式。
 
 變數契約（全部都要定義）：
 
 ```css
 :root {
-  --bg: ;            /* 一般頁背景 */
-  --fg: ;            /* 主要文字 */
-  --muted: ;         /* 次要文字、未點亮的導航 */
-  --accent: ;        /* 突出色：只給重點用 */
-  --accent-ink: ;    /* 放在突出色色塊上的文字顏色 */
-  --line: ;          /* 分隔線、頁籤底線 */
-  --shock-bg: ;      /* 震撼頁背景（通常與 --bg 反差大） */
-  --shock-fg: ;      /* 震撼頁文字 */
-  --font-head: ;     /* 標題字體堆疊 */
-  --font-body: ;     /* 內文字體堆疊 */
-  --head-weight: ;   /* 標題字重 */
-  --key-weight: ;    /* 重點字重 */
-  --radius: ;        /* 圓角 */
-  --texture: ;       /* 背景紋理，可為 none 或 gradient */
+  /* 表面與文字：三階文字色在 --bg 上都要達到 4.5:1 */
+  --bg: ; --bg-2: ;
+  --fg: ; --fg-2: ; --fg-3: ;
+  --line: ;            /* 強線（段落、表頭） */
+  --line-2: ;          /* 弱線（列分隔、框架），通常是 fg 的 12–18% 透明度 */
+  /* 突出色：用途固定（重點、數字、條列記號、唯一被強調的項目） */
+  --accent: ;          /* 色塊、短線 */
+  --accent-text: ;     /* 小字用的突出色（在 --bg 上 4.5:1） */
+  --accent-ink: ;      /* 放在 --accent 色塊上的文字（4.5:1） */
+  --shock-bg: ; --shock-fg: ;
+  /* 三種字體聲音 */
+  --font-display: ; --font-quote: ; --font-number: ;
+  --font-body: ;       /* 拉丁字體放前面，中文字體放後面 */
+  --font-label: ;      /* 框架字：頁尾、頁碼、標籤、來源 */
+  --display-weight: ; --title-weight: ; --quote-weight: ; --number-weight: ; --numeral-weight: ;
+  --display-tracking: ; --title-tracking: ; --label-tracking: ;   /* 中文用 0 或接近 0 */
+  /* 質感 */
+  --radius: ;          /* 建議 0 */
+  --grain: ; --grain-blend: ;      /* 淺色 multiply .08–.13；深色 screen 或 overlay .08–.12；0 為關閉 */
+  --ghost: ;           /* 章節浮水印透明度 .03–.05 */
+  --surface: ;         /* 背景光層或紋理，可為 none */
+  --enter-easing: ;    /* 進場緩動，例如 cubic-bezier(.16,1,.3,1)；steps(5) 會變成逐格貼上 */
 }
 ```
 
-`--accent` 與 `--bg`、`--shock-fg` 與 `--shock-bg` 的對比要足夠（至少 4.5:1），因為投影機會讓對比再掉一截。
+選用變數：
+- `--cover-bg`、`--cover-fg`、`--cover-fg-2`、`--cover-fg-3`、`--cover-line`、`--cover-accent`：封面與結尾的環境色
+- `--frame`：內縮 36px 的髮絲框顏色
+
+做完後用 `check.mjs` 跑一次，它會檢查文字對比，對比不足的地方會逐行列出。
+
+**禁用**（研究顯示這些是「AI 模板」的訊號）：
+- 用 Inter、Roboto、Space Grotesk、Playfair Display 當展示字
+- 紫色漸層、#6366f1
+- 純白 #FFF 或純黑 #000 背景
+- 裝飾性陰影、圖片加粗框

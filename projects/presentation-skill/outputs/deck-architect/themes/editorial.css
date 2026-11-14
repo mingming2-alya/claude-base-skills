@@ -1,0 +1,19 @@
+/* editorial（編輯）— 知性、沉穩的雜誌編輯感。襯線展示字 × 黑體內文 × 等寬框架字；一個故宮朱作突出色。
+   @fonts family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,700
+   色彩理由：故宮朱（低明度、低彩度的朱紅），在米灰紙色上有印刷感而不刺眼。 */
+:root{
+  --bg:#F2EFE8; --bg-2:#E8E3D8;
+  --fg:#1B1915; --fg-2:#4A463E; --fg-3:#6F6B62;
+  --line:#1B1915; --line-2:rgba(27,25,21,.16);
+  --accent:#B23A2B; --accent-text:#A3311F; --accent-ink:#FBF6EE;
+  --shock-bg:#1B1915; --shock-fg:#F2EFE8;
+  --font-display:"Newsreader","Noto Serif TC","Songti TC","PMingLiU",serif;
+  --font-quote:var(--font-display); --font-number:"Newsreader","Noto Serif TC",serif;
+  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
+  --display-weight:900; --title-weight:700; --quote-weight:700; --number-weight:700; --numeral-weight:500;
+  --display-tracking:-.015em; --title-tracking:0; --label-tracking:.06em;
+  --radius:0px; --grain:.10; --grain-blend:multiply; --ghost:.035;
+  --surface:radial-gradient(1400px 900px at 90% -10%,rgba(178,58,43,.05),transparent 60%),radial-gradient(1200px 800px at -10% 110%,rgba(27,25,21,.05),transparent 60%);
+  --enter-easing:cubic-bezier(.16,1,.3,1);
+}

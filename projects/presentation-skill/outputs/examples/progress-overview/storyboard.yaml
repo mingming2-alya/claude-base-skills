@@ -1,7 +1,7 @@
 # 範例：AI 專案群的週進度總覽（兩頁，status-table）。內容為虛構示意，非真實資料。
 meta:
   title: 數位專案群 · 週進度總覽
-  theme: ink
+  theme: midnight
   format: section
   minutes: 3
 

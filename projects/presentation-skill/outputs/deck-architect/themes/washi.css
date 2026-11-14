@@ -1,0 +1,33 @@
+/* washi（和紙）— 溫暖、手作、有人味。和紙底色、楷體展示字、藍染靛突出色；重點以「剪紙」卡片呈現，逐格（steps）貼上。
+   @fonts family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500
+   色彩理由：藍染靛＋和紙米色是傳統手工印染的配色，溫暖但不甜；適合經驗分享、個人成長、科普。
+   紙藝手法改寫自 Jane-xiaoer/paper-collage-ppt（MIT）。 */
+:root{
+  --bg:#EDE4D3; --bg-2:#E2D6C0;
+  --fg:#2A231B; --fg-2:#574D40; --fg-3:#6E6455;
+  --line:#2A231B; --line-2:rgba(42,35,27,.18);
+  --accent:#2F4C7E; --accent-text:#2B4675; --accent-ink:#F6F0E4;
+  --shock-bg:#2F4C7E; --shock-fg:#F6F0E4;
+  --font-display:"LXGW WenKai TC","Kaiti TC","DFKai-SB",serif;
+  --font-quote:var(--font-display); --font-number:"LXGW WenKai TC",serif;
+  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
+  --display-weight:700; --title-weight:700; --quote-weight:400; --number-weight:700; --numeral-weight:400;
+  --display-tracking:0; --title-tracking:0; --label-tracking:.04em;
+  --radius:0px; --grain:.13; --grain-blend:multiply; --ghost:.04;
+  --surface:radial-gradient(ellipse 120% 120% at 50% 45%,transparent 55%,rgba(42,35,27,.08)),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .16 0 0 0 0 .13 0 0 0 0 .1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='900' height='900' filter='url(%23m)'/%3E%3C/svg%3E");
+  --enter-easing:steps(5);
+  --paper-card:1;
+}
+/* paper-craft cards: hand-cut edge (clip-path), two-layer drop shadow lit from top-left, lit face.
+   Adapted from Jane-xiaoer/paper-collage-ppt (MIT). */
+.point,.number,.quote{position:relative;padding:72px 84px;background:#F7F1E6;
+  clip-path:polygon(0.6% 1.8%,33% 0.4%,68% 1.5%,99.5% 0.7%,98.9% 34%,99.6% 67%,99.1% 98.6%,66% 99.5%,32% 98.4%,0.8% 99.2%,1.5% 65%,0.3% 33%);
+  filter:drop-shadow(1px 2px 2px rgba(42,35,27,.20)) drop-shadow(8px 12px 16px rgba(42,35,27,.14));
+  transform:rotate(-.4deg);align-self:flex-start}
+.number{transform:rotate(.6deg)}
+.quote{transform:rotate(-.8deg)}
+.quote::before{margin-left:-20px}
+.compare .col:last-child{clip-path:polygon(1.2% 0.5%,36% 1.6%,70% 0.3%,99.2% 1.4%,99.7% 36%,98.8% 70%,99.6% 99.3%,64% 98.5%,29% 99.6%,0.4% 98.7%,0.9% 63%,1.7% 30%)}
+.point .support{border-left-color:var(--accent)}

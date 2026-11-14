@@ -66,7 +66,7 @@ lint 會檢查架構與呈現規則。有 ERROR 必須修到通過；WARNING 要
 讀 `references/samples.md`。挑三個方向（穩健 / 大膽 / 驚喜），用使用者**真實的標題與內容**產生樣張：
 
 ```bash
-python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples paper,signal,ink
+python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples editorial,swiss,broadsheet
 ```
 
 樣張會包含封面、一頁一般內容、震撼頁（若有）各一張，三種風格並排。打開給使用者看，**停下來等使用者選**。使用者可以混搭（例如「A 的配色 + B 的字體」），這時照 `references/samples.md` 的方式寫一個自訂主題。

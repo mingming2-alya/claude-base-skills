@@ -62,6 +62,25 @@ for (let i = 0; i < count; i++) {
       if (fs < 20 && el.children.length === 0)
         out.issues.push(`文字太小（${fs.toFixed(0)}px）：「${el.textContent.trim().slice(0, 24)}」`);
     }
+    // contrast (WCAG): text vs the nearest solid background; idea from huashu-design's design_lint (MIT), reimplemented
+    const parse = c => { const m = c.match(/rgba?\(([^)]+)\)/); if (!m) return null;
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+    const lin = v => { v /= 255; return v <= .03928 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4; };
+    const L = c => .2126 * lin(c[0]) + .7152 * lin(c[1]) + .0722 * lin(c[2]);
+    const bgOf = el => { for (let e = el; e && e !== document.body; e = e.parentElement) {
+        const c = parse(getComputedStyle(e).backgroundColor); if (c && c[3] > .5) return c; } return [0, 0, 0, 1]; };
+    const lowContrast = [];
+    for (const el of sl.querySelectorAll('h1,h2,h3,p,li,span,cite,div.value,div.label,div.sv,div.sl,td,th,footer span')) {
+      if (!el.textContent.trim() || el.children.length && ![...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+      if (el.closest('.ghost,[aria-hidden],.toc li.off,#nav,#tabs')) continue;
+      const cs = getComputedStyle(el); let fg = parse(cs.color); if (!fg) continue;
+      const bg = bgOf(el); if (fg[3] < 1) fg = fg.map((v, i) => i < 3 ? v * fg[3] + bg[i] * (1 - fg[3]) : 1);
+      const a = L(fg), b = L(bg), ratio = (Math.max(a, b) + .05) / (Math.min(a, b) + .05);
+      const size = parseFloat(cs.fontSize) / scale, bold = parseInt(cs.fontWeight) >= 700;
+      const need = size >= 24 || (size >= 18.66 && bold) ? 3 : 4.5;
+      if (ratio < need) lowContrast.push(`對比不足（${ratio.toFixed(1)}:1，需要 ${need}:1）：「${el.textContent.trim().slice(0, 20)}」`);
+    }
+    out.issues.push(...[...new Set(lowContrast)].slice(0, 5));
     for (const img of sl.querySelectorAll('img')) if (!img.complete || !img.naturalWidth)
       out.issues.push(`圖片載入失敗：${img.getAttribute('src')}`);
     out.issues = [...new Set(out.issues)];
