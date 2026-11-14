@@ -21,7 +21,7 @@
   --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
   --display-weight:700; --title-weight:500; --quote-weight:500; --number-weight:500; --numeral-weight:500;
   --display-tracking:-.01em; --title-tracking:.01em; --label-tracking:.08em;
-  --radius:0px; --grain:.09; --grain-blend:screen; --ghost:.04; --frame:rgba(237,232,222,.10);
+  --radius:0px; --grain:.09; --grain-blend:screen; --ghost:.03; --frame:rgba(237,232,222,.10);
   --surface:radial-gradient(70% 45% at 50% 112%,rgba(210,166,79,.20),rgba(210,166,79,.06) 48%,transparent 72%),
             radial-gradient(ellipse 80% 70% at 50% 45%,transparent 45%,rgba(0,0,0,.45) 100%);
   --enter-easing:cubic-bezier(.16,1,.3,1);
@@ -87,7 +87,7 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .pageno{position:absolute;right:140px;bottom:52px;font:500 20px/1 var(--font-label);color:var(--fg-3);letter-spacing:var(--label-tracking)}
 
 /* ghost word: the chapter label, huge and nearly invisible, on a chapter's first page */
-.ghost{position:absolute;right:-60px;bottom:-90px;font:var(--display-weight) 460px/1 var(--font-display);
+.ghost{position:absolute;right:-60px;bottom:-170px;font:var(--display-weight) 460px/1 var(--font-display);
   letter-spacing:-.04em;color:var(--fg);opacity:var(--ghost,.03);white-space:nowrap;pointer-events:none;z-index:0}
 
 /* ---------------------------------------------------------------- content slides */
@@ -115,6 +115,22 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
   padding-bottom:10px;border-bottom:2px solid var(--accent)}
 .number .note{font:400 30px/1.6 var(--font-body);color:var(--fg-2);margin-top:22px;align-self:start}
 
+/* before → after figures: the old value is muted, the outcome carries the accent */
+.pair{display:inline-flex;align-items:baseline;gap:.12em;white-space:nowrap}
+.pair .was{color:var(--fg-3)}
+.pair .arrow{font-size:.5em;font-weight:400;color:var(--fg-3);margin:0 .12em;position:relative;top:-.12em}
+.number .value:has(.pair){font-size:280px}
+
+/* stats: a row of figures, each with a label and an optional scope note */
+.stats-page{max-width:1640px}
+.stats-lead{font:var(--title-weight) 46px/1.3 var(--font-display);margin-bottom:56px;max-width:1300px;text-wrap:balance}
+.stats-row{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:56px}
+.stats-row .stat{padding-top:28px;border-top:2px solid var(--line)}
+.stats-row .sv{font:var(--number-weight) 150px/1 var(--font-number);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stats-row .sl{margin-top:18px;font:500 32px/1.35 var(--font-body);color:var(--fg)}
+.stats-row .sn{margin-top:10px;font:400 24px/1.45 var(--font-body);color:var(--fg-3)}
+.lnote{margin-top:36px;padding-left:24px;border-left:2px solid var(--accent);font:400 30px/1.5 var(--font-body);color:var(--fg-2);max-width:1300px}
+
 /* bullets: accent dash marks, generous spacing, hairline between items */
 .bullets{list-style:none;display:flex;flex-direction:column;max-width:1400px}
 .bullets li{font:500 46px/1.45 var(--font-body);padding:26px 0 26px 76px;position:relative;border-top:1px solid var(--line-2)}
@@ -125,7 +141,8 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .steps{list-style:none;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:56px}
 .steps li{position:relative;padding-top:28px;border-top:2px solid var(--line)}
 .steps .n{display:block;font:var(--numeral-weight) 120px/1 var(--font-number);letter-spacing:-.04em;color:var(--fg-3);margin-bottom:28px}
-.steps li:last-child .n{color:var(--accent-text)}
+.steps li:has(mark.em) .n{color:var(--accent-text)}
+.steps .d{display:block;margin-top:14px;font:400 28px/1.5 var(--font-body);color:var(--fg-2)}
 .steps .t{font:500 38px/1.45 var(--font-body);display:block}
 
 /* compare: muted "before" column, the "after" column becomes the accent environment */

@@ -21,7 +21,7 @@
   --font-label:"JetBrains Mono","Noto Sans TC",monospace;
   --display-weight:300; --title-weight:500; --quote-weight:300; --number-weight:300; --numeral-weight:300;
   --display-tracking:-.02em; --title-tracking:0; --label-tracking:.04em;
-  --radius:0px; --grain:0; --ghost:.03;
+  --radius:0px; --grain:0; --ghost:.028;
   --surface:linear-gradient(90deg,rgba(11,11,11,.035) 1px,transparent 1px) 0 0/calc(1640px/12) 100% no-repeat,
             linear-gradient(90deg,rgba(11,11,11,.035) 1px,transparent 1px) 140px 0/calc(1640px/12) 100%;
   --enter-easing:cubic-bezier(.16,1,.3,1);
@@ -87,7 +87,7 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .pageno{position:absolute;right:140px;bottom:52px;font:500 20px/1 var(--font-label);color:var(--fg-3);letter-spacing:var(--label-tracking)}
 
 /* ghost word: the chapter label, huge and nearly invisible, on a chapter's first page */
-.ghost{position:absolute;right:-60px;bottom:-90px;font:var(--display-weight) 460px/1 var(--font-display);
+.ghost{position:absolute;right:-60px;bottom:-170px;font:var(--display-weight) 460px/1 var(--font-display);
   letter-spacing:-.04em;color:var(--fg);opacity:var(--ghost,.03);white-space:nowrap;pointer-events:none;z-index:0}
 
 /* ---------------------------------------------------------------- content slides */
@@ -115,6 +115,22 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
   padding-bottom:10px;border-bottom:2px solid var(--accent)}
 .number .note{font:400 30px/1.6 var(--font-body);color:var(--fg-2);margin-top:22px;align-self:start}
 
+/* before → after figures: the old value is muted, the outcome carries the accent */
+.pair{display:inline-flex;align-items:baseline;gap:.12em;white-space:nowrap}
+.pair .was{color:var(--fg-3)}
+.pair .arrow{font-size:.5em;font-weight:400;color:var(--fg-3);margin:0 .12em;position:relative;top:-.12em}
+.number .value:has(.pair){font-size:280px}
+
+/* stats: a row of figures, each with a label and an optional scope note */
+.stats-page{max-width:1640px}
+.stats-lead{font:var(--title-weight) 46px/1.3 var(--font-display);margin-bottom:56px;max-width:1300px;text-wrap:balance}
+.stats-row{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:56px}
+.stats-row .stat{padding-top:28px;border-top:2px solid var(--line)}
+.stats-row .sv{font:var(--number-weight) 150px/1 var(--font-number);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stats-row .sl{margin-top:18px;font:500 32px/1.35 var(--font-body);color:var(--fg)}
+.stats-row .sn{margin-top:10px;font:400 24px/1.45 var(--font-body);color:var(--fg-3)}
+.lnote{margin-top:36px;padding-left:24px;border-left:2px solid var(--accent);font:400 30px/1.5 var(--font-body);color:var(--fg-2);max-width:1300px}
+
 /* bullets: accent dash marks, generous spacing, hairline between items */
 .bullets{list-style:none;display:flex;flex-direction:column;max-width:1400px}
 .bullets li{font:500 46px/1.45 var(--font-body);padding:26px 0 26px 76px;position:relative;border-top:1px solid var(--line-2)}
@@ -125,7 +141,8 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .steps{list-style:none;display:grid;grid-template-columns:repeat(var(--n),1fr);gap:56px}
 .steps li{position:relative;padding-top:28px;border-top:2px solid var(--line)}
 .steps .n{display:block;font:var(--numeral-weight) 120px/1 var(--font-number);letter-spacing:-.04em;color:var(--fg-3);margin-bottom:28px}
-.steps li:last-child .n{color:var(--accent-text)}
+.steps li:has(mark.em) .n{color:var(--accent-text)}
+.steps .d{display:block;margin-top:14px;font:400 28px/1.5 var(--font-body);color:var(--fg-2)}
 .steps .t{font:500 38px/1.45 var(--font-body);display:block}
 
 /* compare: muted "before" column, the "after" column becomes the accent environment */
@@ -309,7 +326,7 @@ body:hover #hint{opacity:.7}
 <div id="viewport"><div id="stage">
 <div id="nav"></div><div id="tabs"></div>
 <section class="slide overview" data-kind="overview" data-chi="-1" data-notes="先唸口號，再由左到右：方向、價值、支撐。被問到細節時點進附件。"><i class="frame-line"></i><header class="ov-head"><div class="ov-kicker rv">示範部門 · 年度成果</div><h2 class="ov-headline rv">定方向・<mark class="em">創價值</mark>・固根本</h2></header><div class="pillars" style="--n:3"><div class="pillar rv" style="--k:0" data-link="strategy-detail"><div class="pk">DIRECTION</div><h3>方向</h3><p class="psub">先找痛點，再找可複用的做法</p><ul><li>第 1 季：先做小規模試點</li><li>第 2–3 季：整合共用工具</li><li>第 4 季：擴大到全部門</li></ul><span class="more">看細節 →</span></div><div class="pillar rv" style="--k:1" data-link="value-detail"><div class="pk">VALUE</div><h3>價值</h3><p class="psub">試點成果進入日常工作</p><div class="stats"><div class="stat"><div class="sv"><span class="num">12</span></div><div class="sl">項案例</div></div><div class="stat"><div class="sv"><mark class="em"><span class="num">300</span></mark></div><div class="sl">萬元／年效益（示意）</div></div></div><span class="more">看細節 →</span></div><div class="pillar rv" style="--k:2" data-link="base-detail"><div class="pk">FOUNDATION</div><h3>根本</h3><p class="psub">穩定營運支撐新做法</p><div class="stats"><div class="stat"><div class="sv"><span class="num">40</span></div><div class="sl">項年度需求</div></div><div class="stat"><div class="sv"><span class="num">15</span></div><div class="sl">項已完成</div></div></div><span class="more">看細節 →</span></div></div><p class="source">資料來源：示意資料</p></section>
-<section class="slide content layout-steps" data-kind="content" data-chi="0" data-notes="" data-appendix="1" data-id="strategy-detail" data-tab="0" data-tabs="1"><i class="frame-line"></i><button class="back" type="button">← 返回</button><div class="snav"><div class="slabels"><span class="on">定方向</span><span class="">創價值</span><span class="">固根本</span></div></div><header class="slide-head"><h2 class="title">方向</h2></header><div class="body"><ol class="steps" style="--n:4"><li class="rv"><span class="n">01</span><span class="t">盤點流程</span></li><li class="rv"><span class="n">02</span><span class="t">選定痛點</span></li><li class="rv"><span class="n">03</span><span class="t">小規模試作</span></li><li class="rv"><span class="n">04</span><span class="t">驗收推廣</span></li></ol></div><footer class="foot"><span>年度成果（示範）</span><span class="pg">附件</span></footer></section>
+<section class="slide content layout-steps" data-kind="content" data-chi="0" data-notes="" data-appendix="1" data-id="strategy-detail" data-tab="0" data-tabs="1"><i class="frame-line"></i><button class="back" type="button">← 返回</button><div class="snav"><div class="slabels"><span class="on">定方向</span><span class="">創價值</span><span class="">固根本</span></div></div><header class="slide-head"><h2 class="title">方向</h2></header><div class="body"><div><ol class="steps" style="--n:4"><li class="rv"><span class="n">01</span><span class="t">盤點流程</span></li><li class="rv"><span class="n">02</span><span class="t">選定痛點</span></li><li class="rv"><span class="n">03</span><span class="t">小規模試作</span></li><li class="rv"><span class="n">04</span><span class="t">驗收推廣</span></li></ol></div></div><footer class="foot"><span>年度成果（示範）</span><span class="pg">附件</span></footer></section>
 <section class="slide content layout-number" data-kind="content" data-chi="1" data-notes="" data-appendix="1" data-id="value-detail" data-tab="0" data-tabs="1"><i class="frame-line"></i><button class="back" type="button">← 返回</button><div class="snav"><div class="slabels"><span class="">定方向</span><span class="on">創價值</span><span class="">固根本</span></div></div><header class="slide-head"><h2 class="title">價值</h2></header><div class="body"><div class="number"><div class="value rv"><span class="num">300</span></div><div class="label rv">萬元／年，12 項案例合計（示意）</div><p class="note rv">2 個共用案例、10 個個別案例</p></div></div><p class="source">資料來源：示意資料</p><footer class="foot"><span>年度成果（示範）</span><span class="pg">附件</span></footer></section>
 <section class="slide content layout-compare" data-kind="content" data-chi="2" data-notes="" data-appendix="1" data-id="base-detail" data-tab="0" data-tabs="1"><i class="frame-line"></i><button class="back" type="button">← 返回</button><div class="snav"><div class="slabels"><span class="">定方向</span><span class="">創價值</span><span class="on">固根本</span></div></div><header class="slide-head"><h2 class="title">根本</h2></header><div class="body"><div class="compare"><div class="col rv"><h3>已完成</h3><ul><li>15 項</li></ul></div><div class="divider"></div><div class="col rv"><h3>推動中</h3><ul><li>25 項</li></ul></div></div></div><footer class="foot"><span>年度成果（示範）</span><span class="pg">附件</span></footer></section>
 <div id="curtain"></div>

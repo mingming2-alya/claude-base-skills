@@ -10,6 +10,8 @@ Runs lint first and refuses to build when lint reports errors (use --force to ov
 Navigation (chapter bar, TOC highlight pages, tabs), chapter-change motion (derived from
 structure.axis) and shock-page treatment are generated automatically.
 """
+import sys
+sys.dont_write_bytecode = True
 import argparse
 import html
 import json
@@ -200,6 +202,12 @@ def number_html(value):
     raw = str(value if value is not None else "")
     em = raw.startswith("==") and raw.endswith("==") and len(raw) > 4
     inner = raw[2:-2] if em else raw
+    pair = re.match(r"^\s*([\d][\d.,]*)\s*([^\d\s→>-]*)\s*(?:→|->)\s*(?:==)?([\d][\d.,]*)(?:==)?\s*(.*)$", raw if not em else inner)
+    if pair:  # before → after: the outcome carries the accent
+        a, ua, b, ub = pair.groups()
+        unit = lambda u: f'<span class="unit">{esc(u.strip())}</span>' if u.strip() else ""
+        return (f'<span class="pair"><span class="num was">{esc(a)}</span>{unit(ua)}<span class="arrow">→</span>'
+                f'<mark class="em"><span class="num">{esc(b)}</span>{unit(ub)}</mark></span>')
     m = NUM_RE.match(inner)
     if not m or EMPH_RE.search(inner):
         return rich(raw)
@@ -223,14 +231,26 @@ def render_layout(s, base_dir):
         note = f'<p class="note rv">{rich(s["note"])}</p>' if s.get("note") else ""
         return (f'<div class="number"><div class="value rv">{number_html(s.get("value"))}</div>'
                 f'<div class="label rv">{rich(s.get("label"))}</div>{note}</div>')
+    foot_note = f'<p class="lnote rv">{rich(s["note"])}</p>' if s.get("note") else ""
+    if lay == "stats":
+        cells = "".join(f'<div class="stat rv"><div class="sv">{number_html(st.get("value"))}</div>'
+                        f'<div class="sl">{rich(st.get("label"))}</div>'
+                        + (f'<div class="sn">{rich(st["note"])}</div>' if st.get("note") else "") + "</div>"
+                        for st in s.get("stats", []))
+        lead = f'<p class="stats-lead rv">{rich(s["lead"])}</p>' if s.get("lead") else ""
+        return f'<div class="stats-page">{lead}<div class="stats-row" style="--n:{len(s.get("stats", []))}">{cells}</div>{foot_note}</div>'
     if lay == "bullets":
         lis = "".join(f'<li class="rv">{rich(x)}</li>' for x in s.get("items", []))
-        return f'<ul class="bullets">{lis}</ul>'
+        return f'<div><ul class="bullets">{lis}</ul>{foot_note}</div>'
     if lay == "steps":
         items = s.get("items", [])
-        lis = "".join(f'<li class="rv"><span class="n">{i:02d}</span><span class="t">{rich(x)}</span></li>'
-                      for i, x in enumerate(items, 1))
-        return f'<ol class="steps" style="--n:{len(items)}">{lis}</ol>'
+        def step(i, x):
+            if isinstance(x, dict):  # {label, detail}
+                d = f'<span class="d">{rich(x["detail"])}</span>' if x.get("detail") else ""
+                return f'<li class="rv"><span class="n">{i:02d}</span><span class="t">{rich(x.get("label"))}</span>{d}</li>'
+            return f'<li class="rv"><span class="n">{i:02d}</span><span class="t">{rich(x)}</span></li>'
+        lis = "".join(step(i, x) for i, x in enumerate(items, 1))
+        return f'<div><ol class="steps" style="--n:{len(items)}">{lis}</ol>{foot_note}</div>'
     if lay == "compare":
         def col(side):
             v = s.get(side) or {}
@@ -334,7 +354,8 @@ def render_slides(data, base_dir, records):
     ids = [c["id"] for c in data["chapters"]]
     ch_sources = [[s for s in main_slides(data) if s.get("type", "content") == "content"
                    and s.get("chapter") == cid and s.get("layout") != "pillars"] for cid in ids]
-    return [render_slide(r, data, i, len(records), base_dir, ch_sources) for i, r in enumerate(records, 1)]
+    total = sum(1 for r in records if not r.get("appendix"))
+    return [render_slide(r, data, i, total, base_dir, ch_sources) for i, r in enumerate(records, 1)]
 
 
 # ----------------------------------------------------------------------------- page assembly
@@ -361,29 +382,43 @@ def deck_html(data, base_dir):
         slides="\n".join(slides), deck=json.dumps(deck_json, ensure_ascii=False), runtime=RUNTIME_JS)
 
 
-def samples_html(data, base_dir, themes):
+def samples_html(data, base_dir, themes, pages=None):
     records = expand(data)
     slides = render_slides(data, base_dir, records)
     pick = [0] if records and records[0]["kind"] == "cover" else []
     contents = [i for i, r in enumerate(records) if r["kind"] == "content"]
-    with_em = [i for i in contents if EMPH_RE.search(json.dumps(r_src(records[i]), ensure_ascii=False))
-               or r_src(records[i]).get("layout") == "point"]
-    pick.append((with_em or contents or [0])[0])
-    shocks = [i for i, r in enumerate(records) if r["kind"] == "shock"]
-    if shocks:
-        pick.append(shocks[0])
-    elif len(contents) > 1:
-        pick.append(contents[1] if contents[1] != pick[-1] else contents[-1])
+    contents = [i for i in contents if not records[i].get("appendix")]
+    if pages:  # explicit choice: 1-based page numbers of the built deck
+        pick = [p - 1 for p in pages if 0 < p <= len(records)]
+    else:
+        # the signature page first (one big idea or figure), then a page with a different layout
+        sig = [i for i in contents if r_src(records[i]).get("layout") in ("point", "number", "stats")]
+        with_em = [i for i in contents if EMPH_RE.search(json.dumps(r_src(records[i]), ensure_ascii=False))]
+        first = (sig or with_em or contents or [0])[0]
+        pick.append(first)
+        shocks = [i for i, r in enumerate(records) if r["kind"] == "shock"]
+        other = [i for i in contents if r_src(records[i]).get("layout") != r_src(records[first]).get("layout")]
+        if shocks:
+            pick.append(shocks[0])
+        elif other:
+            pick.append(other[0])
 
     motion = motion_for(data["structure"])
     blocks, css_all = [], []
     roles = ["A", "B", "C", "D", "E"]
+    try:
+        names = json.loads((THEMES_DIR / "index.json").read_text(encoding="utf-8"))
+    except Exception:
+        names = {}
     for n, th in enumerate(themes):
+        th, _, role = th.partition(":")
         css, stem = theme_css(th, base_dir)
+        zh = (names.get(stem) or {}).get("name", "")
+        label = " · ".join(x for x in (role, zh, stem) if x)
         cls = f"t-{re.sub(r'[^a-z0-9]+', '-', stem.lower())}"
         css_all.append(scope_theme(css, cls))
         frames = "".join(f'<div class="frame"><div class="frame-inner {cls}">{slides[i]}</div></div>' for i in pick)
-        blocks.append(f'<section class="sample"><h2><b>{roles[n]}</b> {esc(stem)}</h2><div class="row">{frames}</div></section>')
+        blocks.append(f'<section class="sample"><h2><b>{roles[n]}</b> {esc(label)}</h2><div class="row">{frames}</div></section>')
     return SAMPLES_PAGE.format(
         lang=esc(data["meta"].get("lang", "zh-Hant")), fonts=fonts_link(*css_all), base=BASE_CSS,
         themes="\n".join(css_all), motion=motion, shape=toc_shape(motion),
@@ -457,8 +492,8 @@ body{{font-family:system-ui,"Noto Sans TC","PingFang TC",sans-serif;color:#222;p
 header.top h1{{font-size:26px;font-weight:700}}
 header.top p{{color:#666;margin-top:6px;font-size:15px}}
 .sample{{margin-top:40px}}
-.sample h2{{font-size:20px;font-weight:600;margin-bottom:14px;color:#333}}
-.sample h2 b{{display:inline-block;background:#222;color:#fff;border-radius:4px;padding:2px 10px;margin-right:8px}}
+.sample>h2{{font-size:20px;font-weight:600;margin-bottom:14px;color:#333}}
+.sample>h2 b{{display:inline-block;background:#222;color:#fff;border-radius:4px;padding:2px 10px;margin-right:8px}}
 .row{{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}}
 .frame{{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.14);container-type:inline-size}}
 .frame-inner{{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;transform:scale(calc(100cqw / 1920px))}}
@@ -484,7 +519,8 @@ document.querySelectorAll('[data-shape=rings] .toc-list').forEach(ol=>{{const li
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("storyboard")
-    ap.add_argument("--samples", help="comma-separated themes, e.g. paper,signal,ink")
+    ap.add_argument("--samples", help="comma-separated themes, optionally with a role: swiss:穩健,broadsheet:大膽,washi:驚喜")
+    ap.add_argument("--sample-pages", help="comma-separated page numbers to show in the samples (default: cover, signature page, one more)")
     ap.add_argument("--out")
     ap.add_argument("--force", action="store_true", help="build even if lint reports errors")
     a = ap.parse_args()
@@ -503,7 +539,8 @@ def main():
     if a.samples:
         themes = [t.strip() for t in a.samples.split(",") if t.strip()]
         out = Path(a.out) if a.out else base / "samples.html"
-        out.write_text(samples_html(data, base, themes), encoding="utf-8")
+        pages = [int(x) for x in a.sample_pages.split(",")] if a.sample_pages else None
+        out.write_text(samples_html(data, base, themes, pages), encoding="utf-8")
     else:
         out = Path(a.out) if a.out else base / "deck.html"
         out.write_text(deck_html(data, base), encoding="utf-8")

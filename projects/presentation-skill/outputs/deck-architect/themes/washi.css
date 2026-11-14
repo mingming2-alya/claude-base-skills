@@ -14,7 +14,7 @@
   --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
   --display-weight:700; --title-weight:700; --quote-weight:400; --number-weight:700; --numeral-weight:400;
   --display-tracking:0; --title-tracking:0; --label-tracking:.04em;
-  --radius:0px; --grain:.13; --grain-blend:multiply; --ghost:.04;
+  --radius:0px; --grain:.13; --grain-blend:multiply; --ghost:.035;
   --surface:radial-gradient(ellipse 120% 120% at 50% 45%,transparent 55%,rgba(42,35,27,.08)),
             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .16 0 0 0 0 .13 0 0 0 0 .1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='900' height='900' filter='url(%23m)'/%3E%3C/svg%3E");
   --enter-easing:steps(5);

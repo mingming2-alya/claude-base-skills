@@ -57,7 +57,7 @@ decks/<name>/
 python3 <skill>/scripts/lint.py decks/<name>/storyboard.yaml
 ```
 
-lint 會檢查架構與呈現規則。有 ERROR 必須修到通過；WARNING 要嘛修正、要嘛在給使用者的摘要裡說明為什麼保留。不要為了讓 lint 通過而扭曲內容，lint 抓的問題通常代表架構真的有洞。
+lint 會檢查架構與呈現規則（訊息裡的 `slides[n]` 從 1 起算，也會提醒版型不認得的欄位）。有 ERROR 必須修到通過；WARNING 要嘛修正、要嘛在給使用者的摘要裡說明為什麼保留。不要為了讓 lint 通過而扭曲內容，lint 抓的問題通常代表架構真的有洞。
 
 完成後給使用者一頁**架構摘要**（章節、每頁標題、重點、震撼頁位置）。使用者沒意見可以直接進 Step 3，不用另外等。
 
@@ -66,10 +66,10 @@ lint 會檢查架構與呈現規則。有 ERROR 必須修到通過；WARNING 要
 讀 `references/samples.md`。挑三個方向（穩健 / 大膽 / 驚喜），用使用者**真實的標題與內容**產生樣張：
 
 ```bash
-python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples editorial,swiss,broadsheet
+python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples swiss:穩健,broadsheet:大膽,washi:驚喜
 ```
 
-樣張會包含封面、一頁一般內容、震撼頁（若有）各一張，三種風格並排。打開給使用者看，**停下來等使用者選**。使用者可以混搭（例如「A 的配色 + B 的字體」），這時照 `references/samples.md` 的方式寫一個自訂主題。
+樣張預設包含封面、這份簡報的招牌頁（大重點或大數字）、再一頁不同版型的內容頁（有震撼頁就用震撼頁），三種風格並排。想指定頁面就加 `--sample-pages 1,3,5`（成品的頁碼）。冒號後面的角色會顯示在樣張上。產生後先自己截圖看一次，確認沒有壞掉再給使用者。打開給使用者看，**停下來等使用者選**。使用者可以混搭（例如「A 的配色 + B 的字體」），這時照 `references/samples.md` 的方式寫一個自訂主題。
 
 ### Step 4｜製作 → `deck.html`
 
@@ -91,7 +91,7 @@ build 會根據架構自動產生導航（章節列、目錄點亮、頁籤）�
 node <skill>/scripts/check.mjs decks/<name>/deck.html
 ```
 
-它會逐頁截圖並檢查文字溢出、字太小、主控台錯誤。有問題就回到 storyboard 修正後重建，**最多修 2 輪**；兩輪後仍有問題，如實告訴使用者還剩什麼問題，不要假裝通過。
+它會逐頁截圖並檢查文字溢出、字太小、文字對比不足、圖片載入失敗、主控台錯誤。它抓不到「斷行很醜」這類問題，所以截圖一定要自己看。有問題就回到 storyboard 修正後重建，**最多修 2 輪**；兩輪後仍有問題，如實告訴使用者還剩什麼問題，不要假裝通過。
 
 接著**自己看截圖**，用 `references/presentation-rules.md` 最後的「品管清單」逐條檢查。這一步你是評審，不是作者：用挑剔的眼光看。
 

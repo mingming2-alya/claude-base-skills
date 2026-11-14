@@ -6,13 +6,16 @@ Usage: python3 lint.py path/to/storyboard.yaml [--json]
 Exit code 0 = no errors (warnings allowed), 1 = errors found, 2 = could not read file.
 Every message says what is wrong AND what to do about it, so the agent can fix it directly.
 """
+import sys
+sys.dont_write_bytecode = True
 import json
 import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from deck_model import (AXES, CELL_STATES, EMPH_RE, LAYOUTS, RISK_LEVELS, SLIDE_TYPES,  # noqa: E402
+from deck_model import (AXES, CELL_STATES, COMMON_FIELDS, EMPH_RE, LAYOUT_FIELDS, LAYOUTS,  # noqa: E402
+                        RISK_LEVELS, SLIDE_TYPES,
                         TRANSITION_PHRASES,
                         StoryboardError, emphasis_count, load, page_count, slide_texts, toc_mode,
                         visible_len)
@@ -117,8 +120,13 @@ def lint(data):
                     W(where, f"出現過場語「{p}」。位置感交給導航，不要寫過場文字；覺得需要就代表架構要調整。")
                     break
 
+        if t == "content" and s.get("layout") in LAYOUT_FIELDS:
+            unknown = set(s) - COMMON_FIELDS - LAYOUT_FIELDS[s["layout"]]
+            if unknown:
+                W(where, f"layout「{s['layout']}」不認得欄位 {', '.join(sorted(unknown))}，建置時會被忽略。"
+                         f"這個版型可用：{', '.join(sorted(LAYOUT_FIELDS[s['layout']]))}。")
         has_digit = any(re.search(r"\d", x) for x in texts)
-        if has_digit and not s.get("source") and (t == "shock" or (t == "content" and s.get("layout") == "number")):
+        if has_digit and not s.get("source") and (t == "shock" or (t == "content" and s.get("layout") in ("number", "stats"))):
             W(where, "關鍵數字沒有 source（出處）。先跟原始資料核對，再寫上出處與適用範圍。")
 
         if t == "content" and s.get("layout") == "status-table":
@@ -249,7 +257,11 @@ def lint(data):
             if em > 1:
                 E(where, f"有 {em} 處重點。每頁最多一處，到處強調等於沒強調。保留最重要的一個，或拆頁。")
             chars = sum(visible_len(x) for x in texts) - visible_len(title)
-            if chars > 110:
+            if s.get("layout") == "stats":
+                n_st = len(s.get("stats") or [])
+                if not 2 <= n_st <= 4:
+                    E(where, "stats 需要 2–4 個數字，每個有 value 與 label。")
+            if chars > 110 and not is_appendix:
                 W(where, f"內容約 {chars} 字，偏多。上台講的頁面，講者 30 秒內要講得完。")
 
         elif t == "shock":

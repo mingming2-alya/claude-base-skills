@@ -34,6 +34,16 @@ LAYOUTS = {
     "image": ["src"],
     "pillars": ["headline", "pillars"],
     "status-table": ["stages", "groups"],
+    "stats": ["stats"],
+}
+
+# fields each layout understands (besides the common ones); anything else is silently ignored by build
+COMMON_FIELDS = {"type", "chapter", "title", "tab", "layout", "notes", "source", "link", "appendix", "id", "role"}
+LAYOUT_FIELDS = {
+    "point": {"key", "support"}, "bullets": {"items", "note"}, "number": {"value", "label", "note"},
+    "compare": {"left", "right"}, "steps": {"items", "note"}, "quote": {"text"}, "image": {"src", "alt", "caption"},
+    "pillars": {"headline", "pillars", "stagger"}, "status-table": {"summary", "stages", "groups", "continued"},
+    "stats": {"stats", "lead", "note"},
 }
 
 CELL_STATES = {"done", "doing", "target", "na"}
@@ -85,7 +95,7 @@ def slide_texts(s):
                 walk(x)
         elif isinstance(v, dict):
             for k, x in v.items():
-                if k in ("notes", "src", "chapter", "layout", "type", "tab"):
+                if k in ("notes", "src", "chapter", "layout", "type", "tab", "source", "id", "link", "appendix", "role"):
                     continue
                 walk(x)
 

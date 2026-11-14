@@ -15,7 +15,7 @@
   --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
   --display-weight:900; --title-weight:700; --quote-weight:700; --number-weight:900; --numeral-weight:700;
   --display-tracking:-.025em; --title-tracking:0; --label-tracking:.1em;
-  --radius:0px; --grain:.12; --grain-blend:overlay; --ghost:.05;
+  --radius:0px; --grain:.12; --grain-blend:overlay; --ghost:.03;
   --surface:none;
   --enter-easing:cubic-bezier(.16,1,.3,1);
 }

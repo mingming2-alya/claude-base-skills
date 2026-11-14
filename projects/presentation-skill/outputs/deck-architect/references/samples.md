@@ -27,10 +27,12 @@
 ## 產生樣張
 
 ```bash
-python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples editorial,swiss,broadsheet
+python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples swiss:穩健,broadsheet:大膽,washi:驚喜
 ```
 
-樣張用使用者真實的標題與內容，每個方向各一張：封面、第一個有重點的內容頁、震撼頁（若有）。打開 `samples.html` 給使用者看，請他選一個，或說明要怎麼混搭。
+樣張用使用者真實的標題與內容，每個方向三張：封面、招牌頁（第一個 `point`、`number` 或 `stats` 頁）、再一頁不同版型的內容頁（有震撼頁就用震撼頁）。要換頁面就加 `--sample-pages 1,3,5`。冒號後面寫角色，會和主題的中文名稱一起顯示在樣張上。
+
+**三個方向要在內容頁上也看得出差別**，不只是封面。兩個淺色主題並排時，內容頁容易看起來很像；通常一淺一深再加一個質感不同的，差別最清楚。打開 `samples.html` 給使用者看，請他選一個，或說明要怎麼混搭。
 
 ## 自訂主題
 

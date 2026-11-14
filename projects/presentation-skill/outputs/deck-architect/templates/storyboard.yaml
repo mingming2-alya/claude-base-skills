@@ -4,10 +4,13 @@
 
 meta:
   title: 2026 年度回顧              # 封面主標
+  # short: 年度回顧                 # 頁尾顯示的短名稱（可省略，預設用 title）
+  # kicker: 內部分享                # 封面左上的小標（可省略）
   subtitle: 從困境到轉型的一年      # 封面副標（可省略）
   presenter: 王小明 · 產品部        # 封面講者（可省略）
   date: 2026.12                     # 封面日期（可省略）
   theme: editorial                  # editorial / swiss / midnight / broadsheet / washi，或自訂主題 ./theme.css
+                                    # 選風格之前可以先不填（預設 editorial），使用者選定後再寫
   minutes: 15                       # 總時長（分鐘），lint 會檢查頁數與各章時間
   pages: 12                         # 頁數上限（含封面與自動目錄頁，不含附件頁），可省略
   # format: section                 # 作為大簡報的一章：不需要封面、不顯示頁碼（範例見 examples/annual-section）
@@ -40,10 +43,12 @@ chapters:
 # 轉折點：在章節內用 layout: point 放一個「做到這些就夠了嗎？」的提問，下一頁接故事（quote 或 image）
 # layout（content 才需要）：
 #   point   整頁只為一個重點服務：key（重點）+ support（一行補充，可省略）
-#   bullets 條列：items（最多 5 條）
+#   bullets 條列：items（最多 5 條）+ note（條列下方的一行補充，可省略）
 #   number  大數字：value + label + note（可省略）＋ source（出處，強烈建議）
+#           value 寫一個數字（"38%" 會自動把單位縮小），或前後對比 "63 → 16"（前者淡、後者用突出色）
+#   stats   一排數字：stats（2–4 個，各有 value、label，以及選填的 note 寫適用範圍）+ lead（上方一句話）+ note
 #   compare 左右比較：left/right 各有 heading + items
-#   steps   有順序的步驟：items（最多 5 步）
+#   steps   有順序的步驟：items（最多 5 步；每項可寫成字串，或 {label, detail}）+ note
 #   quote   引言：text + source
 #   image   圖片：src（相對於 storyboard 的路徑）+ caption；圖只是氣氛，重點仍要寫在文字裡
 #   pillars 一頁總覽：headline（主句）+ pillars（每章一欄：chapter、kicker、heading、sub、items、stats、link）

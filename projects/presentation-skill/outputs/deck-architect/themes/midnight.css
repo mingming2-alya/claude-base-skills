@@ -13,7 +13,7 @@
   --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
   --display-weight:700; --title-weight:500; --quote-weight:500; --number-weight:500; --numeral-weight:500;
   --display-tracking:-.01em; --title-tracking:.01em; --label-tracking:.08em;
-  --radius:0px; --grain:.09; --grain-blend:screen; --ghost:.04; --frame:rgba(237,232,222,.10);
+  --radius:0px; --grain:.09; --grain-blend:screen; --ghost:.03; --frame:rgba(237,232,222,.10);
   --surface:radial-gradient(70% 45% at 50% 112%,rgba(210,166,79,.20),rgba(210,166,79,.06) 48%,transparent 72%),
             radial-gradient(ellipse 80% 70% at 50% 45%,transparent 45%,rgba(0,0,0,.45) 100%);
   --enter-easing:cubic-bezier(.16,1,.3,1);
