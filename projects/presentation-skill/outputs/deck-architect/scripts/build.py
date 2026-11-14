@@ -19,7 +19,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from deck_model import AXES, EMPH_RE, StoryboardError, load  # noqa: E402
+from deck_model import AXES, EMPH_RE, StoryboardError, load, toc_mode  # noqa: E402
 from lint import lint  # noqa: E402
 
 THEMES_DIR = HERE.parent / "themes"
@@ -76,18 +76,22 @@ def toc_shape(motion):
 
 # ----------------------------------------------------------------------------- slide expansion
 def expand(data):
-    """Return a flat list of slide records, inserting TOC pages when there are > 3 chapters."""
+    """Return a flat list of slide records, inserting TOC pages according to toc_mode()."""
     chapters = data["chapters"]
     ids = [c["id"] for c in chapters]
-    use_toc = len(chapters) > 3
+    mode = toc_mode(data)
+    use_toc = mode == "per-chapter"
     per_ch = {cid: [] for cid in ids}
     for s in data["slides"]:
         if s.get("type", "content") == "content" and s.get("chapter") in per_ch:
             per_ch[s["chapter"]].append(s)
 
-    out, started = [], set()
+    out, started, agenda_done = [], set(), mode != "agenda"
     for s in data["slides"]:
         t = s.get("type", "content")
+        if not agenda_done and t != "cover":
+            out.append({"kind": "toc", "chi": -1, "src": None})  # one agenda page, all chapters lit
+            agenda_done = True
         if t == "content":
             cid = s["chapter"]
             chi = ids.index(cid)
@@ -103,6 +107,10 @@ def expand(data):
 
 
 # ----------------------------------------------------------------------------- renderers
+def source_line(s):
+    return f'<p class="source">資料來源：{esc(s["source"])}</p>' if s.get("source") else ""
+
+
 def render_layout(s, base_dir):
     lay = s.get("layout")
     if lay == "point":
@@ -166,14 +174,14 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
                 f'<div class="route rv">{route}</div></section>')
 
     if kind == "toc":
-        lis = "".join(f'<li class="{"on" if i == rec["chi"] else "off"}"><span class="i">{i + 1:02d}</span>'
+        lis = "".join(f'<li class="{"on" if rec["chi"] in (-1, i) else "off"}"><span class="i">{i + 1:02d}</span>'
                       f'<span class="l">{esc(c["label"])}</span></li>' for i, c in enumerate(chapters))
         return f'<section class="slide toc" {attrs}><ol class="toc-list">{lis}</ol>{pageno}</section>'
 
     if kind == "shock":
         sub = f'<p class="shock-sub">{rich(s["sub"])}</p>' if s.get("sub") else ""
         return (f'<section class="slide shock" {attrs}><div class="shock-inner">'
-                f'<p class="shock-text">{rich(s.get("text"))}</p>{sub}</div></section>')
+                f'<p class="shock-text">{rich(s.get("text"))}</p>{sub}</div>{source_line(s)}</section>')
 
     if kind == "closing":
         sub = f'<p class="closing-sub rv">{rich(s["sub"])}</p>' if s.get("sub") else ""
@@ -186,7 +194,7 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
     attrs += f' data-tab="{rec["tab"]}" data-tabs="{rec["tabs"]}"'
     return (f'<section class="slide content layout-{esc(s.get("layout"))}{tabbed}" {attrs}>{snav}'
             f'<header class="slide-head"><h2 class="title">{esc(s.get("title"))}</h2></header>'
-            f'<div class="body">{render_layout(s, base_dir)}</div>{pageno}</section>')
+            f'<div class="body">{render_layout(s, base_dir)}</div>{source_line(s)}{pageno}</section>')
 
 
 def render_slides(data, base_dir, records):
@@ -260,6 +268,8 @@ html,body{height:100%;background:#000;overflow:hidden}
   font-family:var(--font-body);visibility:hidden;overflow:hidden}
 .slide.active{visibility:visible}
 mark.em{background:none;color:var(--accent);font-weight:var(--key-weight)}
+.source{position:absolute;left:140px;bottom:56px;font:400 22px/1.3 var(--font-body);color:var(--muted);max-width:1400px}
+.shock .source{color:inherit;opacity:.55}
 .pageno{position:absolute;right:120px;bottom:56px;font:500 22px/1 var(--font-body);color:var(--muted);letter-spacing:.08em}
 
 /* persistent navigation (screen) */

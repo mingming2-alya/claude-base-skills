@@ -13,7 +13,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from deck_model import (AXES, EMPH_RE, LAYOUTS, SLIDE_TYPES, TRANSITION_PHRASES,  # noqa: E402
-                        StoryboardError, emphasis_count, load, slide_texts, visible_len)
+                        StoryboardError, emphasis_count, load, page_count, slide_texts, toc_mode,
+                        visible_len)
 
 CJK = re.compile(r"[㐀-鿿]")
 LATIN = re.compile(r"[A-Za-z]")
@@ -54,7 +55,8 @@ def lint(data):
     if len(chapters) > 4:
         E("chapters", f"有 {len(chapters)} 章，超過 4 章。軸切得太細，合併相鄰的章節。")
     elif len(chapters) == 4:
-        I("chapters", "4 章：每章開始前會自動插入目錄點亮頁。理想是 3 章以內，確認真的需要 4 章。")
+        how = "每章開始前會自動插入目錄點亮頁" if toc_mode(data) == "per-chapter" else "章節短，只會在封面後插入一頁目錄"
+        I("chapters", f"4 章：{how}。理想是 3 章以內，確認真的需要 4 章。")
     if len(set(ids)) != len(ids) or any(not i for i in ids):
         E("chapters", "每章都要有唯一的 id。")
     for i, lab in enumerate(labels):
@@ -98,6 +100,10 @@ def lint(data):
                 if p in low:
                     W(where, f"出現過場語「{p}」。位置感交給導航，不要寫過場文字；覺得需要就代表架構要調整。")
                     break
+
+        has_digit = any(re.search(r"\d", x) for x in texts)
+        if has_digit and not s.get("source") and (t == "shock" or (t == "content" and s.get("layout") == "number")):
+            W(where, "關鍵數字沒有 source（出處）。先跟原始資料核對，再寫上出處與適用範圍。")
 
         if t == "content":
             seen_content = True
@@ -174,6 +180,12 @@ def lint(data):
         if b - a < 4:
             E(f"slides[{b}]", f"與上一個震撼頁（第 {a} 頁）距離太近。兩個震撼頁之間至少隔 3 頁。")
 
+    budget = data["meta"].get("pages")
+    if isinstance(budget, int) and budget > 0:
+        total_pages = page_count(data)
+        if total_pages > budget:
+            E("meta.pages", f"建置後共 {total_pages} 頁（含封面與自動目錄頁），超過上限 {budget} 頁。")
+
     minutes = data["meta"].get("minutes")
     ch_minutes = [c.get("minutes") for c in chapters if isinstance(c, dict)]
     if chapters and all(isinstance(m, (int, float)) for m in ch_minutes):
@@ -191,9 +203,9 @@ def lint(data):
         I("chapters.minutes", "沒有寫每章分鐘數。加上 chapters[].minutes 可以檢查時間分配。")
     if isinstance(minutes, (int, float)) and minutes > 0:
         n_content = sum(1 for s in slides if isinstance(s, dict) and s.get("type", "content") in ("content", "shock"))
-        lo, hi = round(minutes * 0.5), round(minutes * 1.2) + 1
+        lo, hi = max(1, int(minutes * 0.3)), round(minutes * 1.2) + 1
         if not lo <= n_content <= hi:
-            W("meta.minutes", f"{minutes} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.6–1 頁）。")
+            W("meta.minutes", f"{minutes} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.4–1 頁；圖解密集的頁面可以更少）。")
 
     return errors, warnings, infos
 

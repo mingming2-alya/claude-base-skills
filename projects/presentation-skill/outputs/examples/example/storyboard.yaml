@@ -9,6 +9,7 @@ meta:
   date: 2026.12                     # 封面日期（可省略）
   theme: paper                      # paper / signal / ink，或自訂主題的相對路徑 ./theme.css
   minutes: 15                       # 總時長（分鐘），lint 會檢查頁數與各章時間
+  pages: 12                         # 頁數上限（含封面與自動目錄頁），可省略
   lang: zh-Hant
 
 structure:
@@ -39,7 +40,7 @@ chapters:
 # layout（content 才需要）：
 #   point   整頁只為一個重點服務：key（重點）+ support（一行補充，可省略）
 #   bullets 條列：items（最多 5 條）
-#   number  大數字：value + label + note（可省略）
+#   number  大數字：value + label + note（可省略）＋ source（出處，強烈建議）
 #   compare 左右比較：left/right 各有 heading + items
 #   steps   有順序的步驟：items（最多 5 步）
 #   quote   引言：text + source
@@ -48,7 +49,8 @@ chapters:
 #   chapter 屬於哪一章（content 必填，填 chapters 的 id）
 #   title   這頁在講什麼（路標，不寫結論，≤12 字）
 #   tab     頁籤上的短名稱（可省略，預設用 title）
-#   notes   講者備註（按 N 顯示）
+#   notes   講者備註（按 N 顯示）；限制、適用範圍、不承諾的事可以寫在這裡
+#   source  數字或引述的出處，小字顯示在頁面底部（number、shock、point 都可用）
 # 重點標記：在文字中用 ==重點== 標出，每頁最多一處。point 的 key 沒有標記時，整句視為重點。
 
 slides:
@@ -65,6 +67,7 @@ slides:
     value: "0%"
     label: 上半年營收成長
     note: 連續兩季持平，三個主要客戶續約延後
+    source: 2026 上半年財務報告
     notes: 先讓大家回到年初的感覺，不要急著解釋原因。
 
   - chapter: past
@@ -100,6 +103,7 @@ slides:
   - type: shock
     text: 下半年，營收成長 38%
     sub: 而且沒有增加任何一位業務
+    source: 2026 下半年財務報告
     notes: 停兩秒再說話。
 
   - chapter: next

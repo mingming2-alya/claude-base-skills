@@ -147,3 +147,28 @@
     5. 關鍵數字先查核出處
     6. 短簡報不要每章插目錄頁
 - 補充：成品因為對總數有疑慮，沒有採用「63 → 16」。Claude 逐列加總後，兩個總數其實都正確，但「先查核再採用」的做法是對的。
+
+## 2026-11-14｜套用第二次迭代的修正（deck-architect v0.2）
+
+- 使用者決定：4 項修正全部套用；**v1 改成做 4 次迭代**，第三、四次分別用「年度成果」與「會議簡報」。
+- 修改：
+  - `references/grill.md`
+    - 同一張表單的題目不可互相依賴，既有框架單獨先問
+    - 頁數要問含不含封面與目錄
+    - 新增「證據」與「限制與不承諾」兩題
+    - 新增「查核關鍵數字」：出處、總數是否等於逐項加總、適用範圍
+  - `references/presentation-rules.md`
+    - 章節數 > 3 但每章平均 < 2 頁時，只插一頁目錄
+    - 數字要有出處
+  - `scripts/deck_model.py`：新增 `toc_mode()`（per-chapter／agenda／none）與 `page_count()`
+  - `scripts/build.py`：agenda 模式在封面後插一頁全亮的目錄；`source` 以小字顯示在頁面底部
+  - `scripts/lint.py`
+    - `meta.pages` 頁數上限（含封面與自動目錄頁）
+    - 含數字的震撼頁或大數字頁缺 `source` 時警告
+  - `templates/`：brief 加入頁數定義、證據、限制與不承諾；storyboard 加入 `pages`、`source` 範例
+  - `SKILL.md`：Step 1 同步
+- 測試時又發現一個問題：節奏規則「每分鐘 0.6–1 頁」會對真實成品（10 分鐘 4 頁內容）誤報。這個基準原本是 Claude 假設的，改依兩份真實成品校正為每分鐘 0.4–1 頁。
+- 測試：
+  - 模擬第二次迭代的 4 章 6 頁簡報：只插一頁目錄、`source` 正常顯示（截圖確認），`pages: 5` 時正確報錯
+  - test4 範例改為 agenda 模式（4 章各 1 頁）
+- 重新打包 `outputs/deck-architect.skill`，範例重建

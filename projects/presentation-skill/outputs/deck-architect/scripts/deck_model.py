@@ -97,5 +97,30 @@ def emphasis_count(s):
     return n
 
 
+def toc_mode(data):
+    """How chapter navigation pages are inserted.
+
+    per-chapter: > 3 chapters and on average >= 2 content pages each -> a TOC highlight page before every chapter
+    agenda:      > 3 chapters but short chapters -> a single agenda page after the cover
+    none:        <= 3 chapters -> the persistent chapter bar is enough
+    """
+    chapters = data.get("chapters") or []
+    if len(chapters) <= 3:
+        return "none"
+    n_content = sum(1 for s in data.get("slides") or [] if isinstance(s, dict) and s.get("type", "content") == "content")
+    return "per-chapter" if n_content / len(chapters) >= 2 else "agenda"
+
+
+def page_count(data):
+    """Pages the built deck will have, including automatic TOC pages."""
+    n = sum(1 for s in data.get("slides") or [] if isinstance(s, dict))
+    mode = toc_mode(data)
+    if mode == "per-chapter":
+        n += len(data.get("chapters") or [])
+    elif mode == "agenda":
+        n += 1
+    return n
+
+
 def visible_len(text):
     return len(EMPH_RE.sub(r"\1", text))
