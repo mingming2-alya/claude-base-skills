@@ -296,3 +296,19 @@
   - 掃描整個 `projects/` 確認沒有殘留
 - **git 歷史仍保留 v0.3 的真實內容**。是否改寫歷史並強制推送，屬於破壞性操作，交由使用者決定。
 - 往後的規則：範例一律從零虛構，**不從使用者的真實資料改寫**。
+
+## 2026-11-14｜改寫 git 歷史，移除外洩的真實資料
+
+- 使用者決定：改寫歷史並強制推送。
+- 範圍：只改 `presentation-skill-generation` 分支，`main` 不動。
+  - 含真實資料的 commit 有 4 個，從 v0.3 到第四次迭代的比對結論。
+  - 涉及的檔案：年度成果範例（storyboard 與 deck.html）、LOG 裡的一行、lint.py 的一段註解，以及包著同一段註解的 `.skill` 壓縮檔。
+- 做法：用 `git filter-branch --tree-filter`，在每個受影響的 commit 裡換成現在的虛構內容；lint.py 有變動的 commit 就重新打包 `.skill`。
+- 驗證：
+  - 所有 commit 的文字檔沒有命中
+  - 所有 `.skill` 壓縮檔內部沒有命中
+  - 改寫後的最終檔案與改寫前完全相同
+- 用 `--force-with-lease` 推送，只有遠端仍是上次推的版本時才覆蓋。
+- 副作用：
+  - filter-branch 不保留 commit 的 SSH 簽章，所以分支上**所有 commit 的編號都變了**，包括內容沒變的前 8 個。其他地方若有舊的副本，要重新抓取。
+  - GitHub 可能仍保留舊 commit 的快取，用舊編號直接存取還看得到，直到 GitHub 清理為止。要立即清除，需要聯絡 GitHub Support。
