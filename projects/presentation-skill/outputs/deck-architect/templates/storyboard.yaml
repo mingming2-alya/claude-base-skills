@@ -46,12 +46,14 @@ chapters:
 #   bullets 條列：items（最多 5 條）+ note（條列下方的一行補充，可省略）
 #   number  大數字：value + label + note（可省略）＋ source（出處，強烈建議）＋ points（2–3 條佐證，只有 evidence 排法會顯示）
 #           value 寫一個數字（"38%" 會自動把單位縮小），或前後對比 "45 → 12"（前者淡、後者用突出色）
-#   stats   多個數字：stats（2–4 個，各有 value、label，以及選填的 note 寫適用範圍、bar 0–100 給數據柱排法）+ lead（一句話）+ note
+#   stats   多個數字：stats（2–4 個，各有 value、label，以及選填的 heading 這個數字要證明的論點、note 適用範圍、
+#           bar 0–100 給數據柱排法）+ lead（一句話）+ note
 #           value 可以寫成 "==1,840==" 標出主角
 #   compare 左右比較：left/right 各有 heading + items；note（下方一句結論，可省略）
 #   steps   有順序的步驟：items（最多 5 步；每項可寫成字串，或 {label, detail}）+ note
 #   quote   引言：text + source（畫面上用英文引號 “ ”，text 裡不用自己加引號）
 #   timeline 時間軸：events（3–6 個，各有 when、label、detail）+ note
+#   lanes   逐段前後對照：lanes（[上排名稱, 下排名稱]）+ stages（3–6 段，各有 before 清單、change、after、detail）+ note
 #   table   表格：columns（欄名，最多 6 欄）+ rows（每列一個清單，最多 7 列）+ note；整欄都是數字會自動靠右
 #   image   圖片：src（相對於 storyboard 的路徑）+ caption；圖只是氣氛，重點仍要寫在文字裡
 #   pillars 一頁總覽：headline（主句）+ pillars（每章一欄：chapter、kicker、heading、sub、items、stats、link）

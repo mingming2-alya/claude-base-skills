@@ -29,11 +29,11 @@ CONTENT = {
     "point": dict(key="客人回來，不是因為折扣，\n是因為==被記得==", support="訪談 30 位常客，22 位提到「店員記得我喝什麼」"),
     "number": dict(value="==72%==", label="的常客每週至少來三次", note="2026 年 3 月會員資料，共 1,840 位常客",
                    points=["平均每次消費高出 18%", "其中六成會帶朋友來", "流失率只有一般會員的一半"]),
-    "stats": dict(lead="三個數字，說明常客有多重要", stats=[
-        dict(value="==1,840==", label="位常客", note="每週至少來一次", bar=46),
-        dict(value="72%", label="每週來三次以上", note="占常客的比例", bar=72),
-        dict(value="18%", label="客單價較高", note="與一般會員相比", bar=18),
-        dict(value="4.6", label="平均滿意度", note="滿分 5 分", bar=92)], note="資料期間：2026 年第一季"),
+    "stats": dict(lead="四個數字，說明常客有多重要", stats=[
+        dict(heading="常客很多", value="==1,840==", label="位常客", note="每週至少來一次", bar=46),
+        dict(heading="來得很勤", value="72%", label="每週來三次以上", note="占常客的比例", bar=72),
+        dict(heading="花得更多", value="18%", label="客單價較高", note="與一般會員相比", bar=18),
+        dict(heading="相當滿意", value="4.6", label="平均滿意度", note="滿分 5 分", bar=92)], note="資料期間：2026 年第一季"),
     "steps": dict(items=[dict(label="記下偏好", detail="第一次點單就記錄甜度與溫度"),
                          dict(label="==叫出名字==", detail="第二次來就用名字打招呼"),
                          dict(label="主動推薦", detail="依照偏好推薦當季新品"),
@@ -49,15 +49,21 @@ CONTENT = {
     "bullets": dict(items=["每家店指定一位常客負責人", "每週回報一次==回訪率==", "每月選出一個最佳做法", "每季全區分享一次"],
                     note="先從直營店開始"),
     "image": dict(src="photo.svg", alt="吧台示意圖", caption="吧台是認識客人的==第一現場=="),
+    "lanes": dict(lanes=["以前怎麼做", "現在怎麼做"], stages=[
+        dict(before=["客人自己填資料卡", "店員抄進筆記本", "月底整理一次"], change="改成點單時順手記", after="點單時記偏好", detail="兩個欄位：甜度、溫度"),
+        dict(before=["看筆記本找名字", "常常找不到"], change="系統自動帶出", after="==叫出名字==", detail="刷會員就顯示"),
+        dict(before=["店長憑印象推薦"], change="依紀錄推薦", after="推薦當季新品", detail="每季更新一次清單"),
+        dict(before=["發問卷", "回收率不到一成"], change="改成當面問", after="每月問一個問題", detail="結帳時順口問")],
+        note="四個步驟都不需要新設備"),
     "table": dict(columns=["門市", "常客數", "回訪率", "負責人"],
                   rows=[["信義店", "420", "81%", "店長"], ["公館店", "==388==", "77%", "副店長"],
                         ["天母店", "305", "69%", "店長"], ["板橋店", "290", "64%", "資深店員"]],
                   note="回訪率：30 天內再次消費的比例"),
 }
 CHAPTERS = [dict(id="a", label="為什麼", minutes=5), dict(id="b", label="怎麼做", minutes=5), dict(id="c", label="成果", minutes=5)]
-ORDER = ["point", "number", "stats", "quote", "steps", "timeline", "bullets", "compare", "image", "table"]
+ORDER = ["point", "number", "stats", "quote", "steps", "timeline", "bullets", "compare", "lanes", "image", "table"]
 CHAPTER_OF = {"point": "a", "number": "a", "stats": "a", "quote": "a", "steps": "b", "timeline": "b", "bullets": "b",
-              "compare": "c", "image": "c", "table": "c"}
+              "compare": "c", "lanes": "c", "image": "c", "table": "c"}
 CLOSING = dict(type="closing", text="明天開始，\n==記得一位客人==", sub="從你的店開始", points=["記下偏好", "叫出名字", "==每週看回訪率=="])
 
 

@@ -242,24 +242,38 @@ slides:
   title: stats・橫排
   appendix: true
   id: stats-row
-  lead: 三個數字，說明常客有多重要
+  lead: 四個數字，說明常客有多重要
   stats: &id003
-  - value: ==1,840==
+  - heading: 常客很多
+    value: ==1,840==
     label: 位常客
     note: 每週至少來一次
     bar: 46
-  - value: 72%
+  - heading: 來得很勤
+    value: 72%
     label: 每週來三次以上
     note: 占常客的比例
     bar: 72
-  - value: 18%
+  - heading: 花得更多
+    value: 18%
     label: 客單價較高
     note: 與一般會員相比
     bar: 18
-  - value: '4.6'
+  - heading: 相當滿意
+    value: '4.6'
     label: 平均滿意度
     note: 滿分 5 分
     bar: 92
+  note: 資料期間：2026 年第一季
+  type: content
+- chapter: a
+  layout: stats
+  variant: claims
+  title: stats・論點＋數字
+  appendix: true
+  id: stats-claims
+  lead: 四個數字，說明常客有多重要
+  stats: *id003
   note: 資料期間：2026 年第一季
   type: content
 - chapter: a
@@ -268,7 +282,7 @@ slides:
   title: stats・直向帳單
   appendix: true
   id: stats-ledger
-  lead: 三個數字，說明常客有多重要
+  lead: 四個數字，說明常客有多重要
   stats: *id003
   note: 資料期間：2026 年第一季
   type: content
@@ -278,7 +292,7 @@ slides:
   title: stats・一大多小
   appendix: true
   id: stats-hero
-  lead: 三個數字，說明常客有多重要
+  lead: 四個數字，說明常客有多重要
   stats: *id003
   note: 資料期間：2026 年第一季
   type: content
@@ -288,7 +302,7 @@ slides:
   title: stats・數字卡
   appendix: true
   id: stats-cards
-  lead: 三個數字，說明常客有多重要
+  lead: 四個數字，說明常客有多重要
   stats: *id003
   note: 資料期間：2026 年第一季
   type: content
@@ -298,7 +312,7 @@ slides:
   title: stats・陳述＋四格
   appendix: true
   id: stats-split
-  lead: 三個數字，說明常客有多重要
+  lead: 四個數字，說明常客有多重要
   stats: *id003
   note: 資料期間：2026 年第一季
   type: content
@@ -308,7 +322,7 @@ slides:
   title: stats・數據柱
   appendix: true
   id: stats-tower
-  lead: 三個數字，說明常客有多重要
+  lead: 四個數字，說明常客有多重要
   stats: *id003
   note: 資料期間：2026 年第一季
   type: content
@@ -577,6 +591,52 @@ slides:
   note: 成本沒有增加，改變的是每天的習慣
   type: content
 - chapter: c
+  layout: lanes
+  variant: columns
+  title: lanes・逐欄對照
+  appendix: true
+  id: lanes-columns
+  lanes: &id009
+  - 以前怎麼做
+  - 現在怎麼做
+  stages: &id010
+  - before:
+    - 客人自己填資料卡
+    - 店員抄進筆記本
+    - 月底整理一次
+    change: 改成點單時順手記
+    after: 點單時記偏好
+    detail: 兩個欄位：甜度、溫度
+  - before:
+    - 看筆記本找名字
+    - 常常找不到
+    change: 系統自動帶出
+    after: ==叫出名字==
+    detail: 刷會員就顯示
+  - before:
+    - 店長憑印象推薦
+    change: 依紀錄推薦
+    after: 推薦當季新品
+    detail: 每季更新一次清單
+  - before:
+    - 發問卷
+    - 回收率不到一成
+    change: 改成當面問
+    after: 每月問一個問題
+    detail: 結帳時順口問
+  note: 四個步驟都不需要新設備
+  type: content
+- chapter: c
+  layout: lanes
+  variant: rows
+  title: lanes・逐列對照
+  appendix: true
+  id: lanes-rows
+  lanes: *id009
+  stages: *id010
+  note: 四個步驟都不需要新設備
+  type: content
+- chapter: c
   layout: image
   variant: split
   title: image・圖左文右
@@ -632,12 +692,12 @@ slides:
   title: table・帳冊
   appendix: true
   id: table-ledger
-  columns: &id009
+  columns: &id011
   - 門市
   - 常客數
   - 回訪率
   - 負責人
-  rows: &id010
+  rows: &id012
   - - 信義店
     - '420'
     - 81%
@@ -662,8 +722,8 @@ slides:
   title: table・條紋
   appendix: true
   id: table-stripe
-  columns: *id009
-  rows: *id010
+  columns: *id011
+  rows: *id012
   note: 回訪率：30 天內再次消費的比例
   type: content
 - chapter: c
@@ -672,8 +732,8 @@ slides:
   title: table・逐列紙條
   appendix: true
   id: table-strips
-  columns: *id009
-  rows: *id010
+  columns: *id011
+  rows: *id012
   note: 回訪率：30 天內再次消費的比例
   type: content
 - chapter: c
@@ -682,7 +742,7 @@ slides:
   title: table・左說明右表
   appendix: true
   id: table-lead
-  columns: *id009
-  rows: *id010
+  columns: *id011
+  rows: *id012
   note: 回訪率：30 天內再次消費的比例
   type: content

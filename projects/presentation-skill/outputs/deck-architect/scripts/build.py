@@ -270,7 +270,9 @@ def render_layout(s, base_dir):
                 f'<div class="label rv">{rich(s.get("label"))}</div>{note}{points}</div>')
     foot_note = f'<p class="lnote rv">{rich(s["note"])}</p>' if s.get("note") else ""
     if lay == "stats":
-        cells = "".join(f'<div class="stat rv"><div class="sv">{number_html(st.get("value"))}</div>'
+        cells = "".join(f'<div class="stat rv">'
+                        + (f'<div class="sh">{rich(st["heading"])}</div>' if st.get("heading") else "")
+                        + f'<div class="sv">{number_html(st.get("value"))}</div>'
                         f'<div class="sl">{rich(st.get("label"))}</div>'
                         + (f'<div class="sn">{rich(st["note"])}</div>' if st.get("note") else "")
                         + (f'<i class="bar" style="--h:{float(st["bar"]):g}"></i>'
@@ -307,6 +309,17 @@ def render_layout(s, base_dir):
             return (f'<li class="rv"><div class="tb"><span class="w">{rich(x.get("when", ""))}</span>'
                     f'<span class="t">{rich(x.get("label"))}</span>{d}</div><i class="dot"></i></li>')
         return f'<div><ol class="tl" style="--n:{len(events)}">{"".join(ev(x) for x in events)}</ol>{foot_note}</div>'
+    if lay == "lanes":
+        stages = [x for x in s.get("stages", []) if isinstance(x, dict)]
+        names = list(s.get("lanes") or []) + ["原本", "現在"]
+        def lane(i, x):
+            old = "".join(f"<li>{rich(o)}</li>" for o in x.get("before", []))
+            d = f'<span class="d">{rich(x["detail"])}</span>' if x.get("detail") else ""
+            ch = f'<div class="lc">{rich(x["change"])}</div>' if x.get("change") else '<div class="lc"></div>'
+            return (f'<div class="lane rv" style="--i:{i}"><ul class="lo">{old}</ul>{ch}'
+                    f'<div class="ln"><span class="n">{i + 1:02d}</span><span class="t">{rich(x.get("after"))}</span>{d}</div></div>')
+        return (f'<div><div class="lanes" style="--n:{len(stages)}"><div class="ll lb">{rich(names[0])}</div>'
+                f'<div class="ll la">{rich(names[1])}</div>{"".join(lane(i, x) for i, x in enumerate(stages))}</div>{foot_note}</div>')
     if lay == "table":
         cols, rows = s.get("columns", []), s.get("rows", [])
         is_num = lambda c: bool(CELL_NUM_RE.match(EMPH_RE.sub(r"\1", str(c)).strip()))

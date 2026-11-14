@@ -37,6 +37,7 @@ LAYOUTS = {
     "stats": ["stats"],
     "timeline": ["events"],
     "table": ["columns", "rows"],
+    "lanes": ["stages"],
 }
 
 # Layout library: every arrangement of every layout. Style (themes/*.css) never decides layout;
@@ -45,7 +46,7 @@ LAYOUTS = {
 VARIANTS = {
     "point": ["plain", "offset", "split", "band", "bottom", "card"],
     "number": ["side", "center", "stack", "reverse", "bottom", "evidence"],
-    "stats": ["row", "ledger", "hero", "cards", "split", "tower"],
+    "stats": ["row", "claims", "ledger", "hero", "cards", "split", "tower"],
     "steps": ["row", "ledger", "vertical", "pipeline", "cycle", "pyramid", "stack", "cards"],
     "timeline": ["axis", "alternate", "vertical", "ledger"],
     "compare": ["panel", "halves", "versus", "arrow", "rows"],
@@ -53,6 +54,7 @@ VARIANTS = {
     "bullets": ["list", "split", "numbered", "grid", "cards"],
     "image": ["split", "flip", "full", "top", "frame"],
     "table": ["ledger", "stripe", "strips", "lead"],
+    "lanes": ["columns", "rows"],
     "cover": ["bottom", "center", "top", "split", "bands"],
     "toc": ["axis", "cards", "strips", "numeral"],
     "closing": ["bottom", "center", "split", "card"],
@@ -66,7 +68,7 @@ LAYOUT_FIELDS = {
     "compare": {"left", "right", "note"}, "steps": {"items", "note"}, "quote": {"text"}, "image": {"src", "alt", "caption"},
     "pillars": {"headline", "pillars", "stagger"}, "status-table": {"summary", "stages", "groups", "continued"},
     "stats": {"stats", "lead", "note"},
-    "timeline": {"events", "note"}, "table": {"columns", "rows", "note"},
+    "timeline": {"events", "note"}, "table": {"columns", "rows", "note"}, "lanes": {"lanes", "stages", "note"},
 }
 
 CELL_STATES = {"done", "doing", "target", "na"}
@@ -214,6 +216,8 @@ def variant_problems(s, v=None):
             out.append("stats 的 tower 排法需要每個數字都有 bar（0–100，決定柱子高度）")
         if v == "split" and not s.get("lead"):
             out.append("stats 的 split 排法需要 lead（左邊的大字陳述）")
+        if v == "claims" and not all(isinstance(x, dict) and x.get("heading") for x in stats):
+            out.append("stats 的 claims 排法是「論點配數字」，每個數字都要有 heading（它證明的那句話）")
         if v == "hero" and len(stats) < 2:
             out.append("stats 的 hero 排法至少要 2 個數字")
     if key == "steps":
@@ -245,6 +249,13 @@ def variant_problems(s, v=None):
             out.append("table 的 strips 排法最多 5 列")
         if v == "lead" and len(s.get("columns") or []) > 4:
             out.append("table 的 lead 排法把左邊讓給說明，表格最多 4 欄")
+    if key == "lanes":
+        stages = s.get("stages") or []
+        lo, hi = (3, 6) if v == "columns" else (2, 4)
+        if not lo <= len(stages) <= hi:
+            out.append(f"lanes 的 {v} 排法適合 {lo}–{hi} 段")
+        if any(len((x or {}).get("before") or []) > 5 for x in stages if isinstance(x, dict)):
+            out.append("lanes 每一段的 before 最多 5 條")
     if key == "closing" and v == "split" and not 1 <= len(s.get("points") or []) <= 3:
         out.append("closing 的 split 排法需要 points：1–3 條帶走的重點")
     return out
@@ -254,7 +265,7 @@ def variant_problems(s, v=None):
 VARIANT_ZH = {
     "point": {"plain": "靠左大字", "offset": "左側留白", "split": "左右分半", "band": "底部橫帶", "bottom": "貼底大字", "card": "置中紙卡"},
     "number": {"side": "數字在左", "center": "全部置中", "stack": "上下堆疊", "reverse": "數字在右", "bottom": "巨數貼底", "evidence": "數字＋佐證"},
-    "stats": {"row": "橫排", "ledger": "直向帳單", "hero": "一大多小", "cards": "數字卡", "split": "陳述＋四格", "tower": "數據柱"},
+    "stats": {"row": "橫排", "claims": "論點＋數字", "ledger": "直向帳單", "hero": "一大多小", "cards": "數字卡", "split": "陳述＋四格", "tower": "數據柱"},
     "steps": {"row": "橫排", "ledger": "帳簿列", "vertical": "直向軸線", "pipeline": "箭頭管線", "cycle": "四角循環", "pyramid": "金字塔",
               "stack": "左標題右堆疊", "cards": "步驟卡"},
     "timeline": {"axis": "橫軸", "alternate": "上下交替", "vertical": "直軸", "ledger": "日程帳冊"},
@@ -263,6 +274,7 @@ VARIANT_ZH = {
     "bullets": {"list": "清單", "split": "左標題右清單", "numbered": "編號長條", "grid": "格線方格", "cards": "卡片"},
     "image": {"split": "圖左文右", "flip": "文左圖右", "full": "滿版圖", "top": "上圖下文", "frame": "置中相框"},
     "table": {"ledger": "帳冊", "stripe": "條紋", "strips": "逐列紙條", "lead": "左說明右表"},
+    "lanes": {"columns": "逐欄對照", "rows": "逐列對照"},
     "cover": {"bottom": "標題貼底", "center": "置中", "top": "標題在上", "split": "左文右路線", "bands": "章節橫帶"},
     "toc": {"axis": "依軸向", "cards": "編號卡", "strips": "編號長條", "numeral": "巨大章號"},
     "closing": {"bottom": "貼底", "center": "置中", "split": "左結語右重點", "card": "行動卡"},

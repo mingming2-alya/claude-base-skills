@@ -93,8 +93,19 @@
 
 /* ================================================================ stats (多個數字) */
 .stats-row .bar{display:none}
+/* claims: each column pairs a claim (stat.heading) on top with the figure that proves it at the bottom.
+   Idea: GZ Swiss "three arguments, a figure under each". */
+.layout-stats.v-claims .stats-row{gap:0;min-height:470px}
+.layout-stats.v-claims .stat{display:flex;flex-direction:column;padding:0 48px;border-top:0;border-left:1px solid var(--line-2)}
+.layout-stats.v-claims .stat:first-child{padding-left:0;border-left:0}
+.layout-stats.v-claims .stat:last-child{padding-right:0}
+.layout-stats.v-claims .sh{margin:0 0 auto;padding-top:26px;border-top:2px solid var(--line);font-size:56px;line-height:1.25;text-wrap:balance}
+.layout-stats.v-claims .sv{margin-top:48px;font-size:128px}
+.layout-stats.v-claims .sl{font-size:28px;margin-top:12px}
 /* ledger: one figure per row, hairlines between rows: figure, label, scope. Idea: GZ Swiss stacked KPI ledger. */
 .layout-stats.v-ledger .stats-row{grid-template-columns:auto minmax(0,1fr) minmax(0,420px);gap:0 72px}
+.layout-stats.v-ledger .stats-row:has(.sh){grid-template-columns:auto auto minmax(0,1fr) minmax(0,360px);gap:0 64px}
+.layout-stats.v-ledger .sh{margin:0;font-size:44px}
 .layout-stats.v-ledger .stat{display:grid;grid-template-columns:subgrid;grid-column:1/-1;align-items:baseline;padding:16px 0;
   border-top:1px solid var(--line-2)}
 .layout-stats.v-ledger .stat:first-child{border-top:2px solid var(--line)}
@@ -113,6 +124,10 @@
 .layout-stats.v-hero .lnote{margin-top:24px}
 .layout-stats.v-hero .stat:nth-child(2){border-top:2px solid var(--line)}
 .layout-stats.v-hero .stat:not(:first-child) .sv{font-size:80px}
+.layout-stats.v-hero .stat:not(:first-child) .sh{font-size:28px;margin-bottom:4px}
+.layout-stats.v-hero .stats-row:has(.sh) .stat:not(:first-child) .sn{display:none}
+.layout-stats.v-hero .stats-row:has(.sh) .stat:not(:first-child) .sv{font-size:72px}
+.layout-stats.v-hero .stats-row:has(.sh) .stat:first-child .sv{font-size:210px}
 .layout-stats.v-hero .stat:not(:first-child) .sl{font-size:26px;margin-top:6px}
 .layout-stats.v-hero .stat:not(:first-child) .sn{font-size:20px;margin-top:4px}
 /* cards: one card per figure; the card holding the emphasis is reversed out. Origins: PC paper L8, GZ magazine data cards (idea). */
@@ -121,6 +136,7 @@
   rotate:calc(var(--_tilt) * var(--s,1));clip-path:var(--card-clip,none)}
 .layout-stats.v-cards .stat:nth-child(even){--s:-1}
 .layout-stats.v-cards .sv{font-size:128px}
+.layout-stats.v-cards .sh{margin-bottom:28px}
 .layout-stats.v-cards .stat:has(mark.em){background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .layout-stats.v-cards .stat:has(mark.em) :is(.sl,.sn){color:inherit}
 .layout-stats.v-cards .stat:has(mark.em) mark.em{color:var(--em-on-accent,inherit)}
@@ -131,6 +147,7 @@
 .layout-stats.v-split .stat{padding-top:20px}
 .layout-stats.v-split .sv{font-size:104px}
 .layout-stats.v-split .sl{font-size:26px;margin-top:10px}
+.layout-stats.v-split .sh{font-size:28px;margin-bottom:6px}
 .layout-stats.v-split .sn{font-size:20px}
 .layout-stats.v-split .lnote{grid-column:1;margin-top:40px}
 /* tower: each column stands on a bar whose height comes from the data (stat.bar, 0–100). Idea: GZ Swiss KPI tower. */
@@ -138,6 +155,7 @@
 .layout-stats.v-tower .stat{display:flex;flex-direction:column;justify-content:flex-end;padding:0;border:0}
 .layout-stats.v-tower .sv{font-size:100px}
 .layout-stats.v-tower .sl{font-size:28px;margin-top:10px}
+.layout-stats.v-tower .sh{font-size:30px;margin-bottom:8px}
 .layout-stats.v-tower .bar{display:block;flex:none;order:9;margin-top:20px;height:calc(var(--h) * 2.3px + 10px);background:var(--fg-3)}
 .layout-stats.v-tower .stat:has(mark.em) .bar{background:var(--accent)}
 .layout-stats.v-tower .stats-lead{margin-bottom:24px}
@@ -402,6 +420,41 @@
 .layout-table.v-lead .body>div{display:grid;grid-template-columns:560px minmax(0,1fr);column-gap:100px;height:100%;align-content:center}
 .layout-table.v-lead .tbl{grid-column:2;grid-row:1;align-self:center}
 .layout-table.v-lead .lnote{grid-column:1;grid-row:1;align-self:end;margin:0}
+
+/* ================================================================ lanes (逐段前後對照) */
+/* Each stage keeps its own before (what it used to take), a one-line change, and its after.
+   Origin of the arrangement: the user's own deck (stage-by-stage before/after map). */
+.lanes{display:grid;grid-template-columns:130px repeat(var(--n),minmax(0,1fr));grid-template-rows:auto auto auto;column-gap:16px}
+.lanes .ll{grid-column:1;font:500 22px/1.4 var(--font-label);letter-spacing:var(--label-tracking);color:var(--fg-3);padding-top:18px}
+.lanes .lb{grid-row:1}
+.lanes .la{grid-row:3;color:var(--fg)}
+.lanes .lane{display:grid;grid-template-rows:subgrid;grid-row:1/4;grid-column:calc(var(--i) + 2)}
+.lanes .lo{list-style:none;padding:0 0 18px;border-top:1px solid var(--line-2)}
+.lanes .lo li{padding:12px 0;border-bottom:1px solid var(--line-2);font:400 22px/1.4 var(--font-body);color:var(--fg-2)}
+.lanes .lo li:last-child{border-bottom:0}
+.lanes .lc{align-self:end;padding:12px 14px;background:var(--bg-2);font:500 22px/1.35 var(--font-body);color:var(--fg)}
+.lanes .lc:not(:empty)::before{content:"↓ ";color:var(--fg-3)}
+.lanes .ln{margin-top:18px;padding-top:18px;border-top:3px solid var(--line)}
+.lanes .ln .n{display:block;font:var(--numeral-weight) 44px/1 var(--font-number);color:var(--fg-3);margin-bottom:12px}
+.lanes .ln .t{display:block;font:700 28px/1.3 var(--font-body);text-wrap:balance}
+.lanes .ln .d{display:block;margin-top:8px;font:400 22px/1.4 var(--font-body);color:var(--fg-2)}
+.lanes .lane:has(mark.em) .ln{border-top-color:var(--accent)}
+.lanes .lane:has(mark.em) .ln .n{color:var(--accent-text)}
+/* rows: one stage per row — before on the left, the change in the middle, after on the right. */
+.layout-lanes.v-rows .lanes{grid-template-columns:minmax(0,1.25fr) 300px minmax(0,1fr);grid-template-rows:auto repeat(var(--n),auto);column-gap:48px}
+.layout-lanes.v-rows .ll{padding:0 0 14px}
+.layout-lanes.v-rows .lb{grid-row:1;grid-column:1}
+.layout-lanes.v-rows .la{grid-row:1;grid-column:3}
+.layout-lanes.v-rows .lane{grid-template-rows:none;grid-template-columns:subgrid;grid-column:1/-1;grid-row:calc(var(--i) + 2);align-items:center;
+  padding:18px 0;border-top:1px solid var(--line-2)}
+.layout-lanes.v-rows .lane:first-of-type{border-top:2px solid var(--line)}
+.layout-lanes.v-rows .lo{display:flex;flex-wrap:wrap;gap:4px 24px;padding:0;border:0}
+.layout-lanes.v-rows .lo li{padding:0;border:0;font-size:24px}
+.layout-lanes.v-rows .lc{align-self:center}
+.layout-lanes.v-rows .lc:not(:empty)::before{content:"→ "}
+.layout-lanes.v-rows .ln{display:grid;grid-template-columns:64px minmax(0,1fr);margin:0;padding:0;border:0}
+.layout-lanes.v-rows .ln .n{grid-row:1/3;font-size:36px;margin:0}
+.layout-lanes.v-rows .ln .t{font-size:32px}
 
 /* ================================================================ cover (封面) */
 /* center. Idea: GZ magazine cover. */
