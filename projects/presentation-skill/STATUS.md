@@ -4,18 +4,25 @@ _最後更新：2026-11-14_
 
 ## 目前在哪
 
-- **deck-architect v0 已完成**：流程骨架、lint、HTML 簡報產生器、三種主題、樣張頁、品管腳本。原始碼在 `outputs/deck-architect/`，安裝包 `outputs/deck-architect.skill`，範例在 `outputs/examples/`。
+- **deck-architect v0.1**（2026-11-14）：套用第一次迭代的修正，見下方 v1 進度。
+- deck-architect v0 已完成：流程骨架、lint、HTML 簡報產生器、三種主題、樣張頁、品管腳本。原始碼在 `outputs/deck-architect/`，安裝包 `outputs/deck-architect.skill`，範例在 `outputs/examples/`。
 - 專案同步規則已建立：根目錄 `CLAUDE.md`＋Stop hook（`.claude/hooks/check-sync.sh`）。
 
 ## v1 進度
 
 - ✅ 第一次迭代（2026-11-14）：用一場 15 分鐘的副總演講比對，結論在 `inputs/v1-iteration-1-comparison.md`。聽眾、終點、人際顧慮、開場提問都對；架構候選漏掉使用者原本的框架、故事位置、結尾語氣、每章時間預算要修。
+- ✅ 已套用修正（v0.1）：
+  - 架構候選必含使用者既有框架
+  - 序幕、轉折點、尾聲
+  - `role: opener` 開場提問
+  - 有人際顧慮時改用「我們」提問
+  - 每章時間預算與 lint 檢查
+  - Grill 預設用互動表單
 
 ## 下一步
 
-1. 等使用者確認後，把第一次迭代的 5 條修正寫進 deck-architect（structure.md、grill.md、presentation-rules.md、lint.py、templates）。
-2. 第二次迭代：換一種類型的真實簡報（v1 完成條件是 3 份不同類型）。
-3. v1 其他項目：可編輯的 PPTX 匯出、快速模式沿用上次風格。
+1. 第二次迭代：換一種類型的真實簡報（v1 完成條件是 3 份不同類型）。
+2. v1 其他項目：可編輯的 PPTX 匯出、快速模式沿用上次風格。
 
 ## 待使用者決定
 

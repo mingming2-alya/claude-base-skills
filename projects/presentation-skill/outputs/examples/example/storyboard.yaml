@@ -8,6 +8,7 @@ meta:
   presenter: 王小明 · 產品部        # 封面講者（可省略）
   date: 2026.12                     # 封面日期（可省略）
   theme: paper                      # paper / signal / ink，或自訂主題的相對路徑 ./theme.css
+  minutes: 15                       # 總時長（分鐘），lint 會檢查頁數與各章時間
   lang: zh-Hant
 
 structure:
@@ -19,17 +20,22 @@ structure:
   sensitivity: false     # 有人際顧慮（不想讓人被比較）時設 true，lint 會阻擋價值軸
 
 # 章節：導航（章節列、目錄、頁籤）全部由這裡自動產生。
-# 2–4 個，命名平行、簡短，用這次內容自己的話。
+# 2–4 個，命名平行、簡短，用這次內容自己的話。minutes 是這章預計講幾分鐘（總和＋緩衝＝總時長）。
 chapters:
   - id: past
     label: 年初的困境
+    minutes: 3
   - id: shift
     label: 轉型的半年
+    minutes: 7
   - id: next
     label: 明年的方向
+    minutes: 4
 
 # 逐頁內容。
 # type:   cover（封面，自動用 meta）/ content（預設）/ shock（震撼頁）/ closing（結尾）
+#         shock 加上 role: opener ＝ 開場提問（序幕），只能放在封面後第一頁，不計入震撼頁數量
+# 轉折點：在章節內用 layout: point 放一個「做到這些就夠了嗎？」的提問，下一頁接故事（quote 或 image）
 # layout（content 才需要）：
 #   point   整頁只為一個重點服務：key（重點）+ support（一行補充，可省略）
 #   bullets 條列：items（最多 5 條）
@@ -47,6 +53,11 @@ chapters:
 
 slides:
   - type: cover
+
+  - type: shock
+    role: opener
+    text: 如果重來一次，你還會這樣過今年嗎？
+    notes: 序幕。請 2–3 位回答，每人 15 秒，不評論。
 
   - chapter: past
     title: 年初的處境

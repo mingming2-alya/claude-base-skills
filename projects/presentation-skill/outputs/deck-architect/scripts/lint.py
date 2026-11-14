@@ -90,6 +90,8 @@ def lint(data):
             continue
         texts = slide_texts(s)
 
+        if st.get("sensitivity") and any("你們" in x for x in texts):
+            W(where, "有人際顧慮（sensitivity: true）卻出現「你們」。把批評改成以「我們」開頭的反思提問，聽眾才不會覺得被指責。")
         for txt in texts:
             low = txt.lower()
             for p in TRANSITION_PHRASES:
@@ -147,9 +149,15 @@ def lint(data):
                 E(where, "震撼頁需要 text。")
             elif visible_len(text) > 20:
                 W(where, f"震撼頁文字 {visible_len(text)} 字，偏長。震撼頁只放一句話，盡量 20 字以內。")
-            if not seen_content:
-                E(where, "震撼頁前面沒有任何內容頁。震撼來自對比，前面必須有鋪陳。")
-            shock_positions.append(n)
+            is_opener = s.get("role") == "opener"
+            first_after_cover = all(isinstance(x, dict) and x.get("type") == "cover" for x in slides[:n - 1])
+            if is_opener and not first_after_cover:
+                E(where, "role: opener 只能放在封面之後的第一頁（開場提問）。")
+            elif not seen_content and not is_opener:
+                E(where, "震撼頁前面沒有任何內容頁。震撼來自對比，前面必須有鋪陳。"
+                         "如果這是開場提問（用問題讓全場先停下來想），加上 role: opener。")
+            if not is_opener:
+                shock_positions.append(n)
 
         elif t == "cover" and n != 1:
             W(where, "封面通常是第一頁。")
@@ -167,11 +175,25 @@ def lint(data):
             E(f"slides[{b}]", f"與上一個震撼頁（第 {a} 頁）距離太近。兩個震撼頁之間至少隔 3 頁。")
 
     minutes = data["meta"].get("minutes")
+    ch_minutes = [c.get("minutes") for c in chapters if isinstance(c, dict)]
+    if chapters and all(isinstance(m, (int, float)) for m in ch_minutes):
+        total = sum(ch_minutes)
+        if isinstance(minutes, (int, float)) and minutes > 0:
+            if total > minutes:
+                E("chapters.minutes", f"各章時間合計 {total:g} 分，超過總時長 {minutes:g} 分。")
+            elif minutes - total > max(2, minutes * 0.2):
+                W("chapters.minutes", f"各章時間合計 {total:g} 分，比總時長 {minutes:g} 分少很多。緩衝通常 1–2 分鐘就夠。")
+        for c, m in zip(chapters, ch_minutes):
+            pages = content_per_ch.get(c.get("id"), 0)
+            if m and pages / m > 1.5:
+                W(f"chapters[{c.get('id')}]", f"{m:g} 分鐘配 {pages} 頁，每分鐘超過 1.5 頁，講者會趕。")
+    elif isinstance(minutes, (int, float)) and minutes > 0:
+        I("chapters.minutes", "沒有寫每章分鐘數。加上 chapters[].minutes 可以檢查時間分配。")
     if isinstance(minutes, (int, float)) and minutes > 0:
         n_content = sum(1 for s in slides if isinstance(s, dict) and s.get("type", "content") in ("content", "shock"))
         lo, hi = round(minutes * 0.5), round(minutes * 1.2) + 1
         if not lo <= n_content <= hi:
-            W("meta.minutes", f"{minutes} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.7–1 頁）。")
+            W("meta.minutes", f"{minutes} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.6–1 頁）。")
 
     return errors, warnings, infos
 
