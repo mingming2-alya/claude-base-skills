@@ -55,6 +55,38 @@ def rich(s):
     return out.replace("\n", "<br>")
 
 
+PHRASE_SPLIT = re.compile(r'(<mark class="em">.*?</mark>|<br>)')
+PHRASE_END = re.compile(r'(?<=[，、；：。！？,;!?])\s*')
+
+
+def display(s):
+    """rich() for large display text: lines may only break after punctuation.
+
+    Each phrase becomes an inline-block, so the browser moves a whole phrase to the
+    next line instead of splitting a word ("營 / 收成長"). A phrase that is wider
+    than the line still wraps inside itself, so nothing can overflow.
+    """
+    phrases, cur = [], ""
+    for piece in PHRASE_SPLIT.split(rich(s)):
+        if not piece:
+            continue
+        if piece == "<br>":
+            phrases.append(cur); phrases.append("<br>"); cur = ""
+        elif piece.startswith("<mark"):
+            cur += piece
+        else:
+            parts = PHRASE_END.split(piece)
+            for i, part in enumerate(parts):
+                cur += part
+                if i < len(parts) - 1:
+                    phrases.append(cur); cur = ""
+    phrases.append(cur)
+    phrases = [x for x in phrases if x]
+    if len([x for x in phrases if x != "<br>"]) < 2:
+        return "".join(phrases)
+    return "".join(x if x == "<br>" else f'<span class="ph">{x}</span>' for x in phrases)
+
+
 # ----------------------------------------------------------------------------- theme
 def theme_css(theme, base_dir):
     if not theme:
@@ -226,7 +258,7 @@ def render_layout(s, base_dir):
         key = s.get("key", "")
         whole = "" if EMPH_RE.search(key) else " whole"
         sup = f'<p class="support rv">{rich(s["support"])}</p>' if s.get("support") else ""
-        return f'<div class="point"><p class="key rv{whole}">{rich(key)}</p>{sup}</div>'
+        return f'<div class="point"><p class="key rv{whole}">{display(key)}</p>{sup}</div>'
     if lay == "number":
         note = f'<p class="note rv">{rich(s["note"])}</p>' if s.get("note") else ""
         return (f'<div class="number"><div class="value rv">{number_html(s.get("value"))}</div>'
@@ -316,7 +348,7 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
         has_who = bool(who or meta.get("date"))
         route = ((f'<div class="who"><i>{esc(meta.get("date", ""))}</i>{who}</div>' if has_who else "")
                  + "".join(f'<div><i>{i + 1:02d}</i>{esc(c["label"])}</div>' for i, c in enumerate(chapters)))
-        parts = [f'<h1 class="cover-title rv">{rich(meta.get("title"))}</h1>',
+        parts = [f'<h1 class="cover-title rv">{display(meta.get("title"))}</h1>',
                  f'<p class="cover-sub rv">{rich(meta.get("subtitle"))}</p>' if meta.get("subtitle") else ""]
         kicker = f'<div class="kicker rv">{esc(meta.get("kicker"))}</div>' if meta.get("kicker") else ""
         return (f'<section class="slide cover" {attrs}>{frame}{kicker}<div class="cover-inner">{"".join(parts)}</div>'
@@ -330,12 +362,12 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
     if kind == "shock":
         sub = f'<p class="shock-sub">{rich(s["sub"])}</p>' if s.get("sub") else ""
         return (f'<section class="slide shock" {attrs}>{frame}<div class="shock-inner">'
-                f'<p class="shock-text">{rich(s.get("text"))}</p>{sub}</div>{source_line(s)}</section>')
+                f'<p class="shock-text">{display(s.get("text"))}</p>{sub}</div>{source_line(s)}</section>')
 
     if kind == "closing":
         sub = f'<p class="closing-sub rv">{rich(s["sub"])}</p>' if s.get("sub") else ""
         return (f'<section class="slide closing" {attrs}>{frame}<div class="closing-inner">'
-                f'<p class="closing-text rv">{rich(s.get("text", ""))}</p>{sub}</div></section>')
+                f'<p class="closing-text rv">{display(s.get("text", ""))}</p>{sub}</div></section>')
 
     # content
     snav = static_nav(chapters, rec["chi"], rec["tab"], rec["tabs"], ch_sources[rec["chi"]])
@@ -344,7 +376,11 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
     ghost = ""
     if rec["tab"] == 0 and not rec.get("appendix") and 0 <= rec["chi"] < len(chapters):
         ghost = f'<div class="ghost" aria-hidden="true">{esc(chapters[rec["chi"]]["label"])}</div>'
-    return (f'<section class="slide content layout-{esc(s.get("layout"))}{tabbed}" {attrs}>{frame}{ghost}{back}{snav}'
+    hooks = ""
+    if 0 <= rec["chi"] < len(chapters):
+        hooks = (f'<div class="chno" aria-hidden="true">{rec["chi"] + 1:02d}</div>'
+                 f'<div class="chname" aria-hidden="true">{esc(chapters[rec["chi"]]["label"])}</div>')
+    return (f'<section class="slide content layout-{esc(s.get("layout"))}{tabbed}" {attrs}>{frame}{ghost}{hooks}{back}{snav}'
             f'<header class="slide-head"><h2 class="title">{esc(s.get("title"))}</h2></header>'
             f'<div class="body">{render_layout(s, base_dir)}</div>'
             f'{"" if s.get("layout") == "quote" else source_line(s)}{more}{foot}</section>')
@@ -379,7 +415,7 @@ def deck_html(data, base_dir):
         title=esc(re.sub(r"==", "", str(data["meta"].get("title", "Deck")))),
         fonts=fonts, theme=css_theme, base=BASE_CSS,
         motion=motion, shape=toc_shape(motion),
-        slides="\n".join(slides), deck=json.dumps(deck_json, ensure_ascii=False), runtime=RUNTIME_JS)
+        slides="\n".join(slides), deck=json.dumps(deck_json, ensure_ascii=False), runtime=RUNTIME_JS, fit=FIT_JS)
 
 
 def samples_html(data, base_dir, themes, pages=None):
@@ -422,7 +458,7 @@ def samples_html(data, base_dir, themes, pages=None):
     return SAMPLES_PAGE.format(
         lang=esc(data["meta"].get("lang", "zh-Hant")), fonts=fonts_link(*css_all), base=BASE_CSS,
         themes="\n".join(css_all), motion=motion, shape=toc_shape(motion),
-        title=esc(re.sub(r"==", "", str(data["meta"].get("title", "")))), blocks="\n".join(blocks))
+        title=esc(re.sub(r"==", "", str(data["meta"].get("title", "")))), blocks="\n".join(blocks), fit=FIT_JS)
 
 
 def scope_theme(css, cls):
@@ -450,6 +486,7 @@ def r_src(rec):
 BASE_CSS = (HERE.parent / "assets" / "base.css").read_text(encoding="utf-8")
 
 RUNTIME_JS = (HERE.parent / "assets" / "runtime.js").read_text(encoding="utf-8")
+FIT_JS = (HERE.parent / "assets" / "fit.js").read_text(encoding="utf-8")
 
 PAGE = """<!doctype html>
 <html lang="{lang}" data-shape="{shape}" data-motion="{motion}" data-format="{fmt}">
@@ -459,8 +496,8 @@ PAGE = """<!doctype html>
 <title>{title}</title>
 {fonts}
 <style>
-{theme}
 {base}
+{theme}
 </style>
 </head>
 <body>
@@ -473,6 +510,7 @@ PAGE = """<!doctype html>
 <div id="hint">← → 翻頁 · F 全螢幕 · N 備註 · P 列印</div>
 <script>const DECK={deck};</script>
 <script>{runtime}</script>
+<script>{fit}</script>
 </body>
 </html>
 """
@@ -485,8 +523,8 @@ SAMPLES_PAGE = """<!doctype html>
 <title>風格樣張 · {title}</title>
 {fonts}
 <style>
-{themes}
 {base}
+{themes}
 html,body{{height:auto;overflow:auto;background:#e9e7e3}}
 body{{font-family:system-ui,"Noto Sans TC","PingFang TC",sans-serif;color:#222;padding:40px 32px 80px}}
 header.top h1{{font-size:26px;font-weight:700}}
@@ -510,6 +548,7 @@ header.top p{{color:#666;margin-top:6px;font-size:15px}}
 document.querySelectorAll('.frame').forEach(f=>{{const fit=()=>f.firstElementChild.style.transform='scale('+(f.clientWidth/1920)+')';fit();addEventListener('resize',fit);}});
 document.querySelectorAll('[data-shape=rings] .toc-list').forEach(ol=>{{const lis=[...ol.children],n=lis.length;lis.forEach((li,i)=>li.style.setProperty('--r',940-i*(700/Math.max(1,n-1))));}});
 </script>
+<script>{fit}</script>
 </body>
 </html>
 """

@@ -4,29 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>數位專案群 · 週進度總覽</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* midnight（深夜）— 高級、沉穩、有份量。深墨底、地平線光暈、細雜訊、內縮髮絲框；一個暖金突出色。
-   @fonts family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700&family=IBM+Plex+Mono:wght@400;500
-   色彩理由：暖金在深墨上有「舞台燈光」的溫度，適合發表會、開場與高階主管場合；避開常見的青紫科技光暈。 */
-:root{
-  --bg:#0F1116; --bg-2:#171A21;
-  --fg:#EDE8DE; --fg-2:#B5AFA4; --fg-3:#827D75;
-  --line:#EDE8DE; --line-2:rgba(237,232,222,.14);
-  --accent:#D2A64F; --accent-text:#DDB466; --accent-ink:#15120B;
-  --shock-bg:#EDE8DE; --shock-fg:#0F1116;
-  --font-display:"Bodoni Moda","Noto Serif TC","Songti TC",serif;
-  --font-quote:var(--font-display); --font-number:"Bodoni Moda","Noto Serif TC",serif;
-  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
-  --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
-  --display-weight:700; --title-weight:500; --quote-weight:500; --number-weight:500; --numeral-weight:500;
-  --display-tracking:-.01em; --title-tracking:.01em; --label-tracking:.08em;
-  --radius:0px; --grain:.09; --grain-blend:screen; --ghost:.03; --frame:rgba(237,232,222,.10);
-  --surface:radial-gradient(70% 45% at 50% 112%,rgba(210,166,79,.20),rgba(210,166,79,.06) 48%,transparent 72%),
-            radial-gradient(ellipse 80% 70% at 50% 45%,transparent 45%,rgba(0,0,0,.45) 100%);
-  --enter-easing:cubic-bezier(.16,1,.3,1);
-}
-
 /* deck-architect base design system (v2).
  *
  * Principles drawn from the stage-2 research (inputs/design-research.md):
@@ -85,6 +64,9 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .slide:has(.source) .foot span:first-child{display:none}
 .slide .source{bottom:44px;padding-top:14px}
 .pageno{position:absolute;right:140px;bottom:52px;font:500 20px/1 var(--font-label);color:var(--fg-3);letter-spacing:var(--label-tracking)}
+
+/* composition hooks a theme may place: chapter number and chapter name */
+.chno,.chname{display:none;pointer-events:none}
 
 /* ghost word: the chapter label, huge and nearly invisible, on a chapter's first page */
 .ghost{position:absolute;right:-60px;bottom:-170px;font:var(--display-weight) 460px/1 var(--font-display);
@@ -191,7 +173,7 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 /* ---------------------------------------------------------------- closing */
 .closing{background:var(--cover-bg,var(--bg));color:var(--cover-fg,var(--fg))}
 .closing-inner{position:absolute;left:140px;right:140px;bottom:200px}
-.closing-text{padding-bottom:.1em;font:var(--display-weight) 200px/1 var(--font-display);letter-spacing:var(--display-tracking)}
+.closing-text{padding-bottom:.16em;font:var(--display-weight) 200px/1.1 var(--font-display);letter-spacing:var(--display-tracking)}
 .closing-sub{margin-top:36px;font:400 40px/1.4 var(--font-body);color:var(--cover-fg-2,var(--fg-2))}
 
 /* ---------------------------------------------------------------- TOC highlight pages (shape follows the axis) */
@@ -215,6 +197,9 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 [data-shape=rings] .toc .i{display:none}
 [data-shape=rings] .toc .l{font-size:46px}
 [data-shape=rings] .toc li.off{opacity:.35}
+
+/* phrases of display text: break after punctuation, never inside a phrase */
+.ph{display:inline-block;max-width:100%}
 
 /* ---------------------------------------------------------------- shock: breaks every rule */
 .shock{background:var(--shock-bg);background-image:none;color:var(--shock-fg)}
@@ -294,7 +279,7 @@ body:hover #hint{opacity:.7}
 
 /* ---------------------------------------------------------------- static mode: samples and print */
 .static .slide{position:relative;visibility:visible;width:1920px;height:1080px}
-.static .snav{display:block;position:absolute;left:140px;right:140px;top:56px;z-index:9}
+.static .snav{display:flex;flex-direction:column;position:absolute;left:140px;right:140px;top:56px;z-index:9}
 .static .slabels{display:flex;gap:48px;font:500 22px/1 var(--font-label);letter-spacing:var(--label-tracking);color:var(--fg-3);
   border-bottom:1px solid var(--line-2);padding-bottom:16px}
 .static .slabels span.on{color:var(--fg);box-shadow:0 18px 0 -16px var(--fg)}
@@ -311,7 +296,7 @@ body:hover #hint{opacity:.7}
   .slide *{opacity:1;transform:none!important}
   .slide .ghost{opacity:var(--ghost,.045)!important}
   .toc li.off{opacity:.25!important}
-  .snav{display:block;position:absolute;left:140px;right:140px;top:56px}
+  .snav{display:flex;flex-direction:column;position:absolute;left:140px;right:140px;top:56px}
   .slabels{display:flex;gap:48px;font:500 22px/1 var(--font-label);color:var(--fg-3);border-bottom:1px solid var(--line-2);padding-bottom:16px}
   .slabels span.on{color:var(--fg)}
   .stabs{display:flex;gap:28px;margin-top:22px;font:500 20px/1 var(--font-label);color:var(--fg-3)}
@@ -319,6 +304,58 @@ body:hover #hint{opacity:.7}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 @media (prefers-reduced-motion: reduce){#nav .ind,#tabs span,#nav span{transition:none}}
+
+/* midnight（深夜）— 高級、沉穩、有份量。深墨底、地平線光暈、細雜訊、內縮髮絲框；一個暖金突出色。
+   @fonts family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500
+   色彩理由：暖金在深墨上有「舞台燈光」的溫度，適合發表會、開場與高階主管場合；避開常見的青紫科技光暈。 */
+:root{
+  --bg:#0F1116; --bg-2:#171A21;
+  --fg:#EDE8DE; --fg-2:#B5AFA4; --fg-3:#827D75;
+  --line:#EDE8DE; --line-2:rgba(237,232,222,.14);
+  --accent:#D2A64F; --accent-text:#DDB466; --accent-ink:#15120B;
+  --shock-bg:#EDE8DE; --shock-fg:#0F1116;
+  --font-display:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --font-quote:var(--font-display); --font-number:"Noto Serif TC","Songti TC",serif;
+  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
+  --display-weight:700; --title-weight:500; --quote-weight:500; --number-weight:500; --numeral-weight:500;
+  --display-tracking:-.01em; --title-tracking:.01em; --label-tracking:.08em;
+  --radius:0px; --grain:.09; --grain-blend:screen; --ghost:0; --frame:rgba(237,232,222,.10);
+  --surface:radial-gradient(70% 45% at 50% 112%,rgba(210,166,79,.20),rgba(210,166,79,.06) 48%,transparent 72%),
+            radial-gradient(ellipse 80% 70% at 50% 45%,transparent 45%,rgba(0,0,0,.45) 100%);
+  --enter-easing:cubic-bezier(.16,1,.3,1);
+}
+
+/* ---- 構圖：舞台。章節名稱是左側的直排大字，內容集中在右側；數字與步驟都排成直列 ---- */
+.chname{display:block;position:absolute;left:150px;top:250px;writing-mode:vertical-rl;font:var(--display-weight) 58px/1 var(--font-display);
+  letter-spacing:.14em;color:var(--fg)}
+.chno{display:block;position:absolute;left:156px;bottom:118px;font:500 24px/1 var(--font-label);letter-spacing:.1em;color:var(--accent-text)}
+.content::before{content:"";position:absolute;left:330px;top:150px;bottom:120px;width:1px;background:var(--line-2)}
+.slide-head{left:420px}
+.title{font:500 28px/1.3 var(--font-label);letter-spacing:.1em;color:var(--accent-text)}
+.body{left:420px;top:220px}
+.content.tabbed .body{top:250px}
+.stats-lead{font-size:36px;margin-bottom:30px}
+.stats-row{grid-template-columns:1fr;gap:0}
+.stats-row .stat{display:grid;grid-template-columns:480px minmax(0,1fr);column-gap:40px;align-items:baseline;padding:20px 0;border-top:1px solid var(--line-2)}
+.stats-row .stat:last-child{border-bottom:1px solid var(--line-2)}
+.stats-row .sv{font-size:112px;grid-row:1/3}
+.stats-row .sl{margin:0;font-size:32px}
+.stats-row .sn{grid-column:2;margin-top:6px}
+.number{grid-template-columns:minmax(0,480px) auto;column-gap:80px;justify-content:space-between}
+.number .value{grid-column:2;grid-row:1/3}
+.number .label{grid-column:1;grid-row:1}
+.number .note{grid-column:1;grid-row:2}
+.steps{grid-template-columns:1fr;gap:0;border-left:1px solid var(--line-2);margin-left:8px}
+.steps li{position:relative;border-top:0;padding:0 0 30px 60px}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:-8px;top:14px;width:15px;height:15px;border-radius:50%;background:var(--fg-3)}
+.steps li:has(mark.em)::before{background:var(--accent)}
+.steps .n{display:inline;font:500 24px/1 var(--font-label);letter-spacing:.1em;margin:0 20px 0 0;vertical-align:.5em}
+.steps .t{display:inline;font-size:38px}
+.steps .d{margin-top:8px}
+.cover-inner{top:0;bottom:200px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.cover-title{font-size:160px}
 
 </style>
 </head>
@@ -462,6 +499,24 @@ addEventListener('click',e=>{
 const start=parseInt((location.hash||'#1').slice(1),10)||1;
 go(start-1,true);
 window.__deck={go:(n)=>go(n,true),count:slides.length,get index(){return cur;}};
+})();
+</script>
+<script>// Display text: if a phrase does not fit on one line, shrink the text (down to 72%)
+// until every phrase does. If it still does not fit, keep full size and let it wrap.
+(function(){
+  function fitPhrases(){
+    document.querySelectorAll('.key,.shock-text,.closing-text,.cover-title').forEach(function(el){
+      var phs=[].slice.call(el.querySelectorAll('.ph')); if(!phs.length) return;
+      el.style.fontSize='';
+      var base=parseFloat(getComputedStyle(el).fontSize), size=base;
+      function wraps(){var lh=parseFloat(getComputedStyle(el).lineHeight)||size*1.2;
+        return phs.some(function(p){return p.offsetHeight>lh*1.5;});}
+      while(wraps()&&size>base*.72){size-=base*.04;el.style.fontSize=size+'px';}
+      if(wraps()) el.style.fontSize='';
+    });
+  }
+  fitPhrases();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitPhrases);
 })();
 </script>
 </body>

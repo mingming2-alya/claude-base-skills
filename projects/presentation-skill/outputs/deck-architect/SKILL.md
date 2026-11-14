@@ -63,7 +63,7 @@ lint 會檢查架構與呈現規則（訊息裡的 `slides[n]` 從 1 起算，�
 
 ### Step 3｜三種風格樣張 → `samples.html`　⛔ 關卡二
 
-讀 `references/samples.md`。挑三個方向（穩健 / 大膽 / 驚喜），用使用者**真實的標題與內容**產生樣張：
+讀 `references/samples.md`。挑三個方向（穩健 / 大膽 / 驚喜），用使用者**真實的標題與內容**產生樣張。每套主題是一套**構圖**（版面語法），不只是字體和顏色；三個方向要挑構圖不同的：
 
 ```bash
 python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples swiss:穩健,broadsheet:大膽,washi:驚喜

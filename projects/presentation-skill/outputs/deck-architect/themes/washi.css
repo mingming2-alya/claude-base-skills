@@ -14,20 +14,42 @@
   --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
   --display-weight:700; --title-weight:700; --quote-weight:400; --number-weight:700; --numeral-weight:400;
   --display-tracking:0; --title-tracking:0; --label-tracking:.04em;
-  --radius:0px; --grain:.13; --grain-blend:multiply; --ghost:.035;
+  --radius:0px; --grain:.13; --grain-blend:multiply; --ghost:0;
   --surface:radial-gradient(ellipse 120% 120% at 50% 45%,transparent 55%,rgba(42,35,27,.08)),
             url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='3'/%3E%3CfeColorMatrix values='0 0 0 0 .16 0 0 0 0 .13 0 0 0 0 .1 0 0 0 .06 0'/%3E%3C/filter%3E%3Crect width='900' height='900' filter='url(%23m)'/%3E%3C/svg%3E");
   --enter-easing:steps(5);
   --paper-card:1;
 }
-/* paper-craft cards: hand-cut edge (clip-path), two-layer drop shadow lit from top-left, lit face.
-   Adapted from Jane-xiaoer/paper-collage-ppt (MIT). */
-.point,.number,.quote{position:relative;padding:72px 84px;background:#F7F1E6;
-  clip-path:polygon(0.6% 1.8%,33% 0.4%,68% 1.5%,99.5% 0.7%,98.9% 34%,99.6% 67%,99.1% 98.6%,66% 99.5%,32% 98.4%,0.8% 99.2%,1.5% 65%,0.3% 33%);
-  filter:drop-shadow(1px 2px 2px rgba(42,35,27,.20)) drop-shadow(8px 12px 16px rgba(42,35,27,.14));
-  transform:rotate(-.4deg);align-self:flex-start}
-.number{transform:rotate(.6deg)}
-.quote{transform:rotate(-.8deg)}
+
+/* ---- 構圖：拼貼。標題貼在膠帶上，每個數字、每個步驟都是一張微微歪斜的紙片
+   紙藝手法改寫自 Jane-xiaoer/paper-collage-ppt（MIT）。陰影放在父層，因為 clip-path 會把同一元素上的陰影裁掉 ---- */
+.title{display:inline-block;padding:10px 40px 12px;font-size:40px;background:rgba(47,76,126,.16);rotate:-1.2deg;
+  clip-path:polygon(1% 6%,99% 0,100% 92%,0 100%)}
+.layout-point .body,.layout-number .body,.layout-quote .body,.stats-row,.steps{
+  filter:drop-shadow(1px 2px 2px rgba(42,35,27,.20)) drop-shadow(8px 12px 16px rgba(42,35,27,.14))}
+.point,.number,.quote,.stats-row .stat,.steps li{background:#F7F1E6;border-top:0;
+  clip-path:polygon(0.6% 1.8%,33% 0.4%,68% 1.5%,99.5% 0.7%,98.9% 34%,99.6% 67%,99.1% 98.6%,66% 99.5%,32% 98.4%,0.8% 99.2%,1.5% 65%,0.3% 33%)}
+.point,.number,.quote{padding:72px 84px;align-self:flex-start;rotate:-.5deg}
+.number{rotate:.6deg}
+.quote{rotate:-.8deg}
 .quote::before{margin-left:-20px}
+.stats-row{gap:44px;align-items:start}
+.stats-row .stat{padding:36px 40px 44px}
+.stats-row .stat:nth-child(1){rotate:-1deg}
+.stats-row .stat:nth-child(2){rotate:.8deg;margin-top:40px}
+.stats-row .stat:nth-child(3){rotate:-.5deg;margin-top:14px}
+.stats-row .stat:nth-child(4){rotate:1deg;margin-top:48px}
+.stats-row .sv{font-size:128px}
+.steps{gap:36px;align-items:start}
+.steps li{padding:30px 32px 38px}
+.steps li:nth-child(odd){rotate:-.8deg}
+.steps li:nth-child(even){rotate:.7deg;margin-top:34px}
+.steps .n{font-size:84px;margin-bottom:14px}
+.steps .t{font-size:36px}
+.bullets li{border-top:0;padding-top:20px;padding-bottom:20px}
+.bullets li:last-child{border-bottom:0}
+.bullets li::before{width:22px;height:22px;border-radius:50%;background:none;border:3px solid var(--accent);top:calc(20px + .5em)}
 .compare .col:last-child{clip-path:polygon(1.2% 0.5%,36% 1.6%,70% 0.3%,99.2% 1.4%,99.7% 36%,98.8% 70%,99.6% 99.3%,64% 98.5%,29% 99.6%,0.4% 98.7%,0.9% 63%,1.7% 30%)}
-.point .support{border-left-color:var(--accent)}
+.cover-inner{right:auto;max-width:1400px;padding:60px 84px 64px;background:#F7F1E6;rotate:-1deg;
+  clip-path:polygon(0.6% 1.8%,33% 0.4%,68% 1.5%,99.5% 0.7%,98.9% 34%,99.6% 67%,99.1% 98.6%,66% 99.5%,32% 98.4%,0.8% 99.2%,1.5% 65%,0.3% 33%)}
+.cover-title{font-size:150px}

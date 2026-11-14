@@ -6,7 +6,10 @@ _最後更新：2026-11-14_
 
 ## 目前在哪
 
-- **deck-architect v2.0**（2026-11-14）：階段 2 設計系統重建，見 ROADMAP 與 LOG。
+- **deck-architect v2.2**（2026-11-14）：主題從「皮」升級成「構圖」。五套主題各有自己的版面語法；大字只在標點後換行、放不下自動縮字。總覽圖在 `outputs/examples/compositions-v2.2.png`（虛構內容）。
+- **真實簡報實測進行中**：全新 agent 只靠 SKILL.md 做「內部工具推廣與部署說明」，已完成 Step 2–3。使用者在關卡二退回第一版樣張（三種只差字體和顏色），已用 v2.2 重出樣張，**等使用者選風格**。真實內容只在暫存區，不進 repo。
+- deck-architect v2.1（2026-11-14）：新 agent 實測回報的 7 個 bug 修正，新增 `stats` 版型、`note`、步驟 `{label, detail}`。
+- deck-architect v2.0（2026-11-14）：階段 2 設計系統重建，見 ROADMAP 與 LOG。
 - deck-architect v1.0（2026-11-14）：v1 四次迭代的修正全部套用完成，見下方 v1 進度。
 - deck-architect v0 已完成：流程骨架、lint、HTML 簡報產生器、三種主題、樣張頁、品管腳本。原始碼在 `outputs/deck-architect/`，安裝包 `outputs/deck-architect.skill`，範例在 `outputs/examples/`。
 - 專案同步規則已建立：根目錄 `CLAUDE.md`＋Stop hook（`.claude/hooks/check-sync.sh`）。
@@ -55,18 +58,23 @@ _最後更新：2026-11-14_
 
 > 主軸以 `ROADMAP.md` 為準。
 
-1. **階段 2 待使用者驗收**：deck-architect v2 設計系統（5 套主題、新版型、對比檢查）。對照圖在 `outputs/examples/before-after-v2.png`。
-2. 驗收後進入階段 3：畫面活起來（動態背景、元素跨頁延續、滾動數字、插畫流程）。
+1. **使用者選風格**（關卡二，v2.2 構圖樣張）。
+2. 選定後確認兩個架構問題：成本那一行要多顯眼、附件頁要不要留。
+3. 讓同一個 agent 接著做 Step 4–6，完成第一份真實成品；使用者拿它和當時的 Codex 版本比較。
+4. 通過後階段 2 才算驗收，進入階段 3：畫面活起來（插畫流程、動態背景、元素跨頁延續、滾動數字）。
+5. ROADMAP 待辦清單還有 14 項未處理。
 
 ## 待使用者決定
 
 - 開新對話時要選 `presentation-skill-generation` 分支（使用者選了方案 A，不改 main）。
 - deck-architect 未來是否要搬進 `skills/` 讓 install.sh 安裝（目前放在 `projects/`，不會被安裝）。
+- git 歷史裡還留著一組沒有上下文的真實數字（兩個步驟數）。目前檔案已清除；要不要再改寫一次歷史。
 
 ## 使用者偏好
 
 - Grill 時喜歡用**互動表單**回答問題。
 - 含公司內部資訊的簡報檔**不上傳**到公開 repo，只記抽象結論。
+- 三選一樣張要在**排版與呈現**上不同，只換字體和顏色不算不同。
 
 ## 已知限制
 

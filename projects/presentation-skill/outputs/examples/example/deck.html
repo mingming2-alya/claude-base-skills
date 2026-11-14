@@ -6,26 +6,6 @@
 <title>2026 年度回顧</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,700&display=swap" rel="stylesheet">
 <style>
-/* editorial（編輯）— 知性、沉穩的雜誌編輯感。襯線展示字 × 黑體內文 × 等寬框架字；一個故宮朱作突出色。
-   @fonts family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,700
-   色彩理由：故宮朱（低明度、低彩度的朱紅），在米灰紙色上有印刷感而不刺眼。 */
-:root{
-  --bg:#F2EFE8; --bg-2:#E8E3D8;
-  --fg:#1B1915; --fg-2:#4A463E; --fg-3:#6F6B62;
-  --line:#1B1915; --line-2:rgba(27,25,21,.16);
-  --accent:#B23A2B; --accent-text:#A3311F; --accent-ink:#FBF6EE;
-  --shock-bg:#1B1915; --shock-fg:#F2EFE8;
-  --font-display:"Newsreader","Noto Serif TC","Songti TC","PMingLiU",serif;
-  --font-quote:var(--font-display); --font-number:"Newsreader","Noto Serif TC",serif;
-  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
-  --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
-  --display-weight:900; --title-weight:700; --quote-weight:700; --number-weight:700; --numeral-weight:500;
-  --display-tracking:-.015em; --title-tracking:0; --label-tracking:.06em;
-  --radius:0px; --grain:.10; --grain-blend:multiply; --ghost:.032;
-  --surface:radial-gradient(1400px 900px at 90% -10%,rgba(178,58,43,.05),transparent 60%),radial-gradient(1200px 800px at -10% 110%,rgba(27,25,21,.05),transparent 60%);
-  --enter-easing:cubic-bezier(.16,1,.3,1);
-}
-
 /* deck-architect base design system (v2).
  *
  * Principles drawn from the stage-2 research (inputs/design-research.md):
@@ -84,6 +64,9 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .slide:has(.source) .foot span:first-child{display:none}
 .slide .source{bottom:44px;padding-top:14px}
 .pageno{position:absolute;right:140px;bottom:52px;font:500 20px/1 var(--font-label);color:var(--fg-3);letter-spacing:var(--label-tracking)}
+
+/* composition hooks a theme may place: chapter number and chapter name */
+.chno,.chname{display:none;pointer-events:none}
 
 /* ghost word: the chapter label, huge and nearly invisible, on a chapter's first page */
 .ghost{position:absolute;right:-60px;bottom:-170px;font:var(--display-weight) 460px/1 var(--font-display);
@@ -190,7 +173,7 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 /* ---------------------------------------------------------------- closing */
 .closing{background:var(--cover-bg,var(--bg));color:var(--cover-fg,var(--fg))}
 .closing-inner{position:absolute;left:140px;right:140px;bottom:200px}
-.closing-text{padding-bottom:.1em;font:var(--display-weight) 200px/1 var(--font-display);letter-spacing:var(--display-tracking)}
+.closing-text{padding-bottom:.16em;font:var(--display-weight) 200px/1.1 var(--font-display);letter-spacing:var(--display-tracking)}
 .closing-sub{margin-top:36px;font:400 40px/1.4 var(--font-body);color:var(--cover-fg-2,var(--fg-2))}
 
 /* ---------------------------------------------------------------- TOC highlight pages (shape follows the axis) */
@@ -214,6 +197,9 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 [data-shape=rings] .toc .i{display:none}
 [data-shape=rings] .toc .l{font-size:46px}
 [data-shape=rings] .toc li.off{opacity:.35}
+
+/* phrases of display text: break after punctuation, never inside a phrase */
+.ph{display:inline-block;max-width:100%}
 
 /* ---------------------------------------------------------------- shock: breaks every rule */
 .shock{background:var(--shock-bg);background-image:none;color:var(--shock-fg)}
@@ -293,7 +279,7 @@ body:hover #hint{opacity:.7}
 
 /* ---------------------------------------------------------------- static mode: samples and print */
 .static .slide{position:relative;visibility:visible;width:1920px;height:1080px}
-.static .snav{display:block;position:absolute;left:140px;right:140px;top:56px;z-index:9}
+.static .snav{display:flex;flex-direction:column;position:absolute;left:140px;right:140px;top:56px;z-index:9}
 .static .slabels{display:flex;gap:48px;font:500 22px/1 var(--font-label);letter-spacing:var(--label-tracking);color:var(--fg-3);
   border-bottom:1px solid var(--line-2);padding-bottom:16px}
 .static .slabels span.on{color:var(--fg);box-shadow:0 18px 0 -16px var(--fg)}
@@ -310,7 +296,7 @@ body:hover #hint{opacity:.7}
   .slide *{opacity:1;transform:none!important}
   .slide .ghost{opacity:var(--ghost,.045)!important}
   .toc li.off{opacity:.25!important}
-  .snav{display:block;position:absolute;left:140px;right:140px;top:56px}
+  .snav{display:flex;flex-direction:column;position:absolute;left:140px;right:140px;top:56px}
   .slabels{display:flex;gap:48px;font:500 22px/1 var(--font-label);color:var(--fg-3);border-bottom:1px solid var(--line-2);padding-bottom:16px}
   .slabels span.on{color:var(--fg)}
   .stabs{display:flex;gap:28px;margin-top:22px;font:500 20px/1 var(--font-label);color:var(--fg-3)}
@@ -319,20 +305,76 @@ body:hover #hint{opacity:.7}
 }
 @media (prefers-reduced-motion: reduce){#nav .ind,#tabs span,#nav span{transition:none}}
 
+/* editorial（編輯）— 知性、沉穩的雜誌編輯感。襯線展示字 × 黑體內文 × 等寬框架字；一個故宮朱作突出色。
+   @fonts family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,700
+   色彩理由：故宮朱（低明度、低彩度的朱紅），在米灰紙色上有印刷感而不刺眼。 */
+:root{
+  --bg:#F2EFE8; --bg-2:#E8E3D8;
+  --fg:#1B1915; --fg-2:#4A463E; --fg-3:#6F6B62;
+  --line:#1B1915; --line-2:rgba(27,25,21,.16);
+  --accent:#B23A2B; --accent-text:#A3311F; --accent-ink:#FBF6EE;
+  --shock-bg:#1B1915; --shock-fg:#F2EFE8;
+  --font-display:"Newsreader","Noto Serif TC","Songti TC","PMingLiU",serif;
+  --font-quote:var(--font-display); --font-number:"Newsreader","Noto Serif TC",serif;
+  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
+  --display-weight:900; --title-weight:700; --quote-weight:700; --number-weight:700; --numeral-weight:500;
+  --display-tracking:-.015em; --title-tracking:0; --label-tracking:.06em;
+  --radius:0px; --grain:.10; --grain-blend:multiply; --ghost:0;
+  --surface:radial-gradient(1400px 900px at 90% -10%,rgba(178,58,43,.05),transparent 60%),radial-gradient(1200px 800px at -10% 110%,rgba(27,25,21,.05),transparent 60%);
+  --enter-easing:cubic-bezier(.16,1,.3,1);
+}
+
+/* ---- 構圖：置中的雜誌版面。標題兩側有細線，數字之間用直線分隔，步驟排成兩欄 ---- */
+#nav{justify-content:center}
+#tabs{left:0;right:0;justify-content:center}
+.slabels,.stabs{justify-content:center}
+.slide-head{text-align:center}
+.title{display:inline-flex;align-items:center;gap:32px;font-size:34px;font-weight:500;letter-spacing:.24em;padding-left:.24em}
+.title::before,.title::after{content:"";width:110px;height:1px;background:var(--line)}
+.body{align-items:center;text-align:center}
+.stats-lead{margin-left:auto;margin-right:auto;font-size:42px}
+.stats-row{gap:0}
+.stats-row .stat{border-top:0;border-left:1px solid var(--line-2);padding:8px 48px}
+.stats-row .stat:first-child{border-left:0}
+.stats-row .sv{font-size:160px}
+.number{grid-template-columns:1fr;justify-items:center;row-gap:0}
+.number .value{grid-row:auto;font-size:380px}
+.number .value:has(.pair){font-size:320px}
+.number .label{margin-top:44px;padding:0 0 14px}
+.number .note{max-width:1000px;text-align:center}
+.steps{grid-template-columns:repeat(2,minmax(0,640px));justify-content:center;gap:44px 110px;text-align:left}
+.steps li{display:grid;grid-template-columns:120px minmax(0,1fr);column-gap:28px;align-content:start;padding-top:24px;border-top:1px solid var(--line)}
+.steps .n{grid-row:1/3;font-size:104px;line-height:.9;margin:0}
+.steps .t{font-size:38px}
+.bullets{margin:0 auto;text-align:left;max-width:1180px}
+.compare{width:100%;max-width:1400px;margin:0 auto;text-align:left}
+.point{margin:0 auto}
+.point .support{border-left:0;padding:28px 0 0;border-top:1px solid var(--line);display:inline-block;margin-top:44px}
+.quote{margin:0 auto}
+.quote::before{margin-left:auto;margin-right:auto;width:1em}
+.quote cite{justify-content:center}
+.lnote{border-left:0;padding:22px 0 0;border-top:1px solid var(--line-2);display:inline-block;margin-top:40px}
+.cover-inner{top:0;bottom:210px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.cover-inner::before{content:"";width:220px;height:7px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:60px}
+.cover-title{font-size:180px}
+.route{text-align:center}
+.closing-inner{top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+
 </style>
 </head>
 <body>
 <div id="viewport"><div id="stage">
 <div id="nav"></div><div id="tabs"></div>
 <section class="slide cover" data-kind="cover" data-chi="-1" data-notes=""><i class="frame-line"></i><div class="cover-inner"><h1 class="cover-title rv">2026 年度回顧</h1><p class="cover-sub rv">從困境到轉型的一年</p></div><div class="route rv" style="--n:3"><div class="who"><i>2026.12</i>王小明 · 產品部</div><div><i>01</i>年初的困境</div><div><i>02</i>轉型的半年</div><div><i>03</i>明年的方向</div></div></section>
-<section class="slide shock" data-kind="shock" data-chi="-1" data-notes="序幕。請 2–3 位回答，每人 15 秒，不評論。"><i class="frame-line"></i><div class="shock-inner"><p class="shock-text">如果重來一次，你還會這樣過今年嗎？</p></div></section>
-<section class="slide content layout-number" data-kind="content" data-chi="0" data-notes="先讓大家回到年初的感覺，不要急著解釋原因。" data-tab="0" data-tabs="2"><i class="frame-line"></i><div class="ghost" aria-hidden="true">年初的困境</div><div class="snav"><div class="slabels"><span class="on">年初的困境</span><span class="">轉型的半年</span><span class="">明年的方向</span></div></div><header class="slide-head"><h2 class="title">年初的處境</h2></header><div class="body"><div class="number"><div class="value rv"><span class="num">0</span><span class="unit">%</span></div><div class="label rv">上半年營收成長</div><p class="note rv">連續兩季持平，三個主要客戶續約延後</p></div></div><p class="source">資料來源：2026 上半年財務報告</p><footer class="foot"><span>2026 年度回顧</span><span class="pg">03 / 10</span></footer></section>
-<section class="slide content layout-point" data-kind="content" data-chi="0" data-notes="" data-tab="1" data-tabs="2"><i class="frame-line"></i><div class="snav"><div class="slabels"><span class="on">年初的困境</span><span class="">轉型的半年</span><span class="">明年的方向</span></div></div><header class="slide-head"><h2 class="title">問題出在哪</h2></header><div class="body"><div class="point"><p class="key rv">客戶要的不是更多功能，是<mark class="em">更快上手</mark></p><p class="support rv">訪談 24 位客戶，19 位提到導入太慢</p></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">04 / 10</span></footer></section>
-<section class="slide content layout-steps tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="0" data-tabs="3"><i class="frame-line"></i><div class="ghost" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="on">我們做了什麼</span><span class="">導入時間</span><span class="">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">我們做了什麼</h2></header><div class="body"><div><ol class="steps" style="--n:3"><li class="rv"><span class="n">01</span><span class="t">砍掉 40% 的設定步驟</span></li><li class="rv"><span class="n">02</span><span class="t">每個新客戶配一位導入專員</span></li><li class="rv"><span class="n">03</span><span class="t">把教學影片改成 3 分鐘以內</span></li></ol></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">05 / 10</span></footer></section>
-<section class="slide content layout-compare tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="1" data-tabs="3"><i class="frame-line"></i><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="">我們做了什麼</span><span class="on">導入時間</span><span class="">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">導入時間</h2></header><div class="body"><div class="compare"><div class="col rv"><h3>轉型前</h3><ul><li>平均 45 天上線</li><li>客戶要自己讀文件</li></ul></div><div class="divider"></div><div class="col rv"><h3>轉型後</h3><ul><li>平均 <mark class="em">12 天</mark>上線</li><li>專員陪跑兩週</li></ul></div></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">06 / 10</span></footer></section>
-<section class="slide content layout-quote tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="2" data-tabs="3"><i class="frame-line"></i><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="">我們做了什麼</span><span class="">導入時間</span><span class="on">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">客戶怎麼說</h2></header><div class="body"><blockquote class="quote"><p class="rv">這是我們第一次在一個月內讓全公司都用起來的系統。</p><cite class="rv">某製造業客戶 IT 主管</cite></blockquote></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">07 / 10</span></footer></section>
-<section class="slide shock" data-kind="shock" data-chi="-1" data-notes="停兩秒再說話。"><i class="frame-line"></i><div class="shock-inner"><p class="shock-text">下半年，營收成長 38%</p><p class="shock-sub">而且沒有增加任何一位業務</p></div><p class="source">資料來源：2026 下半年財務報告</p></section>
-<section class="slide content layout-bullets" data-kind="content" data-chi="2" data-notes="" data-tab="0" data-tabs="1"><i class="frame-line"></i><div class="ghost" aria-hidden="true">明年的方向</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="">轉型的半年</span><span class="on">明年的方向</span></div></div><header class="slide-head"><h2 class="title">明年需要的支持</h2></header><div class="body"><div><ul class="bullets"><li class="rv">導入專員從 2 人擴編到 <mark class="em">4 人</mark></li><li class="rv">目標：新客戶 30 天內完成導入</li><li class="rv">預估多承接 15 個客戶</li></ul></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">09 / 10</span></footer></section>
+<section class="slide shock" data-kind="shock" data-chi="-1" data-notes="序幕。請 2–3 位回答，每人 15 秒，不評論。"><i class="frame-line"></i><div class="shock-inner"><p class="shock-text"><span class="ph">如果重來一次，</span><span class="ph">你還會這樣過今年嗎？</span></p></div></section>
+<section class="slide content layout-number" data-kind="content" data-chi="0" data-notes="先讓大家回到年初的感覺，不要急著解釋原因。" data-tab="0" data-tabs="2"><i class="frame-line"></i><div class="ghost" aria-hidden="true">年初的困境</div><div class="chno" aria-hidden="true">01</div><div class="chname" aria-hidden="true">年初的困境</div><div class="snav"><div class="slabels"><span class="on">年初的困境</span><span class="">轉型的半年</span><span class="">明年的方向</span></div></div><header class="slide-head"><h2 class="title">年初的處境</h2></header><div class="body"><div class="number"><div class="value rv"><span class="num">0</span><span class="unit">%</span></div><div class="label rv">上半年營收成長</div><p class="note rv">連續兩季持平，三個主要客戶續約延後</p></div></div><p class="source">資料來源：2026 上半年財務報告</p><footer class="foot"><span>2026 年度回顧</span><span class="pg">03 / 10</span></footer></section>
+<section class="slide content layout-point" data-kind="content" data-chi="0" data-notes="" data-tab="1" data-tabs="2"><i class="frame-line"></i><div class="chno" aria-hidden="true">01</div><div class="chname" aria-hidden="true">年初的困境</div><div class="snav"><div class="slabels"><span class="on">年初的困境</span><span class="">轉型的半年</span><span class="">明年的方向</span></div></div><header class="slide-head"><h2 class="title">問題出在哪</h2></header><div class="body"><div class="point"><p class="key rv"><span class="ph">客戶要的不是更多功能，</span><span class="ph">是<mark class="em">更快上手</mark></span></p><p class="support rv">訪談 24 位客戶，19 位提到導入太慢</p></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">04 / 10</span></footer></section>
+<section class="slide content layout-steps tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="0" data-tabs="3"><i class="frame-line"></i><div class="ghost" aria-hidden="true">轉型的半年</div><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="on">我們做了什麼</span><span class="">導入時間</span><span class="">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">我們做了什麼</h2></header><div class="body"><div><ol class="steps" style="--n:3"><li class="rv"><span class="n">01</span><span class="t">砍掉 40% 的設定步驟</span></li><li class="rv"><span class="n">02</span><span class="t">每個新客戶配一位導入專員</span></li><li class="rv"><span class="n">03</span><span class="t">把教學影片改成 3 分鐘以內</span></li></ol></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">05 / 10</span></footer></section>
+<section class="slide content layout-compare tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="1" data-tabs="3"><i class="frame-line"></i><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="">我們做了什麼</span><span class="on">導入時間</span><span class="">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">導入時間</h2></header><div class="body"><div class="compare"><div class="col rv"><h3>轉型前</h3><ul><li>平均 45 天上線</li><li>客戶要自己讀文件</li></ul></div><div class="divider"></div><div class="col rv"><h3>轉型後</h3><ul><li>平均 <mark class="em">12 天</mark>上線</li><li>專員陪跑兩週</li></ul></div></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">06 / 10</span></footer></section>
+<section class="slide content layout-quote tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="2" data-tabs="3"><i class="frame-line"></i><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="">我們做了什麼</span><span class="">導入時間</span><span class="on">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">客戶怎麼說</h2></header><div class="body"><blockquote class="quote"><p class="rv">這是我們第一次在一個月內讓全公司都用起來的系統。</p><cite class="rv">某製造業客戶 IT 主管</cite></blockquote></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">07 / 10</span></footer></section>
+<section class="slide shock" data-kind="shock" data-chi="-1" data-notes="停兩秒再說話。"><i class="frame-line"></i><div class="shock-inner"><p class="shock-text"><span class="ph">下半年，</span><span class="ph">營收成長 38%</span></p><p class="shock-sub">而且沒有增加任何一位業務</p></div><p class="source">資料來源：2026 下半年財務報告</p></section>
+<section class="slide content layout-bullets" data-kind="content" data-chi="2" data-notes="" data-tab="0" data-tabs="1"><i class="frame-line"></i><div class="ghost" aria-hidden="true">明年的方向</div><div class="chno" aria-hidden="true">03</div><div class="chname" aria-hidden="true">明年的方向</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="">轉型的半年</span><span class="on">明年的方向</span></div></div><header class="slide-head"><h2 class="title">明年需要的支持</h2></header><div class="body"><div><ul class="bullets"><li class="rv">導入專員從 2 人擴編到 <mark class="em">4 人</mark></li><li class="rv">目標：新客戶 30 天內完成導入</li><li class="rv">預估多承接 15 個客戶</li></ul></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">09 / 10</span></footer></section>
 <section class="slide closing" data-kind="closing" data-chi="-1" data-notes=""><i class="frame-line"></i><div class="closing-inner"><p class="closing-text rv">謝謝</p><p class="closing-sub rv">歡迎提問</p></div></section>
 <div id="curtain"></div>
 </div></div>
@@ -469,6 +511,24 @@ addEventListener('click',e=>{
 const start=parseInt((location.hash||'#1').slice(1),10)||1;
 go(start-1,true);
 window.__deck={go:(n)=>go(n,true),count:slides.length,get index(){return cur;}};
+})();
+</script>
+<script>// Display text: if a phrase does not fit on one line, shrink the text (down to 72%)
+// until every phrase does. If it still does not fit, keep full size and let it wrap.
+(function(){
+  function fitPhrases(){
+    document.querySelectorAll('.key,.shock-text,.closing-text,.cover-title').forEach(function(el){
+      var phs=[].slice.call(el.querySelectorAll('.ph')); if(!phs.length) return;
+      el.style.fontSize='';
+      var base=parseFloat(getComputedStyle(el).fontSize), size=base;
+      function wraps(){var lh=parseFloat(getComputedStyle(el).lineHeight)||size*1.2;
+        return phs.some(function(p){return p.offsetHeight>lh*1.5;});}
+      while(wraps()&&size>base*.72){size-=base*.04;el.style.fontSize=size+'px';}
+      if(wraps()) el.style.fontSize='';
+    });
+  }
+  fitPhrases();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitPhrases);
 })();
 </script>
 </body>

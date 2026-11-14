@@ -15,7 +15,51 @@
   --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
   --display-weight:900; --title-weight:700; --quote-weight:700; --number-weight:900; --numeral-weight:700;
   --display-tracking:-.025em; --title-tracking:0; --label-tracking:.1em;
-  --radius:0px; --grain:.12; --grain-blend:overlay; --ghost:.03;
+  --radius:0px; --grain:.12; --grain-blend:overlay; --ghost:0;
   --surface:none;
   --enter-easing:cubic-bezier(.16,1,.3,1);
 }
+
+/* ---- 構圖：頭版。導航在底部，章節編號是右上角的巨大數字，內容沉在底部；第一個數字獨佔一行 ---- */
+#nav{top:auto;bottom:40px;align-items:flex-start;border-top:1px solid var(--line-2);padding-top:16px}
+#nav::after{display:none}
+#nav span{padding-bottom:0}
+#nav .ind{bottom:auto;top:-2px;height:3px;background:var(--accent)}
+#tabs{top:auto;bottom:92px}
+.snav{top:auto;bottom:40px;flex-direction:column-reverse;gap:16px}
+.slabels{border-bottom:0;border-top:1px solid var(--line-2);padding:16px 0 0}
+.slabels span.on{box-shadow:none}
+.stabs{margin-top:0}
+.foot{top:56px;bottom:auto;border-top:0;padding-top:0;justify-content:flex-end}
+.foot span:first-child{display:none}
+.slide .source{bottom:104px;padding-top:0}
+.more-btn{bottom:96px;right:140px}
+.slide-head{top:104px;right:520px}
+.content.tabbed .slide-head{top:104px}
+.title{font:500 26px/1.3 var(--font-label);letter-spacing:.1em;color:var(--fg-2)}
+.title::before{content:"";display:inline-block;width:22px;height:22px;background:var(--accent);margin-right:18px;vertical-align:-2px}
+.chno{display:block;position:absolute;right:136px;top:96px;font:900 230px/.8 var(--font-number);letter-spacing:-.05em;color:var(--accent)}
+.body{top:190px;bottom:150px;justify-content:flex-end}
+.content.tabbed .body{top:190px;bottom:190px}
+.stats-lead{font-size:38px;margin-bottom:28px}
+.stats-row{display:flex;flex-wrap:wrap;gap:30px 72px}
+.stats-row .stat{flex:1;padding-top:20px}
+.stats-row .stat:first-child{flex:0 0 100%;border-top:0;padding-top:0}
+.stats-row .stat:first-child .sv{font-size:230px;line-height:.9}
+.stats-row .sv{font-size:104px}
+.stats-row .sl{margin-top:12px;font-size:28px}
+.stats-row .sn{font-size:22px;margin-top:6px}
+.number{grid-template-columns:1fr;row-gap:0}
+.number .value{grid-row:auto;font-size:440px}
+.number .value:has(.pair){font-size:380px}
+.number .label{margin-top:36px;justify-self:start}
+.number .note{max-width:1100px}
+.steps{gap:40px}
+.steps li{border-top:8px solid var(--fg);padding-top:22px}
+.steps li:has(mark.em){border-top-color:var(--accent)}
+.steps .n{font-size:140px;color:var(--fg);margin-bottom:20px}
+.steps li:has(mark.em) .n{color:var(--accent-text)}
+.point .key{font-size:160px;line-height:1.08;padding-bottom:.06em}
+.bullets li{font-weight:700}
+.cover-inner{bottom:250px}
+.cover-title{font-size:230px;line-height:1;padding-bottom:.1em}
