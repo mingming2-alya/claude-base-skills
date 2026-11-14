@@ -19,7 +19,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from deck_model import AXES, EMPH_RE, StoryboardError, load, toc_mode  # noqa: E402
+from deck_model import AXES, EMPH_RE, StoryboardError, load, main_slides, toc_mode  # noqa: E402
 from lint import lint  # noqa: E402
 
 THEMES_DIR = HERE.parent / "themes"
@@ -81,18 +81,21 @@ def expand(data):
     ids = [c["id"] for c in chapters]
     mode = toc_mode(data)
     use_toc = mode == "per-chapter"
+    flow = main_slides(data)
     per_ch = {cid: [] for cid in ids}
-    for s in data["slides"]:
-        if s.get("type", "content") == "content" and s.get("chapter") in per_ch:
+    for s in flow:
+        if s.get("type", "content") == "content" and s.get("chapter") in per_ch and s.get("layout") != "pillars":
             per_ch[s["chapter"]].append(s)
 
     out, started, agenda_done = [], set(), mode != "agenda"
-    for s in data["slides"]:
+    for s in flow:
         t = s.get("type", "content")
         if not agenda_done and t != "cover":
             out.append({"kind": "toc", "chi": -1, "src": None})  # one agenda page, all chapters lit
             agenda_done = True
-        if t == "content":
+        if t == "content" and s.get("layout") == "pillars":
+            out.append({"kind": "overview", "chi": -1, "src": s})
+        elif t == "content":
             cid = s["chapter"]
             chi = ids.index(cid)
             if use_toc and cid not in started:
@@ -103,10 +106,42 @@ def expand(data):
                         "tab": siblings.index(s), "tabs": len(siblings)})
         else:
             out.append({"kind": t, "chi": -1, "src": s})
+    # appendix pages: reached only through links, kept out of the linear flow
+    for s in data["slides"]:
+        if isinstance(s, dict) and s.get("appendix"):
+            t = s.get("type", "content")
+            if t == "content" and s.get("layout") == "pillars":
+                out.append({"kind": "overview", "chi": -1, "src": s, "appendix": True})
+            elif t == "content":
+                cid = s.get("chapter")
+                out.append({"kind": "content", "chi": ids.index(cid) if cid in ids else -1, "src": s,
+                            "tab": 0, "tabs": 1, "appendix": True})
+            else:
+                out.append({"kind": t, "chi": -1, "src": s, "appendix": True})
     return out
 
 
 # ----------------------------------------------------------------------------- renderers
+def render_pillars(s, motion):
+    pillars = s.get("pillars") or []
+    stagger = s.get("stagger") or ("down" if motion == "vertical" else "none")
+    cols = []
+    for i, p in enumerate(pillars):
+        k = i if stagger == "down" else (len(pillars) - 1 - i if stagger == "up" else 0)
+        items = "".join(f"<li>{rich(x)}</li>" for x in p.get("items", []))
+        stats = "".join(f'<div class="stat"><div class="sv">{rich(st.get("value"))}</div>'
+                        f'<div class="sl">{rich(st.get("label"))}</div></div>' for st in p.get("stats", []))
+        link = f' data-link="{esc(p["link"])}"' if p.get("link") else ""
+        more = '<span class="more">看細節 →</span>' if p.get("link") else ""
+        kicker = '<div class="pk">' + esc(p.get("kicker")) + "</div>" if p.get("kicker") else ""
+        sub = '<p class="psub">' + rich(p.get("sub")) + "</p>" if p.get("sub") else ""
+        ul = "<ul>" + items + "</ul>" if items else ""
+        st = '<div class="stats">' + stats + "</div>" if stats else ""
+        cols.append(f'<div class="pillar rv" style="--k:{k}"{link}>{kicker}<h3>{rich(p.get("heading"))}</h3>'
+                    f'{sub}{ul}{st}{more}</div>')
+    return f'<div class="pillars" style="--n:{len(pillars)}">{"".join(cols)}</div>'
+
+
 def source_line(s):
     return f'<p class="source">資料來源：{esc(s["source"])}</p>' if s.get("source") else ""
 
@@ -162,7 +197,20 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
     meta, chapters = data["meta"], data["chapters"]
     notes = esc(s.get("notes", ""))
     attrs = f'data-kind="{kind}" data-chi="{rec["chi"]}" data-notes="{notes}"'
-    pageno = f'<div class="pageno">{idx:02d}</div>'
+    back = ""
+    if rec.get("appendix"):
+        attrs += f' data-appendix="1" data-id="{esc(s.get("id"))}"'
+        back = '<button class="back" type="button">← 返回</button>'
+    pageno = f'<div class="pageno">{"附件" if rec.get("appendix") else f"{idx:02d}"}</div>'
+    more = (f'<button class="more-btn" type="button" data-link="{esc(s["link"])}">看細節 →</button>'
+            if s.get("link") else "")
+
+    if kind == "overview":
+        motion = motion_for(data["structure"])
+        kicker = f'<div class="ov-kicker rv">{esc(s.get("title"))}</div>' if s.get("title") else ""
+        return (f'<section class="slide overview" {attrs}>{back}<header class="ov-head">{kicker}'
+                f'<h2 class="ov-headline rv">{rich(s.get("headline"))}</h2></header>'
+                f'{render_pillars(s, motion)}{source_line(s)}{more}</section>')
 
     if kind == "cover":
         route = "".join(f'<span>{esc(c["label"])}</span>' for c in chapters)
@@ -192,15 +240,15 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
     snav = static_nav(chapters, rec["chi"], rec["tab"], rec["tabs"], ch_sources[rec["chi"]])
     tabbed = " tabbed" if rec["tabs"] > 2 else ""
     attrs += f' data-tab="{rec["tab"]}" data-tabs="{rec["tabs"]}"'
-    return (f'<section class="slide content layout-{esc(s.get("layout"))}{tabbed}" {attrs}>{snav}'
+    return (f'<section class="slide content layout-{esc(s.get("layout"))}{tabbed}" {attrs}>{back}{snav}'
             f'<header class="slide-head"><h2 class="title">{esc(s.get("title"))}</h2></header>'
-            f'<div class="body">{render_layout(s, base_dir)}</div>{source_line(s)}{pageno}</section>')
+            f'<div class="body">{render_layout(s, base_dir)}</div>{source_line(s)}{more}{pageno}</section>')
 
 
 def render_slides(data, base_dir, records):
     ids = [c["id"] for c in data["chapters"]]
-    ch_sources = [[s for s in data["slides"] if s.get("type", "content") == "content" and s.get("chapter") == cid]
-                  for cid in ids]
+    ch_sources = [[s for s in main_slides(data) if s.get("type", "content") == "content"
+                   and s.get("chapter") == cid and s.get("layout") != "pillars"] for cid in ids]
     return [render_slide(r, data, i, len(records), base_dir, ch_sources) for i, r in enumerate(records, 1)]
 
 
@@ -212,12 +260,14 @@ def deck_html(data, base_dir):
     motion = motion_for(data["structure"])
     deck_json = {
         "chapters": [c["label"] for c in data["chapters"]],
-        "tabs": [[(s.get("tab") or s.get("title")) for s in data["slides"]
-                  if s.get("type", "content") == "content" and s.get("chapter") == c["id"]]
+        "tabs": [[(s.get("tab") or s.get("title")) for s in main_slides(data)
+                  if s.get("type", "content") == "content" and s.get("chapter") == c["id"]
+                  and s.get("layout") != "pillars"]
                  for c in data["chapters"]],
         "motion": motion,
     }
     return PAGE.format(
+        fmt=esc(data["meta"].get("format", "deck")),
         lang=esc(data["meta"].get("lang", "zh-Hant")),
         title=esc(re.sub(r"==", "", str(data["meta"].get("title", "Deck")))),
         fonts=FONTS, theme=css_theme, base=BASE_CSS,
@@ -330,6 +380,32 @@ mark.em{background:none;color:var(--accent);font-weight:var(--key-weight)}
 .image img{width:100%;height:100%;object-fit:cover;display:block}
 .image .caption{font:500 44px/1.45 var(--font-body)}
 
+/* overview: one-page summary with pillars; column height encodes the axis */
+.ov-head{position:absolute;left:140px;right:140px;top:84px}
+.ov-kicker{font:600 26px/1.2 var(--font-body);color:var(--muted);letter-spacing:.08em;margin-bottom:20px}
+.ov-headline{font:var(--key-weight) 96px/1.15 var(--font-head);letter-spacing:-.01em;text-wrap:balance}
+.pillars{position:absolute;left:140px;right:140px;top:330px;bottom:96px;display:grid;
+  grid-template-columns:repeat(var(--n),1fr);gap:40px;align-items:start}
+.pillar{margin-top:calc(var(--k) * 64px);padding:34px 36px 38px;border-top:4px solid var(--fg);
+  background:color-mix(in srgb,var(--fg) 4%,transparent);border-radius:0 0 var(--radius) var(--radius);position:relative}
+.pillar[data-link]{cursor:pointer}
+.pillar[data-link]:hover{background:color-mix(in srgb,var(--fg) 7%,transparent)}
+.pk{font:600 22px/1.2 var(--font-body);color:var(--muted);letter-spacing:.06em;margin-bottom:14px}
+.pillar h3{font:var(--head-weight) 46px/1.2 var(--font-head)}
+.psub{margin-top:14px;font:400 26px/1.45 var(--font-body);color:var(--muted)}
+.pillar ul{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:10px}
+.pillar li{font:500 26px/1.4 var(--font-body);padding-left:22px;position:relative}
+.pillar li::before{content:"";position:absolute;left:0;top:.65em;width:10px;height:2px;background:var(--fg)}
+.stats{display:flex;flex-wrap:wrap;gap:22px 40px;margin-top:28px}
+.sv{font:var(--key-weight) 64px/1 var(--font-head);letter-spacing:-.02em}
+.sl{margin-top:8px;font:400 22px/1.3 var(--font-body);color:var(--muted)}
+.more{display:inline-block;margin-top:24px;font:600 22px/1 var(--font-body);color:var(--muted)}
+.more-btn{position:absolute;right:240px;bottom:44px;font:600 22px/1 var(--font-body);color:var(--fg);background:none;
+  border:1px solid var(--line);border-radius:999px;padding:12px 22px;cursor:pointer;z-index:6}
+.back{position:absolute;right:120px;top:48px;font:600 22px/1 var(--font-body);color:var(--fg);background:var(--bg);
+  border:1px solid var(--line);border-radius:999px;padding:12px 22px;cursor:pointer;z-index:6}
+[data-format=section] .pageno{display:none}
+
 /* cover / closing */
 .cover-inner{position:absolute;left:140px;right:140px;top:0;bottom:200px;display:flex;flex-direction:column;justify-content:center}
 .kicker{font:600 28px/1 var(--font-body);color:var(--muted);letter-spacing:.2em;margin-bottom:48px}
@@ -394,7 +470,7 @@ body:hover #hint{opacity:.7}
   html,body{height:auto;overflow:visible;background:none}
   #viewport{position:static;display:block}
   #stage{transform:none!important;width:1920px;height:auto;overflow:visible}
-  #nav,#tabs,#curtain,#notes,#hint{display:none!important}
+  #nav,#tabs,#curtain,#notes,#hint,.back,.more-btn{display:none!important}
   .slide{position:relative;visibility:visible!important;width:1920px;height:1080px;break-after:page;opacity:1!important;transform:none!important}
   .slide *{opacity:1!important;transform:none!important}
   .snav{display:block;position:absolute;left:140px;right:140px;top:64px}
@@ -413,7 +489,20 @@ const stage=document.getElementById('stage'), slides=[...document.querySelectorA
 const nav=document.getElementById('nav'), tabsEl=document.getElementById('tabs'), curtain=document.getElementById('curtain');
 const notesEl=document.getElementById('notes');
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const M=DECK.motion; let cur=-1, busy=false;
+const M=DECK.motion; let cur=-1, busy=false, returnTo=[];
+const isApp=i=>slides[i] && slides[i].dataset.appendix==='1';
+function step(d){
+  if(isApp(cur)){ back(); return; }
+  let n=cur+d; while(n>=0 && n<slides.length && isApp(n)) n+=d;
+  if(n>=0 && n<slides.length) go(n);
+}
+function openLink(id){
+  const n=slides.findIndex(s=>s.dataset.appendix==='1' && s.dataset.id===id);
+  if(n<0) return;
+  if(!isApp(cur)) returnTo.push(cur);
+  go(n);
+}
+function back(){ const n=returnTo.length?returnTo.pop():0; go(n); }
 
 // rings TOC radii
 document.querySelectorAll('[data-shape=rings] .toc-list').forEach(ol=>{
@@ -503,14 +592,20 @@ async function go(n,instant){
 
 addEventListener('keydown',e=>{
   const k=e.key;
-  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)){e.preventDefault();go(cur+1);}
-  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();go(cur-1);}
+  if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k)){e.preventDefault();step(1);}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k)){e.preventDefault();step(-1);}
+  else if(k==='Escape' && isApp(cur)){e.preventDefault();back();}
   else if(k==='Home') go(0); else if(k==='End') go(slides.length-1);
   else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
   else if(k==='n'||k==='N') notesEl.classList.toggle('show');
   else if(k==='p'||k==='P') print();
 });
-addEventListener('click',e=>{ if(e.target.closest('#notes')) return; go(cur+(e.clientX>innerWidth/3?1:-1)); });
+addEventListener('click',e=>{
+  if(e.target.closest('#notes')) return;
+  const b=e.target.closest('.back'); if(b){ back(); return; }
+  const l=e.target.closest('[data-link]'); if(l){ openLink(l.dataset.link); return; }
+  step(e.clientX>innerWidth/3?1:-1);
+});
 const start=parseInt((location.hash||'#1').slice(1),10)||1;
 go(start-1,true);
 window.__deck={go:(n)=>go(n,true),count:slides.length,get index(){return cur;}};
@@ -518,7 +613,7 @@ window.__deck={go:(n)=>go(n,true),count:slides.length,get index(){return cur;}};
 """
 
 PAGE = """<!doctype html>
-<html lang="{lang}" data-shape="{shape}" data-motion="{motion}">
+<html lang="{lang}" data-shape="{shape}" data-motion="{motion}" data-format="{fmt}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">

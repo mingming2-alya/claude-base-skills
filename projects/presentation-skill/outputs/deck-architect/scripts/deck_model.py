@@ -32,6 +32,7 @@ LAYOUTS = {
     "steps": ["items"],
     "quote": ["text"],
     "image": ["src"],
+    "pillars": ["headline", "pillars"],
 }
 
 SLIDE_TYPES = {"cover", "content", "shock", "closing"}
@@ -105,21 +106,27 @@ def toc_mode(data):
     none:        <= 3 chapters -> the persistent chapter bar is enough
     """
     chapters = data.get("chapters") or []
-    if len(chapters) <= 3:
+    if len(chapters) <= 3 or (data.get("meta") or {}).get("format") == "section":
         return "none"
-    n_content = sum(1 for s in data.get("slides") or [] if isinstance(s, dict) and s.get("type", "content") == "content")
+    n_content = sum(1 for s in main_slides(data)
+                    if s.get("type", "content") == "content" and s.get("layout") != "pillars")
     return "per-chapter" if n_content / len(chapters) >= 2 else "agenda"
 
 
 def page_count(data):
     """Pages the built deck will have, including automatic TOC pages."""
-    n = sum(1 for s in data.get("slides") or [] if isinstance(s, dict))
+    n = len(main_slides(data))
     mode = toc_mode(data)
     if mode == "per-chapter":
         n += len(data.get("chapters") or [])
     elif mode == "agenda":
         n += 1
     return n
+
+
+def main_slides(data):
+    """Slides in the linear flow (appendix pages excluded)."""
+    return [s for s in data.get("slides") or [] if isinstance(s, dict) and not s.get("appendix")]
 
 
 def visible_len(text):

@@ -49,7 +49,7 @@ for (let i = 0; i < count; i++) {
     const stage = sl.getBoundingClientRect();
     const scale = stage.width / 1920;
     // overflow: content areas must not scroll, nothing may leave the slide
-    for (const el of sl.querySelectorAll('.body, .cover-inner, .shock-inner, .closing-inner')) {
+    for (const el of sl.querySelectorAll('.body, .cover-inner, .shock-inner, .closing-inner, .pillars')) {
       if (el.scrollHeight > el.clientHeight + 2 || el.scrollWidth > el.clientWidth + 2)
         out.issues.push(`內容超出版面（${el.className}）：高 ${el.scrollHeight}/${el.clientHeight}`);
     }

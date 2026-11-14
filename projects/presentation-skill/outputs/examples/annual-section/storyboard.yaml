@@ -1,0 +1,74 @@
+# 範例：年度成果，作為大簡報裡的「一頁總覽」章節，加上可點入的附件。
+# 內容為虛構示意，非真實資料。
+meta:
+  title: 年度成果（示範）
+  theme: signal
+  format: section          # section：作為大簡報的一章，不需要封面、不顯示頁碼
+  minutes: 5
+
+structure:
+  start: 高階主管想知道今年做出了什麼、接下來往哪走
+  destination: 支持明年的方向與資源投入
+  axis: abstraction
+  direction: 戰略 → 價值 → 基座
+  sensitivity: false
+
+chapters:
+  - {id: s, label: 定方向, minutes: 1.5}
+  - {id: v, label: 創價值, minutes: 2}
+  - {id: f, label: 固根本, minutes: 1.5}
+
+slides:
+  - layout: pillars
+    title: 示範部門 · 年度成果
+    headline: 定方向・==創價值==・固根本
+    pillars:
+      - chapter: s
+        kicker: DIRECTION
+        heading: 方向
+        sub: 先找痛點，再找可複用的做法
+        items: [第 1 季：先做小規模試點, 第 2–3 季：整合共用工具, 第 4 季：擴大到全部門]
+        link: strategy-detail
+      - chapter: v
+        kicker: VALUE
+        heading: 價值
+        sub: 試點成果進入日常工作
+        stats:
+          - {value: "12", label: 項案例}
+          - {value: "==300==", label: 萬元／年效益（示意）}
+        link: value-detail
+      - chapter: f
+        kicker: FOUNDATION
+        heading: 根本
+        sub: 穩定營運支撐新做法
+        stats:
+          - {value: "40", label: 項年度需求}
+          - {value: "15", label: 項已完成}
+        link: base-detail
+    source: 示意資料
+    notes: 先唸口號，再由左到右：方向、價值、支撐。被問到細節時點進附件。
+
+  - appendix: true
+    id: strategy-detail
+    chapter: s
+    title: 方向
+    layout: steps
+    items: [盤點流程, 選定痛點, 小規模試作, 驗收推廣]
+
+  - appendix: true
+    id: value-detail
+    chapter: v
+    title: 價值
+    layout: number
+    value: "300"
+    label: 萬元／年，12 項案例合計（示意）
+    note: 2 個共用案例、10 個個別案例
+    source: 示意資料
+
+  - appendix: true
+    id: base-detail
+    chapter: f
+    title: 根本
+    layout: compare
+    left: {heading: 已完成, items: [15 項]}
+    right: {heading: 推動中, items: [25 項]}

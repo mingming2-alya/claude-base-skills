@@ -68,7 +68,8 @@ def lint(data):
         lens = [visible_len(x) for x in labels]
         if max(lens) > 2 * min(lens) and max(lens) - min(lens) > 3:
             W("chapters", f"章節名稱長度差很多（{', '.join(labels)}）。停靠點命名要平行：結構、長度、詞性一致。")
-        scripts = {("cjk" if CJK.search(x) else "") + ("latin" if LATIN.search(x) else "") for x in labels}
+        # a label counts as Chinese if it has any CJK (縮寫如「導入 AI」仍算中文)；只有中英兩類並存才算不平行
+        scripts = {"cjk" if CJK.search(x) else "latin" for x in labels}
         if len(scripts) > 1:
             W("chapters", f"章節名稱混用中英文（{', '.join(labels)}）。命名要平行。")
 
@@ -80,6 +81,17 @@ def lint(data):
     content_per_ch = {cid: 0 for cid in ids}
     shock_positions = []
     seen_content = False
+    appendix_ids, links = set(), []
+    for s in slides:
+        if isinstance(s, dict):
+            if s.get("appendix"):
+                if s.get("id"):
+                    appendix_ids.add(s["id"])
+            if s.get("link"):
+                links.append(s["link"])
+            for p in s.get("pillars") or []:
+                if isinstance(p, dict) and p.get("link"):
+                    links.append(p["link"])
 
     for n, s in enumerate(slides, 1):
         where = f"slides[{n}]"
@@ -91,6 +103,9 @@ def lint(data):
             E(where, f"type 必須是 {', '.join(sorted(SLIDE_TYPES))} 之一（目前：{t!r}）。")
             continue
         texts = slide_texts(s)
+        is_appendix = bool(s.get("appendix"))
+        if is_appendix and not s.get("id"):
+            E(where, "附件頁（appendix: true）需要 id，才能被 link 指到。")
 
         if st.get("sensitivity") and any("你們" in x for x in texts):
             W(where, "有人際顧慮（sensitivity: true）卻出現「你們」。把批評改成以「我們」開頭的反思提問，聽眾才不會覺得被指責。")
@@ -105,12 +120,38 @@ def lint(data):
         if has_digit and not s.get("source") and (t == "shock" or (t == "content" and s.get("layout") == "number")):
             W(where, "關鍵數字沒有 source（出處）。先跟原始資料核對，再寫上出處與適用範圍。")
 
+        if t == "content" and s.get("layout") == "pillars":
+            seen_content = True
+            pillars = s.get("pillars") or []
+            if not isinstance(pillars, list) or not 2 <= len(pillars) <= 4:
+                E(where, "pillars 需要 2–4 欄。")
+                pillars = pillars if isinstance(pillars, list) else []
+            order = []
+            for k, p in enumerate(pillars):
+                if not isinstance(p, dict) or p.get("chapter") not in chapter_index or not p.get("heading"):
+                    E(f"{where}.pillars[{k}]", "每欄需要 chapter（chapters 的 id）與 heading。")
+                    continue
+                content_per_ch[p["chapter"]] += 1
+                order.append(chapter_index[p["chapter"]])
+                em = sum(len(EMPH_RE.findall(x)) for x in slide_texts(p))
+                if em > 1:
+                    E(f"{where}.pillars[{k}]", f"這一欄有 {em} 處重點，每欄最多一處。")
+            if order != sorted(order):
+                E(where, "pillars 的欄位順序要跟 chapters 一致（架構的方向）。")
+            if len(order) != len(ids):
+                W(where, "pillars 沒有涵蓋所有章節。一頁總覽通常每章一欄。")
+            if EMPH_RE.findall(str(s.get("headline", ""))).__len__() > 1:
+                E(where, "headline 最多一處重點。")
+            continue
+
         if t == "content":
             seen_content = True
             title = str(s.get("title") or "")
             ch = s.get("chapter")
             if ch not in chapter_index:
                 E(where, f"chapter「{ch}」不在 chapters 的 id 裡。")
+            elif is_appendix:
+                pass  # appendix pages are reached by links, not by the chapter flow
             else:
                 content_per_ch[ch] += 1
                 if chapter_index[ch] < last_ch:
@@ -168,6 +209,12 @@ def lint(data):
         elif t == "cover" and n != 1:
             W(where, "封面通常是第一頁。")
 
+    for target in links:
+        if target not in appendix_ids:
+            E("link", f"link 指向「{target}」，但沒有 id 為「{target}」的附件頁（appendix: true）。")
+    for aid in appendix_ids - set(links):
+        W(f"appendix[{aid}]", "這個附件頁沒有任何 link 指向它，現場點不到。")
+
     for cid, count in content_per_ch.items():
         if count == 0:
             E(f"chapters[{cid}]", "這章沒有任何內容頁。")
@@ -202,7 +249,8 @@ def lint(data):
     elif isinstance(minutes, (int, float)) and minutes > 0:
         I("chapters.minutes", "沒有寫每章分鐘數。加上 chapters[].minutes 可以檢查時間分配。")
     if isinstance(minutes, (int, float)) and minutes > 0:
-        n_content = sum(1 for s in slides if isinstance(s, dict) and s.get("type", "content") in ("content", "shock"))
+        n_content = sum(1 for s in slides if isinstance(s, dict) and not s.get("appendix")
+                        and s.get("type", "content") in ("content", "shock"))
         lo, hi = max(1, int(minutes * 0.3)), round(minutes * 1.2) + 1
         if not lo <= n_content <= hi:
             W("meta.minutes", f"{minutes} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.4–1 頁；圖解密集的頁面可以更少）。")

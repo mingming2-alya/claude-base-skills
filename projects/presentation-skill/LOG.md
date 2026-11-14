@@ -187,3 +187,38 @@
     2. 計畫轉成果
     3. 一頁總覽章節模式與三欄支柱版型
     4. 可點入的附件
+
+## 2026-11-14｜套用第三次迭代的修正（deck-architect v0.3）
+
+- 使用者決定：4 項修正全部套用。
+- 修改：
+  - `references/structure.md`：既有框架的最上層若是並列，要明白提醒並提出路徑版本（附抽象化的真實案例）
+  - `references/grill.md`
+    - 第 6 題擴充為「既有框架與前一版」
+    - 計畫改成果時導向 contexts.md
+    - 只要一頁或作為大簡報的一章時，改用 section＋pillars
+  - `references/contexts.md`：新增「計畫轉成果」
+    - 三件事：成果語言、依聽眾重排、敢刪
+    - 平行口號、關鍵數字拉到主頁
+  - `references/presentation-rules.md`：新增「一頁總覽與附件」
+  - `scripts/deck_model.py`
+    - `pillars` 版型
+    - `main_slides()` 排除附件頁
+    - section 格式不插目錄頁
+  - `scripts/build.py`
+    - overview 頁，欄位依 `stagger` 逐階排列，垂直軸預設往下
+    - 附件頁不在線性翻頁順序內
+    - `link` 點入
+    - 返回鈕、Esc 與方向鍵返回原頁
+    - section 格式不顯示頁碼
+  - `scripts/lint.py`
+    - pillars 檢查：2–4 欄、欄序依 chapters、每欄最多一處重點
+    - link 目標必須存在；沒被指到的附件頁會警告
+  - `scripts/check.mjs`：溢出檢查涵蓋 pillars
+  - `templates/storyboard.yaml`、`SKILL.md` 同步
+- 測試：
+  - 新範例 `examples/annual-section/`：一頁總覽＋3 個附件，內容為虛構示意
+  - lint 與 check 無問題
+  - 用 Playwright 實測：方向鍵不會進入附件；點欄位進附件；返回鈕、Esc、方向鍵都回到總覽
+- 測試時又發現一個 lint 誤報：使用者實際採用、含英文縮寫的中文章節名稱（例如「導入 AI」這類）被判為「混用中英文」。已修正：含中文的名稱一律算中文，只有純中文和純英文並存才警告。
+- 相容性：腳本確認可在 Python 3.9 以上解析。

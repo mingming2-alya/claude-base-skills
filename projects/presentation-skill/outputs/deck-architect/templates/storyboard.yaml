@@ -9,7 +9,8 @@ meta:
   date: 2026.12                     # 封面日期（可省略）
   theme: paper                      # paper / signal / ink，或自訂主題的相對路徑 ./theme.css
   minutes: 15                       # 總時長（分鐘），lint 會檢查頁數與各章時間
-  pages: 12                         # 頁數上限（含封面與自動目錄頁），可省略
+  pages: 12                         # 頁數上限（含封面與自動目錄頁，不含附件頁），可省略
+  # format: section                 # 作為大簡報的一章：不需要封面、不顯示頁碼（範例見 examples/annual-section）
   lang: zh-Hant
 
 structure:
@@ -45,12 +46,16 @@ chapters:
 #   steps   有順序的步驟：items（最多 5 步）
 #   quote   引言：text + source
 #   image   圖片：src（相對於 storyboard 的路徑）+ caption；圖只是氣氛，重點仍要寫在文字裡
+#   pillars 一頁總覽：headline（主句）+ pillars（每章一欄：chapter、kicker、heading、sub、items、stats、link）
+#           不需要 chapter 欄位；垂直軸時欄位會逐欄往下排
 # 共用欄位：
 #   chapter 屬於哪一章（content 必填，填 chapters 的 id）
 #   title   這頁在講什麼（路標，不寫結論，≤12 字）
 #   tab     頁籤上的短名稱（可省略，預設用 title）
 #   notes   講者備註（按 N 顯示）；限制、適用範圍、不承諾的事可以寫在這裡
 #   source  數字或引述的出處，小字顯示在頁面底部（number、shock、point 都可用）
+#   link    點了會進入某個附件頁（填附件的 id）
+# 附件頁：加上 appendix: true 與 id，不在一般翻頁順序裡，只能從 link 進入；返回鈕或 Esc 回到原頁
 # 重點標記：在文字中用 ==重點== 標出，每頁最多一處。point 的 key 沒有標記時，整句視為重點。
 
 slides:

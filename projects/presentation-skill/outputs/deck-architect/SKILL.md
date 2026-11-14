@@ -38,7 +38,7 @@ decks/<name>/
 
 - 目的、對象、時長、場合 → 推出**聽眾的起點**與**你要帶他去的終點**
 - 有沒有需要顧慮的人或部門（決定能不能用「價值軸」，以及要不要把批評改成「我們」提問）
-- 有沒有既有的框架或大綱：有的話先讀，它**一定要是架構候選之一**
+- 有沒有既有的框架、大綱或前一版報告：有的話先讀，它**一定要是架構候選之一**；若它的最上層是並列的，要提醒並提出路徑版本；若是計畫改成果，照 contexts.md「計畫轉成果」處理
 - 每章的時間分配；頁數含不含封面與目錄
 - 說服或推廣型：有沒有**證據**（數據、案例），以及有沒有**還做不到、不能承諾**的事
 - 關鍵數字要先跟原始資料**查核**（見 grill.md「查核關鍵數字」）
@@ -78,6 +78,8 @@ python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples paper,si
 ```bash
 python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml
 ```
+
+只要一頁、或是大簡報裡的一章時，用 `meta.format: section` 與 `layout: pillars`（一頁總覽）；需要現場點進細節時，用附件頁（`appendix: true`＋`link`）。見 presentation-rules.md「一頁總覽與附件」。
 
 build 會根據架構自動產生導航（章節列、目錄點亮、頁籤）、依「軸」決定換章的運鏡方向、處理震撼頁。你不需要手寫 HTML。
 
