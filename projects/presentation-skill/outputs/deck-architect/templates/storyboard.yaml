@@ -45,7 +45,7 @@ chapters:
 #   point   整頁只為一個重點服務：key（重點）+ support（一行補充，可省略）
 #   bullets 條列：items（最多 5 條）+ note（條列下方的一行補充，可省略）
 #   number  大數字：value + label + note（可省略）＋ source（出處，強烈建議）
-#           value 寫一個數字（"38%" 會自動把單位縮小），或前後對比 "63 → 16"（前者淡、後者用突出色）
+#           value 寫一個數字（"38%" 會自動把單位縮小），或前後對比 "45 → 12"（前者淡、後者用突出色）
 #   stats   一排數字：stats（2–4 個，各有 value、label，以及選填的 note 寫適用範圍）+ lead（上方一句話）+ note
 #   compare 左右比較：left/right 各有 heading + items
 #   steps   有順序的步驟：items（最多 5 步；每項可寫成字串，或 {label, detail}）+ note
