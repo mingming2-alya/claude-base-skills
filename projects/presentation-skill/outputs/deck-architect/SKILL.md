@@ -23,6 +23,7 @@ description: 架構先行的簡報製作技能：先用 Grill 問清楚目的、
 decks/<name>/
 ├── brief.md          # Step 1 產出：Grill 結論
 ├── storyboard.yaml   # Step 2 產出：唯一的內容來源（之後改字都改這裡）
+├── layouts.html      # Step 3 產出：排版選單（灰階，每頁幾種排法）
 ├── samples.html      # Step 3 產出：三種風格樣張
 ├── deck.html         # Step 4 產出：成品
 └── check/            # Step 5 產出：截圖與檢查報告
@@ -61,15 +62,27 @@ lint 會檢查架構與呈現規則（訊息裡的 `slides[n]` 從 1 起算，�
 
 完成後給使用者一頁**架構摘要**（章節、每頁標題、重點、震撼頁位置）。使用者沒意見可以直接進 Step 3，不用另外等。
 
-### Step 3｜三種風格樣張 → `samples.html`　⛔ 關卡二
+### Step 3｜先選排版，再選風格 → `layouts.html`、`samples.html`　⛔ 關卡二
 
-讀 `references/samples.md`。挑三個方向（穩健 / 大膽 / 驚喜），用使用者**真實的標題與內容**產生樣張。每套主題是一套**構圖**（版面語法），不只是字體和顏色；三個方向要挑構圖不同的：
+**排版和風格是兩件獨立的事**：排版（東西放哪裡）逐頁跟著內容走；風格（顏色、字體、質感）整份固定。風格不決定排版，所以分兩步選。
+
+**3a 排版**。讀 `references/layouts.md`。依每一頁內容的形狀，替它挑 2–3 種候選排法，寫成 `variant: [建議的, 候選, 候選]`，然後：
+
+```bash
+python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --layouts
+```
+
+產生的 `layouts.html` 是灰階的排版選單：每頁一列，每個候選有編號（例如 3A、3B）。先自己截圖看一次，確認沒有壞掉，再給使用者，**停下來等使用者逐頁選**（可以只回「3B、5A，其他照你的建議」）。選定後把每頁的 `variant` 改成單一名稱，目錄頁的排法寫進 `meta.toc`，再跑一次 lint：相鄰兩頁不可以是同一種排法；同一類內容的頁面（例如不同案例的進度）寫上同一個 `series`，就會要求它們長得一樣。
+
+**3b 風格**。讀 `references/samples.md`。依調性挑三個方向（穩健 / 大膽 / 驚喜），用使用者真實的內容與**剛選定的排版**產生樣張：
 
 ```bash
 python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples swiss:穩健,broadsheet:大膽,washi:驚喜
 ```
 
-樣張預設包含封面、這份簡報的招牌頁（大重點或大數字）、再一頁不同版型的內容頁（有震撼頁就用震撼頁），三種風格並排。想指定頁面就加 `--sample-pages 1,3,5`（成品的頁碼）。冒號後面的角色會顯示在樣張上。產生後先自己截圖看一次，確認沒有壞掉再給使用者。打開給使用者看，**停下來等使用者選**。使用者可以混搭（例如「A 的配色 + B 的字體」），這時照 `references/samples.md` 的方式寫一個自訂主題。
+樣張預設包含封面、這份簡報的招牌頁（大重點或大數字）、再一頁不同版型的內容頁（有震撼頁就用震撼頁），三種風格並排。想指定頁面就加 `--sample-pages 1,3,5`（成品的頁碼）。冒號後面的角色會顯示在樣張上。產生後先自己截圖看一次，確認沒有壞掉再給使用者，**停下來等使用者選**。使用者可以混搭（例如「A 的配色 + B 的字體」），這時照 `references/samples.md` 的方式寫一個自訂主題。
+
+快速模式可以把兩步合成一次：排版由你依內容決定，只給風格樣張；使用者指出不滿意的頁面時再換排法。
 
 ### Step 4｜製作 → `deck.html`
 
@@ -126,7 +139,8 @@ node <skill>/scripts/check.mjs decks/<name>/deck.html
 | `references/structure.md` | Step 1 推導架構時 |
 | `references/contexts.md` | 判斷情境、選擇快速 / 標準模式時 |
 | `references/presentation-rules.md` | Step 2 寫 storyboard 前、Step 5 品管時 |
-| `references/samples.md` | Step 3 做樣張、或使用者要自訂風格時 |
+| `references/layouts.md` | Step 2 寫 storyboard、Step 3a 挑每頁的排法時（版型庫：每種內容有哪些排法、什麼時候用） |
+| `references/samples.md` | Step 3b 做風格樣張、或使用者要自訂風格時 |
 | `references/progress-report.md` | 定期進度回報、專案群總覽、多人填寫的回報時 |
 | `templates/brief.md` | 寫 brief 時 |
 | `templates/storyboard.yaml` | 寫 storyboard 時（含所有欄位與版型說明） |

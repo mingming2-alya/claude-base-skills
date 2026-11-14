@@ -18,7 +18,8 @@ from deck_model import (AXES, CELL_STATES, COMMON_FIELDS, EMPH_RE, LAYOUT_FIELDS
                         RISK_LEVELS, SLIDE_TYPES,
                         TRANSITION_PHRASES,
                         StoryboardError, emphasis_count, load, page_count, slide_texts, toc_mode,
-                        visible_len)
+                        visible_len, VARIANTS, VARIANT_ZH, layout_key, main_slides, variant_of, variant_options,
+                        variant_problems)
 
 CJK = re.compile(r"[㐀-鿿]")
 LATIN = re.compile(r"[A-Za-z]")
@@ -125,6 +126,22 @@ def lint(data):
             if unknown:
                 W(where, f"layout「{s['layout']}」不認得欄位 {', '.join(sorted(unknown))}，建置時會被忽略。"
                          f"這個版型可用：{', '.join(sorted(LAYOUT_FIELDS[s['layout']]))}。")
+        # layout variant: must exist for this layout, and the content must fit it
+        key = layout_key(s)
+        if key in VARIANTS:
+            names = VARIANTS[key]
+            listing = "、".join(f"{v}（{VARIANT_ZH[key][v]}）" for v in names)
+            opts = variant_options(s)
+            bad = [v for v in opts if v not in names]
+            if bad:
+                E(where, f"「{key}」沒有 {', '.join(bad)} 這種排法。可用：{listing}。")
+            elif len(opts) > 1:
+                I(where, f"variant 寫了 {len(opts)} 個候選，成品會用第一個（{opts[0]}）。使用者選定後改成單一名稱。")
+            if not bad:
+                for msg in variant_problems(s):
+                    W(where, msg + "。換一種排法，或調整內容。")
+        elif s.get("variant"):
+            W(where, f"「{key}」沒有可選的排法，variant 會被忽略。")
         has_digit = any(re.search(r"\d", x) for x in texts)
         if has_digit and not s.get("source") and (t == "shock" or (t == "content" and s.get("layout") in ("number", "stats"))):
             W(where, "關鍵數字沒有 source（出處）。先跟原始資料核對，再寫上出處與適用範圍。")
@@ -328,6 +345,43 @@ def lint(data):
         lo, hi = max(1, int(minutes * 0.3)), round(minutes * 1.2) + 1
         if not lo <= n_content <= hi:
             W("meta.minutes", f"{minutes} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.4–1 頁；圖解密集的頁面可以更少）。")
+
+    # ---- layout variety: style never decides layout, so variety has to be checked here
+    if meta.get("toc") and str(meta["toc"]) not in VARIANTS["toc"]:
+        E("meta.toc", f"目錄頁沒有「{meta['toc']}」這種排法。可用：{', '.join(VARIANTS['toc'])}。")
+    flow = [(n, s) for n, s in enumerate(slides, 1) if isinstance(s, dict) and not s.get("appendix")]
+    combo = lambda s: (s.get("layout"), variant_of(s))  # noqa: E731
+    label = lambda c: f"{c[0]}／{c[1]}（{VARIANT_ZH.get(c[0], {}).get(c[1], c[1])}）"  # noqa: E731
+    prev = None
+    for n, s in flow:
+        if s.get("type", "content") != "content" or s.get("layout") not in VARIANTS:
+            prev = None  # a cover, shock or overview page breaks the run
+            continue
+        if prev and combo(prev) == combo(s) and not (s.get("series") and s.get("series") == prev.get("series")):
+            W(f"slides[{n}]", f"和上一頁用同一種排法 {label(combo(s))}。相鄰兩頁換一種排法，聽眾才分得出這是兩件事。"
+                              "如果這幾頁是同一類內容（例如不同案例的進度），在這幾頁寫上同一個 series，就會要求它們長得一樣。")
+        prev = s
+    series = {}
+    for n, s in flow:
+        if s.get("series") and s.get("type", "content") == "content":
+            series.setdefault(str(s["series"]), []).append((n, s))
+    for name, pages in series.items():
+        kinds = {combo(s) for _, s in pages}
+        if len(pages) == 1:
+            I(f"slides[{pages[0][0]}]", f"series「{name}」只有這一頁。series 是給「同一類、要長得一樣」的多頁用的。")
+        elif len(kinds) > 1:
+            W(f"series「{name}」", "同一個系列的頁面用了不同排法：" + "、".join(label(k) for k in sorted(kinds, key=str))
+              + "。同一系列要長得一樣，聽眾才看得出它們是同一類。")
+    units, seen_series = [], set()
+    for n, s in flow:
+        if s.get("type", "content") == "content" and s.get("layout") in VARIANTS:
+            if s.get("series"):
+                if s["series"] in seen_series:
+                    continue
+                seen_series.add(s["series"])
+            units.append(combo(s))
+    if len(units) >= 6 and len(set(units)) < 4:
+        W("slides", f"{len(units)} 頁內容只用了 {len(set(units))} 種排法，畫面會單調。依內容換排法（見 references/layouts.md）。")
 
     return errors, warnings, infos
 

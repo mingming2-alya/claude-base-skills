@@ -15,3 +15,19 @@
   fitPhrases();
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitPhrases);
 })();
+
+// Figures: a number never wraps, so when it is wider than its column (or pushes the page wider than
+// the stage) every figure on that page shrinks together, down to half size.
+(function(){
+  function fitFigures(){
+    document.querySelectorAll('.slide .body').forEach(function(b){
+      var els=[].slice.call(b.querySelectorAll('.number .value,.stats-row .sv')); if(!els.length) return;
+      els.forEach(function(e){e.style.fontSize='';});
+      var base=els.map(function(e){return parseFloat(getComputedStyle(e).fontSize);}), k=1;
+      function over(){return b.scrollWidth>b.clientWidth+1||els.some(function(e){return e.scrollWidth>e.clientWidth+1;});}
+      while(over()&&k>.5){k-=.05;els.forEach(function(e,i){e.style.fontSize=(base[i]*k)+'px';});}
+    });
+  }
+  fitFigures();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitFigures);
+})();

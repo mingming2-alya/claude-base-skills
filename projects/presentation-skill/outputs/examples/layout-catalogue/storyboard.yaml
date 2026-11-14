@@ -1,0 +1,688 @@
+# 版型型錄：由 scripts/catalogue.py 產生。內容是虛構的；頁數與章節安排不符合一般簡報的規則，建置時不經過 lint。
+meta:
+  title: 讓客人==被記得==
+  subtitle: 版型型錄：每一種排法都用同一份虛構內容
+  presenter: 示範
+  date: '2026.11'
+  minutes: 15
+  theme: wireframe
+structure:
+  start: 不知道常客為什麼來
+  destination: 知道每天要做哪四件事
+  axis: causal
+  direction: 原因 → 做法 → 成果
+chapters:
+- id: a
+  label: 為什麼
+  minutes: 5
+- id: b
+  label: 怎麼做
+  minutes: 5
+- id: c
+  label: 成果
+  minutes: 5
+slides:
+- type: cover
+- chapter: a
+  layout: point
+  title: point（預設排法）
+  key: '客人回來，不是因為折扣，
+
+    是因為==被記得=='
+  support: 訪談 30 位常客，22 位提到「店員記得我喝什麼」
+  type: content
+- chapter: b
+  layout: steps
+  title: steps（預設排法）
+  items: &id004
+  - label: 記下偏好
+    detail: 第一次點單就記錄甜度與溫度
+  - label: ==叫出名字==
+    detail: 第二次來就用名字打招呼
+  - label: 主動推薦
+    detail: 依照偏好推薦當季新品
+  - label: 收集回饋
+    detail: 每月一次，問一個問題
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: c
+  layout: compare
+  title: compare（預設排法）
+  left: &id007
+    heading: 以前
+    items:
+    - 發折價券
+    - 每月辦一次活動
+    - 看營業額
+  right: &id008
+    heading: 現在
+    items:
+    - ==記得每位常客==
+    - 每天做四個小動作
+    - 看回訪率
+  note: 成本沒有增加，改變的是每天的習慣
+  type: content
+- type: cover
+  variant: center
+- type: cover
+  variant: top
+- type: cover
+  variant: split
+- type: cover
+  variant: bands
+- type: closing
+  text: '明天開始，
+
+    ==記得一位客人=='
+  sub: 從你的店開始
+  points: &id001
+  - 記下偏好
+  - 叫出名字
+  - ==每週看回訪率==
+  variant: bottom
+- type: closing
+  text: '明天開始，
+
+    ==記得一位客人=='
+  sub: 從你的店開始
+  points: *id001
+  variant: center
+- type: closing
+  text: '明天開始，
+
+    ==記得一位客人=='
+  sub: 從你的店開始
+  points: *id001
+  variant: split
+- type: closing
+  text: '明天開始，
+
+    ==記得一位客人=='
+  sub: 從你的店開始
+  points: *id001
+  variant: card
+- chapter: a
+  layout: point
+  variant: plain
+  title: point・靠左大字
+  appendix: true
+  id: point-plain
+  key: '客人回來，不是因為折扣，
+
+    是因為==被記得=='
+  support: 訪談 30 位常客，22 位提到「店員記得我喝什麼」
+  type: content
+- chapter: a
+  layout: point
+  variant: offset
+  title: point・左側留白
+  appendix: true
+  id: point-offset
+  key: '客人回來，不是因為折扣，
+
+    是因為==被記得=='
+  support: 訪談 30 位常客，22 位提到「店員記得我喝什麼」
+  type: content
+- chapter: a
+  layout: point
+  variant: split
+  title: point・左右分半
+  appendix: true
+  id: point-split
+  key: '客人回來，不是因為折扣，
+
+    是因為==被記得=='
+  support: 訪談 30 位常客，22 位提到「店員記得我喝什麼」
+  type: content
+- chapter: a
+  layout: point
+  variant: band
+  title: point・底部橫帶
+  appendix: true
+  id: point-band
+  key: '客人回來，不是因為折扣，
+
+    是因為==被記得=='
+  support: 訪談 30 位常客，22 位提到「店員記得我喝什麼」
+  type: content
+- chapter: a
+  layout: point
+  variant: bottom
+  title: point・貼底大字
+  appendix: true
+  id: point-bottom
+  key: '客人回來，不是因為折扣，
+
+    是因為==被記得=='
+  support: 訪談 30 位常客，22 位提到「店員記得我喝什麼」
+  type: content
+- chapter: a
+  layout: point
+  variant: card
+  title: point・置中紙卡
+  appendix: true
+  id: point-card
+  key: '客人回來，不是因為折扣，
+
+    是因為==被記得=='
+  support: 訪談 30 位常客，22 位提到「店員記得我喝什麼」
+  type: content
+- chapter: a
+  layout: number
+  variant: side
+  title: number・數字在左
+  appendix: true
+  id: number-side
+  value: ==72%==
+  label: 的常客每週至少來三次
+  note: 2026 年 3 月會員資料，共 1,840 位常客
+  points: &id002
+  - 平均每次消費高出 18%
+  - 其中六成會帶朋友來
+  - 流失率只有一般會員的一半
+  type: content
+- chapter: a
+  layout: number
+  variant: center
+  title: number・全部置中
+  appendix: true
+  id: number-center
+  value: ==72%==
+  label: 的常客每週至少來三次
+  note: 2026 年 3 月會員資料，共 1,840 位常客
+  points: *id002
+  type: content
+- chapter: a
+  layout: number
+  variant: stack
+  title: number・上下堆疊
+  appendix: true
+  id: number-stack
+  value: ==72%==
+  label: 的常客每週至少來三次
+  note: 2026 年 3 月會員資料，共 1,840 位常客
+  points: *id002
+  type: content
+- chapter: a
+  layout: number
+  variant: reverse
+  title: number・數字在右
+  appendix: true
+  id: number-reverse
+  value: ==72%==
+  label: 的常客每週至少來三次
+  note: 2026 年 3 月會員資料，共 1,840 位常客
+  points: *id002
+  type: content
+- chapter: a
+  layout: number
+  variant: bottom
+  title: number・巨數貼底
+  appendix: true
+  id: number-bottom
+  value: ==72%==
+  label: 的常客每週至少來三次
+  note: 2026 年 3 月會員資料，共 1,840 位常客
+  points: *id002
+  type: content
+- chapter: a
+  layout: number
+  variant: evidence
+  title: number・數字＋佐證
+  appendix: true
+  id: number-evidence
+  value: ==72%==
+  label: 的常客每週至少來三次
+  note: 2026 年 3 月會員資料，共 1,840 位常客
+  points: *id002
+  type: content
+- chapter: a
+  layout: stats
+  variant: row
+  title: stats・橫排
+  appendix: true
+  id: stats-row
+  lead: 三個數字，說明常客有多重要
+  stats: &id003
+  - value: ==1,840==
+    label: 位常客
+    note: 每週至少來一次
+    bar: 46
+  - value: 72%
+    label: 每週來三次以上
+    note: 占常客的比例
+    bar: 72
+  - value: 18%
+    label: 客單價較高
+    note: 與一般會員相比
+    bar: 18
+  - value: '4.6'
+    label: 平均滿意度
+    note: 滿分 5 分
+    bar: 92
+  note: 資料期間：2026 年第一季
+  type: content
+- chapter: a
+  layout: stats
+  variant: ledger
+  title: stats・直向帳單
+  appendix: true
+  id: stats-ledger
+  lead: 三個數字，說明常客有多重要
+  stats: *id003
+  note: 資料期間：2026 年第一季
+  type: content
+- chapter: a
+  layout: stats
+  variant: hero
+  title: stats・一大多小
+  appendix: true
+  id: stats-hero
+  lead: 三個數字，說明常客有多重要
+  stats: *id003
+  note: 資料期間：2026 年第一季
+  type: content
+- chapter: a
+  layout: stats
+  variant: cards
+  title: stats・數字卡
+  appendix: true
+  id: stats-cards
+  lead: 三個數字，說明常客有多重要
+  stats: *id003
+  note: 資料期間：2026 年第一季
+  type: content
+- chapter: a
+  layout: stats
+  variant: split
+  title: stats・陳述＋四格
+  appendix: true
+  id: stats-split
+  lead: 三個數字，說明常客有多重要
+  stats: *id003
+  note: 資料期間：2026 年第一季
+  type: content
+- chapter: a
+  layout: stats
+  variant: tower
+  title: stats・數據柱
+  appendix: true
+  id: stats-tower
+  lead: 三個數字，說明常客有多重要
+  stats: *id003
+  note: 資料期間：2026 年第一季
+  type: content
+- chapter: a
+  layout: quote
+  variant: mark
+  title: quote・引號在上
+  appendix: true
+  id: quote-mark
+  text: 我換了三家咖啡店，只有這家==記得我不加糖==。
+  source: 一位來了兩年的常客
+  type: content
+- chapter: a
+  layout: quote
+  variant: center
+  title: quote・置中
+  appendix: true
+  id: quote-center
+  text: 我換了三家咖啡店，只有這家==記得我不加糖==。
+  source: 一位來了兩年的常客
+  type: content
+- chapter: a
+  layout: quote
+  variant: side
+  title: quote・右側色條
+  appendix: true
+  id: quote-side
+  text: 我換了三家咖啡店，只有這家==記得我不加糖==。
+  source: 一位來了兩年的常客
+  type: content
+- chapter: a
+  layout: quote
+  variant: band
+  title: quote・橫帶反白
+  appendix: true
+  id: quote-band
+  text: 我換了三家咖啡店，只有這家==記得我不加糖==。
+  source: 一位來了兩年的常客
+  type: content
+- chapter: a
+  layout: quote
+  variant: giant
+  title: quote・巨大引號
+  appendix: true
+  id: quote-giant
+  text: 我換了三家咖啡店，只有這家==記得我不加糖==。
+  source: 一位來了兩年的常客
+  type: content
+- chapter: b
+  layout: steps
+  variant: row
+  title: steps・橫排
+  appendix: true
+  id: steps-row
+  items: *id004
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: b
+  layout: steps
+  variant: ledger
+  title: steps・帳簿列
+  appendix: true
+  id: steps-ledger
+  items: *id004
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: b
+  layout: steps
+  variant: vertical
+  title: steps・直向軸線
+  appendix: true
+  id: steps-vertical
+  items: *id004
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: b
+  layout: steps
+  variant: pipeline
+  title: steps・箭頭管線
+  appendix: true
+  id: steps-pipeline
+  items: *id004
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: b
+  layout: steps
+  variant: cycle
+  title: steps・四角循環
+  appendix: true
+  id: steps-cycle
+  items: *id004
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: b
+  layout: steps
+  variant: pyramid
+  title: steps・金字塔
+  appendix: true
+  id: steps-pyramid
+  items: *id004
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: b
+  layout: steps
+  variant: stack
+  title: steps・左標題右堆疊
+  appendix: true
+  id: steps-stack
+  items: *id004
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: b
+  layout: steps
+  variant: cards
+  title: steps・步驟卡
+  appendix: true
+  id: steps-cards
+  items: *id004
+  note: 四個動作每天都做，不需要新系統
+  type: content
+- chapter: b
+  layout: timeline
+  variant: axis
+  title: timeline・橫軸
+  appendix: true
+  id: timeline-axis
+  events: &id005
+  - when: 1 月
+    label: 試辦兩家店
+    detail: 信義店、公館店
+  - when: 3 月
+    label: ==擴大到八家==
+    detail: 加入北區所有直營店
+  - when: 6 月
+    label: 全台上線
+    detail: 含加盟店
+  - when: 9 月
+    label: 檢討成效
+    detail: 決定明年預算
+  note: 每個階段結束後停一週檢討
+  type: content
+- chapter: b
+  layout: timeline
+  variant: alternate
+  title: timeline・上下交替
+  appendix: true
+  id: timeline-alternate
+  events: *id005
+  note: 每個階段結束後停一週檢討
+  type: content
+- chapter: b
+  layout: timeline
+  variant: vertical
+  title: timeline・直軸
+  appendix: true
+  id: timeline-vertical
+  events: *id005
+  note: 每個階段結束後停一週檢討
+  type: content
+- chapter: b
+  layout: timeline
+  variant: ledger
+  title: timeline・日程帳冊
+  appendix: true
+  id: timeline-ledger
+  events: *id005
+  note: 每個階段結束後停一週檢討
+  type: content
+- chapter: b
+  layout: bullets
+  variant: list
+  title: bullets・清單
+  appendix: true
+  id: bullets-list
+  items: &id006
+  - 每家店指定一位常客負責人
+  - 每週回報一次==回訪率==
+  - 每月選出一個最佳做法
+  - 每季全區分享一次
+  note: 先從直營店開始
+  type: content
+- chapter: b
+  layout: bullets
+  variant: split
+  title: bullets・左標題右清單
+  appendix: true
+  id: bullets-split
+  items: *id006
+  note: 先從直營店開始
+  type: content
+- chapter: b
+  layout: bullets
+  variant: numbered
+  title: bullets・編號長條
+  appendix: true
+  id: bullets-numbered
+  items: *id006
+  note: 先從直營店開始
+  type: content
+- chapter: b
+  layout: bullets
+  variant: grid
+  title: bullets・格線方格
+  appendix: true
+  id: bullets-grid
+  items: *id006
+  note: 先從直營店開始
+  type: content
+- chapter: b
+  layout: bullets
+  variant: cards
+  title: bullets・卡片
+  appendix: true
+  id: bullets-cards
+  items: *id006
+  note: 先從直營店開始
+  type: content
+- chapter: c
+  layout: compare
+  variant: panel
+  title: compare・淡對強色塊
+  appendix: true
+  id: compare-panel
+  left: *id007
+  right: *id008
+  note: 成本沒有增加，改變的是每天的習慣
+  type: content
+- chapter: c
+  layout: compare
+  variant: halves
+  title: compare・滿版對半
+  appendix: true
+  id: compare-halves
+  left: *id007
+  right: *id008
+  note: 成本沒有增加，改變的是每天的習慣
+  type: content
+- chapter: c
+  layout: compare
+  variant: versus
+  title: compare・VS 對決
+  appendix: true
+  id: compare-versus
+  left: *id007
+  right: *id008
+  note: 成本沒有增加，改變的是每天的習慣
+  type: content
+- chapter: c
+  layout: compare
+  variant: arrow
+  title: compare・前 → 後
+  appendix: true
+  id: compare-arrow
+  left: *id007
+  right: *id008
+  note: 成本沒有增加，改變的是每天的習慣
+  type: content
+- chapter: c
+  layout: compare
+  variant: rows
+  title: compare・逐列對照
+  appendix: true
+  id: compare-rows
+  left: *id007
+  right: *id008
+  note: 成本沒有增加，改變的是每天的習慣
+  type: content
+- chapter: c
+  layout: image
+  variant: split
+  title: image・圖左文右
+  appendix: true
+  id: image-split
+  src: photo.svg
+  alt: 吧台示意圖
+  caption: 吧台是認識客人的==第一現場==
+  type: content
+- chapter: c
+  layout: image
+  variant: flip
+  title: image・文左圖右
+  appendix: true
+  id: image-flip
+  src: photo.svg
+  alt: 吧台示意圖
+  caption: 吧台是認識客人的==第一現場==
+  type: content
+- chapter: c
+  layout: image
+  variant: full
+  title: image・滿版圖
+  appendix: true
+  id: image-full
+  src: photo.svg
+  alt: 吧台示意圖
+  caption: 吧台是認識客人的==第一現場==
+  type: content
+- chapter: c
+  layout: image
+  variant: top
+  title: image・上圖下文
+  appendix: true
+  id: image-top
+  src: photo.svg
+  alt: 吧台示意圖
+  caption: 吧台是認識客人的==第一現場==
+  type: content
+- chapter: c
+  layout: image
+  variant: frame
+  title: image・置中相框
+  appendix: true
+  id: image-frame
+  src: photo.svg
+  alt: 吧台示意圖
+  caption: 吧台是認識客人的==第一現場==
+  type: content
+- chapter: c
+  layout: table
+  variant: ledger
+  title: table・帳冊
+  appendix: true
+  id: table-ledger
+  columns: &id009
+  - 門市
+  - 常客數
+  - 回訪率
+  - 負責人
+  rows: &id010
+  - - 信義店
+    - '420'
+    - 81%
+    - 店長
+  - - 公館店
+    - ==388==
+    - 77%
+    - 副店長
+  - - 天母店
+    - '305'
+    - 69%
+    - 店長
+  - - 板橋店
+    - '290'
+    - 64%
+    - 資深店員
+  note: 回訪率：30 天內再次消費的比例
+  type: content
+- chapter: c
+  layout: table
+  variant: stripe
+  title: table・條紋
+  appendix: true
+  id: table-stripe
+  columns: *id009
+  rows: *id010
+  note: 回訪率：30 天內再次消費的比例
+  type: content
+- chapter: c
+  layout: table
+  variant: strips
+  title: table・逐列紙條
+  appendix: true
+  id: table-strips
+  columns: *id009
+  rows: *id010
+  note: 回訪率：30 天內再次消費的比例
+  type: content
+- chapter: c
+  layout: table
+  variant: lead
+  title: table・左說明右表
+  appendix: true
+  id: table-lead
+  columns: *id009
+  rows: *id010
+  note: 回訪率：30 天內再次消費的比例
+  type: content

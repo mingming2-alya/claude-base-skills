@@ -1,0 +1,21 @@
+/* wireframe（灰階線框）— 只用來「選排版」，不是成品風格。沒有字體個性，除了重點字以外全部灰階，讓人只看東西放在哪裡。
+   @fonts family=Noto+Sans+TC:wght@400;500;700
+   色彩理由：選排版時不該被顏色影響，所以全部是灰階；只有重點字保留一個顏色，因為「重點在哪」也是排版的一部分。 */
+:root{
+  --bg:#F4F4F3; --bg-2:#E4E4E2;
+  --fg:#1F1F1F; --fg-2:#454545; --fg-3:#5C5C5C;
+  --line:#1F1F1F; --line-2:#C9C9C6;
+  --accent:#555555; --accent-text:#B4380F; --accent-ink:#FFFFFF;
+  /* 重點字在色塊上的顏色：強調色塊、墨色橫帶、震撼頁（重點一律用顏色，不畫底線） */
+  --em-on-accent:#FFD27A; --em-on-ink:#FFB38A; --shock-em:#FFB38A;
+  --shock-bg:#1F1F1F; --shock-fg:#F4F4F3;
+  --font-display:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-quote:var(--font-display); --font-number:var(--font-display);
+  --font-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-label:"Noto Sans TC","PingFang TC",sans-serif;
+  --display-weight:700; --title-weight:700; --quote-weight:500; --number-weight:700; --numeral-weight:400;
+  --display-tracking:0; --title-tracking:0; --label-tracking:.02em;
+  --radius:0px; --grain:0; --grain-blend:multiply;
+  --surface:none;
+  --enter-easing:cubic-bezier(.16,1,.3,1);
+}

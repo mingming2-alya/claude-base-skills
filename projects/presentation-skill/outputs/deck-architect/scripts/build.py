@@ -21,7 +21,8 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from deck_model import AXES, EMPH_RE, StoryboardError, load, main_slides, toc_mode  # noqa: E402
+from deck_model import (AXES, EMPH_RE, VARIANTS, StoryboardError, layout_key, load, main_slides, toc_mode,  # noqa: E402
+                        VARIANT_ZH, variant_of, variant_options, variant_problems)
 from lint import lint  # noqa: E402
 
 THEMES_DIR = HERE.parent / "themes"
@@ -225,6 +226,7 @@ def render_status_table(s):
     return f"{summary}<table class='status-table'><thead>{head}</thead><tbody>{''.join(body)}</tbody></table>"
 
 
+CELL_NUM_RE = re.compile(r"^[-+−]?[\d][\d.,]*\s*[^\d\s]{0,3}$")
 NUM_RE = re.compile(r"^(?P<pre>[^\d]*?)(?P<num>[\d][\d.,]*)(?P<post>.*)$")
 
 
@@ -261,16 +263,21 @@ def render_layout(s, base_dir):
         return f'<div class="point"><p class="key rv{whole}">{display(key)}</p>{sup}</div>'
     if lay == "number":
         note = f'<p class="note rv">{rich(s["note"])}</p>' if s.get("note") else ""
+        points = ""
+        if s.get("points"):
+            points = '<ul class="points">' + "".join(f'<li class="rv">{rich(x)}</li>' for x in s["points"]) + "</ul>"
         return (f'<div class="number"><div class="value rv">{number_html(s.get("value"))}</div>'
-                f'<div class="label rv">{rich(s.get("label"))}</div>{note}</div>')
+                f'<div class="label rv">{rich(s.get("label"))}</div>{note}{points}</div>')
     foot_note = f'<p class="lnote rv">{rich(s["note"])}</p>' if s.get("note") else ""
     if lay == "stats":
         cells = "".join(f'<div class="stat rv"><div class="sv">{number_html(st.get("value"))}</div>'
                         f'<div class="sl">{rich(st.get("label"))}</div>'
-                        + (f'<div class="sn">{rich(st["note"])}</div>' if st.get("note") else "") + "</div>"
+                        + (f'<div class="sn">{rich(st["note"])}</div>' if st.get("note") else "")
+                        + (f'<i class="bar" style="--h:{float(st["bar"]):g}"></i>'
+                           if isinstance(st.get("bar"), (int, float)) else "") + "</div>"
                         for st in s.get("stats", []))
         lead = f'<p class="stats-lead rv">{rich(s["lead"])}</p>' if s.get("lead") else ""
-        return f'<div class="stats-page">{lead}<div class="stats-row" style="--n:{len(s.get("stats", []))}">{cells}</div>{foot_note}</div>'
+        return f'<div class="stats-page">{lead}<div class="stats-row" style="--n:{len(s.get("stats", []))};--m:{max(1, len(s.get("stats", [])) - 1)}">{cells}</div>{foot_note}</div>'
     if lay == "bullets":
         lis = "".join(f'<li class="rv">{rich(x)}</li>' for x in s.get("items", []))
         return f'<div><ul class="bullets">{lis}</ul>{foot_note}</div>'
@@ -279,8 +286,9 @@ def render_layout(s, base_dir):
         def step(i, x):
             if isinstance(x, dict):  # {label, detail}
                 d = f'<span class="d">{rich(x["detail"])}</span>' if x.get("detail") else ""
-                return f'<li class="rv"><span class="n">{i:02d}</span><span class="t">{rich(x.get("label"))}</span>{d}</li>'
-            return f'<li class="rv"><span class="n">{i:02d}</span><span class="t">{rich(x)}</span></li>'
+                return (f'<li class="rv" style="--i:{i - 1}"><span class="n">{i:02d}</span>'
+                        f'<span class="t">{rich(x.get("label"))}</span>{d}</li>')
+            return f'<li class="rv" style="--i:{i - 1}"><span class="n">{i:02d}</span><span class="t">{rich(x)}</span></li>'
         lis = "".join(step(i, x) for i, x in enumerate(items, 1))
         return f'<div><ol class="steps" style="--n:{len(items)}">{lis}</ol>{foot_note}</div>'
     if lay == "compare":
@@ -288,7 +296,26 @@ def render_layout(s, base_dir):
             v = s.get(side) or {}
             lis = "".join(f"<li>{rich(x)}</li>" for x in v.get("items", []))
             return f'<div class="col rv"><h3>{rich(v.get("heading"))}</h3><ul>{lis}</ul></div>'
-        return f'<div class="compare">{col("left")}<div class="divider"></div>{col("right")}</div>'
+        rows = max(len((s.get(k) or {}).get("items", [])) for k in ("left", "right"))
+        return (f'<div><div class="compare" style="--r:{max(1, rows)}">{col("left")}<div class="divider"></div>'
+                f'{col("right")}</div>{foot_note}</div>')
+    if lay == "timeline":
+        events = s.get("events", [])
+        def ev(x):
+            x = x if isinstance(x, dict) else {"label": x}
+            d = f'<span class="d">{rich(x["detail"])}</span>' if x.get("detail") else ""
+            return (f'<li class="rv"><div class="tb"><span class="w">{rich(x.get("when", ""))}</span>'
+                    f'<span class="t">{rich(x.get("label"))}</span>{d}</div><i class="dot"></i></li>')
+        return f'<div><ol class="tl" style="--n:{len(events)}">{"".join(ev(x) for x in events)}</ol>{foot_note}</div>'
+    if lay == "table":
+        cols, rows = s.get("columns", []), s.get("rows", [])
+        is_num = lambda c: bool(CELL_NUM_RE.match(EMPH_RE.sub(r"\1", str(c)).strip()))
+        numeric = [bool(rows) and all(i < len(r) and is_num(r[i]) for r in rows) for i in range(len(cols))]
+        cls = lambda i: ' class="num"' if i < len(numeric) and numeric[i] else ""
+        head = "".join(f"<th{cls(i)}>{rich(c)}</th>" for i, c in enumerate(cols))
+        body = "".join("<tr class='rv'>" + "".join(f"<td{cls(i)}>{rich(c)}</td>" for i, c in enumerate(r)) + "</tr>"
+                       for r in rows)
+        return f'<div><table class="tbl"><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table>{foot_note}</div>'
     if lay == "quote":
         src = f'<cite class="rv">{rich(s["source"])}</cite>' if s.get("source") else ""
         return f'<blockquote class="quote"><p class="rv">{rich(s.get("text"))}</p>{src}</blockquote>'
@@ -321,11 +348,13 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
         back = '<button class="back" type="button">← 返回</button>'
     pageno = f'<div class="pageno">{"附件" if rec.get("appendix") else f"{idx:02d}"}</div>'
     frame = '<i class="frame-line"></i>'
-    deck_name = esc(re.sub(r"==", "", str(meta.get("short") or meta.get("title") or "")))
-    foot = (f'<footer class="foot"><span>{deck_name}</span>'
+    foot = (f'<footer class="foot">'
             f'<span class="pg">{"附件" if rec.get("appendix") else f"{idx:02d} / {total:02d}"}</span></footer>')
     more = (f'<button class="more-btn" type="button" data-link="{esc(s["link"])}">看細節 →</button>'
             if s.get("link") else "")
+    # layout variant: a class on the slide; the default variant of each layout needs no class
+    v = variant_of(s) if s else ""
+    vcls = f" v-{esc(v)}" if v and v != (VARIANTS.get(layout_key(s)) or [""])[0] else ""
 
     if kind == "status":
         cont = "（續）" if s.get("continued") else ""
@@ -351,13 +380,16 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
         parts = [f'<h1 class="cover-title rv">{display(meta.get("title"))}</h1>',
                  f'<p class="cover-sub rv">{rich(meta.get("subtitle"))}</p>' if meta.get("subtitle") else ""]
         kicker = f'<div class="kicker rv">{esc(meta.get("kicker"))}</div>' if meta.get("kicker") else ""
-        return (f'<section class="slide cover" {attrs}>{frame}{kicker}<div class="cover-inner">{"".join(parts)}</div>'
+        return (f'<section class="slide cover{vcls}" {attrs}>{frame}{kicker}<div class="cover-inner">{"".join(parts)}</div>'
                 f'<div class="route rv{"" if has_who else " no-who"}" style="--n:{len(chapters)}">{route}</div></section>')
 
     if kind == "toc":
         lis = "".join(f'<li class="{"on" if rec["chi"] in (-1, i) else "off"}"><span class="i">{i + 1:02d}</span>'
                       f'<span class="l">{esc(c["label"])}</span></li>' for i, c in enumerate(chapters))
-        return f'<section class="slide toc" {attrs}>{frame}<ol class="toc-list">{lis}</ol></section>'
+        tv = rec.get("variant") or str(meta.get("toc") or "")
+        tv = f" v-{esc(tv)}" if tv in VARIANTS["toc"][1:] else ""
+        num = f'<div class="toc-num" aria-hidden="true">{rec["chi"] + 1:02d}</div>' if rec["chi"] >= 0 else ""
+        return f'<section class="slide toc{tv}" {attrs}>{frame}{num}<ol class="toc-list">{lis}</ol></section>'
 
     if kind == "shock":
         sub = f'<p class="shock-sub">{rich(s["sub"])}</p>' if s.get("sub") else ""
@@ -366,21 +398,22 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
 
     if kind == "closing":
         sub = f'<p class="closing-sub rv">{rich(s["sub"])}</p>' if s.get("sub") else ""
-        return (f'<section class="slide closing" {attrs}>{frame}<div class="closing-inner">'
-                f'<p class="closing-text rv">{display(s.get("text", ""))}</p>{sub}</div></section>')
+        pts = ""
+        if s.get("points"):
+            pts = '<ul class="closing-points">' + "".join(f'<li class="rv">{rich(x)}</li>' for x in s["points"]) + "</ul>"
+        return (f'<section class="slide closing{vcls}" {attrs}>{frame}<div class="closing-inner">'
+                f'<p class="closing-text rv">{display(s.get("text", ""))}</p>{sub}</div>{pts}</section>')
 
     # content
     snav = static_nav(chapters, rec["chi"], rec["tab"], rec["tabs"], ch_sources[rec["chi"]])
     tabbed = " tabbed" if rec["tabs"] > 2 else ""
     attrs += f' data-tab="{rec["tab"]}" data-tabs="{rec["tabs"]}"'
-    ghost = ""
-    if rec["tab"] == 0 and not rec.get("appendix") and 0 <= rec["chi"] < len(chapters):
-        ghost = f'<div class="ghost" aria-hidden="true">{esc(chapters[rec["chi"]]["label"])}</div>'
+    ghost = ""  # no watermark: nothing decorative may sit behind or on top of text
     hooks = ""
     if 0 <= rec["chi"] < len(chapters):
         hooks = (f'<div class="chno" aria-hidden="true">{rec["chi"] + 1:02d}</div>'
                  f'<div class="chname" aria-hidden="true">{esc(chapters[rec["chi"]]["label"])}</div>')
-    return (f'<section class="slide content layout-{esc(s.get("layout"))}{tabbed}" {attrs}>{frame}{ghost}{hooks}{back}{snav}'
+    return (f'<section class="slide content layout-{esc(s.get("layout"))}{vcls}{tabbed}" {attrs}>{frame}{ghost}{hooks}{back}{snav}'
             f'<header class="slide-head"><h2 class="title">{esc(s.get("title"))}</h2></header>'
             f'<div class="body">{render_layout(s, base_dir)}</div>'
             f'{"" if s.get("layout") == "quote" else source_line(s)}{more}{foot}</section>')
@@ -413,7 +446,7 @@ def deck_html(data, base_dir):
         fmt=esc(data["meta"].get("format", "deck")),
         lang=esc(data["meta"].get("lang", "zh-Hant")),
         title=esc(re.sub(r"==", "", str(data["meta"].get("title", "Deck")))),
-        fonts=fonts, theme=css_theme, base=BASE_CSS,
+        fonts=fonts, theme=css_theme, base=BASE_CSS, layouts=LAYOUTS_CSS,
         motion=motion, shape=toc_shape(motion),
         slides="\n".join(slides), deck=json.dumps(deck_json, ensure_ascii=False), runtime=RUNTIME_JS, fit=FIT_JS)
 
@@ -456,8 +489,79 @@ def samples_html(data, base_dir, themes, pages=None):
         frames = "".join(f'<div class="frame"><div class="frame-inner {cls}">{slides[i]}</div></div>' for i in pick)
         blocks.append(f'<section class="sample"><h2><b>{roles[n]}</b> {esc(label)}</h2><div class="row">{frames}</div></section>')
     return SAMPLES_PAGE.format(
-        lang=esc(data["meta"].get("lang", "zh-Hant")), fonts=fonts_link(*css_all), base=BASE_CSS,
+        lang=esc(data["meta"].get("lang", "zh-Hant")), fonts=fonts_link(*css_all), base=BASE_CSS, layouts=LAYOUTS_CSS,
         themes="\n".join(css_all), motion=motion, shape=toc_shape(motion),
+        tab="風格樣張", heading="風格樣張", intro="同一套架構、內容與排版，三種風格。選一個，或告訴我要怎麼混搭。",
+        title=esc(re.sub(r"==", "", str(data["meta"].get("title", "")))), blocks="\n".join(blocks), fit=FIT_JS)
+
+
+def layout_candidates(s, key, limit=3):
+    """Variants to show for one page: the ones written on the slide, else the current one plus
+    the next arrangements this content fits."""
+    names = VARIANTS.get(key) or []
+    written = [v for v in variant_options(s) if v in names]
+    if len(written) > 1:
+        return written[:4]
+    out = [written[0] if written else names[0]] if names else []
+    for v in names:
+        if len(out) >= limit:
+            break
+        if v not in out and not variant_problems(s, v):
+            out.append(v)
+    return out
+
+
+def layouts_html(data, base_dir, pages=None, theme="wireframe", every=False):
+    """Step 3a: the layout-options page. Greyscale, so only the arrangement is being chosen.
+    With every=True it shows every variant the content fits (used for the layout catalogue)."""
+    records = expand(data)
+    ids = [c["id"] for c in data["chapters"]]
+    ch_sources = [[s for s in main_slides(data) if s.get("type", "content") == "content"
+                   and s.get("chapter") == cid and s.get("layout") != "pillars"] for cid in ids]
+    total = sum(1 for r in records if not r.get("appendix"))
+    css, _ = theme_css(theme, base_dir)
+    blocks, toc_done = [], False
+    for idx, rec in enumerate(records, 1):
+        if pages and idx not in pages:
+            continue
+        s, kind = rec["src"] or {}, rec["kind"]
+        if kind == "toc":
+            if toc_done:
+                continue
+            toc_done = True
+            key, cur = "toc", str(data["meta"].get("toc") or VARIANTS["toc"][0])
+            cands = [cur] + [v for v in VARIANTS["toc"] if v != cur][:9 if every else 2]
+            title = "目錄頁（每一張目錄頁都用同一種）"
+        elif kind in ("content", "cover", "closing"):
+            key = layout_key(s)
+            cands = layout_candidates(dict(s, variant=None) if every else s, key, 99 if every else 3)
+            title = s.get("title") or {"cover": "封面", "closing": "結尾"}.get(kind, "")
+        else:
+            continue
+        if len(cands) < 2:
+            continue
+        frames = []
+        for n, v in enumerate(cands):
+            r2 = dict(rec)
+            r2["variant"] = v
+            if rec["src"] is not None:
+                r2["src"] = dict(s, variant=v)
+            html_slide = render_slide(r2, data, idx, total, base_dir, ch_sources)
+            tag = "ABCDEFGHIJ"[n]
+            mark = "（目前）" if n == 0 and not every else ""
+            frames.append(f'<figure class="opt"><div class="frame"><div class="frame-inner">{html_slide}</div></div>'
+                          f'<figcaption><b>{idx}{tag}</b> {esc(VARIANT_ZH.get(key, {}).get(v, v))} '
+                          f'<code>{esc(v)}</code>{mark}</figcaption></figure>')
+        page = "附件" if rec.get("appendix") else f"第 {idx} 頁"
+        blocks.append(f'<section class="sample"><h2><b>{page}</b> {esc(re.sub("==", "", str(title)))} '
+                      f'<small>{esc(key)}</small></h2><div class="row">{"".join(frames)}</div></section>')
+    motion = motion_for(data["structure"])
+    return SAMPLES_PAGE.format(
+        lang=esc(data["meta"].get("lang", "zh-Hant")), fonts=fonts_link(css), base=BASE_CSS, layouts=LAYOUTS_CSS,
+        themes=css, motion=motion, shape=toc_shape(motion),
+        tab="版型型錄" if every else "排版選單", heading="版型型錄" if every else "排版選單",
+        intro=("每一種內容的每一種排法。排法逐頁依內容選，和風格無關；怎麼選見 references/layouts.md。" if every else
+               "同一頁內容的幾種排法，用灰階呈現，只看東西放在哪裡。每頁選一個（例如「3B、4A」），沒選的就用目前的。風格下一步再選。"),
         title=esc(re.sub(r"==", "", str(data["meta"].get("title", "")))), blocks="\n".join(blocks), fit=FIT_JS)
 
 
@@ -487,6 +591,7 @@ BASE_CSS = (HERE.parent / "assets" / "base.css").read_text(encoding="utf-8")
 
 RUNTIME_JS = (HERE.parent / "assets" / "runtime.js").read_text(encoding="utf-8")
 FIT_JS = (HERE.parent / "assets" / "fit.js").read_text(encoding="utf-8")
+LAYOUTS_CSS = (HERE.parent / "assets" / "layouts.css").read_text(encoding="utf-8")
 
 PAGE = """<!doctype html>
 <html lang="{lang}" data-shape="{shape}" data-motion="{motion}" data-format="{fmt}">
@@ -497,6 +602,7 @@ PAGE = """<!doctype html>
 {fonts}
 <style>
 {base}
+{layouts}
 {theme}
 </style>
 </head>
@@ -520,10 +626,11 @@ SAMPLES_PAGE = """<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>風格樣張 · {title}</title>
+<title>{tab} · {title}</title>
 {fonts}
 <style>
 {base}
+{layouts}
 {themes}
 html,body{{height:auto;overflow:auto;background:#e9e7e3}}
 body{{font-family:system-ui,"Noto Sans TC","PingFang TC",sans-serif;color:#222;padding:40px 32px 80px}}
@@ -532,6 +639,10 @@ header.top p{{color:#666;margin-top:6px;font-size:15px}}
 .sample{{margin-top:40px}}
 .sample>h2{{font-size:20px;font-weight:600;margin-bottom:14px;color:#333}}
 .sample>h2 b{{display:inline-block;background:#222;color:#fff;border-radius:4px;padding:2px 10px;margin-right:8px}}
+.sample>h2 small{{font-weight:400;color:#888;margin-left:8px}}
+.opt figcaption{{margin-top:8px;font-size:15px;color:#333}}
+.opt figcaption b{{display:inline-block;min-width:34px;font-weight:700}}
+.opt figcaption code{{color:#888;font-size:13px;margin-left:4px}}
 .row{{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}}
 .frame{{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:6px;box-shadow:0 6px 24px rgba(0,0,0,.14);container-type:inline-size}}
 .frame-inner{{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;transform:scale(calc(100cqw / 1920px))}}
@@ -539,7 +650,7 @@ header.top p{{color:#666;margin-top:6px;font-size:15px}}
 </style>
 </head>
 <body>
-<header class="top"><h1>{title}：風格樣張</h1><p>同一套架構與內容，三種風格。選一個，或告訴我要怎麼混搭。</p></header>
+<header class="top"><h1>{title}：{heading}</h1><p>{intro}</p></header>
 <div class="static">
 {blocks}
 </div>
@@ -560,6 +671,9 @@ def main():
     ap.add_argument("storyboard")
     ap.add_argument("--samples", help="comma-separated themes, optionally with a role: swiss:穩健,broadsheet:大膽,washi:驚喜")
     ap.add_argument("--sample-pages", help="comma-separated page numbers to show in the samples (default: cover, signature page, one more)")
+    ap.add_argument("--layouts", action="store_true",
+                    help="write layouts.html: greyscale layout options for each page (step 3a)")
+    ap.add_argument("--layout-pages", help="comma-separated page numbers to show in the layout options (default: all)")
     ap.add_argument("--out")
     ap.add_argument("--force", action="store_true", help="build even if lint reports errors")
     a = ap.parse_args()
@@ -575,7 +689,11 @@ def main():
         sys.exit("\nlint 有錯誤，未建置。修正 storyboard 後重試（或加 --force 強制建置）。")
 
     base = Path(a.storyboard).resolve().parent
-    if a.samples:
+    if a.layouts:
+        out = Path(a.out) if a.out else base / "layouts.html"
+        pages = [int(x) for x in a.layout_pages.split(",")] if a.layout_pages else None
+        out.write_text(layouts_html(data, base, pages), encoding="utf-8")
+    elif a.samples:
         themes = [t.strip() for t in a.samples.split(",") if t.strip()]
         out = Path(a.out) if a.out else base / "samples.html"
         pages = [int(x) for x in a.sample_pages.split(",")] if a.sample_pages else None

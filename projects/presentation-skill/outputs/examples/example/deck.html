@@ -35,7 +35,8 @@ html,body{height:100%;background:#000;overflow:hidden}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E")}
 .slide>.frame-line{position:absolute;inset:36px;border:1px solid var(--frame,transparent);pointer-events:none;z-index:7}
 
-/* emphasis: colour + weight, never italic for CJK */
+/* emphasis: always a colour, never an underline and never italic (CJK). On coloured surfaces the
+   theme supplies the emphasis colour: --em-on-accent, --em-on-ink, --shock-em. */
 mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .num{font-variant-numeric:tabular-nums lining-nums}
 .unit{font-size:.4em;font-weight:400;letter-spacing:0;opacity:.7;margin-left:.08em;font-family:var(--font-body)}
@@ -56,21 +57,15 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 #stage.hide-nav #nav,#stage.hide-nav #tabs{opacity:0}
 #stage.no-trans *,#stage.no-trans{transition:none!important}
 .snav{display:none}
-.foot{position:absolute;left:140px;right:140px;bottom:44px;display:flex;justify-content:space-between;align-items:flex-start;
+.foot{position:absolute;left:140px;right:140px;bottom:44px;display:flex;justify-content:flex-end;align-items:flex-start;
   padding-top:14px;border-top:1px solid var(--line-2);font:500 20px/1 var(--font-label);letter-spacing:var(--label-tracking);
   color:var(--fg-3);z-index:5}
 .foot .pg{font-variant-numeric:tabular-nums}
-.slide:has(.source) .foot{justify-content:flex-end}
-.slide:has(.source) .foot span:first-child{display:none}
 .slide .source{bottom:44px;padding-top:14px}
 .pageno{position:absolute;right:140px;bottom:52px;font:500 20px/1 var(--font-label);color:var(--fg-3);letter-spacing:var(--label-tracking)}
 
 /* composition hooks a theme may place: chapter number and chapter name */
 .chno,.chname{display:none;pointer-events:none}
-
-/* ghost word: the chapter label, huge and nearly invisible, on a chapter's first page */
-.ghost{position:absolute;right:-60px;bottom:-170px;font:var(--display-weight) 460px/1 var(--font-display);
-  letter-spacing:-.04em;color:var(--fg);opacity:var(--ghost,.03);white-space:nowrap;pointer-events:none;z-index:0}
 
 /* ---------------------------------------------------------------- content slides */
 .slide-head{position:absolute;left:140px;right:140px;top:150px;z-index:2}
@@ -93,8 +88,7 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .number .value{grid-row:1/3;font:var(--number-weight) 340px/.82 var(--font-number);letter-spacing:-.05em;color:var(--fg)}
 .number .value .num{font-variant-numeric:tabular-nums lining-nums}
 .number .value mark.em{color:var(--accent-text)}
-.number .label{font:var(--title-weight) 54px/1.2 var(--font-display);letter-spacing:var(--title-tracking);align-self:end;
-  padding-bottom:10px;border-bottom:2px solid var(--accent)}
+.number .label{font:var(--title-weight) 54px/1.2 var(--font-display);letter-spacing:var(--title-tracking);align-self:end}
 .number .note{font:400 30px/1.6 var(--font-body);color:var(--fg-2);margin-top:22px;align-self:start}
 
 /* before → after figures: the old value is muted, the outcome carries the accent */
@@ -106,9 +100,9 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 /* stats: a row of figures, each with a label and an optional scope note */
 .stats-page{max-width:1640px}
 .stats-lead{font:var(--title-weight) 46px/1.3 var(--font-display);margin-bottom:56px;max-width:1300px;text-wrap:balance}
-.stats-row{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:56px}
+.stats-row{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:56px}
 .stats-row .stat{padding-top:28px;border-top:2px solid var(--line)}
-.stats-row .sv{font:var(--number-weight) 150px/1 var(--font-number);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stats-row .sv{font:var(--number-weight) 150px/1 var(--font-number);letter-spacing:-.04em;font-variant-numeric:tabular-nums;white-space:nowrap}
 .stats-row .sl{margin-top:18px;font:500 32px/1.35 var(--font-body);color:var(--fg)}
 .stats-row .sn{margin-top:10px;font:400 24px/1.45 var(--font-body);color:var(--fg-3)}
 .lnote{margin-top:36px;padding-left:24px;border-left:2px solid var(--accent);font:400 30px/1.5 var(--font-body);color:var(--fg-2);max-width:1300px}
@@ -125,6 +119,7 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .steps .n{display:block;font:var(--numeral-weight) 120px/1 var(--font-number);letter-spacing:-.04em;color:var(--fg-3);margin-bottom:28px}
 .steps li:has(mark.em) .n{color:var(--accent-text)}
 .steps .d{display:block;margin-top:14px;font:400 28px/1.5 var(--font-body);color:var(--fg-2)}
+.steps .d mark.em{font-weight:700}
 .steps .t{font:500 38px/1.45 var(--font-body);display:block}
 
 /* compare: muted "before" column, the "after" column becomes the accent environment */
@@ -133,15 +128,15 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .compare .col{padding:56px 64px}
 .compare .col:first-child{color:var(--fg-2);border-top:2px solid var(--line-2)}
 .compare .col:last-child{background:var(--accent);color:var(--accent-ink);border-radius:var(--radius)}
-.compare .col:last-child mark.em{color:inherit;font-weight:900;text-decoration:underline;text-decoration-thickness:.08em;text-underline-offset:.18em}
+.compare .col:last-child mark.em{color:var(--em-on-accent,inherit)}
 .compare h3{font:500 22px/1 var(--font-label);letter-spacing:var(--label-tracking);margin-bottom:40px;opacity:.75}
 .compare ul{list-style:none;display:flex;flex-direction:column;gap:30px}
 .compare li{font:var(--title-weight) 50px/1.3 var(--font-display);letter-spacing:var(--title-tracking)}
 
 /* quote: oversized accent quote mark, serif display */
 .quote{max-width:1460px;position:relative;padding-left:12px}
-.quote::before{content:"「";display:block;font:var(--display-weight) 220px/.7 var(--font-display);color:var(--accent);
-  margin:0 0 30px -60px;height:110px}
+.quote::before{content:"\201C";display:block;font:var(--display-weight) 260px/1 var(--font-display);color:var(--accent);
+  margin:0 0 6px -8px;height:140px}
 .quote p{font:var(--quote-weight) 76px/1.4 var(--font-quote);letter-spacing:var(--title-tracking);text-wrap:balance}
 .quote cite{display:flex;align-items:center;gap:20px;margin-top:56px;font:500 26px/1.4 var(--font-label);
   letter-spacing:var(--label-tracking);color:var(--fg-3);font-style:normal}
@@ -151,7 +146,7 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .image{display:grid;grid-template-columns:1.35fr 1fr;gap:88px;align-items:end;height:100%}
 .image .img{height:100%;overflow:hidden;background:var(--bg-2);border-radius:var(--radius)}
 .image img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block}
-.image .caption{font:var(--title-weight) 46px/1.4 var(--font-display);padding-bottom:12px;border-bottom:2px solid var(--accent)}
+.image .caption{font:var(--title-weight) 46px/1.4 var(--font-display)}
 
 /* ---------------------------------------------------------------- cover: bottom-anchored title + colophon */
 .cover{background:var(--cover-bg,var(--bg));color:var(--cover-fg,var(--fg))}
@@ -206,7 +201,7 @@ mark.em{background:none;color:var(--accent-text);font-weight:inherit}
 .shock-inner{position:absolute;left:140px;right:140px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center}
 .shock-text{font:var(--display-weight) 168px/1.08 var(--font-display);letter-spacing:var(--display-tracking);text-wrap:balance;
   max-width:1640px;font-feature-settings:"halt" 1}
-.shock-text mark.em{color:inherit;text-decoration:underline;text-decoration-thickness:.06em;text-underline-offset:.16em}
+.shock-text mark.em{color:var(--shock-em,inherit)}
 .shock-sub{margin-top:52px;font:400 42px/1.45 var(--font-body);opacity:.72}
 .shock .source{color:inherit;opacity:.55}
 #curtain{position:absolute;inset:0;background:#000;z-index:20;opacity:0;pointer-events:none}
@@ -305,6 +300,491 @@ body:hover #hint{opacity:.7}
 }
 @media (prefers-reduced-motion: reduce){#nav .ind,#tabs span,#nav span{transition:none}}
 
+/* deck-architect layout library (v3): one file, every arrangement, no colours or fonts of its own.
+ *
+ * Style and layout are two independent axes:
+ *   - themes/*.css   = style: tokens only (colour, type, texture, card surface)
+ *   - this file      = layout: where things sit. Chosen per page from the content, never from the theme.
+ * A variant is a class on the slide: <section class="slide content layout-steps v-cycle">.
+ * The first variant of each layout is the default and lives in base.css.
+ *
+ * Sources (see inputs/layout-research.md in the project for the full survey):
+ *   HPS  lewislulu/html-ppt-skill (MIT)            BHT  zarazhangrui/beautiful-html-templates (MIT)
+ *   PC   Jane-xiaoer/paper-collage-ppt (MIT)       FS   zarazhangrui/frontend-slides (MIT)
+ *   CDX  ningzimu/codex-ppt-skill (MIT)            HS   alchaincyf/huashu-design (MIT)
+ *   GZ   op7418/guizang-ppt-skill (AGPL-3.0): arrangement ideas only, re-implemented here from scratch;
+ *        no code, CSS or class names were copied.
+ * House rules for every arrangement: emphasis is a colour, never an underline; no decorative line or shape
+ * may sit on top of text; nothing but chapter navigation at the very top and bottom of a slide.
+ * All CSS below is written for this skill's own markup; MIT sources are credited per rule as the origin
+ * of the arrangement.
+ */
+
+/* card surface: themes may restyle every "card" at once through these tokens */
+.slide{--_card-bg:var(--card-bg,var(--bg-2));--_card-line:var(--card-line,var(--line-2));--_tilt:var(--card-tilt,0deg)}
+
+/* ================================================================ point (單一關鍵陳述) */
+/* offset: the left third stays empty, footnote bottom-right. Idea: GZ Swiss "statement" page. */
+.layout-point.v-offset .body{padding-left:547px}
+.layout-point.v-offset .point{max-width:none;position:static}
+.layout-point.v-offset .key{font-size:112px}
+.layout-point.v-offset .support{position:absolute;right:0;bottom:0;margin:0;max-width:560px;padding:22px 0 0;
+  border-left:0;border-top:1px solid var(--line);font-size:28px}
+/* split: statement on the left, explanation on a panel that bleeds off the top and right. Idea: GZ Swiss split page. */
+.layout-point.v-split .body::before{content:"";position:absolute;left:56%;right:-140px;top:-300px;bottom:0;background:var(--bg-2);z-index:-1}
+.layout-point.v-split .point{display:grid;grid-template-columns:56fr 44fr;align-items:center;max-width:none;height:100%}
+.layout-point.v-split .key{font-size:108px;padding-right:72px}
+.layout-point.v-split .support{margin:0;padding:0 0 0 80px;border:0;font-size:38px;line-height:1.55;color:var(--fg)}
+/* band: statement above, an ink band bleeding left and right carries the reversed-out support line. Idea: GZ Swiss manifesto + banner. */
+.layout-point.v-band .point{max-width:none;height:100%;display:flex;flex-direction:column;justify-content:center;padding-bottom:170px}
+.layout-point.v-band .support{position:absolute;left:-140px;right:-140px;bottom:0;margin:0;max-width:none;padding:40px 140px;
+  background:var(--fg);color:var(--bg);border:0;font-size:40px}
+.layout-point.v-band .support mark.em{color:var(--em-on-ink,inherit)}
+/* bottom: the statement sinks to the bottom edge, as large as it gets. Origin: BHT signal / broadside cover. */
+.layout-point.v-bottom .body{justify-content:flex-end}
+.layout-point.v-bottom .point{max-width:1640px}
+.layout-point.v-bottom .key{font-size:156px;line-height:1.08}
+.layout-point.v-bottom .support{margin-top:40px}
+/* card: a centred card with a slightly rotated band bleeding behind it. Origin: PC paper style L3. */
+.layout-point.v-card .body{align-items:center;filter:var(--card-shadow,none)}
+.layout-point.v-card .body::before{content:"";position:absolute;left:-140px;right:-140px;top:50%;height:150px;translate:0 -50%;
+  rotate:-1.6deg;background:var(--accent);z-index:-1}
+.layout-point.v-card .point{position:relative;max-width:1320px;padding:72px 96px;text-align:center;background:var(--_card-bg);
+  border:1px solid var(--_card-line);rotate:var(--_tilt);clip-path:var(--card-clip,none)}
+.layout-point.v-card .key{font-size:104px}
+.layout-point.v-card .support{margin:36px auto 0;padding:26px 0 0;border-left:0;border-top:1px solid var(--line-2)}
+
+/* ================================================================ number (單一大數字) */
+/* center: everything centred. Origin: HPS stat-highlight. */
+.layout-number.v-center .body{align-items:center}
+.layout-number.v-center .number{display:flex;flex-direction:column;align-items:center;text-align:center}
+.layout-number.v-center .value{font-size:400px}
+.layout-number.v-center .value:has(.pair){font-size:320px}
+.layout-number.v-center .label{margin-top:72px;align-self:center}
+.layout-number.v-center .note{max-width:1000px;align-self:center}
+/* stack: figure on top, label and note underneath, all flush left. */
+.layout-number.v-stack .number{display:flex;flex-direction:column;align-items:flex-start}
+.layout-number.v-stack .value{font-size:400px}
+.layout-number.v-stack .value:has(.pair){font-size:320px}
+.layout-number.v-stack .label{margin-top:72px;align-self:flex-start}
+.layout-number.v-stack .note{max-width:1100px}
+/* reverse: label and note in a narrow left column, the figure flush right. */
+.layout-number.v-reverse .number{grid-template-columns:minmax(0,560px) minmax(0,1fr);column-gap:72px;justify-content:stretch;align-items:center}
+.layout-number.v-reverse .label{grid-column:1;grid-row:1;align-self:end}
+.layout-number.v-reverse .note{grid-column:1;grid-row:2}
+.layout-number.v-reverse .value{grid-column:2;grid-row:1/3;justify-self:end;font-size:400px}
+.layout-number.v-reverse .value:has(.pair){font-size:300px}
+/* bottom: label and note on top, the figure pushed to the bottom at half-screen size. Ideas: GZ Swiss, HS "half-screen figure". */
+.layout-number.v-bottom .body{justify-content:stretch}
+.layout-number.v-bottom .number{display:flex;flex-direction:column;align-items:flex-start;height:100%}
+.layout-number.v-bottom .label{order:1;align-self:flex-start}
+.layout-number.v-bottom .note{order:2;max-width:1100px}
+.layout-number.v-bottom .value{order:3;margin-top:auto;font-size:400px;line-height:1}
+.layout-number.v-bottom .value:has(.pair){font-size:400px}
+/* evidence: giant figure and label on the left, up to three supporting lines on the right. Origin: CDX e-ink magazine style. */
+.layout-number.v-evidence .number{grid-template-columns:auto minmax(0,1fr);column-gap:110px;align-items:center;justify-content:stretch}
+.layout-number.v-evidence .value{grid-column:1;grid-row:1;font-size:330px}
+.layout-number.v-evidence .value:has(.pair){font-size:250px}
+.layout-number.v-evidence .label{grid-column:1;grid-row:2;margin-top:72px;justify-self:start}
+.layout-number.v-evidence .note{grid-column:1;grid-row:3}
+.layout-number.v-evidence .points{grid-column:2;grid-row:1/4;align-self:center}
+.number .points{display:none;list-style:none}
+.layout-number.v-evidence .points{display:block}
+.number .points li{padding:26px 0;border-top:1px solid var(--line-2);font:500 36px/1.45 var(--font-body)}
+.number .points li:first-child{border-top:2px solid var(--line)}
+
+/* ================================================================ stats (多個數字) */
+.stats-row .bar{display:none}
+/* ledger: one figure per row, hairlines between rows: figure, label, scope. Idea: GZ Swiss stacked KPI ledger. */
+.layout-stats.v-ledger .stats-row{grid-template-columns:auto minmax(0,1fr) minmax(0,420px);gap:0 72px}
+.layout-stats.v-ledger .stat{display:grid;grid-template-columns:subgrid;grid-column:1/-1;align-items:baseline;padding:16px 0;
+  border-top:1px solid var(--line-2)}
+.layout-stats.v-ledger .stat:first-child{border-top:2px solid var(--line)}
+.layout-stats.v-ledger .sv{font-size:calc(160px - var(--n) * 16px)}
+.layout-stats.v-ledger .sl{margin:0;font-size:38px}
+.layout-stats.v-ledger .sn{margin:0;text-align:right}
+.layout-stats.v-ledger .stats-lead{margin-bottom:28px}
+.layout-stats.v-ledger .lnote{margin-top:24px}
+/* hero: the first figure takes the left side at full size, the others stack on the right. Origin: BHT neo-grid-bold stats mosaic. */
+.layout-stats.v-hero .stats-row{grid-template-columns:1.45fr 1fr;grid-template-rows:repeat(var(--m),auto);gap:0 96px;align-items:end}
+.layout-stats.v-hero .stat:first-child{grid-row:1/-1;align-self:end}
+.layout-stats.v-hero .stat:first-child .sv{font-size:230px;line-height:1}
+.layout-stats.v-hero .stat:first-child .sl{font-size:40px;margin-top:28px}
+.layout-stats.v-hero .stat:not(:first-child){grid-column:2;padding:14px 0 14px;border-top:1px solid var(--line-2)}
+.layout-stats.v-hero .stats-lead{margin-bottom:28px}
+.layout-stats.v-hero .lnote{margin-top:24px}
+.layout-stats.v-hero .stat:nth-child(2){border-top:2px solid var(--line)}
+.layout-stats.v-hero .stat:not(:first-child) .sv{font-size:80px}
+.layout-stats.v-hero .stat:not(:first-child) .sl{font-size:26px;margin-top:6px}
+.layout-stats.v-hero .stat:not(:first-child) .sn{font-size:20px;margin-top:4px}
+/* cards: one card per figure; the card holding the emphasis is reversed out. Origins: PC paper L8, GZ magazine data cards (idea). */
+.layout-stats.v-cards .stats-row{gap:36px;filter:var(--card-shadow,none)}
+.layout-stats.v-cards .stat{padding:44px 44px 48px;border:1px solid var(--_card-line);background:var(--_card-bg);
+  rotate:calc(var(--_tilt) * var(--s,1));clip-path:var(--card-clip,none)}
+.layout-stats.v-cards .stat:nth-child(even){--s:-1}
+.layout-stats.v-cards .sv{font-size:128px}
+.layout-stats.v-cards .stat:has(mark.em){background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.layout-stats.v-cards .stat:has(mark.em) :is(.sl,.sn){color:inherit}
+.layout-stats.v-cards .stat:has(mark.em) mark.em{color:var(--em-on-accent,inherit)}
+/* split: the lead statement large on the left, figures in a 2 × 2 on the right. Origin: BHT signal editorial. */
+.layout-stats.v-split .stats-page{display:grid;grid-template-columns:1.15fr .85fr;column-gap:110px;align-items:center;max-width:none}
+.layout-stats.v-split .stats-lead{margin:0;font-size:76px;line-height:1.2}
+.layout-stats.v-split .stats-row{grid-template-columns:repeat(2,1fr);gap:44px 56px}
+.layout-stats.v-split .stat{padding-top:20px}
+.layout-stats.v-split .sv{font-size:104px}
+.layout-stats.v-split .sl{font-size:26px;margin-top:10px}
+.layout-stats.v-split .sn{font-size:20px}
+.layout-stats.v-split .lnote{grid-column:1;margin-top:40px}
+/* tower: each column stands on a bar whose height comes from the data (stat.bar, 0–100). Idea: GZ Swiss KPI tower. */
+.layout-stats.v-tower .stats-row{height:500px;align-items:stretch;gap:44px}
+.layout-stats.v-tower .stat{display:flex;flex-direction:column;justify-content:flex-end;padding:0;border:0}
+.layout-stats.v-tower .sv{font-size:100px}
+.layout-stats.v-tower .sl{font-size:28px;margin-top:10px}
+.layout-stats.v-tower .bar{display:block;flex:none;order:9;margin-top:20px;height:calc(var(--h) * 2.3px + 10px);background:var(--fg-3)}
+.layout-stats.v-tower .stat:has(mark.em) .bar{background:var(--accent)}
+.layout-stats.v-tower .stats-lead{margin-bottom:24px}
+
+/* ================================================================ steps (步驟／流程) */
+/* ledger: one row per step — number, label, detail — with hairlines. */
+.layout-steps.v-ledger .steps{grid-template-columns:1fr;gap:0}
+.layout-steps.v-ledger .steps li{display:grid;grid-template-columns:130px minmax(0,1fr) minmax(0,1.25fr);column-gap:40px;align-items:baseline;
+  padding:26px 0;border-top:1px solid var(--line-2)}
+.layout-steps.v-ledger .steps li:first-child{border-top:2px solid var(--line)}
+.layout-steps.v-ledger .steps .n{font-size:52px;margin:0}
+.layout-steps.v-ledger .steps .t{font-size:42px}
+.layout-steps.v-ledger .steps .d{margin:0;font-size:32px}
+/* vertical: a spine with dots on the left, steps read downwards. */
+.layout-steps.v-vertical .steps{grid-template-columns:1fr;gap:0;position:relative;padding-left:72px}
+.layout-steps.v-vertical .steps::before{content:"";position:absolute;left:11px;top:22px;bottom:22px;width:2px;background:var(--line-2)}
+.layout-steps.v-vertical .steps li{display:grid;grid-template-columns:90px minmax(0,1fr) minmax(0,1.2fr);column-gap:36px;align-items:baseline;
+  padding:22px 0;border:0}
+.layout-steps.v-vertical .steps li::before{content:"";position:absolute;left:-72px;top:36px;width:24px;height:24px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--fg-3)}
+.layout-steps.v-vertical .steps li:has(mark.em)::before{background:var(--accent);border-color:var(--accent)}
+.layout-steps.v-vertical .steps .n{font:500 24px/1 var(--font-label);letter-spacing:var(--label-tracking);margin:0}
+.layout-steps.v-vertical .steps .t{font-size:42px}
+.layout-steps.v-vertical .steps .d{margin:0;font-size:32px}
+/* pipeline: outlined nodes joined by arrows, the emphasised node filled. Origin: HPS flow-diagram. */
+.layout-steps.v-pipeline .steps{gap:84px}
+.layout-steps.v-pipeline .steps li{padding:32px 32px 36px;border:2px solid var(--line)}
+.layout-steps.v-pipeline .steps li:not(:last-child)::after{content:"→";position:absolute;left:100%;top:50%;width:84px;translate:0 -50%;
+  text-align:center;font:400 44px/1 var(--font-body);color:var(--fg-3)}
+.layout-steps.v-pipeline .steps .n{font:500 24px/1 var(--font-label);letter-spacing:var(--label-tracking);margin-bottom:22px}
+.layout-steps.v-pipeline .steps .t{font-size:36px}
+.layout-steps.v-pipeline .steps li:has(mark.em){background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.layout-steps.v-pipeline .steps li:has(mark.em) :is(.n,.d){color:inherit}
+.layout-steps.v-pipeline .steps li:has(mark.em) mark.em{color:var(--em-on-accent,inherit)}
+/* cycle: four steps in the corners of a 3 × 3 grid, arrows in the edge cells (exactly 4 steps). Origin: BHT signal cycle. */
+.layout-steps.v-cycle .steps{grid-template-columns:minmax(0,1fr) 180px minmax(0,1fr);grid-template-rows:auto 96px auto;gap:0}
+.layout-steps.v-cycle .steps li{display:grid;grid-template-columns:110px minmax(0,1fr);column-gap:24px;align-content:start;min-height:200px;padding-top:24px}
+.layout-steps.v-cycle .steps li:nth-child(1){grid-area:1/1}
+.layout-steps.v-cycle .steps li:nth-child(2){grid-area:1/3}
+.layout-steps.v-cycle .steps li:nth-child(3){grid-area:3/3}
+.layout-steps.v-cycle .steps li:nth-child(4){grid-area:3/1}
+.layout-steps.v-cycle .steps .n{grid-row:1/3;font-size:84px;margin:0}
+.layout-steps.v-cycle .steps .t{font-size:38px}
+.layout-steps.v-cycle .steps li::after{position:absolute;display:grid;place-items:center;font:400 52px/1 var(--font-body);color:var(--accent-text)}
+.layout-steps.v-cycle .steps li:nth-child(1)::after{content:"→";left:100%;top:0;width:180px;height:100%}
+.layout-steps.v-cycle .steps li:nth-child(2)::after{content:"↓";left:0;top:100%;width:100%;height:96px}
+.layout-steps.v-cycle .steps li:nth-child(3)::after{content:"←";right:100%;top:0;width:180px;height:100%}
+.layout-steps.v-cycle .steps li:nth-child(4)::after{content:"↑";left:0;bottom:100%;width:100%;height:96px}
+/* pyramid: centred bands that widen step by step (3–5 steps). Origin: BHT signal pyramid. */
+.layout-steps.v-pyramid .steps{display:flex;flex-direction:column;align-items:center;gap:12px}
+.layout-steps.v-pyramid .steps li{width:calc(40% + 60% / (var(--n) - 1) * var(--i));display:flex;align-items:baseline;justify-content:center;gap:24px;
+  flex-wrap:wrap;padding:24px 40px;border:0;background:var(--bg-2);text-align:center}
+.layout-steps.v-pyramid .steps .n{font:500 24px/1 var(--font-label);letter-spacing:var(--label-tracking);margin:0}
+.layout-steps.v-pyramid .steps .t{font-size:38px}
+.layout-steps.v-pyramid .steps .d{margin:0;font-size:26px}
+.layout-steps.v-pyramid .steps li:has(mark.em){background:var(--accent);color:var(--accent-ink)}
+.layout-steps.v-pyramid .steps li:has(mark.em) :is(.n,.d){color:inherit}
+.layout-steps.v-pyramid .steps li:has(mark.em) mark.em{color:var(--em-on-accent,inherit)}
+/* stack: the title large in a left column, steps as horizontal cards stacked on the right. Idea: GZ Swiss stacked cards. */
+.layout-steps.v-stack .slide-head{right:auto;width:480px;top:250px}
+.layout-steps.v-stack.tabbed .slide-head{top:290px}
+.layout-steps.v-stack .title{font-size:80px;line-height:1.15}
+.layout-steps.v-stack .body{left:700px}
+.layout-steps.v-stack .steps{grid-template-columns:1fr;gap:14px;filter:var(--card-shadow,none)}
+.layout-steps.v-stack .steps li{display:grid;grid-template-columns:104px minmax(0,1fr);column-gap:28px;align-items:center;padding:18px 40px;
+  border:1px solid var(--_card-line);background:var(--_card-bg)}
+.layout-steps.v-stack .steps .n{grid-row:1/3;font-size:68px;margin:0}
+.layout-steps.v-stack .steps .t{font-size:36px}
+.layout-steps.v-stack .lnote{margin-top:22px}
+.layout-steps.v-stack .steps .d{margin-top:4px;font-size:28px}
+/* cards: one card per step with a large numeral, alternately tilted. Origin: PC paper L6. */
+.layout-steps.v-cards .steps{gap:32px;filter:var(--card-shadow,none)}
+.layout-steps.v-cards .steps li{padding:36px 36px 44px;border:1px solid var(--_card-line);background:var(--_card-bg);
+  rotate:calc(var(--_tilt) * var(--s,1));clip-path:var(--card-clip,none)}
+.layout-steps.v-cards .steps li:nth-child(even){--s:-1;translate:0 28px}
+.layout-steps.v-cards .steps .n{font-size:96px;margin-bottom:20px}
+.layout-steps.v-cards .steps .t{font-size:34px}
+
+/* ================================================================ timeline (時間軸) */
+.tl{list-style:none;position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));column-gap:48px}
+.tl .tb{display:block}
+.tl .w{display:block;font:var(--number-weight) 76px/1 var(--font-number);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.tl .t{display:block;margin-top:18px;font:500 36px/1.4 var(--font-body)}
+.tl .d{display:block;margin-top:10px;font:400 26px/1.5 var(--font-body);color:var(--fg-2)}
+.tl .dot{display:block;width:22px;height:22px;border-radius:50%;background:var(--fg)}
+.tl li:has(mark.em) .dot{background:var(--accent);box-shadow:0 0 0 8px var(--bg),0 0 0 10px var(--accent)}
+.tl li:has(mark.em) .w{color:var(--accent-text)}
+/* axis (default): a line bleeding off both edges, dots on it, date then text below. Origin: HPS timeline. */
+.layout-timeline .tl::before{content:"";position:absolute;left:-140px;right:-140px;top:10px;height:2px;background:var(--line)}
+.layout-timeline .tl li{display:flex;flex-direction:column-reverse;justify-content:flex-end;position:relative}
+.layout-timeline .tl .tb{margin-top:44px}
+/* alternate: entries alternate above and below the axis. Origins: PC paper L12, PC geometric G8. */
+.layout-timeline.v-alternate .tl{grid-template-rows:minmax(0,1fr) 22px minmax(0,1fr);height:560px;row-gap:32px}
+.layout-timeline.v-alternate .tl::before{top:50%;translate:0 -1px}
+.layout-timeline.v-alternate .tl li{display:grid;grid-row:1/4;grid-template-rows:subgrid}
+.layout-timeline.v-alternate .tl .dot{grid-row:2}
+.layout-timeline.v-alternate .tl .tb{margin:0}
+.layout-timeline.v-alternate .tl li:nth-child(odd) .tb{grid-row:1;align-self:end}
+.layout-timeline.v-alternate .tl li:nth-child(even) .tb{grid-row:3;align-self:start}
+.layout-timeline.v-alternate .tl .w{font-size:64px}
+/* vertical: dates in a left column, a spine with dots, text on the right. Idea: GZ Swiss vertical timeline; BHT signal vtimeline. */
+.layout-timeline.v-vertical .tl{grid-template-columns:1fr;row-gap:0}
+.layout-timeline.v-vertical .tl::before{left:331px;right:auto;top:30px;bottom:30px;width:2px;height:auto}
+.layout-timeline.v-vertical .tl li{display:grid;grid-template-columns:280px 104px minmax(0,1fr) minmax(0,1.1fr);align-items:center;padding:20px 0}
+.layout-timeline.v-vertical .tl .tb{display:contents}
+.layout-timeline.v-vertical .tl .w{grid-column:1;grid-row:1;font-size:64px;text-align:right}
+.layout-timeline.v-vertical .tl .dot{grid-column:2;grid-row:1;justify-self:center}
+.layout-timeline.v-vertical .tl .t{grid-column:3;grid-row:1;margin:0;font-size:40px}
+.layout-timeline.v-vertical .tl .d{grid-column:4;grid-row:1;margin:0;padding-left:40px}
+/* ledger: a schedule ledger — index, date, entry, detail — no axis. Origin: BHT long-table calendar. */
+.layout-timeline.v-ledger .tl{grid-template-columns:1fr;row-gap:0;counter-reset:tl}
+.layout-timeline.v-ledger .tl::before,.layout-timeline.v-ledger .tl .dot{display:none}
+.layout-timeline.v-ledger .tl li{display:grid;grid-template-columns:96px 300px minmax(0,1fr) minmax(0,1.2fr);column-gap:32px;align-items:baseline;
+  padding:24px 0;border-top:1px solid var(--line-2);counter-increment:tl}
+.layout-timeline.v-ledger .tl li:first-child{border-top:2px solid var(--line)}
+.layout-timeline.v-ledger .tl li::before{content:counter(tl,decimal-leading-zero);font:500 22px/1 var(--font-label);
+  letter-spacing:var(--label-tracking);color:var(--fg-3)}
+.layout-timeline.v-ledger .tl .tb{display:contents}
+.layout-timeline.v-ledger .tl .w{font-size:48px}
+.layout-timeline.v-ledger .tl .t{margin:0;font-size:40px}
+.layout-timeline.v-ledger .tl .d{margin:0}
+
+/* ================================================================ compare (前後對比／比較) */
+/* halves: two full-height panels bleeding to the left and right edges. Origin: BHT signal compare. */
+.layout-compare.v-halves .body{left:0;right:0}
+.layout-compare.v-halves .body>div{height:100%;display:flex;flex-direction:column}
+.layout-compare.v-halves .compare{grid-template-columns:1fr 1fr;flex:1;min-height:0}
+.layout-compare.v-halves .lnote{margin:28px 140px 0}
+.layout-compare.v-halves .col:first-child{padding:56px 96px 56px 140px;background:var(--bg-2);border-top:0}
+.layout-compare.v-halves .col:last-child{padding:56px 140px 56px 96px;border-radius:0}
+/* versus: two equal cards and a round "VS" chip sitting on the seam. Origins: PC paper L7, BHT scatterbrain. */
+.layout-compare.v-versus .compare{grid-template-columns:1fr 1fr;gap:56px;position:relative;filter:var(--card-shadow,none)}
+.layout-compare.v-versus .col{background:var(--_card-bg);border:1px solid var(--_card-line);color:var(--fg)}
+.layout-compare.v-versus .col:first-child{border-top:1px solid var(--_card-line);color:var(--fg-2);rotate:calc(var(--_tilt) * -1)}
+.layout-compare.v-versus .col:last-child{background:var(--_card-bg);color:var(--fg);box-shadow:inset 0 8px 0 var(--accent);rotate:var(--_tilt)}
+.layout-compare.v-versus .col:last-child mark.em{color:var(--accent-text);text-decoration:none;font-weight:inherit}
+.layout-compare.v-versus .divider{display:grid;place-items:center;position:absolute;left:50%;top:50%;translate:-50% -50%;width:128px;height:128px;
+  border-radius:50%;background:var(--fg);color:var(--bg);rotate:-8deg;z-index:2}
+.layout-compare.v-versus .divider::before{content:"VS";font:700 40px/1 var(--font-label);letter-spacing:.04em}
+/* arrow: before, an arrow, after; the verdict (note) underneath. Origin: CDX hand-drawn explainer before/after. */
+.layout-compare.v-arrow .compare{grid-template-columns:1fr 150px 1fr;min-height:400px}
+.layout-compare.v-arrow .divider{display:grid;place-items:center}
+.layout-compare.v-arrow .divider::before{content:"→";font:400 100px/1 var(--font-body);color:var(--accent-text)}
+.layout-compare.v-arrow .col{padding:44px 0 0}
+.layout-compare.v-arrow .col:last-child{background:none;color:var(--fg);border-top:8px solid var(--accent);padding-top:38px}
+.layout-compare.v-arrow .col:last-child mark.em{color:var(--accent-text);text-decoration:none;font-weight:inherit}
+/* rows: the two sides are compared line by line, each pair on one hairline row. Origin: HPS diff. */
+.layout-compare.v-rows .compare{grid-template-columns:1fr 1fr;grid-template-rows:auto repeat(var(--r),auto);column-gap:96px;min-height:0}
+.layout-compare.v-rows .col{display:grid;grid-template-rows:subgrid;grid-row:1/-1;padding:0}
+.layout-compare.v-rows .col:first-child{border-top:0}
+.layout-compare.v-rows .col:last-child{background:none;color:var(--fg)}
+.layout-compare.v-rows .col:last-child mark.em{color:var(--accent-text);text-decoration:none;font-weight:inherit}
+.layout-compare.v-rows .compare h3{margin:0;padding-bottom:22px;border-bottom:2px solid var(--line)}
+.layout-compare.v-rows .compare ul{display:contents}
+.layout-compare.v-rows .compare li{padding:26px 0;border-bottom:1px solid var(--line-2);font-size:44px}
+.layout-compare.v-rows .col:first-child li{color:var(--fg-3)}
+
+/* ================================================================ quote (引言) */
+/* center. Origin: HPS big-quote. */
+.layout-quote.v-center .body{align-items:center}
+.layout-quote.v-center .quote{padding:0;text-align:center}
+.layout-quote.v-center .quote::before{margin:0 auto 6px;width:auto;text-align:center}
+.layout-quote.v-center .quote cite{justify-content:center}
+/* side: the quote keeps to the left; an accent bar bleeds off the top on the right. Origin: BHT cobalt-grid quote. */
+.layout-quote.v-side .quote{max-width:1180px}
+.layout-quote.v-side .body::after{content:"";position:absolute;right:0;top:-300px;bottom:0;width:200px;background:var(--accent)}
+/* band: the quote reversed out on an ink band bleeding left and right. Origins: PC paper L3, BHT sakura-chroma stripe. */
+.layout-quote.v-band .quote{max-width:none;margin:0 -140px;padding:72px 140px 64px;background:var(--fg);color:var(--bg)}
+.layout-quote.v-band .quote::before{display:none}
+.layout-quote.v-band .quote p{max-width:1460px}
+.layout-quote.v-band .quote mark.em{color:var(--em-on-ink,inherit)}
+.layout-quote.v-band .quote cite{color:var(--bg)}
+.layout-quote.v-band .quote cite::before{background:var(--bg)}
+/* giant: a half-page quote mark in its own column on the left, the text beside it (never behind the text). Origin: HS "half-page quote mark". */
+.layout-quote.v-giant .quote{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:72px;align-items:start;max-width:none;padding-left:0}
+.layout-quote.v-giant .quote::before{grid-row:1/3;margin:0;height:420px;font-size:760px;line-height:.9}
+.layout-quote.v-giant .quote p{font-size:80px;align-self:end}
+
+/* ================================================================ bullets (條列) */
+/* split: the title large in a left column, the list on the right. Origin: BHT signal list. */
+.layout-bullets.v-split .slide-head{right:auto;width:540px;top:250px;bottom:120px;display:flex;align-items:center}
+.layout-bullets.v-split.tabbed .slide-head{top:290px}
+.layout-bullets.v-split .title{font-size:84px;line-height:1.15}
+.layout-bullets.v-split .body{left:780px}
+.layout-bullets.v-split .bullets li{font-size:40px}
+/* numbered: a square number block and a long strip per item. Origin: PC geometric G10. */
+.layout-bullets.v-numbered .bullets{counter-reset:b;gap:16px;max-width:none}
+.layout-bullets.v-numbered .bullets li{counter-increment:b;display:flex;align-items:center;min-height:100px;padding:14px 40px 14px 140px;
+  border:0;background:var(--bg-2);font-size:40px}
+.layout-bullets.v-numbered .bullets li:last-child{border:0}
+.layout-bullets.v-numbered .bullets li::before{content:counter(b,decimal-leading-zero);left:0;top:0;width:100px;height:100%;display:grid;
+  place-items:center;background:var(--fg);color:var(--bg);font:var(--numeral-weight) 44px/1 var(--font-number)}
+.layout-bullets.v-numbered .bullets li:has(mark.em)::before{background:var(--accent);color:var(--accent-ink)}
+/* grid: cells divided by hairlines, each with a small index (2 columns; 3 columns from 5 items). Idea: GZ Swiss six-cell grid. */
+.layout-bullets.v-grid .bullets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:72px;counter-reset:b;max-width:none}
+.layout-bullets.v-grid .bullets:has(li:nth-child(5)){grid-template-columns:repeat(3,minmax(0,1fr))}
+.layout-bullets.v-grid .bullets li{counter-increment:b;padding:30px 0 44px;border-top:2px solid var(--line);font-size:40px;line-height:1.4}
+.layout-bullets.v-grid .bullets li:last-child{border-bottom:0}
+.layout-bullets.v-grid .bullets li::before{content:counter(b,decimal-leading-zero);position:static;display:block;width:auto;height:auto;background:none;
+  margin-bottom:22px;font:500 22px/1 var(--font-label);letter-spacing:var(--label-tracking);color:var(--fg-3)}
+.layout-bullets.v-grid .bullets li:has(mark.em){border-top-color:var(--accent)}
+/* cards: one card per item, text top-left, index bottom-right; only the emphasised card takes the accent. Idea: GZ Swiss micro-cards. */
+.layout-bullets.v-cards .bullets{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:28px;counter-reset:b;max-width:none;
+  filter:var(--card-shadow,none)}
+.layout-bullets.v-cards .bullets li{counter-increment:b;min-height:300px;padding:40px 40px 88px;border:1px solid var(--_card-line);background:var(--_card-bg);
+  font-size:38px;line-height:1.4;rotate:calc(var(--_tilt) * var(--s,1));clip-path:var(--card-clip,none)}
+.layout-bullets.v-cards .bullets li:nth-child(even){--s:-1}
+.layout-bullets.v-cards .bullets li:last-child{border:1px solid var(--_card-line)}
+.layout-bullets.v-cards .bullets li::before{content:counter(b,decimal-leading-zero);left:auto;right:36px;top:auto;bottom:32px;width:auto;height:auto;
+  background:none;font:500 22px/1 var(--font-label);letter-spacing:var(--label-tracking);color:var(--fg-3)}
+.layout-bullets.v-cards .bullets li:has(mark.em){background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.layout-bullets.v-cards .bullets li:has(mark.em)::before{color:inherit}
+.layout-bullets.v-cards .bullets li:has(mark.em) mark.em{color:var(--em-on-accent,inherit)}
+
+/* ================================================================ image (圖＋文) */
+/* flip: text left, image right. Origin: HPS image-text-split. */
+.layout-image.v-flip .image{grid-template-columns:1fr 1.35fr}
+.layout-image.v-flip .img{order:2}
+/* full: the image fills the slide, a gradient at the bottom, the caption anchored bottom-left. Origin: HPS image-full-bleed. */
+.layout-image.v-full{background:#101010;color:#fff}
+.layout-image.v-full .body{left:0;right:0;top:0;bottom:0;z-index:0}
+.layout-image.v-full .image{display:block}
+.layout-image.v-full .img{position:absolute;inset:0;border-radius:0}
+.layout-image.v-full .img::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.35),transparent 30%,transparent 45%,rgba(0,0,0,.78))}
+.layout-image.v-full .caption{position:absolute;left:140px;right:140px;bottom:150px;max-width:1200px;padding:0;border:0;font-size:68px;color:#fff}
+.layout-image.v-full :is(.title,.foot,.source){color:#fff}
+.layout-image.v-full .caption mark.em{color:#FFD98A}
+.layout-image.v-full .foot{border-top-color:rgba(255,255,255,.4)}
+/* top: a wide image on top, the caption underneath. Idea: GZ Swiss image-over-text page. */
+.layout-image.v-top .image{grid-template-columns:1fr;grid-template-rows:minmax(0,64%) auto;gap:36px;align-items:start}
+.layout-image.v-top .caption{justify-self:start;max-width:1300px}
+/* frame: one large framed picture in the middle, the caption centred below. Origin: PC paper L17. */
+.layout-image.v-frame .image{display:flex;flex-direction:column;align-items:center;gap:30px;filter:var(--card-shadow,none)}
+.layout-image.v-frame .img{flex:1;min-height:0;width:72%;padding:22px;background:var(--_card-bg);border:1px solid var(--_card-line);rotate:var(--_tilt)}
+.layout-image.v-frame .caption{padding:0;border:0;font-size:36px;text-align:center}
+
+/* ================================================================ table (表格) */
+.tbl{width:100%;border-collapse:collapse;font:400 32px/1.4 var(--font-body)}
+.tbl th{padding:0 28px 18px 0;text-align:left;font:500 22px/1.3 var(--font-label);letter-spacing:var(--label-tracking);color:var(--fg-3);
+  border-bottom:2px solid var(--line);white-space:nowrap}
+.tbl td{padding:22px 28px 22px 0;border-bottom:1px solid var(--line-2);vertical-align:baseline}
+.tbl td:first-child{font-weight:500;font-size:34px}
+.tbl :is(td,th).num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl :is(td,th):last-child{padding-right:0}
+/* stripe: a dark header strip, alternating rows, an accent bar on the first column; no grid lines. Origin: PC geometric G16. */
+.layout-table.v-stripe .tbl th{padding:18px 28px;background:var(--fg);color:var(--bg);border:0}
+.layout-table.v-stripe .tbl td{padding:22px 28px;border:0}
+.layout-table.v-stripe .tbl tbody tr:nth-child(even) td{background:var(--bg-2)}
+.layout-table.v-stripe .tbl td:first-child{box-shadow:inset 8px 0 0 var(--accent)}
+.layout-table.v-stripe .tbl :is(td,th):last-child{padding-right:28px}
+/* strips: every row is its own strip (up to 5 rows). Origin: PC paper L16. */
+.layout-table.v-strips .tbl{border-collapse:separate;border-spacing:0 14px;filter:var(--card-shadow,none)}
+.layout-table.v-strips .tbl th{padding:16px 32px;background:var(--fg);color:var(--bg);border:0}
+.layout-table.v-strips .tbl td{padding:26px 32px;border:0;background:var(--_card-bg)}
+.layout-table.v-strips .tbl :is(td,th):last-child{padding-right:32px}
+.layout-table.v-strips .tbl tr:has(mark.em) td{background:var(--accent);color:var(--accent-ink)}
+.layout-table.v-strips .tbl tr:has(mark.em) mark.em{color:var(--em-on-accent,inherit)}
+/* lead: title and note in a left column, the table on the right. Origin: BHT neo-grid-bold chart (5 : 7). */
+.layout-table.v-lead .slide-head{right:auto;width:560px;top:250px}
+.layout-table.v-lead.tabbed .slide-head{top:290px}
+.layout-table.v-lead .title{font-size:76px;line-height:1.15}
+.layout-table.v-lead .body>div{display:grid;grid-template-columns:560px minmax(0,1fr);column-gap:100px;height:100%;align-content:center}
+.layout-table.v-lead .tbl{grid-column:2;grid-row:1;align-self:center}
+.layout-table.v-lead .lnote{grid-column:1;grid-row:1;align-self:end;margin:0}
+
+/* ================================================================ cover (封面) */
+/* center. Idea: GZ magazine cover. */
+.cover.v-center .cover-inner{top:0;bottom:210px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.cover.v-center .cover-inner::before{content:"";width:220px;height:7px;margin-bottom:60px;border-top:1px solid var(--cover-line,var(--line));
+  border-bottom:1px solid var(--cover-line,var(--line))}
+.cover.v-center .route{text-align:center}
+/* top: the title hangs from the top-left, the route stays on the bottom edge. Origin: BHT cobalt-grid cover. */
+.cover.v-top .cover-inner{top:200px;bottom:auto}
+.cover.v-top .cover-title{max-width:1240px}
+/* split: text field on the left, a reversed-out panel on the right lists the route. Origins: FS split presets, PC geometric G1 (58 : 42). */
+.cover.v-split .cover-inner{right:calc(42% + 90px);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center}
+.cover.v-split .cover-title{font-size:132px}
+.cover.v-split .route{left:58%;right:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;gap:0;padding:0 120px 0 96px;
+  background:var(--cover-fg,var(--fg));color:var(--cover-bg,var(--bg));font:var(--title-weight) 46px/1.3 var(--font-display);letter-spacing:var(--title-tracking)}
+.cover.v-split .route>div{padding:30px 0;border-top:1px solid color-mix(in srgb,currentColor 30%,transparent)}
+.cover.v-split .route i{color:inherit;opacity:.7;font:500 22px/1 var(--font-label);margin-bottom:12px}
+.cover.v-split .route .who{order:9;color:inherit;font:500 22px/1.4 var(--font-label);letter-spacing:var(--label-tracking)}
+/* bands: the chapters become the cover — one band each, large number then name. Idea: GZ Swiss three-band cover. */
+.cover.v-bands .cover-inner{top:110px;bottom:auto}
+.cover.v-bands .cover-title{font-size:88px}
+.cover.v-bands .cover-sub{margin-top:20px;font-size:32px}
+.cover.v-bands .route{top:380px;bottom:84px;display:flex;flex-direction:column;gap:0}
+.cover.v-bands .route>div{flex:1;display:flex;align-items:center;gap:64px;padding:0;border-top:2px solid var(--cover-line,var(--line));
+  font:var(--display-weight) 84px/1 var(--font-display);letter-spacing:var(--display-tracking);color:var(--cover-fg,var(--fg))}
+.cover.v-bands .route i{margin:0;min-width:150px;font:var(--numeral-weight) 84px/1 var(--font-number);color:var(--cover-fg-3,var(--fg-3))}
+.cover.v-bands .route .who{flex:none;order:9;gap:32px;padding-top:18px;border-top-width:1px;font:500 22px/1.4 var(--font-label);
+  letter-spacing:var(--label-tracking);color:var(--cover-fg-2,var(--fg-2))}
+.cover.v-bands .route .who i{min-width:0;font:inherit}
+
+/* ================================================================ toc / agenda (目錄) */
+/* cards: numbered cards; the current chapter takes the accent. Origins: HPS toc, BHT sakura-chroma catalogue. */
+.toc.v-cards .toc-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-content:center;gap:28px}
+.toc.v-cards li{min-height:340px;margin:0;padding:44px 40px;border:1px solid var(--_card-line);background:var(--_card-bg);
+  position:static;width:auto;height:auto;border-radius:0;transform:none;display:block;flex:none}
+.toc.v-cards li.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.toc.v-cards li.on .i{color:inherit}
+.toc.v-cards .i{display:block;font-size:84px;margin:0 0 36px}
+.toc.v-cards .l{font-size:54px}
+.toc.v-cards:not(:has(li.off)) li.on{background:var(--_card-bg);border-color:var(--_card-line);color:inherit}
+.toc.v-cards:not(:has(li.off)) li.on .i{color:var(--accent-text)}
+/* strips: full-width numbered strips stacked; the current one reversed out. Origin: PC paper L11. */
+.toc.v-strips .toc-list{flex-direction:column;justify-content:center;align-items:stretch;gap:16px}
+.toc.v-strips li{display:flex;align-items:baseline;gap:56px;margin:0;padding:30px 48px;border:0;background:var(--bg-2);
+  position:static;width:auto;height:auto;border-radius:0;transform:none;flex:none}
+.toc.v-strips .i{display:block;margin:0;font-size:56px;min-width:110px}
+.toc.v-strips .l{font-size:60px}
+.toc.v-strips:has(li.off) li.on{background:var(--fg);color:var(--bg)}
+.toc.v-strips:has(li.off) li.on .i{color:inherit}
+/* numeral: the current chapter number fills a left pane, the list sits on the right. Origin: BHT neo-grid-bold section. */
+.toc .toc-num{display:none}
+.toc.v-numeral .toc-num{display:grid;place-items:center;position:absolute;left:0;top:0;bottom:0;width:40%;background:var(--accent);color:var(--accent-ink);
+  font:var(--number-weight) 440px/1 var(--font-number);letter-spacing:-.05em}
+.toc.v-numeral .toc-list{flex-direction:column;justify-content:center;align-items:stretch;gap:0;padding:0 140px 0 calc(40% + 110px)}
+.toc.v-numeral:not(:has(.toc-num)) .toc-list{padding-left:140px}
+.toc.v-numeral li{display:flex;align-items:baseline;gap:48px;margin:0;padding:34px 0;border:0;border-top:1px solid var(--line-2);
+  position:static;width:auto;height:auto;border-radius:0;transform:none;flex:none}
+.toc.v-numeral li:first-child{border-top:2px solid var(--line)}
+.toc.v-numeral .i{display:block;margin:0;font-size:48px;min-width:96px}
+.toc.v-numeral .l{font-size:64px}
+
+/* ================================================================ closing (結尾) */
+.closing .closing-points{display:none}
+/* center. */
+.closing.v-center .closing-inner{top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+/* split: the closing line on the left half, up to three takeaways on a reversed-out right half. Idea: GZ Swiss split closing. */
+.closing.v-split .closing-inner{right:calc(50% + 80px);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center}
+.closing.v-split .closing-text{font-size:132px}
+.closing.v-split .closing-points{display:flex;flex-direction:column;justify-content:center;list-style:none;position:absolute;left:50%;right:0;top:0;bottom:0;
+  padding:0 140px 0 110px;background:var(--cover-fg,var(--fg));color:var(--cover-bg,var(--bg));counter-reset:c}
+.closing.v-split .closing-points li{counter-increment:c;display:grid;grid-template-columns:90px minmax(0,1fr);padding:36px 0;
+  border-top:1px solid color-mix(in srgb,currentColor 30%,transparent);font:500 44px/1.4 var(--font-body)}
+.closing.v-split .closing-points li::before{content:counter(c,decimal-leading-zero);font:500 22px/2.6 var(--font-label);letter-spacing:var(--label-tracking);opacity:.7}
+.closing.v-split .closing-points mark.em{color:var(--em-on-cover-ink,var(--em-on-ink,inherit))}
+/* card: the call to action on one centred card. Origins: BHT retro-zine rsvp, PC paper L10. */
+.closing.v-card{filter:none}
+.closing.v-card .closing-inner{left:50%;right:auto;top:50%;bottom:auto;translate:-50% -50%;width:1180px;padding:88px 96px;text-align:center;
+  background:var(--_card-bg);color:var(--fg);border:1px solid var(--_card-line);rotate:var(--_tilt)}
+.closing.v-card .closing-text{font-size:128px}
+.closing.v-card .closing-sub{color:var(--fg-2)}
+
 /* editorial（編輯）— 知性、沉穩的雜誌編輯感。襯線展示字 × 黑體內文 × 等寬框架字；一個故宮朱作突出色。
    @fonts family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,500;6..72,700
    色彩理由：故宮朱（低明度、低彩度的朱紅），在米灰紙色上有印刷感而不刺眼。 */
@@ -313,6 +793,8 @@ body:hover #hint{opacity:.7}
   --fg:#1B1915; --fg-2:#4A463E; --fg-3:#6F6B62;
   --line:#1B1915; --line-2:rgba(27,25,21,.16);
   --accent:#B23A2B; --accent-text:#A3311F; --accent-ink:#FBF6EE;
+  /* 重點字在色塊上的顏色：強調色塊、墨色橫帶、震撼頁（重點一律用顏色，不畫底線） */
+  --em-on-accent:#FFE2B8; --em-on-ink:#F08A6B; --shock-em:#F08A6B;
   --shock-bg:#1B1915; --shock-fg:#F2EFE8;
   --font-display:"Newsreader","Noto Serif TC","Songti TC","PMingLiU",serif;
   --font-quote:var(--font-display); --font-number:"Newsreader","Noto Serif TC",serif;
@@ -320,46 +802,10 @@ body:hover #hint{opacity:.7}
   --font-label:"IBM Plex Mono","Noto Sans TC",monospace;
   --display-weight:900; --title-weight:700; --quote-weight:700; --number-weight:700; --numeral-weight:500;
   --display-tracking:-.015em; --title-tracking:0; --label-tracking:.06em;
-  --radius:0px; --grain:.10; --grain-blend:multiply; --ghost:0;
+  --radius:0px; --grain:.10; --grain-blend:multiply;
   --surface:radial-gradient(1400px 900px at 90% -10%,rgba(178,58,43,.05),transparent 60%),radial-gradient(1200px 800px at -10% 110%,rgba(27,25,21,.05),transparent 60%);
   --enter-easing:cubic-bezier(.16,1,.3,1);
 }
-
-/* ---- 構圖：置中的雜誌版面。標題兩側有細線，數字之間用直線分隔，步驟排成兩欄 ---- */
-#nav{justify-content:center}
-#tabs{left:0;right:0;justify-content:center}
-.slabels,.stabs{justify-content:center}
-.slide-head{text-align:center}
-.title{display:inline-flex;align-items:center;gap:32px;font-size:34px;font-weight:500;letter-spacing:.24em;padding-left:.24em}
-.title::before,.title::after{content:"";width:110px;height:1px;background:var(--line)}
-.body{align-items:center;text-align:center}
-.stats-lead{margin-left:auto;margin-right:auto;font-size:42px}
-.stats-row{gap:0}
-.stats-row .stat{border-top:0;border-left:1px solid var(--line-2);padding:8px 48px}
-.stats-row .stat:first-child{border-left:0}
-.stats-row .sv{font-size:160px}
-.number{grid-template-columns:1fr;justify-items:center;row-gap:0}
-.number .value{grid-row:auto;font-size:380px}
-.number .value:has(.pair){font-size:320px}
-.number .label{margin-top:44px;padding:0 0 14px}
-.number .note{max-width:1000px;text-align:center}
-.steps{grid-template-columns:repeat(2,minmax(0,640px));justify-content:center;gap:44px 110px;text-align:left}
-.steps li{display:grid;grid-template-columns:120px minmax(0,1fr);column-gap:28px;align-content:start;padding-top:24px;border-top:1px solid var(--line)}
-.steps .n{grid-row:1/3;font-size:104px;line-height:.9;margin:0}
-.steps .t{font-size:38px}
-.bullets{margin:0 auto;text-align:left;max-width:1180px}
-.compare{width:100%;max-width:1400px;margin:0 auto;text-align:left}
-.point{margin:0 auto}
-.point .support{border-left:0;padding:28px 0 0;border-top:1px solid var(--line);display:inline-block;margin-top:44px}
-.quote{margin:0 auto}
-.quote::before{margin-left:auto;margin-right:auto;width:1em}
-.quote cite{justify-content:center}
-.lnote{border-left:0;padding:22px 0 0;border-top:1px solid var(--line-2);display:inline-block;margin-top:40px}
-.cover-inner{top:0;bottom:210px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
-.cover-inner::before{content:"";width:220px;height:7px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:60px}
-.cover-title{font-size:180px}
-.route{text-align:center}
-.closing-inner{top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
 
 </style>
 </head>
@@ -368,13 +814,13 @@ body:hover #hint{opacity:.7}
 <div id="nav"></div><div id="tabs"></div>
 <section class="slide cover" data-kind="cover" data-chi="-1" data-notes=""><i class="frame-line"></i><div class="cover-inner"><h1 class="cover-title rv">2026 年度回顧</h1><p class="cover-sub rv">從困境到轉型的一年</p></div><div class="route rv" style="--n:3"><div class="who"><i>2026.12</i>王小明 · 產品部</div><div><i>01</i>年初的困境</div><div><i>02</i>轉型的半年</div><div><i>03</i>明年的方向</div></div></section>
 <section class="slide shock" data-kind="shock" data-chi="-1" data-notes="序幕。請 2–3 位回答，每人 15 秒，不評論。"><i class="frame-line"></i><div class="shock-inner"><p class="shock-text"><span class="ph">如果重來一次，</span><span class="ph">你還會這樣過今年嗎？</span></p></div></section>
-<section class="slide content layout-number" data-kind="content" data-chi="0" data-notes="先讓大家回到年初的感覺，不要急著解釋原因。" data-tab="0" data-tabs="2"><i class="frame-line"></i><div class="ghost" aria-hidden="true">年初的困境</div><div class="chno" aria-hidden="true">01</div><div class="chname" aria-hidden="true">年初的困境</div><div class="snav"><div class="slabels"><span class="on">年初的困境</span><span class="">轉型的半年</span><span class="">明年的方向</span></div></div><header class="slide-head"><h2 class="title">年初的處境</h2></header><div class="body"><div class="number"><div class="value rv"><span class="num">0</span><span class="unit">%</span></div><div class="label rv">上半年營收成長</div><p class="note rv">連續兩季持平，三個主要客戶續約延後</p></div></div><p class="source">資料來源：2026 上半年財務報告</p><footer class="foot"><span>2026 年度回顧</span><span class="pg">03 / 10</span></footer></section>
-<section class="slide content layout-point" data-kind="content" data-chi="0" data-notes="" data-tab="1" data-tabs="2"><i class="frame-line"></i><div class="chno" aria-hidden="true">01</div><div class="chname" aria-hidden="true">年初的困境</div><div class="snav"><div class="slabels"><span class="on">年初的困境</span><span class="">轉型的半年</span><span class="">明年的方向</span></div></div><header class="slide-head"><h2 class="title">問題出在哪</h2></header><div class="body"><div class="point"><p class="key rv"><span class="ph">客戶要的不是更多功能，</span><span class="ph">是<mark class="em">更快上手</mark></span></p><p class="support rv">訪談 24 位客戶，19 位提到導入太慢</p></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">04 / 10</span></footer></section>
-<section class="slide content layout-steps tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="0" data-tabs="3"><i class="frame-line"></i><div class="ghost" aria-hidden="true">轉型的半年</div><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="on">我們做了什麼</span><span class="">導入時間</span><span class="">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">我們做了什麼</h2></header><div class="body"><div><ol class="steps" style="--n:3"><li class="rv"><span class="n">01</span><span class="t">砍掉 40% 的設定步驟</span></li><li class="rv"><span class="n">02</span><span class="t">每個新客戶配一位導入專員</span></li><li class="rv"><span class="n">03</span><span class="t">把教學影片改成 3 分鐘以內</span></li></ol></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">05 / 10</span></footer></section>
-<section class="slide content layout-compare tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="1" data-tabs="3"><i class="frame-line"></i><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="">我們做了什麼</span><span class="on">導入時間</span><span class="">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">導入時間</h2></header><div class="body"><div class="compare"><div class="col rv"><h3>轉型前</h3><ul><li>平均 45 天上線</li><li>客戶要自己讀文件</li></ul></div><div class="divider"></div><div class="col rv"><h3>轉型後</h3><ul><li>平均 <mark class="em">12 天</mark>上線</li><li>專員陪跑兩週</li></ul></div></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">06 / 10</span></footer></section>
-<section class="slide content layout-quote tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="2" data-tabs="3"><i class="frame-line"></i><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="">我們做了什麼</span><span class="">導入時間</span><span class="on">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">客戶怎麼說</h2></header><div class="body"><blockquote class="quote"><p class="rv">這是我們第一次在一個月內讓全公司都用起來的系統。</p><cite class="rv">某製造業客戶 IT 主管</cite></blockquote></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">07 / 10</span></footer></section>
+<section class="slide content layout-number" data-kind="content" data-chi="0" data-notes="先讓大家回到年初的感覺，不要急著解釋原因。" data-tab="0" data-tabs="2"><i class="frame-line"></i><div class="chno" aria-hidden="true">01</div><div class="chname" aria-hidden="true">年初的困境</div><div class="snav"><div class="slabels"><span class="on">年初的困境</span><span class="">轉型的半年</span><span class="">明年的方向</span></div></div><header class="slide-head"><h2 class="title">年初的處境</h2></header><div class="body"><div class="number"><div class="value rv"><span class="num">0</span><span class="unit">%</span></div><div class="label rv">上半年營收成長</div><p class="note rv">連續兩季持平，三個主要客戶續約延後</p></div></div><p class="source">資料來源：2026 上半年財務報告</p><footer class="foot"><span class="pg">03 / 10</span></footer></section>
+<section class="slide content layout-point" data-kind="content" data-chi="0" data-notes="" data-tab="1" data-tabs="2"><i class="frame-line"></i><div class="chno" aria-hidden="true">01</div><div class="chname" aria-hidden="true">年初的困境</div><div class="snav"><div class="slabels"><span class="on">年初的困境</span><span class="">轉型的半年</span><span class="">明年的方向</span></div></div><header class="slide-head"><h2 class="title">問題出在哪</h2></header><div class="body"><div class="point"><p class="key rv"><span class="ph">客戶要的不是更多功能，</span><span class="ph">是<mark class="em">更快上手</mark></span></p><p class="support rv">訪談 24 位客戶，19 位提到導入太慢</p></div></div><footer class="foot"><span class="pg">04 / 10</span></footer></section>
+<section class="slide content layout-steps tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="0" data-tabs="3"><i class="frame-line"></i><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="on">我們做了什麼</span><span class="">導入時間</span><span class="">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">我們做了什麼</h2></header><div class="body"><div><ol class="steps" style="--n:3"><li class="rv" style="--i:0"><span class="n">01</span><span class="t">砍掉 40% 的設定步驟</span></li><li class="rv" style="--i:1"><span class="n">02</span><span class="t">每個新客戶配一位導入專員</span></li><li class="rv" style="--i:2"><span class="n">03</span><span class="t">把教學影片改成 3 分鐘以內</span></li></ol></div></div><footer class="foot"><span class="pg">05 / 10</span></footer></section>
+<section class="slide content layout-compare tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="1" data-tabs="3"><i class="frame-line"></i><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="">我們做了什麼</span><span class="on">導入時間</span><span class="">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">導入時間</h2></header><div class="body"><div><div class="compare" style="--r:2"><div class="col rv"><h3>轉型前</h3><ul><li>平均 45 天上線</li><li>客戶要自己讀文件</li></ul></div><div class="divider"></div><div class="col rv"><h3>轉型後</h3><ul><li>平均 <mark class="em">12 天</mark>上線</li><li>專員陪跑兩週</li></ul></div></div></div></div><footer class="foot"><span class="pg">06 / 10</span></footer></section>
+<section class="slide content layout-quote tabbed" data-kind="content" data-chi="1" data-notes="" data-tab="2" data-tabs="3"><i class="frame-line"></i><div class="chno" aria-hidden="true">02</div><div class="chname" aria-hidden="true">轉型的半年</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="on">轉型的半年</span><span class="">明年的方向</span></div><div class="stabs"><span class="">我們做了什麼</span><span class="">導入時間</span><span class="on">客戶怎麼說</span></div></div><header class="slide-head"><h2 class="title">客戶怎麼說</h2></header><div class="body"><blockquote class="quote"><p class="rv">這是我們第一次在一個月內讓全公司都用起來的系統。</p><cite class="rv">某製造業客戶 IT 主管</cite></blockquote></div><footer class="foot"><span class="pg">07 / 10</span></footer></section>
 <section class="slide shock" data-kind="shock" data-chi="-1" data-notes="停兩秒再說話。"><i class="frame-line"></i><div class="shock-inner"><p class="shock-text"><span class="ph">下半年，</span><span class="ph">營收成長 38%</span></p><p class="shock-sub">而且沒有增加任何一位業務</p></div><p class="source">資料來源：2026 下半年財務報告</p></section>
-<section class="slide content layout-bullets" data-kind="content" data-chi="2" data-notes="" data-tab="0" data-tabs="1"><i class="frame-line"></i><div class="ghost" aria-hidden="true">明年的方向</div><div class="chno" aria-hidden="true">03</div><div class="chname" aria-hidden="true">明年的方向</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="">轉型的半年</span><span class="on">明年的方向</span></div></div><header class="slide-head"><h2 class="title">明年需要的支持</h2></header><div class="body"><div><ul class="bullets"><li class="rv">導入專員從 2 人擴編到 <mark class="em">4 人</mark></li><li class="rv">目標：新客戶 30 天內完成導入</li><li class="rv">預估多承接 15 個客戶</li></ul></div></div><footer class="foot"><span>2026 年度回顧</span><span class="pg">09 / 10</span></footer></section>
+<section class="slide content layout-bullets" data-kind="content" data-chi="2" data-notes="" data-tab="0" data-tabs="1"><i class="frame-line"></i><div class="chno" aria-hidden="true">03</div><div class="chname" aria-hidden="true">明年的方向</div><div class="snav"><div class="slabels"><span class="">年初的困境</span><span class="">轉型的半年</span><span class="on">明年的方向</span></div></div><header class="slide-head"><h2 class="title">明年需要的支持</h2></header><div class="body"><div><ul class="bullets"><li class="rv">導入專員從 2 人擴編到 <mark class="em">4 人</mark></li><li class="rv">目標：新客戶 30 天內完成導入</li><li class="rv">預估多承接 15 個客戶</li></ul></div></div><footer class="foot"><span class="pg">09 / 10</span></footer></section>
 <section class="slide closing" data-kind="closing" data-chi="-1" data-notes=""><i class="frame-line"></i><div class="closing-inner"><p class="closing-text rv">謝謝</p><p class="closing-sub rv">歡迎提問</p></div></section>
 <div id="curtain"></div>
 </div></div>
@@ -529,6 +975,22 @@ window.__deck={go:(n)=>go(n,true),count:slides.length,get index(){return cur;}};
   }
   fitPhrases();
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitPhrases);
+})();
+
+// Figures: a number never wraps, so when it is wider than its column (or pushes the page wider than
+// the stage) every figure on that page shrinks together, down to half size.
+(function(){
+  function fitFigures(){
+    document.querySelectorAll('.slide .body').forEach(function(b){
+      var els=[].slice.call(b.querySelectorAll('.number .value,.stats-row .sv')); if(!els.length) return;
+      els.forEach(function(e){e.style.fontSize='';});
+      var base=els.map(function(e){return parseFloat(getComputedStyle(e).fontSize);}), k=1;
+      function over(){return b.scrollWidth>b.clientWidth+1||els.some(function(e){return e.scrollWidth>e.clientWidth+1;});}
+      while(over()&&k>.5){k-=.05;els.forEach(function(e,i){e.style.fontSize=(base[i]*k)+'px';});}
+    });
+  }
+  fitFigures();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitFigures);
 })();
 </script>
 </body>

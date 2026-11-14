@@ -4,12 +4,12 @@
 
 meta:
   title: 2026 年度回顧              # 封面主標
-  # short: 年度回顧                 # 頁尾顯示的短名稱（可省略，預設用 title）
   # kicker: 內部分享                # 封面左上的小標（可省略）
   subtitle: 從困境到轉型的一年      # 封面副標（可省略）
   presenter: 王小明 · 產品部        # 封面講者（可省略）
   date: 2026.12                     # 封面日期（可省略）
-  theme: editorial                  # editorial / swiss / midnight / broadsheet / washi，或自訂主題 ./theme.css
+  # toc: cards                    # 目錄頁的排法（axis / cards / strips / numeral），可省略
+  theme: editorial                  # 風格：editorial / swiss / midnight / broadsheet / washi，或自訂 ./theme.css
                                     # 選風格之前可以先不填（預設 editorial），使用者選定後再寫
   minutes: 15                       # 總時長（分鐘），lint 會檢查頁數與各章時間
   pages: 12                         # 頁數上限（含封面與自動目錄頁，不含附件頁），可省略
@@ -44,18 +44,28 @@ chapters:
 # layout（content 才需要）：
 #   point   整頁只為一個重點服務：key（重點）+ support（一行補充，可省略）
 #   bullets 條列：items（最多 5 條）+ note（條列下方的一行補充，可省略）
-#   number  大數字：value + label + note（可省略）＋ source（出處，強烈建議）
+#   number  大數字：value + label + note（可省略）＋ source（出處，強烈建議）＋ points（2–3 條佐證，只有 evidence 排法會顯示）
 #           value 寫一個數字（"38%" 會自動把單位縮小），或前後對比 "45 → 12"（前者淡、後者用突出色）
-#   stats   一排數字：stats（2–4 個，各有 value、label，以及選填的 note 寫適用範圍）+ lead（上方一句話）+ note
-#   compare 左右比較：left/right 各有 heading + items
+#   stats   多個數字：stats（2–4 個，各有 value、label，以及選填的 note 寫適用範圍、bar 0–100 給數據柱排法）+ lead（一句話）+ note
+#           value 可以寫成 "==1,840==" 標出主角
+#   compare 左右比較：left/right 各有 heading + items；note（下方一句結論，可省略）
 #   steps   有順序的步驟：items（最多 5 步；每項可寫成字串，或 {label, detail}）+ note
-#   quote   引言：text + source
+#   quote   引言：text + source（畫面上用英文引號 “ ”，text 裡不用自己加引號）
+#   timeline 時間軸：events（3–6 個，各有 when、label、detail）+ note
+#   table   表格：columns（欄名，最多 6 欄）+ rows（每列一個清單，最多 7 列）+ note；整欄都是數字會自動靠右
 #   image   圖片：src（相對於 storyboard 的路徑）+ caption；圖只是氣氛，重點仍要寫在文字裡
 #   pillars 一頁總覽：headline（主句）+ pillars（每章一欄：chapter、kicker、heading、sub、items、stats、link）
 #           不需要 chapter 欄位；垂直軸時欄位會逐欄往下排
 #   status-table 進度總覽：summary（本期摘要，依大類各一行）+ stages（共用階段）+ groups（大類）
 #           每列：name、owner、cells（每階段一格：state done/doing/target/na + date）、progress、
 #           risk（red/yellow/green）、support（需要的支援）。範例見 examples/progress-overview
+# 排法（variant）：每種 layout 有好幾種排法，逐頁依內容選，和風格無關。完整型錄與選法見 references/layouts.md。
+#   variant: ledger                  定案後寫一個名稱；不寫就用預設排法
+#   variant: [ledger, pipeline]      還沒定案時寫候選清單（第一個是建議），--layouts 會把它們並排給使用者選
+#   封面與結尾也可以寫 variant；目錄頁的排法寫在 meta.toc
+#   series: 案例進度                 同一類、要長得一樣的幾頁寫上同一個 series（例如不同案例的進度）；
+#                                    lint 會要求它們用同一種排法，而且不受「相鄰頁不可相同」限制
+# 結尾頁（type: closing）：text + sub；points（1–3 條帶走的重點，split 排法會顯示）
 # 共用欄位：
 #   chapter 屬於哪一章（content 必填，填 chapters 的 id）
 #   title   這頁在講什麼（路標，不寫結論，≤12 字）

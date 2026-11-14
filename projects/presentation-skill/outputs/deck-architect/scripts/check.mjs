@@ -49,9 +49,31 @@ for (let i = 0; i < count; i++) {
     const stage = sl.getBoundingClientRect();
     const scale = stage.width / 1920;
     // overflow: content areas must not scroll, nothing may leave the slide
-    for (const el of sl.querySelectorAll('.body, .cover-inner, .shock-inner, .closing-inner, .pillars')) {
+    for (const el of sl.querySelectorAll('.cover-inner, .shock-inner, .closing-inner, .pillars')) {
       if (el.scrollHeight > el.clientHeight + 2 || el.scrollWidth > el.clientWidth + 2)
         out.issues.push(`內容超出版面（${el.className}）：高 ${el.scrollHeight}/${el.clientHeight}`);
+    }
+    // content pages: measure the text and images themselves, so backgrounds that bleed off the edge on purpose
+    // (bands, panels) are not mistaken for overflow
+    for (const el of sl.querySelectorAll('.body')) {
+      const box = el.getBoundingClientRect(), range = document.createRange();
+      let t = Infinity, b = -Infinity, l = Infinity, r = -Infinity;
+      const add = q => { if (!q.width || !q.height) return; t = Math.min(t, q.top); b = Math.max(b, q.bottom); l = Math.min(l, q.left); r = Math.max(r, q.right); };
+      const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      for (let n = w.nextNode(); n; n = w.nextNode()) {
+        if (!n.textContent.trim() || n.parentElement.closest('[aria-hidden]')) continue;
+        const cs = getComputedStyle(n.parentElement), fs = parseFloat(cs.fontSize), lh = parseFloat(cs.lineHeight) || fs * 1.2;
+        if (lh < fs * 1.05) continue; // tight display type: glyph box is taller than its line
+        // a text rect is the font's content area (about 1.45 em for CJK fonts), taller than the line box: trim the difference
+        const trim = Math.max(0, fs * 1.45 - lh) / 2 * scale;
+        range.selectNodeContents(n);
+        for (const q of range.getClientRects()) add({ width: q.width, height: q.height, left: q.left, right: q.right, top: q.top + trim, bottom: q.bottom - trim });
+      }
+      for (const im of el.querySelectorAll('img')) add(im.getBoundingClientRect());
+      const tol = 4 * scale, px = v => Math.round(v / scale);
+      if (b > box.bottom + tol) out.issues.push(`內容超出版面：下方多出 ${px(b - box.bottom)}px`);
+      if (t < box.top - tol) out.issues.push(`內容超出版面：上方多出 ${px(box.top - t)}px`);
+      if (r > box.right + tol || l < box.left - tol) out.issues.push(`內容超出版面：左右多出 ${px(Math.max(r - box.right, box.left - l))}px`);
     }
     for (const el of sl.querySelectorAll('h1,h2,h3,p,li,span,cite,div.value,div.label')) {
       const r = el.getBoundingClientRect();
