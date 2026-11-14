@@ -33,7 +33,11 @@ LAYOUTS = {
     "quote": ["text"],
     "image": ["src"],
     "pillars": ["headline", "pillars"],
+    "status-table": ["stages", "groups"],
 }
+
+CELL_STATES = {"done", "doing", "target", "na"}
+RISK_LEVELS = {"red": 3, "yellow": 2, "green": 1}
 
 SLIDE_TYPES = {"cover", "content", "shock", "closing"}
 
@@ -109,7 +113,7 @@ def toc_mode(data):
     if len(chapters) <= 3 or (data.get("meta") or {}).get("format") == "section":
         return "none"
     n_content = sum(1 for s in main_slides(data)
-                    if s.get("type", "content") == "content" and s.get("layout") != "pillars")
+                    if s.get("type", "content") == "content" and s.get("layout") not in ("pillars", "status-table"))
     return "per-chapter" if n_content / len(chapters) >= 2 else "agenda"
 
 

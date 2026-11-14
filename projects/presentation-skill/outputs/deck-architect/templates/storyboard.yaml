@@ -48,6 +48,9 @@ chapters:
 #   image   圖片：src（相對於 storyboard 的路徑）+ caption；圖只是氣氛，重點仍要寫在文字裡
 #   pillars 一頁總覽：headline（主句）+ pillars（每章一欄：chapter、kicker、heading、sub、items、stats、link）
 #           不需要 chapter 欄位；垂直軸時欄位會逐欄往下排
+#   status-table 進度總覽：summary（本期摘要，依大類各一行）+ stages（共用階段）+ groups（大類）
+#           每列：name、owner、cells（每階段一格：state done/doing/target/na + date）、progress、
+#           risk（red/yellow/green）、support（需要的支援）。範例見 examples/progress-overview
 # 共用欄位：
 #   chapter 屬於哪一章（content 必填，填 chapters 的 id）
 #   title   這頁在講什麼（路標，不寫結論，≤12 字）

@@ -1,0 +1,95 @@
+# 範例：AI 專案群的週進度總覽（兩頁，status-table）。內容為虛構示意，非真實資料。
+meta:
+  title: 數位專案群 · 週進度總覽
+  theme: ink
+  format: section
+  minutes: 3
+
+structure:
+  start: 主管要在三分鐘內知道哪些專案有問題、需要誰介入
+  destination: 當場決定要支援哪幾個紅燈案例
+  axis: importance
+  direction: 需要介入 → 正常
+  sensitivity: false
+
+chapters:
+  - {id: a, label: 平台類, minutes: 1}
+  - {id: b, label: 流程類, minutes: 1}
+  - {id: c, label: 個別案例, minutes: 1}
+
+slides:
+  - layout: status-table
+    title: 週進度總覽
+    summary:
+      - 平台類：文件助手完成原型，進度 30%；影像工具 3/12 首輪驗證
+      - 流程類：排程助手完成需求確認，3/20 接入試點；知識庫整理 55%
+      - 個別案例：客服助手首次驗證正確率 88%；1 案本週無更新（等待採購）
+    stages: [啟動, 需求, 建置, 適配]
+    groups:
+      - name: 平台類
+        rows:
+          - name: 文件助手
+            owner: 甲組
+            cells: [{state: done}, {state: doing, date: 3/B}, {state: target, date: 4/B}, {state: target, date: 5/E}]
+            progress: 25
+            risk: yellow
+            support: 需要 2 個部門提供文件樣本
+          - name: 會議紀錄助手
+            owner: 乙組
+            cells: [{state: done}, {state: done}, {state: done}, {state: done}]
+            progress: 100
+            risk: green
+          - name: 影像工具
+            owner: 丙組
+            cells: [{state: done}, {state: done}, {state: doing, date: 3/12}, {state: target, date: 3/18}]
+            progress: 60
+            risk: green
+      - name: 流程類
+        rows:
+          - name: 採購追蹤
+            owner: 丁組
+            cells: [{state: done}, {state: doing, date: 2/E}, {state: target}, {state: target}]
+            progress: 20
+            risk: red
+            support: 系統權限卡 3 週，請主管協調
+          - name: 流程類任務助手
+            owner: 戊組
+            cells: [{state: done}, {state: done}, {state: done}, {state: doing, date: 3/M}]
+            progress: 90
+            risk: green
+          - name: 知識庫整理
+            owner: 己組
+            cells: [{state: done}, {state: done}, {state: doing, date: 3/18}, {state: target}]
+            progress: 70
+            risk: green
+    source: 示意資料
+    notes: 先講紅燈與需要的支援，再講摘要裡的數字。
+
+  - layout: status-table
+    title: 週進度總覽
+    continued: true
+    stages: [啟動, 需求, 建置, 適配]
+    groups:
+      - name: 個別案例
+        rows:
+          - name: 教育訓練助手
+            owner: 庚組
+            cells: [{state: na}, {state: na}, {state: na}, {state: na}]
+            progress: 0
+            risk: yellow
+            note: 本週無更新，等待採購
+          - name: 客服助手
+            owner: 辛組
+            cells: [{state: done}, {state: done}, {state: done}, {state: doing, date: 3/06}]
+            progress: 85
+            risk: green
+          - name: 市場摘要
+            owner: 辛組
+            cells: [{state: done}, {state: done}, {state: done}, {state: doing, date: 3/B}]
+            progress: 85
+            risk: green
+          - name: 報表整合
+            owner: 丙組
+            cells: [{state: done}, {state: doing, date: 3/06}, {state: target, date: 3/21}, {state: target}]
+            progress: 20
+            risk: green

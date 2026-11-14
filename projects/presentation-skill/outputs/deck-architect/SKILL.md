@@ -81,6 +81,8 @@ python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml
 
 只要一頁、或是大簡報裡的一章時，用 `meta.format: section` 與 `layout: pillars`（一頁總覽）；需要現場點進細節時，用附件頁（`appendix: true`＋`link`）。見 presentation-rules.md「一頁總覽與附件」。
 
+定期進度回報要先拿到模板，總覽用 `layout: status-table`；多個單位交上來的 PPTX 用 `scripts/check_reports.py` 檢查內容。見 progress-report.md。
+
 build 會根據架構自動產生導航（章節列、目錄點亮、頁籤）、依「軸」決定換章的運鏡方向、處理震撼頁。你不需要手寫 HTML。
 
 ### Step 5｜品管 → `check/`
@@ -125,5 +127,6 @@ node <skill>/scripts/check.mjs decks/<name>/deck.html
 | `references/contexts.md` | 判斷情境、選擇快速 / 標準模式時 |
 | `references/presentation-rules.md` | Step 2 寫 storyboard 前、Step 5 品管時 |
 | `references/samples.md` | Step 3 做樣張、或使用者要自訂風格時 |
+| `references/progress-report.md` | 定期進度回報、專案群總覽、多人填寫的回報時 |
 | `templates/brief.md` | 寫 brief 時 |
 | `templates/storyboard.yaml` | 寫 storyboard 時（含所有欄位與版型說明） |

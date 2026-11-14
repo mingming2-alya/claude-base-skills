@@ -95,6 +95,8 @@ def expand(data):
             agenda_done = True
         if t == "content" and s.get("layout") == "pillars":
             out.append({"kind": "overview", "chi": -1, "src": s})
+        elif t == "content" and s.get("layout") == "status-table":
+            out.append({"kind": "status", "chi": -1, "src": s})
         elif t == "content":
             cid = s["chapter"]
             chi = ids.index(cid)
@@ -140,6 +142,41 @@ def render_pillars(s, motion):
         cols.append(f'<div class="pillar rv" style="--k:{k}"{link}>{kicker}<h3>{rich(p.get("heading"))}</h3>'
                     f'{sub}{ul}{st}{more}</div>')
     return f'<div class="pillars" style="--n:{len(pillars)}">{"".join(cols)}</div>'
+
+
+STATE_LABEL = {"done": "已完成", "doing": "進行中", "target": "目標", "na": "—"}
+RISK_LABEL = {"red": "需介入", "yellow": "注意", "green": "正常"}
+
+
+def render_status_table(s):
+    stages = s.get("stages") or []
+    head = ("<tr><th class='c-name'>項目</th><th class='c-owner'>負責</th>"
+            + "".join(f"<th>{esc(x)}</th>" for x in stages)
+            + "<th class='c-prog'>進度</th><th class='c-risk'>風險</th><th class='c-sup'>需要的支援</th></tr>")
+    body = []
+    for g in s.get("groups") or []:
+        note = f"<span class='g-note'>{esc(g['note'])}</span>" if g.get("note") else ""
+        body.append(f"<tr class='grp'><td colspan='{len(stages) + 5}'>{esc(g.get('name'))}{note}</td></tr>")
+        for r in g.get("rows") or []:
+            cells = []
+            for c in r.get("cells") or []:
+                c = c if isinstance(c, dict) else {"state": c}
+                stt = c.get("state", "na")
+                date = f"<b>{esc(c['date'])}</b> " if c.get("date") else ""
+                cells.append(f"<td class='st st-{esc(stt)}'><i></i>{date}{STATE_LABEL.get(stt, '')}</td>")
+            pr = r.get("progress")
+            prog = (f"<td class='c-prog'><span class='bar'><span style='width:{int(pr)}%'></span></span>{int(pr)}%</td>"
+                    if isinstance(pr, (int, float)) else "<td class='c-prog'>—</td>")
+            risk = r.get("risk", "green")
+            sup = esc(r.get("support") or r.get("note") or "")
+            body.append(f"<tr class='rk-{esc(risk)}'><td class='c-name'>{esc(r.get('name'))}</td>"
+                        f"<td class='c-owner'>{esc(r.get('owner', ''))}</td>{''.join(cells)}{prog}"
+                        f"<td class='c-risk'><span class='dot dot-{esc(risk)}'></span>{RISK_LABEL.get(risk, '')}</td>"
+                        f"<td class='c-sup'>{sup}</td></tr>")
+    summary = ""
+    if s.get("summary"):
+        summary = "<ul class='st-summary'>" + "".join(f"<li>{rich(x)}</li>" for x in s["summary"]) + "</ul>"
+    return f"{summary}<table class='status-table'><thead>{head}</thead><tbody>{''.join(body)}</tbody></table>"
 
 
 def source_line(s):
@@ -204,6 +241,15 @@ def render_slide(rec, data, idx, total, base_dir, ch_sources):
     pageno = f'<div class="pageno">{"附件" if rec.get("appendix") else f"{idx:02d}"}</div>'
     more = (f'<button class="more-btn" type="button" data-link="{esc(s["link"])}">看細節 →</button>'
             if s.get("link") else "")
+
+    if kind == "status":
+        cont = "（續）" if s.get("continued") else ""
+        return (f'<section class="slide status" {attrs}>{back}<header class="st-head">'
+                f'<h2 class="title">{esc(s.get("title"))}{cont}</h2>'
+                f'<div class="legend"><span><i class="st-done"></i>已完成</span><span><i class="st-doing"></i>進行中</span>'
+                f'<span><i class="st-target"></i>目標</span><span class="dot dot-red"></span>需介入'
+                f'<span class="dot dot-yellow"></span>注意<span class="dot dot-green"></span>正常</div></header>'
+                f'<div class="st-body">{render_status_table(s)}</div>{source_line(s)}{pageno}</section>')
 
     if kind == "overview":
         motion = motion_for(data["structure"])
@@ -405,6 +451,40 @@ mark.em{background:none;color:var(--accent);font-weight:var(--key-weight)}
 .back{position:absolute;right:120px;top:48px;font:600 22px/1 var(--font-body);color:var(--fg);background:var(--bg);
   border:1px solid var(--line);border-radius:999px;padding:12px 22px;cursor:pointer;z-index:6}
 [data-format=section] .pageno{display:none}
+
+/* status overview: grouped table with shared lifecycle stages, risk and support */
+.st-head{position:absolute;left:80px;right:80px;top:48px;display:flex;justify-content:space-between;align-items:flex-end;gap:40px}
+.legend{display:flex;align-items:center;gap:14px;font:500 20px/1 var(--font-body);color:var(--muted);white-space:nowrap}
+.legend span{display:inline-flex;align-items:center;gap:8px}
+.legend i{width:14px;height:14px;border-radius:50%;display:inline-block}
+.st-body{position:absolute;left:80px;right:80px;top:140px;bottom:90px;overflow:hidden}
+.st-summary{list-style:none;margin-bottom:18px;padding:16px 22px;border-left:4px solid var(--fg);
+  background:color-mix(in srgb,var(--fg) 4%,transparent);display:grid;gap:6px}
+.st-summary li{font:500 22px/1.4 var(--font-body)}
+.status-table{width:100%;border-collapse:collapse;font:400 20px/1.25 var(--font-body)}
+.status-table th{font:600 20px/1.2 var(--font-body);color:var(--muted);text-align:left;padding:8px 10px;border-bottom:2px solid var(--line)}
+.status-table td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.status-table tr.grp td{font:700 21px/1.2 var(--font-body);padding-top:14px;border-bottom:2px solid var(--fg)}
+.g-note{margin-left:14px;font-weight:400;color:var(--muted)}
+.c-name{font-weight:600;min-width:280px}
+.c-owner{color:var(--muted);white-space:nowrap}
+.st{white-space:nowrap;color:var(--muted)}
+.st i,.legend i{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:middle}
+.st-done i,.legend .st-done{background:var(--fg)}
+.st-done{color:var(--fg)}
+.st-doing i,.legend .st-doing{background:var(--accent)}
+.st-doing{color:var(--fg);font-weight:600}
+.st-target i,.legend .st-target{background:transparent;border:2px solid var(--muted)}
+.st-na i{display:none}
+.c-prog{white-space:nowrap;font-weight:600}
+.bar{display:inline-block;width:90px;height:10px;border-radius:5px;background:var(--line);margin-right:10px;vertical-align:middle;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--fg)}
+.c-risk{white-space:nowrap}
+.dot{display:inline-block;width:16px;height:16px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.dot-red{background:#D7262E}.dot-yellow{background:#E8A317}.dot-green{background:#2E9D5B}
+tr.rk-red td.c-name{box-shadow:inset 6px 0 0 #D7262E;padding-left:16px}
+.c-sup{color:var(--fg);max-width:420px}
+.status .source{left:80px}
 
 /* cover / closing */
 .cover-inner{position:absolute;left:140px;right:140px;top:0;bottom:200px;display:flex;flex-direction:column;justify-content:center}

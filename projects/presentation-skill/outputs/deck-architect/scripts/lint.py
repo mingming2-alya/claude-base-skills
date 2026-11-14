@@ -12,7 +12,8 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from deck_model import (AXES, EMPH_RE, LAYOUTS, SLIDE_TYPES, TRANSITION_PHRASES,  # noqa: E402
+from deck_model import (AXES, CELL_STATES, EMPH_RE, LAYOUTS, RISK_LEVELS, SLIDE_TYPES,  # noqa: E402
+                        TRANSITION_PHRASES,
                         StoryboardError, emphasis_count, load, page_count, slide_texts, toc_mode,
                         visible_len)
 
@@ -119,6 +120,67 @@ def lint(data):
         has_digit = any(re.search(r"\d", x) for x in texts)
         if has_digit and not s.get("source") and (t == "shock" or (t == "content" and s.get("layout") == "number")):
             W(where, "關鍵數字沒有 source（出處）。先跟原始資料核對，再寫上出處與適用範圍。")
+
+        if t == "content" and s.get("layout") == "status-table":
+            seen_content = True
+            stages = s.get("stages") or []
+            if not isinstance(stages, list) or not 2 <= len(stages) <= 6:
+                E(where, "status-table 的 stages 需要 2–6 個共用階段（例如 啟動、需求、建置、適配）。")
+                stages = stages if isinstance(stages, list) else []
+            n_rows = 0
+            # groups are the chapters of a progress overview: match by chapter id or label
+            label_to_id = {str(c.get("label")): c.get("id") for c in chapters if isinstance(c, dict)}
+            matched = False
+            for g in s.get("groups") or []:
+                if isinstance(g, dict):
+                    cid = g.get("chapter") or label_to_id.get(str(g.get("name")))
+                    if cid in content_per_ch:
+                        content_per_ch[cid] += 1
+                        matched = True
+            if not matched:
+                for cid in content_per_ch:
+                    content_per_ch[cid] += 1
+            for g_i, g in enumerate(s.get("groups") or []):
+                gw = f"{where}.groups[{g_i}]"
+                if not isinstance(g, dict) or not g.get("name"):
+                    E(gw, "每個 group 需要 name（專案大類）。")
+                    continue
+                prev = None
+                for r_i, r in enumerate(g.get("rows") or []):
+                    n_rows += 1
+                    rw = f"{gw}.rows[{r_i}]「{r.get('name', '?') if isinstance(r, dict) else '?'}」"
+                    if not isinstance(r, dict) or not r.get("name"):
+                        E(rw, "每列需要 name。")
+                        continue
+                    cells = r.get("cells") or []
+                    if len(cells) != len(stages):
+                        E(rw, f"cells 有 {len(cells)} 格，但 stages 有 {len(stages)} 個。每個階段一格。")
+                    for c in cells:
+                        st_ = c.get("state") if isinstance(c, dict) else c
+                        if st_ not in CELL_STATES:
+                            E(rw, f"cell 狀態必須是 {', '.join(sorted(CELL_STATES))} 之一（目前：{st_!r}）。")
+                            break
+                    risk = r.get("risk")
+                    if risk not in RISK_LEVELS:
+                        E(rw, "每列都要有 risk（red／yellow／green）。總覽要讓主管三秒看出哪裡有問題，只有進度百分比看不出來。")
+                    elif risk in ("red", "yellow") and not (r.get("support") or r.get("note")):
+                        W(rw, f"風險是 {risk}，卻沒寫 support（需要誰做什麼）或 note（原因）。")
+                    pr = r.get("progress")
+                    if pr is not None and not (isinstance(pr, (int, float)) and 0 <= pr <= 100):
+                        E(rw, "progress 必須是 0–100 的數字。")
+                    if g.get("order", "risk") == "risk" and risk in RISK_LEVELS:
+                        key = (-RISK_LEVELS[risk], -(pr or 0))
+                        if prev is not None and key < prev:
+                            W(rw, "同一類之內要先排風險高的，同風險再依進度。這列的順序比上一列前面。")
+                        prev = key
+            if n_rows > 13:
+                E(where, f"一頁 {n_rows} 列，超過 13 列放不下。拆成兩頁（第二頁加上 continued: true）。")
+            for k, line in enumerate(s.get("summary") or []):
+                if not re.search(r"\d", str(line)) and not re.search(r"無更新|完成|上線|結案|暫停|延後", str(line)):
+                    W(f"{where}.summary[{k}]", f"「{str(line)[:20]}…」沒有數字也沒有明確狀態。摘要每行要有可檢查的結果。")
+            if not s.get("summary") and not s.get("continued"):
+                W(where, "總覽的第一頁建議加上 summary：依大類各一行本期重點，每行帶數字或明確狀態。")
+            continue
 
         if t == "content" and s.get("layout") == "pillars":
             seen_content = True
