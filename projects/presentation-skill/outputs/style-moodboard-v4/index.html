@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>風格意象圖｜十四款</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+  :root{--bg:#F1EEE8;--card:#FBFAF7;--ink:#24211D;--sub:#6B645B;--line:#DDD7CC;--accent:#B4512F}
+  @media (prefers-color-scheme: dark){:root{--bg:#1B1A18;--card:#252320;--ink:#EEEAE3;--sub:#A69F94;--line:#3A3733;--accent:#E28B6A}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:400 16px/1.7 "Noto Sans TC",system-ui,sans-serif;padding:40px 16px 64px}
+  main{max-width:1240px;margin:0 auto}
+  header h1{font:900 clamp(28px,4vw,40px)/1.25 "Noto Sans TC";letter-spacing:.02em}
+  header p{margin-top:10px;color:var(--sub);max-width:780px}
+  .how{margin:22px 0 34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .how div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .how b{display:block;font-weight:700}
+  .how span{color:var(--sub);font-size:15px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:22px}
+  article{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  article a{display:block}
+  article img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#ccc}
+  .body{padding:18px 20px 20px}
+  .name{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .name b{font:900 24px/1.2 "Noto Sans TC"}
+  .name span{color:var(--sub);font-size:14px;letter-spacing:.06em}
+  .one{margin-top:6px;font-weight:500}
+  dl{margin-top:12px;display:grid;grid-template-columns:72px 1fr;row-gap:6px;column-gap:10px;font-size:15px}
+  dt{color:var(--sub)}
+  .sw{display:flex;flex-wrap:wrap;gap:6px}
+  .sw i{display:inline-flex;align-items:center;gap:6px;font-style:normal;font-size:13px;color:var(--sub)}
+  .sw i::before{content:"";width:18px;height:18px;border-radius:4px;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .var{display:flex;gap:8px;padding:10px 20px 0}
+  .var a{flex:1;font-size:13px;color:var(--sub);text-decoration:none}
+  .var img{border-radius:6px;border:1px solid var(--line)}
+  footer{margin-top:36px;color:var(--sub);font-size:14px}
+  footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>風格意象圖：十四款，並排後再收斂</h1>
+    <p>每款一張意象圖，題材依用途各自挑選。插畫場景與積木構成各有兩種畫法，同一份簡報只用一種。用色都還沒定案，另開一輪討論。</p>
+  </header>
+  <section class="how" aria-label="怎麼看">
+    <div><b>單張看</b><span>想得到自己會在哪個場合用它，而且想用嗎？</span></div>
+    <div><b>十四張並排</b><span>哪幾款看起來太像，可以再合併？</span></div>
+    <div><b>收斂</b><span>哪些留下、哪些放回候選池，再從留下的選首批三款。</span></div>
+  </section>
+  <p style="margin-bottom:18px"><a href="overview.jpg" style="color:var(--accent);font-weight:700">十四張並排總覽圖</a></p>
+  <section class="grid" id="grid"></section>
+  <footer>
+    <p>圖片由 <code>src/</code> 裡的 HTML 以程式繪製，文字都是真文字；攝影雜誌的照片是程式模擬，正式使用時換成真實照片。重繪：<code>node render.cjs</code>；配色距離檢查：<code>python3 measure.py</code>。清單與取捨理由見 <a href="../../inputs/style-list-v4.md">inputs/style-list-v4.md</a>。上一輪的資訊圖表意象圖改當圖表類內容結構的參考：<a href="../style-moodboard/img/04-infographic.jpg">睡眠調查</a>。</p>
+  </footer>
+</main>
+<script>
+const S = [
+  ['01a-illustration-clay','01','插畫場景','illustration','用摸得到的物件，把抽象的事講成故事。','知識分享、新人引導、內部宣導、科普','溫暖、親切、好懂','物件貼邊、中央留給文字，光從同一個方向來；黏土或手繪，一份簡報只用一種','新人報到第一週','你的《AI 的第三次搬家》、NotebookLM 紙黏土（只學做法）、手繪插畫',[['01a-illustration-clay','黏土版'],['01b-illustration-hand','手繪版']]],
+  ['02a-blocks-wood','02','積木構成','blocks','把系統拆成一塊塊疊起來，版面像包浩斯海報。','系統架構、平台分工、方法論、工作坊','清楚、有秩序、有玩心','幾何色格無縫咬合；圖像層用積木堆出結構，色格就是圖例','平台分工三層','PC 幾何風、包浩斯 1923 年的積木玩具、你偏好的 Lego',[['02a-blocks-wood','霧面木'],['02b-blocks-plastic','亮面塑膠']]],
+  ['03-ink','03','水彩水墨','ink','水墨的山、淡彩的海，像一幅會帶路的畫。','旅遊與活動說明、文化與自然導覽、生活分享','人文、空靈、手感','濃淡墨色加淡彩、大片留白、朱印標記與題款','員工旅遊・花蓮兩天一夜','你的水彩手繪圖、中國畫的水墨淡彩、CDX 溫暖手工風'],
+  ['04-apple','04','Apple 發表','apple','黑色舞台、一句話、一個發光的產品。','產品發表、大會開場、主題演講','俐落、高級、期待','置中構圖、漸層關鍵字、邊緣發光的裝置、細線標註','AI 助理 3.0 發表','你分享的 Apple Design、HS 黑底巨型數字劇場、SCR launch'],
+  ['05-scroll','05','書卷刻本','scroll','像翻開一本線裝書：原文直排，講解橫排。','文化講座、讀書會、歷史與國學課、典藏導覽','沉靜、典雅、書卷氣','版框、界欄、魚尾、朱印與朱批','讀書會・《茶經》導讀','HS 宋刻本、呂敬人書籍設計、民國書衣'],
+  ['06-counsel','06','顧問報告','counsel','一張證據圖、一個建議，十秒看懂要決定什麼。','策略提案、決策會議、高階報告','精準、可信、冷靜','標註寫在資料點旁；深色理由欄配細線紋樣；附資料來源','新廠選址三方案','HS 雙字體諮詢版與斷言-證據、CDX 麥肯錫風、BHT signal'],
+  ['07-riso','07','孔版小誌','riso','兩種油墨、套印不準的手作感。','社群活動、市集、社團招募、倡議','熱鬧、手作、有態度','只用兩色；網點、錯位、印章、帳冊列。和年輕潮流刻意拉開：紙上油墨、有紙紋','週末換書市集','BHT retro-zine、peoples-platform、long-table，HS 服部一成'],
+  ['08-deco','08','摩登金','deco','1930 年代的燙金請帖，留給一年一次的大場面。','尾牙與頒獎、週年慶、晚宴、致詞','華麗、隆重、復古','對稱構圖、階梯框、放射扇形、金色雙線','年度最佳團隊頒獎','HS 上海摩登裝飾藝術、BM 黑金奢華、FS Dark Botanical'],
+  ['09-everyday','09','日常工作款','everyday','一頁看完本週進度，和需要你決定的事。','週會、進度回報、專案複盤','清爽、密度高、不囉嗦','髮絲線表格、進度條、狀態標籤、右側決策框','W46 專案週報','你提供的分工、輪值與進度簡報（只學排版）、CDX 清爽專業風、GZ 瑞士風'],
+  ['10-photo','10','攝影雜誌','photo','一張好照片，配上雜誌的版面。','年度回顧、活動紀錄、人物專訪、品牌故事','沉靜、有故事、有質感','滿版照片配襯線大標、期號與目錄式條列。照片是程式模擬，正式使用換真實照片','年度回顧','HS 雜誌編輯長文流、GZ 雜誌風、CDX 電子墨水雜誌風'],
+  ['11-trend','11','年輕潮流','trend','粗黑框、硬陰影、貼紙到處貼。','行銷活動、社群內容、校園招募','大膽、好玩、有能量','螢光底、傾斜卡片、爆炸貼紙。和孔版小誌刻意拉開：螢幕平塗、多色撞色、沒有網點','暑期實習招募','OS Pommi、BHT block-frame、HS 新粗野主義'],
+  ['12-tech','12','科技暗色','tech','把工程師的終端機搬上投影幕。','工程技術分享、事故複盤、資安、AI 技術深談','精準、冷靜、硬派','格線底、等寬字、程式碼差異、只用螢光綠標重點','推論延遲複盤','HS Neo-Swiss 暗色終端、HPS hermes-cyber-terminal、SCR zoom'],
+  ['13-retro','13','在地懷舊','retro','老花磚、撕日曆、紅底招牌，一看就懂的台灣味。','週年回顧、在地文化、懷舊主題活動','溫暖、親切、有年代感','花磚牆、紅底招牌字、名片式火車票時間軸、撕頁日曆','創業五十年','台灣花磚與撕日曆等生活物件、HS 民國書衣、BHT 復古印刷系統'],
+  ['14-neon','14','霓虹城市','neon','夜裡的招牌燈，一亮就熱鬧。','夜間活動、年輕品牌、城市主題','熱鬧、潮、有夜生活感','磚牆暗底、霓虹燈管字、地面倒影','夏夜美食節','HS 香港街招與招牌、BM Retro / analog'],
+];
+document.getElementById('grid').innerHTML = S.map(([f,n,name,id,one,use,tone,lang,topic,src,vars]) => `
+  <article>
+    <a href="img/${f}.jpg"><img src="img/${f}.jpg" alt="${name}意象圖：${topic}" loading="lazy"></a>
+    ${vars ? `<div class="var">${vars.map(([v,l]) => `<a href="img/${v}.jpg"><img src="img/${v}.jpg" alt="${name}：${l}" loading="lazy">${l}</a>`).join('')}</div>` : ''}
+    <div class="body">
+      <div class="name"><b>${n} ${name}</b><span>${id}</span></div>
+      <p class="one">${one}</p>
+      <dl>
+        <dt>適合</dt><dd>${use}</dd>
+        <dt>調性</dt><dd>${tone}</dd>
+        <dt>畫面</dt><dd>${lang}</dd>
+        <dt>題材</dt><dd>${topic}</dd>
+        <dt>來源</dt><dd>${src}</dd>
+      </dl>
+    </div>
+  </article>`).join('');
+</script>
+</body>
+</html>

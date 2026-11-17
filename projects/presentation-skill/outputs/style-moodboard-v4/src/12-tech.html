@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>12 科技暗色｜推論延遲複盤</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700;800&display=block">
+<style>
+  :root{--bg:#07120C;--fg:#E6EDE8;--dim:#82908A;--line:#16281D;--green:#3DFF8F;--amber:#FFB547;--red:#FF6B5E}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;color:var(--fg);font-family:"JetBrains Mono","Noto Sans TC",monospace;
+    background:
+      radial-gradient(1200px 700px at 30% 40%, rgba(61,255,143,.09), rgba(0,0,0,0) 70%),
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg)}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:120px;top:58px;display:flex;gap:10px;font:500 21px/1 "JetBrains Mono","Noto Sans TC";color:var(--dim)}
+  nav .path{color:var(--green);margin-right:18px}
+  nav span,nav b{padding:9px 14px;border:1px solid #26332C}
+  nav b{color:var(--bg);background:var(--green);border-color:var(--green);font-weight:700}
+  h2{position:absolute;left:120px;top:150px;font:700 40px/1.2 "Noto Sans TC";letter-spacing:.04em}
+  h2 small{font:500 22px/1 "JetBrains Mono";color:var(--dim);margin-left:18px;letter-spacing:0}
+  p.key{position:absolute;left:120px;top:214px;font:900 64px/1.3 "Noto Sans TC";letter-spacing:.01em}
+  p.key b{font:800 64px/1 "JetBrains Mono";letter-spacing:-.02em}
+  p.key em{font-style:normal;color:var(--green)}
+  .axis{position:absolute;font:500 19px/1 "JetBrains Mono";color:var(--dim)}
+  .note{position:absolute;font:500 22px/1.35 "Noto Sans TC";color:var(--fg)}
+  .note b{font:700 22px/1 "JetBrains Mono";color:var(--green)}
+  .term{position:absolute;left:1180px;top:150px;width:620px;border:1px solid #2A3A31;background:rgba(9,13,11,.92);box-shadow:0 0 0 1px rgba(61,255,143,.06), 0 30px 80px rgba(0,0,0,.5)}
+  .term header{display:flex;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #2A3A31;font:500 18px/1 "JetBrains Mono";color:var(--dim)}
+  .term pre{padding:22px 24px 26px;font:500 23px/1.75 "JetBrains Mono";color:var(--fg);white-space:pre}
+  .p{color:var(--dim)} .m{color:var(--red)} .a{color:var(--green)} .w{color:var(--amber)}
+  .arch{position:absolute;left:1180px;top:690px;width:620px}
+  .arch h3{font:700 20px/1 "JetBrains Mono";color:var(--dim);letter-spacing:.1em;margin-bottom:22px}
+  .flow{display:flex;align-items:center;gap:0}
+  .box{flex:none;padding:18px 0;width:170px;text-align:center;border:1.5px solid #3A5144;font:700 22px/1.3 "JetBrains Mono"}
+  .box small{display:block;font:500 17px/1.3 "Noto Sans TC";color:var(--dim);margin-top:4px}
+  .box.hot{border-color:var(--green);color:var(--green);box-shadow:0 0 24px rgba(61,255,143,.18)}
+  .arrow{flex:1;height:2px;background:#3A5144;position:relative}
+  .arrow::after{content:"";position:absolute;right:-1px;top:-6px;border:7px solid transparent;border-left:10px solid #3A5144}
+  .tip{margin-top:22px;font:500 21px/1.5 "Noto Sans TC";color:var(--dim)}
+  .tip b{color:var(--amber);font-family:"JetBrains Mono"}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true" id="chart">
+    <defs>
+      <linearGradient id="area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3DFF8F" stop-opacity=".28"/><stop offset="1" stop-color="#3DFF8F" stop-opacity="0"/></linearGradient>
+      <filter id="glow" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2400" height="1500"><feGaussianBlur stdDeviation="6"/></filter>
+    </defs>
+  </svg>
+
+  <nav aria-label="章節"><span class="path">~/postmortem</span><span>背景</span><span>根因</span><b>修正</b><span>下一步</span></nav>
+  <h2>推論延遲複盤<small>INC-2026-1104</small></h2>
+  <p class="key">p95 從 <b>820ms</b> 降到 <em><b>140ms</b></em>。</p>
+  <div id="labels"></div>
+
+  <section class="term">
+    <header><span>config/inference.yaml</span><span>v2.3</span></header>
+<pre><span class="p">$</span> git diff --stat
+<span class="m">-  batch_size: 1</span>
+<span class="a">+  batch_size: 8</span>
+<span class="m">-  kv_cache: off</span>
+<span class="a">+  kv_cache: on</span>
+
+<span class="p">$</span> bench --p95 --runs 500
+   p95   820ms <span class="p">→</span> <span class="a">140ms</span>   <span class="a">▼ 83%</span>
+   cost  <span class="w">+4%</span> GPU hours</pre>
+  </section>
+
+  <section class="arch">
+    <h3>// 架構</h3>
+    <div class="flow">
+      <div class="box">Gateway<small>入口</small></div><div class="arrow"></div>
+      <div class="box hot">Batcher<small>新增：合併請求</small></div><div class="arrow"></div>
+      <div class="box">GPU ×4<small>推論</small></div>
+    </div>
+    <p class="tip">代價：GPU 時數 <b>+4%</b>，換來八成的延遲下降。</p>
+  </section>
+</div>
+<script>
+// p95 latency per day; the fix ships on day 10
+const days = [810, 835, 790, 860, 820, 845, 800, 880, 825, 150, 142, 138, 145, 140];
+const X0 = 236, X1 = 1080, Y0 = 930, Y1 = 470, MAX = 1000;
+const x = i => X0 + (i / (days.length - 1)) * (X1 - X0), y = v => Y0 - (v / MAX) * (Y0 - Y1);
+let s = '', L = '';
+for (const v of [0, 250, 500, 750, 1000]) {
+  s += `<line x1="${X0}" y1="${y(v)}" x2="${X1}" y2="${y(v)}" stroke="#22302A" stroke-dasharray="4 6"/>`;
+  L += `<div class="axis" style="left:${X0 - 126}px;width:104px;text-align:right;top:${y(v) - 9}px">${v}ms</div>`;
+}
+const pts = days.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+s += `<polygon points="${x(0)},${Y0} ${pts} ${x(days.length - 1)},${Y0}" fill="url(#area)"/>`;
+s += `<polyline points="${pts}" fill="none" stroke="#3DFF8F" stroke-width="5" filter="url(#glow)" opacity=".7"/>`;
+s += `<polyline points="${pts}" fill="none" stroke="#3DFF8F" stroke-width="3"/>`;
+s += `<line x1="${x(9) - 32}" y1="${Y1 - 10}" x2="${x(9) - 32}" y2="${Y0}" stroke="#FFB547" stroke-width="2" stroke-dasharray="6 6"/>`;
+s += `<circle cx="${x(13)}" cy="${y(140)}" r="8" fill="#3DFF8F"/>`;
+s += `<line x1="${X0}" y1="${Y0}" x2="${X1}" y2="${Y0}" stroke="#4A5E53" stroke-width="2"/>`;
+L += `<div class="axis" style="left:${X0}px;top:${Y0 + 16}px">11/01</div><div class="axis" style="left:${X1 - 70}px;top:${Y0 + 16}px">11/14</div>`;
+L += `<div class="note" style="left:${x(9) - 20}px;top:${Y1 - 4}px"><b>v2.3</b> 上線<br>合併請求、開快取</div>`;
+document.getElementById('chart').insertAdjacentHTML('beforeend', s);
+document.getElementById('labels').innerHTML = L;
+</script>
+</body>
+</html>

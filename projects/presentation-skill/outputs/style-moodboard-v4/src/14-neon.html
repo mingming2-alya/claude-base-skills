@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>14 霓虹城市｜夏夜美食節</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Bungee&display=block">
+<style>
+  :root{--bg:#0B0E1A;--fg:#F3F1FA;--dim:#A3A8BF;--pink:#FF4FB0;--cyan:#33E6F0;--yellow:#FFD84A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--fg);font-family:"Noto Sans TC",sans-serif}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:120px;top:62px;display:flex;gap:34px;font:500 22px/1 "Noto Sans TC";color:var(--dim);letter-spacing:.06em}
+  nav b{color:var(--cyan);font-weight:700;text-shadow:0 0 10px rgba(51,230,240,.8)}
+  h2{position:absolute;left:120px;top:170px;font:900 44px/1.2 "Noto Sans TC";letter-spacing:.1em;color:var(--yellow);text-shadow:0 0 6px rgba(255,216,74,.9),0 0 22px rgba(255,216,74,.55)}
+  p.key{position:absolute;left:116px;top:248px;font:900 104px/1.24 "Noto Sans TC";letter-spacing:.02em}
+  p.key em{font-style:normal;color:#FFE3F3;text-shadow:0 0 4px #FF4FB0,0 0 14px #FF4FB0,0 0 36px rgba(255,79,176,.8),0 0 70px rgba(255,79,176,.5)}
+  dl{position:absolute;left:120px;top:604px;width:760px}
+  dl div{display:grid;grid-template-columns:120px 1fr;padding:22px 0;border-top:1px solid rgba(163,168,191,.25)}
+  dt{font:700 24px/1.4 "Noto Sans TC";color:var(--cyan);letter-spacing:.16em}
+  dd{font:500 30px/1.4 "Noto Sans TC"}
+  dd b{font:400 30px/1 "Bungee";letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <pattern id="brick" width="120" height="60" patternUnits="userSpaceOnUse">
+        <rect width="120" height="60" fill="#10142A"/>
+        <path d="M0 0.5 H120 M0 30.5 H120 M0.5 0 V30 M60.5 30 V60" stroke="#1A2040" stroke-width="2"/>
+      </pattern>
+      <linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B0E1A" stop-opacity=".2"/><stop offset=".78" stop-color="#0B0E1A" stop-opacity=".5"/><stop offset="1" stop-color="#05060D" stop-opacity=".96"/></linearGradient>
+      <filter id="neon" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b1"/>
+        <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="b2"/>
+        <feGaussianBlur in="SourceGraphic" stdDeviation="30" result="b3"/>
+        <feMerge><feMergeNode in="b3"/><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="haze" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480"><feGaussianBlur stdDeviation="60"/></filter>
+      <filter id="puddle" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480">
+        <feTurbulence type="fractalNoise" baseFrequency=".002 .08" numOctaves="2" seed="3" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feGaussianBlur in="d" stdDeviation="16"/>
+      </filter>
+    </defs>
+    <!-- wall and the colour the signs throw onto it -->
+    <rect width="1920" height="1080" fill="url(#brick)"/>
+    <ellipse cx="1430" cy="420" rx="520" ry="380" fill="#FF4FB0" opacity=".16" filter="url(#haze)"/>
+    <ellipse cx="1700" cy="780" rx="300" ry="200" fill="#33E6F0" opacity=".12" filter="url(#haze)"/>
+    <rect width="1920" height="1080" fill="url(#wall)"/>
+
+    <!-- vertical signboard: 夜市 -->
+    <g id="signs">
+      <rect x="1180" y="110" width="250" height="560" rx="18" fill="#140A1A" stroke="#FF4FB0" stroke-width="5" filter="url(#neon)"/>
+      <rect x="1180" y="110" width="250" height="560" rx="18" fill="none" stroke="#FFD1EA" stroke-width="1.8"/>
+      <g font-family="Noto Sans TC" font-weight="900" font-size="196" text-anchor="middle" fill="none">
+        <text x="1305" y="350" stroke="#FF4FB0" stroke-width="7" filter="url(#neon)">夜</text>
+        <text x="1305" y="590" stroke="#FF4FB0" stroke-width="7" filter="url(#neon)">市</text>
+        <text x="1305" y="350" stroke="#FFE3F3" stroke-width="2.2">夜</text>
+        <text x="1305" y="590" stroke="#FFE3F3" stroke-width="2.2">市</text>
+      </g>
+      <!-- noodle bowl in yellow tubes -->
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(1530 360)">
+        <g stroke="#FFD84A" stroke-width="7" filter="url(#neon)">
+          <path d="M0 80 H260 Q250 190 130 200 Q10 190 0 80 Z"/>
+          <path d="M60 60 L220 -60 M100 66 L250 -30"/>
+          <path d="M70 40 q-14 -24 0 -48 q14 -24 0 -48 M130 40 q-14 -24 0 -48 q14 -24 0 -48"/>
+        </g>
+        <g stroke="#FFF6D2" stroke-width="2.2">
+          <path d="M0 80 H260 Q250 190 130 200 Q10 190 0 80 Z"/>
+          <path d="M60 60 L220 -60 M100 66 L250 -30"/>
+          <path d="M70 40 q-14 -24 0 -48 q14 -24 0 -48 M130 40 q-14 -24 0 -48 q14 -24 0 -48"/>
+        </g>
+      </g>
+      <!-- OPEN with an arrow, in cyan -->
+      <g font-family="Bungee" font-size="92" fill="none" text-anchor="middle">
+        <text x="1660" y="770" stroke="#33E6F0" stroke-width="5" filter="url(#neon)">OPEN</text>
+        <text x="1660" y="770" stroke="#E2FDFF" stroke-width="1.8">OPEN</text>
+      </g>
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M1500 860 H1800 M1760 820 L1800 860 L1760 900" stroke="#33E6F0" stroke-width="6" filter="url(#neon)"/>
+        <path d="M1500 860 H1800 M1760 820 L1800 860 L1760 900" stroke="#E2FDFF" stroke-width="2"/>
+      </g>
+    </g>
+    <!-- reflections on the wet ground -->
+    <g opacity=".5" filter="url(#puddle)">
+      <ellipse cx="1305" cy="1030" rx="90" ry="40" fill="#FF4FB0"/>
+      <ellipse cx="1660" cy="1040" rx="150" ry="26" fill="#33E6F0"/>
+      <ellipse cx="1660" cy="1000" rx="110" ry="14" fill="#FFD84A" opacity=".6"/>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><b>活動資訊</b><span>攤位地圖</span><span>交通</span></nav>
+  <h2>夏夜美食節</h2>
+  <p class="key">六十攤，<br><em>一晚吃完</em>。</p>
+  <dl>
+    <div><dt>日期</dt><dd><b>7/18</b>（五）<b>18:00–24:00</b></dd></div>
+    <div><dt>地點</dt><dd>公司後方停車場</dd></div>
+    <div><dt>規則</dt><dd>每人兩張餐券，現場換</dd></div>
+  </dl>
+</div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>10 摩登金｜年度頒獎典禮</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Poiret+One&family=Limelight&display=block">
+<style>
+  :root{--bg:#0D2924;--gold:#D6B46A;--cream:#F3E8CF;--zhu:#C2452C}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;color:var(--cream);font-family:"Poiret One","Noto Serif TC",serif;text-align:center;
+    background:radial-gradient(1100px 760px at 50% 46%, #15382F 0%, #0D2924 62%, #081C18 100%)}
+  svg{position:absolute;inset:0}
+  .gold{background:linear-gradient(180deg,#F1DCA0 0%,#D6B46A 45%,#A9853C 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  nav{position:absolute;left:0;right:0;top:120px;display:flex;justify-content:center;gap:48px;font:500 22px/1 "Noto Serif TC";letter-spacing:.24em;color:rgba(243,232,207,.62)}
+  nav b{font-weight:700;color:var(--gold)}
+  nav b::before,nav b::after{content:"◆";font-size:12px;vertical-align:4px;margin:0 14px;color:var(--gold)}
+  .event{position:absolute;left:0;right:0;top:214px;font:400 30px/1 "Poiret One";letter-spacing:.5em;color:var(--gold)}
+  .award{position:absolute;left:0;right:0;top:280px;font:700 58px/1.2 "Noto Serif TC";letter-spacing:.42em;padding-left:.42em}
+  h1{position:absolute;left:0;right:0;top:396px;font:900 150px/1.1 "Noto Serif TC";letter-spacing:.06em;color:var(--cream);text-shadow:0 2px 0 rgba(0,0,0,.25)}
+  p.cite{position:absolute;left:0;right:0;top:620px;font:500 46px/1.5 "Noto Serif TC";letter-spacing:.1em;color:rgba(243,232,207,.92)}
+  p.cite em{font-style:normal;font-weight:900}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F1DCA0"/><stop offset=".5" stop-color="#D6B46A"/><stop offset="1" stop-color="#A9853C"/></linearGradient>
+      <linearGradient id="gh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A9853C"/><stop offset=".5" stop-color="#F1DCA0"/><stop offset="1" stop-color="#A9853C"/></linearGradient>
+      <radialGradient id="fade" cx="50%" cy="100%" r="80%"><stop offset="0" stop-color="#D6B46A" stop-opacity=".34"/><stop offset="1" stop-color="#D6B46A" stop-opacity="0"/></radialGradient>
+    </defs>
+    <!-- sunburst rising from the stage -->
+    <g id="rays" stroke="url(#fade)" stroke-width="2"></g>
+    <!-- stepped double frame -->
+    <g fill="none" stroke="url(#g)">
+      <path id="frameOuter" stroke-width="3"/>
+      <path id="frameInner" stroke-width="1.5" opacity=".8"/>
+    </g>
+    <!-- fan at the foot of the stage -->
+    <g id="fan" fill="none" stroke="url(#g)"></g>
+    <!-- chevrons beside the award line -->
+    <g fill="none" stroke="url(#gh)" stroke-width="2.5">
+      <path d="M560 316 H700 M560 328 H690 M560 340 H680"/>
+      <path d="M1360 316 H1220 M1360 328 H1230 M1360 340 H1240"/>
+    </g>
+    <g fill="url(#g)"><path d="M545 328 l12 -12 l12 12 l-12 12 z"/><path d="M1351 328 l12 -12 l12 12 l-12 12 z"/></g>
+  </svg>
+
+  <nav aria-label="章節"><span>開場</span><span>年度新人</span><b>最佳團隊</b><span>特別貢獻</span></nav>
+  <div class="event">ANNUAL AWARDS 2026</div>
+  <div class="award gold">年度最佳團隊</div>
+  <h1>倉儲自動化小組</h1>
+  <p class="cite">這一年，他們讓出貨<em class="gold">快了兩天</em>。</p>
+</div>
+<script>
+// stepped Art Deco frame: rectangle with notched, stepped corners
+function stepped(x0, y0, x1, y1, s) {
+  const d = [];
+  d.push(`M${x0 + 3 * s} ${y0}`, `H${x1 - 3 * s}`, `v${s}`, `h${s}`, `v${s}`, `h${s}`, `v${s}`, `h${s}`,
+    `V${y1 - 3 * s}`, `h${-s}`, `v${s}`, `h${-s}`, `v${s}`, `h${-s}`, `v${s}`,
+    `H${x0 + 3 * s}`, `v${-s}`, `h${-s}`, `v${-s}`, `h${-s}`, `v${-s}`, `h${-s}`,
+    `V${y0 + 3 * s}`, `h${s}`, `v${-s}`, `h${s}`, `v${-s}`, `h${s}`, 'Z');
+  return d.join(' ');
+}
+document.getElementById('frameOuter').setAttribute('d', stepped(56, 52, 1864, 1028, 16));
+document.getElementById('frameInner').setAttribute('d', stepped(76, 72, 1844, 1008, 12));
+// rays
+let r = '';
+for (let i = 0; i <= 44; i++) {
+  const a = Math.PI + (i / 44) * Math.PI, len = i % 2 ? 900 : 1150;
+  r += `<line x1="960" y1="1008" x2="${960 + Math.cos(a) * len}" y2="${1008 + Math.sin(a) * len}"/>`;
+}
+document.getElementById('rays').innerHTML = r;
+// fan: concentric half rings plus spokes, sitting on the inner frame
+let f = '';
+for (const [rad, w] of [[90, 3], [150, 2], [210, 1.5], [270, 1.2]]) f += `<path d="M${960 - rad} 1008 A${rad} ${rad} 0 0 1 ${960 + rad} 1008" stroke-width="${w}"/>`;
+for (let i = 1; i < 12; i++) {
+  const a = Math.PI + (i / 12) * Math.PI;
+  f += `<line x1="${960 + Math.cos(a) * 90}" y1="${1008 + Math.sin(a) * 90}" x2="${960 + Math.cos(a) * 270}" y2="${1008 + Math.sin(a) * 270}" stroke-width="1.2"/>`;
+}
+f += `<path d="M900 1008 A60 60 0 0 1 1020 1008 Z" fill="url(#g)" stroke="none"/>`;
+document.getElementById('fan').innerHTML = f;
+// small quarter fans tucked into the four inner corners
+let c = '';
+for (const [x, y, sx, sy] of [[100, 96, 1, 1], [1820, 96, -1, 1], [100, 984, 1, -1], [1820, 984, -1, -1]]) {
+  let g = '';
+  for (const rad of [26, 46, 66]) g += `<path d="M${rad} 0 A${rad} ${rad} 0 0 1 0 ${rad}" stroke-width="1.4"/>`;
+  for (let i = 1; i < 4; i++) { const a = (i / 4) * Math.PI / 2; g += `<line x1="${Math.cos(a) * 26}" y1="${Math.sin(a) * 26}" x2="${Math.cos(a) * 66}" y2="${Math.sin(a) * 66}" stroke-width="1.2"/>`; }
+  c += `<g transform="translate(${x} ${y}) scale(${sx} ${sy})">${g}</g>`;
+}
+document.getElementById('fan').innerHTML += c;
+</script>
+</body>
+</html>

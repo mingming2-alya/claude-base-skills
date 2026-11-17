@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>10 攝影雜誌｜年度回顧</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Bodoni+Moda:opsz,wght@6..96,500;6..96,700;6..96,900&display=block">
+<style>
+  :root{--paper:#F3F0E9;--ink:#1D1B19;--sub:#68625A;--warm:#B5532F}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--paper)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:"Bodoni Moda","Noto Serif TC",serif}
+  svg{position:absolute;left:720px;top:0}
+  nav{position:absolute;left:96px;top:64px;display:flex;gap:34px;font:500 21px/1 "Noto Sans TC";color:#68625A;letter-spacing:.06em}
+  nav b{color:var(--ink);font-weight:700}
+  .issue{position:absolute;left:96px;top:160px;font:700 30px/1 "Noto Serif TC";letter-spacing:.24em;color:var(--ink)}
+  .issue::after{content:"";display:block;width:520px;height:1px;background:var(--ink);margin-top:20px}
+  h2{position:absolute;left:96px;top:210px;font:700 40px/1.2 "Noto Serif TC";letter-spacing:.12em}
+  p.key{position:absolute;left:92px;top:244px;font:900 86px/1.28 "Noto Serif TC";letter-spacing:.02em}
+  p.key em{font-style:normal;color:var(--warm)}
+  ol{position:absolute;left:96px;top:540px;width:540px;list-style:none}
+  ol li{display:grid;grid-template-columns:76px 1fr;align-items:baseline;padding:16px 0;border-top:1px solid #CFC8BC;font:500 28px/1.4 "Noto Serif TC";letter-spacing:.04em}
+  ol li b{font:700 30px/1 "Bodoni Moda";color:var(--warm)}
+  .year{position:absolute;left:88px;top:842px;font:900 196px/1 "Bodoni Moda";letter-spacing:-.02em;font-variation-settings:"opsz" 96}
+  .cap{position:absolute;left:1500px;top:1010px;width:380px;text-align:right;font:400 20px/1.4 "Noto Sans TC";color:rgba(255,248,238,.88);letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1200" height="1080" viewBox="0 0 1200 1080" aria-hidden="true">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2F3F55"/><stop offset=".26" stop-color="#5D6D83"/><stop offset=".45" stop-color="#B98F86"/><stop offset=".56" stop-color="#EBB894"/><stop offset=".585" stop-color="#F6D2AC"/>
+      </linearGradient>
+      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#C9A79A"/><stop offset=".12" stop-color="#8E8790"/><stop offset=".5" stop-color="#4A586A"/><stop offset="1" stop-color="#202B38"/>
+      </linearGradient>
+      <linearGradient id="glint" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9C6" stop-opacity=".95"/><stop offset=".6" stop-color="#F5C79A" stop-opacity=".35"/><stop offset="1" stop-color="#F5C79A" stop-opacity="0"/></linearGradient>
+      <radialGradient id="vig" cx="50%" cy="50%" r="75%"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".45"/></radialGradient>
+      <linearGradient id="scrim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B1118" stop-opacity="0"/><stop offset="1" stop-color="#0B1118" stop-opacity=".6"/></linearGradient>
+      <filter id="b60" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1800" height="1680"><feGaussianBlur stdDeviation="60"/></filter>
+      <filter id="b14" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1800" height="1680"><feGaussianBlur stdDeviation="14"/></filter>
+      <filter id="b3" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1800" height="1680"><feGaussianBlur stdDeviation="3"/></filter>
+      <filter id="shimmer" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1800" height="1680">
+        <feTurbulence type="fractalNoise" baseFrequency=".004 .09" numOctaves="2" seed="6" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="70" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feGaussianBlur in="d" stdDeviation="2.5"/>
+      </filter>
+      <filter id="grain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="17"/>
+        <feColorMatrix type="saturate" values="0"/>
+      </filter>
+    </defs>
+    <rect width="1200" height="640" fill="url(#sky)"/>
+    <!-- thin clouds catching the light -->
+    <g filter="url(#b14)" opacity=".55">
+      <ellipse cx="380" cy="420" rx="360" ry="16" fill="#E8B49B"/><ellipse cx="860" cy="470" rx="300" ry="12" fill="#F0C2A2"/>
+      <ellipse cx="560" cy="330" rx="420" ry="18" fill="#8D8794"/><ellipse cx="980" cy="250" rx="260" ry="14" fill="#7C7F92"/>
+    </g>
+    <!-- the sun just above the horizon -->
+    <circle cx="790" cy="604" r="140" fill="#FFD9A8" opacity=".55" filter="url(#b60)"/>
+    <circle cx="790" cy="610" r="22" fill="#FFF3DC" filter="url(#b3)"/>
+    <!-- long-exposure sea -->
+    <rect y="628" width="1200" height="452" fill="url(#sea)"/>
+    <rect x="0" y="626" width="1200" height="5" fill="#F3D3B0" opacity=".55" filter="url(#b3)"/>
+    <rect x="764" y="628" width="52" height="440" fill="url(#glint)" filter="url(#shimmer)"/>
+    <!-- rocks in the foreground -->
+    <g fill="#141C24" filter="url(#b3)">
+      <path d="M960 1080 L990 960 L1040 930 L1090 948 L1130 900 L1170 920 L1200 900 L1200 1080 Z"/>
+      <path d="M0 1080 L0 1000 L60 978 L120 996 L170 1030 L190 1080 Z"/>
+    </g>
+    <rect width="1200" height="1080" fill="url(#vig)"/>
+    <rect y="860" width="1200" height="220" fill="url(#scrim)"/>
+    <rect width="1200" height="1080" filter="url(#grain)" opacity=".12" style="mix-blend-mode:overlay"/>
+  </svg>
+
+  <nav aria-label="章節"><span>封面</span><b>這一年</b><span>三件事</span><span>明年</span></nav>
+  <div class="issue">年度回顧・第十二期</div>
+  <p class="key">這一年，<br>我們都在<em>現場</em>。</p>
+  <ol>
+    <li><b>01</b><span>做到的三件事</span></li>
+    <li><b>02</b><span>沒做好的一件事</span></li>
+    <li><b>03</b><span>明年想去的地方</span></li>
+  </ol>
+  <div class="year">2026</div>
+  <div class="cap">封面：年末清晨的海邊</div>
+</div>
+</body>
+</html>

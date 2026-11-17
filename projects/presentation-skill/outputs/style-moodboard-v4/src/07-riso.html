@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>09 孔版小誌｜週末換書市集</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=WDXL+Lubrifont+TC&family=Noto+Sans+TC:wght@500;700;900&family=Space+Mono:wght@400;700&display=block">
+<style>
+  :root{--paper:#F2EDE1;--blue:#2F4FB8;--pink:#FF4FA8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--paper)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--paper);color:var(--blue);font-family:"Space Mono","Noto Sans TC",sans-serif;font-synthesis:none}
+  svg{position:absolute;inset:0}
+  .ink{mix-blend-mode:multiply}
+  nav{position:absolute;left:120px;top:62px;display:flex;gap:14px;font:700 22px/1 "Noto Sans TC";letter-spacing:.06em}
+  nav span,nav b{padding:10px 16px;border:3px solid var(--blue)}
+  nav b{background:var(--blue);color:var(--paper)}
+  h1{position:absolute;left:112px;top:150px;font:400 196px/1.02 "WDXL Lubrifont TC";letter-spacing:.01em}
+  p.key{position:absolute;left:120px;top:576px;font:900 54px/1.45 "Noto Sans TC";letter-spacing:.03em}
+  p.key mark{background:none;color:inherit;position:relative;z-index:0}
+  p.key mark::before{content:"";position:absolute;left:-8px;right:-8px;top:14px;bottom:4px;background:var(--pink);z-index:-1;transform:translate(7px,5px) rotate(-1deg);mix-blend-mode:multiply}
+  dl{position:absolute;left:120px;top:770px;width:860px;border-top:3px solid var(--blue)}
+  dl div{display:grid;grid-template-columns:150px 1fr;align-items:baseline;padding:16px 0;border-bottom:1.5px solid var(--blue)}
+  dt{font:700 24px/1 "Noto Sans TC";letter-spacing:.2em}
+  dd{font:700 32px/1.2 "Noto Sans TC";letter-spacing:.03em}
+  dd .m{font:700 32px/1 "Space Mono"}
+  .stamp{position:absolute;left:1500px;top:770px;width:250px;height:250px;border:5px solid var(--blue);border-radius:50%;display:grid;place-items:center;transform:rotate(-12deg);text-align:center}
+  .stamp::before{content:"";position:absolute;inset:10px;border:2px solid var(--blue);border-radius:50%}
+  .stamp b{display:block;font:700 30px/1 "Space Mono";letter-spacing:.2em}
+  .stamp strong{display:block;font:400 54px/1.1 "WDXL Lubrifont TC";margin-top:6px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <!-- uneven ink coverage, shared by both drums -->
+      <filter id="inky" x="0" y="0" width="100%" height="100%" filterUnits="userSpaceOnUse">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="14" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.6 -.15" result="na"/>
+        <feComposite in="SourceGraphic" in2="na" operator="in"/>
+      </filter>
+      <filter id="grain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="3"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .35  0 0 0 0 .32  0 0 0 0 .25  0 0 0 2.4 -1.35"/>
+      </filter>
+    </defs>
+    <!-- pink drum -->
+    <g class="ink" filter="url(#inky)" id="pinkDrum"></g>
+    <!-- blue drum, printed a few pixels off -->
+    <g class="ink" filter="url(#inky)" id="blueDrum"></g>
+    <rect width="1920" height="1080" filter="url(#grain)" opacity=".6"/>
+  </svg>
+
+  <nav aria-label="章節"><b>活動介紹</b><span>怎麼換</span><span>志工招募</span></nav>
+  <h1>週末<br>換書市集</h1>
+  <p class="key">帶一本書來，<br><mark>換一個故事</mark>回去。</p>
+  <dl>
+    <div><dt>日期</dt><dd><span class="m">11.30</span>（六）<span class="m">10:00–16:00</span></dd></div>
+    <div><dt>地點</dt><dd>二樓交誼廳，搭電梯出來右轉</dd></div>
+    <div><dt>規則</dt><dd>一本換一本，每人最多三本</dd></div>
+  </dl>
+  <div class="stamp"><div><b>FREE</b><strong>免費入場</strong></div></div>
+</div>
+<script>
+const P = '#FF4FA8', B = '#2F4FB8';
+let pink = '', blue = '';
+// halftone sun: dot size falls off from the centre
+const cx = 1440, cy = 420, R = 360, step = 22;
+for (let y = cy - R; y <= cy + R; y += step) for (let x = cx - R; x <= cx + R; x += step) {
+  const d = Math.hypot(x - cx, y - cy) / R;
+  if (d > 1) continue;
+  const r = Math.max(0, (1 - Math.pow(d, 1.6)) * step * .52);
+  if (r > .8) pink += `<circle cx="${x}" cy="${y}" r="${r.toFixed(1)}"/>`;
+}
+pink = `<g fill="${P}">${pink}</g>`;
+// solid pink core
+pink += `<circle cx="${cx}" cy="${cy}" r="150" fill="${P}"/>`;
+// book stack: pink fills, blue key lines offset by the misregistration
+const books = [
+  { x: 1150, y: 700, w: 560, h: 92, a: -2 },
+  { x: 1190, y: 606, w: 500, h: 96, a: 3 },
+  { x: 1140, y: 512, w: 470, h: 96, a: -4 },
+];
+for (const b of books) {
+  pink += `<g transform="rotate(${b.a} ${b.x + b.w / 2} ${b.y + b.h / 2})"><rect x="${b.x + 9}" y="${b.y + 7}" width="${b.w}" height="${b.h}" fill="${P}"/></g>`;
+  blue += `<g transform="rotate(${b.a} ${b.x + b.w / 2} ${b.y + b.h / 2})" fill="none" stroke="${B}" stroke-width="6">
+    <rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}"/>
+    <line x1="${b.x + 60}" y1="${b.y}" x2="${b.x + 60}" y2="${b.y + b.h}"/>
+    <line x1="${b.x + b.w - 60}" y1="${b.y + 18}" x2="${b.x + b.w - 60}" y2="${b.y + b.h - 18}" stroke-width="4"/>
+    <line x1="${b.x + 100}" y1="${b.y + b.h / 2}" x2="${b.x + b.w - 110}" y2="${b.y + b.h / 2}" stroke-width="4" stroke-dasharray="10 12"/></g>`;
+}
+// an open book flying off the top of the stack
+blue += `<g transform="translate(1270 300) rotate(-10)" fill="none" stroke="${B}" stroke-width="6" stroke-linejoin="round">
+  <path d="M0 60 Q90 10 180 50 Q270 10 360 60 L360 170 Q270 130 180 170 Q90 130 0 170 Z" fill="${B}" fill-opacity=".9"/>
+  <path d="M180 50 L180 170" stroke="#F2EDE1"/>
+  <path d="M30 90 Q90 64 150 86 M30 120 Q90 94 150 116 M210 86 Q270 64 330 90 M210 116 Q270 94 330 120" stroke="#F2EDE1" stroke-width="4"/></g>`;
+// sparkles
+for (const [x, y, s] of [[1120, 230, 1], [1790, 300, .8], [1830, 640, .6]]) {
+  blue += `<path transform="translate(${x} ${y}) scale(${s})" d="M0 -40 L9 -9 L40 0 L9 9 L0 40 L-9 9 L-40 0 L-9 -9 Z" fill="${B}"/>`;
+}
+document.getElementById('pinkDrum').innerHTML = pink;
+document.getElementById('blueDrum').innerHTML = blue;
+</script>
+</body>
+</html>

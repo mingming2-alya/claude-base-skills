@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>09 日常工作款｜專案週報</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@500;600;700;800&display=block">
+<style>
+  :root{--bg:#F7F7F5;--ink:#17191C;--sub:#5F646B;--rule:#DADCDF;--ok:#1F8A5B;--warn:#C9401F;--accent:#FF5A1F}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Archivo","Noto Sans TC",sans-serif}
+  nav{position:absolute;left:120px;top:60px;display:flex;gap:0;font:500 22px/1 "Noto Sans TC";color:var(--sub);letter-spacing:.04em}
+  nav span,nav b{padding:14px 26px;border-bottom:3px solid var(--rule)}
+  nav b{color:var(--ink);font-weight:700;border-bottom-color:var(--ink)}
+  h2{position:absolute;left:120px;top:160px;font:700 40px/1.2 "Noto Sans TC";letter-spacing:.04em}
+  h2 span{font:600 40px/1.2 "Archivo";margin-right:10px}
+  p.key{position:absolute;left:120px;top:226px;font:900 60px/1.3 "Noto Sans TC";letter-spacing:.01em}
+  p.key em{font-style:normal;color:var(--warn)}
+  table{position:absolute;left:120px;top:386px;width:1120px;border-collapse:collapse;font:500 26px/1.3 "Noto Sans TC"}
+  th{font:700 20px/1 "Noto Sans TC";color:var(--sub);letter-spacing:.12em;text-align:left;padding:0 0 18px;border-bottom:2px solid var(--ink)}
+  td{padding:30px 0;border-bottom:1px solid var(--rule);vertical-align:middle}
+  td.name strong{display:block;font:700 30px/1.25 "Noto Sans TC";letter-spacing:.02em}
+  td.name small{display:block;margin-top:6px;font:500 21px/1 "Noto Sans TC";color:var(--sub)}
+  .who{width:46px;height:46px;border-radius:50%;background:#E6E8EB;display:grid;place-items:center;font:700 21px/1 "Noto Sans TC"}
+  .bar{position:relative;width:210px;height:12px;border-radius:6px;background:#E6E8EB}
+  .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--ink)}
+  .bar.late i{background:var(--warn)}
+  .pct{font:700 26px/1 "Archivo";margin-left:18px}
+  .cell{display:flex;align-items:center}
+  .pill{display:inline-block;padding:9px 16px;border-radius:999px;font:700 21px/1 "Noto Sans TC";letter-spacing:.04em}
+  .pill.ok{background:#E3F2EA;color:#17704A}
+  .pill.late{background:#FBE6DF;color:#A8331A}
+  td.next{font:500 24px/1.4 "Noto Sans TC";color:#33373C;white-space:nowrap}
+  td.next b{font:600 24px/1 "Archivo";color:var(--ink);margin-right:10px}
+  .ask{position:absolute;left:1330px;top:386px;width:470px;height:560px;background:#FFE7DA;color:var(--ink);padding:42px 40px;border-radius:6px;border-top:8px solid var(--accent)}
+  .ask small{display:block;font:700 20px/1 "Noto Sans TC";letter-spacing:.16em;color:#A8331A}
+  .ask h3{margin-top:20px;font:700 36px/1.4 "Noto Sans TC";letter-spacing:.02em}
+  .opt{margin-top:26px;padding-top:22px;border-top:1px solid rgba(23,25,28,.16)}
+  .opt b{display:block;font:700 26px/1.3 "Noto Sans TC"}
+  .opt span{display:block;margin-top:8px;font:400 22px/1.45 "Noto Sans TC";color:#4E5359}
+  .due{position:absolute;left:40px;bottom:40px;font:500 22px/1 "Noto Sans TC";color:#4E5359}
+  .due b{font:700 22px/1 "Archivo";color:#A8331A}
+</style>
+</head>
+<body>
+<div class="slide">
+  <nav aria-label="章節"><span>上週回顧</span><b>本週進度</b><span>風險</span><span>下週計畫</span></nav>
+  <h2><span>W46</span>三個專案的進度</h2>
+  <p class="key">兩個準時，<em>一個卡在供應商</em>。</p>
+
+  <table>
+    <thead><tr><th style="width:290px">專案</th><th style="width:90px">負責</th><th style="width:330px">進度</th><th style="width:150px">狀態</th><th>下一步</th></tr></thead>
+    <tbody>
+      <tr><td class="name"><strong>官網改版</strong><small>行銷部</small></td><td><div class="who">林</div></td>
+        <td><div class="cell"><div class="bar"><i style="width:80%"></i></div><span class="pct">80%</span></div></td>
+        <td><span class="pill ok">準時</span></td><td class="next"><b>11/24</b>上線前測試</td></tr>
+      <tr><td class="name"><strong>會員系統升級</strong><small>資訊部</small></td><td><div class="who">陳</div></td>
+        <td><div class="cell"><div class="bar"><i style="width:55%"></i></div><span class="pct">55%</span></div></td>
+        <td><span class="pill ok">準時</span></td><td class="next"><b>12/01</b>搬移舊資料</td></tr>
+      <tr><td class="name"><strong>新包材導入</strong><small>生產部</small></td><td><div class="who">王</div></td>
+        <td><div class="cell"><div class="bar late"><i style="width:30%"></i></div><span class="pct">30%</span></div></td>
+        <td><span class="pill late">延遲 2 週</span></td><td class="next">等供應商寄樣品</td></tr>
+    </tbody>
+  </table>
+
+  <aside class="ask">
+    <small>需要你決定</small>
+    <h3>新包材要不要<br>改找第二家供應商？</h3>
+    <div class="opt"><b>A．繼續等原廠</b><span>品質已驗證，但再延 2 週</span></div>
+    <div class="opt"><b>B．改找第二家</b><span>可準時，成本多 8%</span></div>
+    <p class="due">請在 <b>11/20</b> 前回覆</p>
+  </aside>
+</div>
+</body>
+</html>

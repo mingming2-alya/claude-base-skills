@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>07 顧問報告｜選址三方案</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500&display=block">
+<style>
+  :root{--paper:#F4F5F2;--ink:#0F2742;--sub:#55657A;--rule:#C9D0D8;--hi:#0A7A5C;--hiSoft:#E2F0EA}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--paper)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:"Source Serif 4","Noto Sans TC",sans-serif}
+  svg{position:absolute;inset:0}
+  .panel{position:absolute;left:1270px;top:0;width:650px;height:1080px;background:var(--ink)}
+  nav{position:absolute;left:120px;top:52px;display:flex;gap:0;font:500 22px/1 "Noto Sans TC";letter-spacing:.06em;color:var(--sub)}
+  nav span,nav b{padding:0 30px;border-left:1px solid var(--rule)}
+  nav span:first-child{padding-left:0;border-left:0}
+  nav b{color:var(--ink);font-weight:700}
+  h2{position:absolute;left:120px;top:128px;font:700 40px/1.2 "Noto Serif TC";letter-spacing:.06em}
+  p.key{position:absolute;left:120px;top:190px;width:1100px;font:700 56px/1.38 "Noto Serif TC";letter-spacing:.02em}
+  p.key em{font-style:normal;color:var(--hi)}
+  .label{position:absolute;font:500 22px/1.3 "Noto Sans TC";color:var(--sub);letter-spacing:.04em;white-space:nowrap}
+  .why{position:absolute;left:1360px;top:190px;width:480px;color:#F4F5F2}
+  .why h3{font:700 26px/1 "Noto Sans TC";letter-spacing:.16em;color:#A9B8CA;padding-bottom:22px;border-bottom:2px solid #F4F5F2}
+  .why ol{list-style:none}
+  .why li{display:grid;grid-template-columns:62px 1fr;padding:34px 0;border-bottom:1px solid rgba(244,245,242,.22)}
+  .why li b{font:600 48px/1 "Source Serif 4";color:#62D3AC}
+  .why li strong{display:block;font:700 32px/1.3 "Noto Sans TC";letter-spacing:.03em}
+  .why li span{display:block;margin-top:10px;font:400 24px/1.55 "Noto Sans TC";color:#C3CEDB;letter-spacing:.02em}
+  .why .rec{margin-top:40px;padding:22px 26px;border:1.5px solid #62D3AC;font:700 26px/1.5 "Noto Sans TC";letter-spacing:.04em;color:#F4F5F2}
+  .why .rec b{color:#62D3AC}
+  .src{position:absolute;left:120px;top:996px;font:400 20px/1 "IBM Plex Mono","Noto Sans TC";color:#5D697A;letter-spacing:.02em}
+  .tag{position:absolute;font:700 26px/1.2 "Noto Sans TC";letter-spacing:.04em;white-space:nowrap}
+  .tag small{display:block;font:500 21px/1.35 "Noto Sans TC";color:var(--sub);margin-top:4px;letter-spacing:.02em}
+  .tag .pill{display:inline-block;margin-top:12px;padding:10px 16px;background:var(--hi);color:#fff;font:700 22px/1 "Noto Sans TC";letter-spacing:.04em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="panel"></div>
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs><pattern id="hair" width="18" height="18" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" y1="0" x2="0" y2="18" stroke="#ffffff" stroke-opacity=".07" stroke-width="1.2"/></pattern></defs>
+    <rect x="1270" y="0" width="650" height="1080" fill="url(#hair)"/>
+    <rect x="1270" y="0" width="10" height="1080" fill="#0A7A5C"/>
+  </svg>
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true" id="chart"></svg>
+
+  <nav aria-label="章節"><span>背景</span><b>三個方案</b><span>風險</span><span>下一步</span></nav>
+  <h2>三個選址方案</h2>
+  <p class="key">建議選<em>方案 B 台中</em>：<br>投資居中，但最快量產。</p>
+
+  <div class="label" style="left:120px;top:388px">投資金額（億元）</div>
+  <div class="label" style="left:1010px;top:882px;text-align:right;width:160px">量產所需（月）</div>
+  <div class="label" style="left:200px;top:876px;color:#0A7A5C;font-weight:700">越往左下越好</div>
+  <div id="tags"></div>
+
+  <div class="why">
+    <h3>為什麼是 B</h3>
+    <ol>
+      <li><b>1</b><div><strong>最快量產</strong><span>14 個月，趕得上 2028 年的訂單高峰</span></div></li>
+      <li><b>2</b><div><strong>人才好找</strong><span>鄰近既有供應鏈，招募半徑 30 公里內</span></div></li>
+      <li><b>3</b><div><strong>審批單純</strong><span>不需跨國核准，時程風險最低</span></div></li>
+    </ol>
+    <p class="rec">請在 <b>12 月 5 日</b>前決定，<br>才趕得上明年一月動工。</p>
+  </div>
+  <div class="src">資料：2026 年第三季內部評估；金額為新台幣，含土地與設備。</div>
+</div>
+<script>
+// Scatter: x = months to production, y = investment (NT$ 100M). Lower-left is better.
+const X0 = 180, X1 = 1170, Y0 = 920, Y1 = 430;          // plot box in px
+const xm = m => X0 + (m / 30) * (X1 - X0);
+const yv = v => Y0 - (v / 80) * (Y0 - Y1);
+let s = '';
+// fine grid and axes
+for (let m = 0; m <= 30; m += 5) s += `<line x1="${xm(m)}" y1="${Y1}" x2="${xm(m)}" y2="${Y0}" stroke="#DCE1E6" stroke-width="1"/>` +
+  `<text x="${xm(m)}" y="${Y0 + 34}" font-family="Source Serif 4" font-size="22" fill="#55657A" text-anchor="middle">${m}</text>`;
+for (let v = 0; v <= 80; v += 20) s += `<line x1="${X0}" y1="${yv(v)}" x2="${X1}" y2="${yv(v)}" stroke="#DCE1E6" stroke-width="1"/>` +
+  `<text x="${X0 - 18}" y="${yv(v) + 8}" font-family="Source Serif 4" font-size="22" fill="#55657A" text-anchor="end">${v}</text>`;
+s += `<line x1="${X0}" y1="${Y0}" x2="${X1}" y2="${Y0}" stroke="#0F2742" stroke-width="2"/>`;
+s += `<line x1="${X0}" y1="${Y1}" x2="${X0}" y2="${Y0}" stroke="#0F2742" stroke-width="2"/>`;
+// "faster and cheaper" corner hint
+s += `<path d="M${X0 + 2} ${Y0 - 2} L${X0 + 2} ${yv(40)} Q${xm(10)} ${yv(40)} ${xm(16)} ${Y0 - 2} Z" fill="#E2F0EA" opacity=".7"/>`;
+const opts = [
+  { id: 'A', name: '高雄', m: 20, v: 62, hi: false, dx: 36, dy: -20, note: '投資最高' },
+  { id: 'B', name: '台中', m: 14, v: 48, hi: true, dx: 60, dy: -2, note: '', pill: '比 A 快 6 個月' },
+  { id: 'C', name: '越南', m: 26, v: 35, hi: false, dx: -150, dy: 74, note: '最省，但最慢' },
+];
+let tags = '';
+for (const o of opts) {
+  const x = xm(o.m), y = yv(o.v);
+  if (o.hi) s += `<circle cx="${x}" cy="${y}" r="44" fill="none" stroke="#0A7A5C" stroke-width="2" stroke-dasharray="4 6"/>`;
+  s += `<circle cx="${x}" cy="${y}" r="24" fill="${o.hi ? '#0A7A5C' : '#fff'}" stroke="${o.hi ? '#0A7A5C' : '#0F2742'}" stroke-width="3"/>`;
+  s += `<text x="${x}" y="${y + 9}" font-family="Source Serif 4" font-weight="700" font-size="26" fill="${o.hi ? '#fff' : '#0F2742'}" text-anchor="middle">${o.id}</text>`;
+  tags += `<div class="tag" style="left:${x + o.dx}px;top:${y + o.dy - 30}px;color:${o.hi ? '#0A7A5C' : '#0F2742'}">方案 ${o.id}　${o.name}<small>${o.v} 億・${o.m} 個月${o.note ? '・' + o.note : ''}</small>${o.pill ? `<span class="pill">${o.pill}</span>` : ''}</div>`;
+}
+document.getElementById('chart').innerHTML = s;
+document.getElementById('tags').innerHTML = tags;
+</script>
+</body>
+</html>
