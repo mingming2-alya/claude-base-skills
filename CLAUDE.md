@@ -47,6 +47,15 @@ projects/<專案名>/
 
 `.claude/settings.json` 設了一個 Stop hook（`.claude/hooks/check-sync.sh`）。結束回合前，如果 repo 有未 commit 或未推送的變更，它會擋下來提醒你先同步。被擋下時，照「怎麼同步」做完再結束；若這次變更確實不該同步（例如暫存檔），把它加進 `.gitignore` 或刪掉。
 
+## 規則三：問問題一律用互動表單
+
+使用者要求（2026-11-17）：**這個專案裡，所有要問使用者的問題一律用互動表單（AskUserQuestion）問，不在回覆文字裡提問。** 包括 Grill、審閱回饋、待使用者決定的事。
+
+- 每題都要能單獨看懂：表單打開時，使用者可能看不到前面的對話。題目和選項說明要帶上必要的脈絡，例如是哪一款風格、要看哪個檔案。
+- 題目之間不可互相依賴。需要前一題答案才能問的，留到下一張表單。
+- 一題最多 4 個選項，另有「其他」可以自由填寫。選項較多時拆成幾題，或分成幾張表單。
+- 有推薦的選項放第一個，標「（推薦）」。
+
 ## 開新對話時
 
 1. 確認目前在 `presentation-skill-generation` 分支（`git branch --show-current`）。不在的話先 `git fetch origin presentation-skill-generation && git checkout presentation-skill-generation`。
