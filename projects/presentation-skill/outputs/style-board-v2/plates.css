@@ -1,0 +1,246 @@
+/* Reference canvas: 960 × 540. make_board.py converts the same rules to
+   container-width units for the gallery and embeds these pixel rules for print. */
+.stage {
+  --sans: "Noto Sans TC","PingFang TC","Microsoft JhengHei","Noto Sans CJK TC",sans-serif;
+  --serif: "Noto Serif TC","Songti TC","PMingLiU","Noto Serif CJK TC",serif;
+  --latin: "Helvetica Neue",Arial,"Liberation Sans",sans-serif;
+  --mono: "IBM Plex Mono","SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  font: 400 16px/1.45 var(--sans);
+  -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums;
+}
+.stage h3,.stage h4,.stage p,.stage ol {margin:0}
+.stage em,.stage i {font-style:normal}
+.stage h3 {font:800 50px/1.23 var(--sans);letter-spacing:-1px}
+.stage h3 em {white-space:nowrap}
+.stage .stat b {display:block;font:700 50px/1.16 var(--latin);white-space:nowrap;letter-spacing:-2px}
+.stage .stat span {display:block;margin-top:3px;font:500 14px/1.45 var(--sans)}
+.stage .actions {padding:0;list-style:none}
+.stage .actions li {display:flex;align-items:center;gap:13px}
+.stage .actions i {font:600 13px/1.25 var(--mono);flex:none}
+.stage .actions span {font:600 19px/1.4 var(--sans);white-space:nowrap}
+.stage .vertical {display:block;text-align:center}
+.stage .vertical > span {display:block}
+
+/* 01 — facing columns, an ink-red data panel and a ruled editorial ledger. */
+.t-editorial {background:#F4E8D8;color:#39292A}
+.ed-top {position:absolute;left:42px;right:42px;top:31px;display:flex;justify-content:space-between;
+  border-top:3px solid #562E29;border-bottom:1px solid #9D7D62;padding:9px 0;color:#682F2A;font:700 14px/1.4 var(--serif)}
+.ed-lead {position:absolute;left:49px;top:104px;width:510px}
+.ed-lead h3 {font:800 58px/1.31 var(--serif)}
+.ed-lead em {color:#913526}
+.ed-data {position:absolute;left:603px;top:100px;width:314px;height:383px;padding:27px 30px;
+  background:#913526;color:#FFF5E2;border-left:8px solid #D4A16B}
+.ed-data .stat {padding:17px 0 22px}
+.ed-data .stat + .stat {border-top:1px solid #D7A592}
+.ed-data .stat b {font:700 66px/1.16 Georgia,var(--serif);letter-spacing:-3px}
+.ed-data .stat span {color:#FFEFDF}
+.ed-ledger {position:absolute;left:49px;top:318px;width:496px}
+.ed-ledger li {padding:9px 0;border-top:1px solid #BB9F84}
+.ed-ledger li:last-child {border-bottom:1px solid #BB9F84}
+.ed-ledger i {color:#913526}
+
+/* 02 — a cobalt index, the proposition and an independent band for actions. */
+.t-swiss {background:#F3F6FB;color:#132846}
+.sw-side {position:absolute;inset:0 auto 0 0;width:205px;background:#244FC9;color:white;padding:44px 24px}
+.sw-side p {width:146px;font:700 30px/1.25 var(--sans)}
+.sw-side strong {position:absolute;left:22px;bottom:88px;font:400 109px/1 var(--latin);letter-spacing:-6px}
+.sw-side>span {position:absolute;left:29px;bottom:64px;font:500 15px/1.4 var(--sans)}
+.sw-key {position:absolute;left:250px;top:54px;width:655px}
+.sw-key h3 {font:400 64px/1.18 var(--sans);letter-spacing:-2px}
+.sw-key em {font-weight:900;color:#244FC9}
+.sw-steps {position:absolute;left:205px;right:0;top:269px;height:108px;background:#172D51;color:#FFF}
+.sw-steps .actions {position:absolute;left:43px;right:37px;top:20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.sw-steps .actions li {display:block;min-width:0}
+.sw-steps i {display:block;color:#ADCAFF;margin-bottom:4px}
+.sw-numbers {position:absolute;left:250px;right:44px;top:397px;display:grid;grid-template-columns:1fr 1fr;gap:36px}
+.sw-numbers .stat {border-top:2px solid #244FC9;padding-top:9px}
+.sw-numbers .stat b {font-size:45px}
+
+/* 03 — the coloured cells carry the reading order without crossing a text cell. */
+.t-geo {background:#FBF3D9;color:#192F43}
+.ge-title {position:absolute;inset:0 auto auto 0;width:358px;height:208px;background:#087E71;color:#FFF8DC;
+  padding:37px 30px;font:800 41px/1.25 var(--sans)}
+.ge-shape {position:absolute;left:358px;top:0;width:200px;height:208px;background:#D96749;overflow:hidden}
+.ge-shape i {position:absolute;width:202px;height:202px;left:57px;top:67px;background:#E6AF40;border-radius:50%}
+.ge-pct {position:absolute;left:588px;top:23px;width:335px}
+.ge-pct .stat b {font-size:92px;color:#243F69}
+.ge-pct .stat span {font-size:16px}
+.ge-disc,.ge-triangle {position:absolute;top:208px;width:179px;height:139px;overflow:hidden}
+.ge-disc {left:0;background:#E6AF40}
+.ge-disc i {position:absolute;top:22px;left:42px;width:95px;height:95px;border-radius:50%;background:#FFF6DB}
+.ge-triangle {left:179px;background:#94C3AE}
+.ge-triangle i {position:absolute;left:51px;top:33px;width:0;height:0;border-left:39px solid transparent;border-right:39px solid transparent;border-bottom:71px solid #087E71}
+.ge-count {position:absolute;left:0;bottom:0;width:358px;height:193px;background:#243F69;color:#FFF7DF;padding:22px 30px}
+.ge-count .stat b {font-size:68px}
+.ge-key {position:absolute;left:388px;top:220px;width:535px}
+.ge-key h3 {font-size:58px;line-height:1.2}
+.ge-key em {color:#9F3628}
+.ge-steps {position:absolute;left:389px;right:34px;top:422px}
+.ge-steps ol {display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.ge-steps .actions li {display:block;border-top:2px solid #243F69;padding-top:11px}
+.ge-steps i {display:block;color:#087064;margin-bottom:4px}
+.ge-steps .actions span {font-size:17px}
+
+/* 04 — poster headline and an orange column large enough to carry the data. */
+.t-broadsheet {background:#292321;color:#FBEBD5}
+.br-title {position:absolute;left:47px;top:38px;border-top:4px solid #ED774D;width:530px;padding-top:12px;
+  color:#FBE2C5;font:600 16px/1.4 var(--sans)}
+.br-lead {position:absolute;left:44px;bottom:37px;width:528px}
+.br-lead h3 {font:900 76px/1.15 var(--sans);letter-spacing:-3px}
+.br-lead em {color:#F78960}
+.br-column {position:absolute;inset:0 0 0 auto;width:308px;padding:33px 31px;background:#ED774D;color:#30201B}
+.br-column .stat {border-top:2px solid #4E2C22;padding:12px 0 19px}
+.br-column .stat b {font:800 64px/1.12 var(--latin);letter-spacing:-3px}
+.br-column .stat span {font-size:15px}
+.br-actions {margin-top:8px;border-top:2px solid #4E2C22;padding-top:11px}
+.br-actions li {margin:8px 0}
+.br-actions .actions span {font-size:18px}
+
+/* 05 — light, a chapter inscription and three distinct content regions. */
+.t-midnight {background-color:#132E43;color:#F4EFDE;background-image:
+  radial-gradient(ellipse at 17% 74%,#347473 0%,#204953 25%,transparent 56%),
+  radial-gradient(ellipse at 70% 0%,#243954 0%,#112637 76%)}
+.mi-frame {position:absolute;inset:20px;border:1px solid #AB9970}
+.mi-art {position:absolute;left:22px;bottom:22px;width:292px;height:306px;overflow:hidden}
+.mi-art i,.mi-art b {position:absolute;display:block;border:1px solid #AAC0A1;border-radius:50%;opacity:.55}
+.mi-art i {width:358px;height:163px;bottom:-61px;left:-49px}
+.mi-art b {width:302px;height:128px;bottom:-50px;left:-21px}
+.mi-chapter {position:absolute;left:78px;top:91px;color:#E2BE75;font:600 47px/1.32 var(--serif)}
+.mi-lead {position:absolute;left:340px;top:73px;width:548px}
+.mi-lead p {color:#E1C488;font:500 15px/1.45 var(--serif);margin-bottom:16px}
+.mi-lead h3 {font:700 51px/1.3 var(--serif)}
+.mi-lead em {color:#E7C177}
+.mi-data {position:absolute;left:340px;top:286px;width:540px;display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.mi-data .stat {padding-top:10px;border-top:1px solid #968762}
+.mi-data .stat b {font:600 44px/1.18 Georgia,var(--serif);color:#F5EAD2}
+.mi-data .stat span {color:#D8E2DD;font-size:13px}
+.mi-steps {position:absolute;left:340px;right:74px;top:429px}
+.mi-steps ol {display:flex;justify-content:space-between;gap:10px;border-top:1px solid #8C8066;padding-top:12px}
+.mi-steps .actions li {gap:7px}.mi-steps i {color:#E2BE75}.mi-steps .actions span {font-weight:500;font-size:15px}
+
+/* 06 — artwork lives inside the right-hand scene. The CSS still life is complete
+   on its own; supplied art is clipped to the same region, away from the text. */
+.t-clay {color:#49382D;background-color:#F6CBB7;background-image:
+  radial-gradient(ellipse at 10% 5%,#FFF3D9 2%,transparent 59%),
+  radial-gradient(ellipse at 85% 85%,#EFB4B3 0%,transparent 62%)}
+.cl-lead {position:absolute;left:39px;top:62px;width:425px}
+.cl-lead p {color:#74503C;font-weight:700;margin-bottom:23px}
+.cl-lead h3 {font-size:50px;line-height:1.25}
+.cl-lead em {color:#9C4830}
+.cl-data {position:absolute;left:40px;top:290px;width:422px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.cl-data .stat {border-top:2px solid #C48C74;padding-top:11px}
+.cl-data .stat b {font-size:45px}
+.cl-data .stat span {font-size:12px;color:#664A38}
+.cl-actions {position:absolute;left:39px;top:431px;width:425px}
+.cl-actions ol {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.cl-actions .actions li {justify-content:center;gap:5px;padding:8px 2px;border-radius:21px;background:#FFF3DC;color:#5B3C2C}
+.cl-actions .actions i {font-size:11px;color:#93472D}
+.cl-actions .actions span {font-size:14px}
+.scene {position:absolute;left:497px;top:28px;width:439px;height:484px;border-radius:116px 116px 54px 54px;
+  overflow:hidden;background:#E8B7AA;background-image:radial-gradient(ellipse at 25% 16%,#FFF0D5 2%,#F0CCB5 39%,#CDA79F 100%)}
+.still-life,.scene-photo {position:absolute;inset:0;width:100%;height:100%}
+.scene-photo {object-fit:contain}
+.counter {position:absolute;left:-60px;top:294px;width:575px;height:260px;background:linear-gradient(170deg,#AED2C1,#80AA9E 58%,#688F86);border-radius:50% 38% 0 0}
+.loyalty {position:absolute;left:222px;top:113px;width:140px;height:103px;transform:rotate(9deg);border-radius:15px;
+  background:linear-gradient(140deg,#FFF1DC,#E9C4A1);border:2px solid #E3BC99;box-shadow:7px 12px 16px #7854422B}
+.ticket-stripe {position:absolute;top:20px;left:0;right:0;height:14px;background:#CA8B76}
+.ticket-dots {position:absolute;left:20px;bottom:19px;display:flex;gap:10px}
+.ticket-dots i {display:block;width:17px;height:17px;border-radius:50%;background:#8BB6A6}
+.ticket-dots i:last-child {background:#D9AE91}
+.saucer {position:absolute;width:241px;height:57px;left:66px;top:328px;border-radius:50%;
+  background:radial-gradient(ellipse at 44% 33%,#E7C0A4 36%,#FFE2C1 66%,#BA8F7E 93%);box-shadow:9px 15px 16px #405B543D}
+.handle {position:absolute;left:208px;top:247px;width:80px;height:75px;border:13px solid #D08971;border-radius:45%;
+  box-shadow:3px 5px 6px #6B695C38,inset 3px 2px 4px #5D74663B}
+.cup {position:absolute;left:99px;top:231px;width:144px;height:119px;border-radius:14px 14px 52px 52px;
+  background:linear-gradient(110deg,#F0B394 0%,#D68F78 57%,#BC7463 100%);box-shadow:5px 8px 10px #A475633B}
+.cup i {position:absolute;left:0;top:-7px;width:144px;height:23px;border:5px solid #F2B69A;border-radius:50%;
+  background:radial-gradient(ellipse at 42% 30%,#BD8A58,#82593C 76%)}
+.edge-image {position:absolute;max-width:24%;height:auto;max-height:26%;object-fit:contain}
+.edge-image.lower {left:0;bottom:0}.edge-image.upper {right:0;top:0}
+
+/* 07 — printed folio, vertical title and a separate red seal. */
+.t-scroll {color:#382C21;background:#EBD3AA;background-image:radial-gradient(ellipse at 68% 30%,#F8E9CB,transparent 70%)}
+.sc-border {position:absolute;inset:22px;border:3px double #9A6A4D}
+.sc-spine {position:absolute;left:27px;top:27px;bottom:27px;width:63px;background:#466055;color:#F7E7C7;
+  padding-top:49px;font:600 22px/1.58 var(--serif)}
+.sc-title {position:absolute;left:120px;top:57px;width:68px;font:700 34px/1.22 var(--serif)}
+.sc-seal {position:absolute;left:131px;bottom:62px;border:2px solid #973E2B;color:#973E2B;padding:5px;font:700 17px/1.2 var(--serif)}
+.sc-lead {position:absolute;left:236px;top:88px;width:377px}
+.sc-lead h3 {font:700 49px/1.4 var(--serif)}
+.sc-lead em {color:#973E2B}
+.sc-data {position:absolute;left:660px;top:65px;width:220px;border-left:1px solid #B48B62;padding-left:24px}
+.sc-data .stat {padding:9px 0 13px}
+.sc-data .stat + .stat {border-top:1px solid #BF9777}
+.sc-data .stat b {font:700 43px/1.2 Georgia,var(--serif);color:#843727}
+.sc-data .stat span {font-size:13px}
+.sc-actions {position:absolute;left:237px;top:326px;right:82px}
+.sc-actions li {border-top:1px solid #B48B62;padding:7px 0}
+.sc-actions li:last-child {border-bottom:1px solid #B48B62}
+.sc-actions .actions i {font:600 15px/1.4 var(--serif);color:#8E3525}
+.sc-actions .actions span {font:600 18px/1.4 var(--serif)}
+
+/* 08 — a real part-to-whole chart. Its complement comes from the same example. */
+.t-counsel {color:#193851;background:#EDF4F1}
+.co-title {position:absolute;inset:0 0 auto;height:66px;padding:20px 44px;background:#193851;color:white;font:600 19px/1.45 var(--sans)}
+.co-lead {position:absolute;left:44px;top:93px;width:862px}
+.co-lead h3 {font-size:41px;line-height:1.3}
+.co-lead em {color:#116A6C}
+.co-exhibit {position:absolute;left:44px;top:184px;width:523px;height:272px;padding:23px 24px;background:#D6E8E7}
+.co-side {position:absolute;left:604px;top:184px;width:307px}
+.co-exhibit h4,.co-side h4 {font:700 19px/1.4 var(--sans)}
+.co-readout {display:flex;align-items:baseline;gap:12px;margin-top:8px}
+.co-readout strong {font:800 60px/1.16 var(--latin);letter-spacing:-2px;color:#0E6265}
+.co-readout span {font:500 15px/1.45 var(--sans)}
+.co-bar {height:19px;width:100%;margin:10px 0 8px;background:#A4BCBF}
+.co-bar i {display:block;width:72%;height:100%;background:#147879}
+.co-key {display:flex;gap:23px;font:500 13px/1.45 var(--sans)}
+.co-key span {display:flex;align-items:center;gap:6px;white-space:nowrap;flex:none}
+.co-key i {display:block;width:10px;height:10px;background:#147879}
+.co-key span + span i {background:#A4BCBF}
+.co-exhibit .co-sample {border-top:1px solid #A0B9BB;padding-top:9px;margin-top:13px;font:500 13px/1.45 var(--sans)}
+.co-side ol {margin-top:14px}
+.co-side li {padding:13px 0;border-top:1px solid #9DB6B3}
+.co-side i {color:#116A6C}
+.co-source {position:absolute;left:45px;bottom:36px;color:#485F64;font:500 13px/1.4 var(--sans)}
+
+/* 09 — a mosaic with two metrics and a single row of three operation cards. */
+.t-bento {color:#273044;background:#DCE9FA}
+.be-title {position:absolute;left:39px;top:32px;font:700 24px/1.4 var(--sans)}
+.be-mosaic {position:absolute;inset:91px 38px 40px;display:grid;
+  grid-template-columns:1.21fr 1fr;grid-template-rows:124px 110px 105px;gap:12px}
+.be-hero,.be-pct,.be-count,.be-steps li {border-radius:18px}
+.be-hero {grid-column:1;grid-row:1/3;display:flex;align-items:center;background:#4D429A;color:#FFF7E9;padding:24px}
+.be-hero h3 {font-size:47px;line-height:1.32}
+.be-hero em {color:#D4E7AC}
+.be-pct {grid-column:2;grid-row:1;position:relative;padding:14px 22px;background:#9ED4C7}
+.be-pct .stat b,.be-count .stat b {font-size:43px}
+.be-pct .stat span,.be-count .stat span {font-size:13px}
+.be-meter {position:absolute;right:18px;top:25px;width:78px;height:10px;border-radius:6px;background:#D9F1E6;overflow:hidden}
+.be-meter i {display:block;width:72%;height:100%;background:#25675B}
+.be-count {grid-column:2;grid-row:2;padding:10px 22px;background:#FFF3D9}
+.be-steps {grid-column:1/3;grid-row:3}
+.be-steps ol {display:grid;height:100%;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.be-steps .actions li {display:block;background:#F7FAFF;padding:14px 19px}
+.be-steps i {display:block;color:#584999;margin-bottom:6px}
+.be-steps .actions span {font-size:20px}
+
+/* 10 — two print inks. The registration offset is confined to the paper. */
+.t-riso {background-color:#F4EAD3;color:#242538;
+  background-image:radial-gradient(#D3C9B8 .65px,transparent .85px);background-size:5px 5px}
+.ri-paper {position:absolute;left:40px;top:41px;width:538px;height:275px;border:3px solid #293358;
+  background:#EFA5B9;box-shadow:8px 8px 0 #5265AC}
+.ri-lead {position:absolute;left:65px;top:64px;width:470px}
+.ri-lead p {color:#563B4E;font:700 14px/1.4 var(--sans);margin-bottom:19px}
+.ri-lead h3 {font:900 48px/1.28 var(--sans)}
+.ri-lead em {color:#3B3882}
+.ri-stamp {position:absolute;left:501px;top:239px;width:55px;height:55px;display:flex;align-items:center;justify-content:center;
+  text-align:center;transform:rotate(-8deg);border:3px double #334D9D;border-radius:50%;color:#334D9D;font:900 14px/1.2 var(--serif)}
+.ri-data {position:absolute;left:625px;right:42px;top:43px}
+.ri-data .stat {border-top:3px solid #334D9D;padding:8px 0 14px}
+.ri-data .stat b {font:900 52px/1.18 var(--latin);color:#334D9D}
+.ri-data .stat span {font-size:13px}
+.ri-ledger {position:absolute;left:42px;right:42px;top:355px}
+.ri-ledger li {border-top:2px solid #334D9D;padding:5px 6px}
+.ri-ledger li:last-child {border-bottom:2px solid #334D9D}
+.ri-ledger .actions i {border:1px solid #334D9D;padding:1px 5px;color:#334D9D}
+.ri-ledger .actions span {font-size:17px}

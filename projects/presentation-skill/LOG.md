@@ -649,3 +649,10 @@
 - **「允許交錯」的落實方式**：使用者的參考簡報示範的是**安全做法**——物件貼邊、中央留空，裝飾與文字不重疊但視覺上一體。v2 的 `clay` 選擇先學這個，而不是圈字／螢光筆那類直接壓在文字上的手法。`presentation-principles.md` 第 12 條已開啟空間，但實際取用程度待使用者看過樣張再定。
 - **動態**：確定引入 Apple Design 的可打斷動態（`interruptibility`、spring、velocity handoff），來源 MIT。**本次樣張板尚未實作**，留待風格定案後在製作階段處理（涉及 `assets/runtime.js`；若要用 GSAP 需先問使用者）。
 - **交付**：`outputs/style-board-v2/`（`board.html`、`make_board.py`、`IMAGE_TODO.md`、`img/`）；`inputs/style-list-v2.md`。
+
+## 2026-11-17｜生圖按需分工、彩色樣張修訂與首批範圍
+
+- 使用者澄清生圖是依指定效果開單，由使用者生圖、Agent 整合。本輪沒有生圖待辦。
+- 修正原樣張的配色面積、數字與步驟碰撞、圖框壓字。十款保留獨立構圖，紙黏土改為可獨立顯示的 CSS 場景。
+- 凍結技能本體，現階段只審風格。以三款差異最大的候選為首批建議，名單由使用者決定。第 3、5 頁既選結構保留。
+- 更新 ROADMAP、STATUS、簡報心法、風格清單與樣張資料夾。修改構圖用 plates.css，調整樣張內容用 make_board.py，再用 Python 重建 HTML。彩色 PDF 與 JPG 依相同 HTML 列印樣式產生。逐頁檢視並檢查 PDF 字形跨行碰撞與邊界，十頁均通過。
