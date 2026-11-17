@@ -26,7 +26,13 @@ _最後更新：2026-11-17_
     3. **這是我們沒有的新調性群集**：低飽和 0.31–0.43、高明度 0.68–0.78、色相集中 46–99°（暖黃橘綠）的粉彩紙感。10 個風格裡最接近的 `washi` 在飽和度與質感上都不同。
     4. 它驗證了「圖像層提前到風格規格」的決定——這份簡報的融入**就是**圖像層與背景層一起設計的結果。
   - 其他參考的共同缺口：**真正的圖表版型**（長條圖、圓餅圖）、**水彩手繪風**、**Apple Design 的動態語彙**（spring、可打斷的動畫；`github.com/emilkowalski/skills`，MIT）。
-  - **待定案**：修訂後的風格清單與第一批範圍（初步建議 6 個：editorial、swiss、washi、broadsheet、midnight、geo）；`blueprint` 使用者已明確排除；建議新增 `counsel` 顧問報告、`scroll` 書卷刻本，以及**一個對應參考簡報的新粉彩風格**。
+  - **風格清單 v2 已做出樣張板（2026-11-17）**：`outputs/style-board-v2/board.html`（`make_board.py` 產生），清單見 `inputs/style-list-v2.md`。
+    - 新的 10 個：`editorial` `swiss` `geo` `broadsheet` `midnight` **`clay`（紙黏土，新）** **`scroll`（書卷刻本，新）** **`counsel`（顧問報告，新）** `bento` `riso`
+    - **移除** `blueprint`（使用者明確排除）與 `pop`（藍紫與 swiss 撞）；`washi` 未入選第一批（調性與 clay／scroll 重疊，留待第二批評估）
+    - **v2 的核心修正：每一格有自己的一份 HTML 骨架**，不是共用模板換皮。客觀驗證：「一句重點」起點 x 跨距從 v1 的 72px 提升到 **1048px**；45 對兩兩比較中「幾乎同骨架」的有 **0 對**；步驟排法樣式數從 3 種變 9 種。底色最小 ΔE 從 1.6 提升到 6.4。
+    - 圖像層（`clay`）：使用者決定用 AI 生圖。需求做成代辦清單 `outputs/style-board-v2/IMAGE_TODO.md`，內含參考簡報分析出的六條「融入」規則。目前用虛線佔位框，放進 `img/` 後重跑即可替換。
+    - 動態：使用者決定引入可打斷的動態（來源 `emilkowalski/skills` 的 `apple-design`，MIT）。**樣張板尚未實作**，留待風格定案後進入製作階段。
+  - **待使用者決定**：v2 樣張板的方向對不對、第一批深做哪幾個（初步建議 6 個：`editorial` `swiss` `geo` `broadsheet` `midnight` `clay`）。
   - v3.0 的 70 種排法被使用者評為「多少偏傳統」；它們留作**內容結構的清單**與容量規則的基礎，不再是最終的版型
 
 - **deck-architect v2.2**（2026-11-14）：主題從「皮」升級成「構圖」。五套主題各有自己的版面語法；大字只在標點後換行、放不下自動縮字。總覽圖在 `outputs/examples/compositions-v2.2.png`（虛構內容）。

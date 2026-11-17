@@ -1,0 +1,666 @@
+#!/usr/bin/env python3
+"""風格樣張板 v2：同一份虛構內容，用 10 個風格系統各自的「骨架」畫一次。
+
+    python3 make_board.py        # 產生 board.html
+
+與 v1 的關鍵差別：**每一格有自己的一份 HTML 結構與構圖**，不是共用模板換皮。
+v1 的錯誤是 10 格共用同一份 TILE（標題→重點→數字→步驟），只換配色與質感，
+所以被使用者判為「有些風格彼此相似」。
+"""
+from pathlib import Path
+
+OUT = Path(__file__).parent / "board.html"
+IMG_DIR = Path(__file__).parent / "img"
+
+STYLES = [
+    ("editorial",  "編輯刊物", "一本認真編的月刊：不對稱欄格、襯線巨字、帳冊列", "年度成果、策略、科普、經驗分享", "#E9DCCD", "#B23A2B", "不對稱欄格"),
+    ("swiss",      "瑞士網格", "把結構畫出來：左窄標題欄、右寬內容、底部墨帶",     "會議、提案、數據、進度回報",     "#FBFBFB", "#1D3FBF", "左欄＋墨帶"),
+    ("geo",        "幾何構成", "滿版咬合的色格：文字在文字格，幾何在幾何格",       "主題演講、發表、方法論",         "#FBFAE8", "#0A8F78", "咬合色格"),
+    ("broadsheet", "號外",     "字大到變成圖：貼底、右下巨數、整頁單色環境",       "要被記住的提案、內部推廣",       "#171717", "#E8572A", "貼底巨字"),
+    ("midnight",   "深夜舞台", "燈暗下來：內縮髮絲框、直排章名、置中的儀式感",     "發表會、開場、高階主管場合",     "#16232C", "#D2A64F", "內縮髮框"),
+    ("clay",       "紙黏土",   "暖粉漸層裡的一張大圓角卡，貼邊的黏土物件會說故事", "對外分享、科普、內部溝通",       "#FFE1DE", "#8A5A3C", "圖像主導＋貼邊物件"),
+    ("scroll",     "書卷刻本", "宋刻本的版框與界欄：直排標題、朱印、雙線框",       "文化、教育、制度說明、紀念",     "#EEC59D", "#8C2620", "版框界欄"),
+    ("counsel",    "顧問報告", "結論先講：左邊一張證據圖，右邊三條要點，底下來源", "提案、策略報告、決策會議",       "#E6EDF3", "#16324F", "證據＋要點"),
+    ("bento",      "便當格",   "產品感的卡片馬賽克：四種尺寸拼成一個完整矩形",     "產品與數據總覽、儀表板",         "#D5EAF8", "#3D2FB8", "卡片馬賽克"),
+    ("riso",       "孔版小誌", "兩色套印：黑框後的色塊故意錯位、蓋歪的印章",       "觀點、社群、展覽、設計分享",     "#EDE9E2", "#FF4FA3", "錯位套印"),
+]
+
+FONTS = ("https://fonts.googleapis.com/css2?"
+         "family=Noto+Sans+TC:wght@300;400;500;700;900"
+         "&family=Noto+Serif+TC:wght@400;600;700;900"
+         "&family=LXGW+WenKai+TC:wght@400;700"
+         "&family=Chiron+Hei+HK:wght@400;700"
+         "&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,800"
+         "&family=IBM+Plex+Mono:wght@400;500;600"
+         "&family=Archivo:wght@300;400;600;800"
+         "&family=JetBrains+Mono:wght@400;600;800"
+         "&family=Hanken+Grotesk:wght@400;600;800"
+         "&family=Barlow:wght@500;700;900"
+         "&family=Anton"
+         "&family=Space+Mono:wght@400;700"
+         "&family=Jost:wght@400;600;800"
+         "&family=DM+Mono:wght@400;500"
+         "&display=swap")
+
+
+CSS = r"""
+.stage{font-family:"Noto Sans TC",sans-serif}
+img{display:block;max-width:100%}
+
+/* ── 01 editorial 編輯刊物｜不對稱 7:5 分欄＋帳冊列 ───────────── */
+.t-editorial{background:#E9DCCD;color:#241F19;
+  background-image:radial-gradient(1100px 700px at 12% 8%,rgba(255,255,255,.55),transparent 62%)}
+.t-editorial .rule-t{position:absolute;left:132px;right:132px;top:118px;height:1px;background:#241F19}
+.t-editorial .rule-t2{position:absolute;left:132px;right:132px;top:124px;height:1px;background:#241F19}
+.t-editorial .col{position:absolute;top:172px;bottom:150px;width:1px;background:rgba(36,31,25,.22)}
+.t-editorial .c1{left:1030px}.t-editorial .c2{left:1370px}
+.t-editorial .nav{position:absolute;left:132px;top:76px;display:flex;gap:34px;
+  font:500 21px/1 "IBM Plex Mono",monospace;letter-spacing:.08em;color:#6B5F52}
+.t-editorial .nav .on{color:#B23A2B}
+.t-editorial .nav .on::before{content:"";display:inline-block;width:11px;height:11px;
+  background:#B23A2B;margin-right:12px;vertical-align:-1px}
+.t-editorial .ttl{position:absolute;left:132px;top:190px;width:840px;
+  font:600 30px/1.3 "IBM Plex Mono","Noto Sans TC",monospace;letter-spacing:.04em;color:#6B5F52}
+.t-editorial .key{position:absolute;left:132px;top:252px;width:860px;
+  font:800 126px/1.24 "Newsreader","Noto Serif TC",serif;letter-spacing:-.01em}
+.t-editorial .key em{font-style:normal;color:#B23A2B}
+.t-editorial .fig{position:absolute;color:#241F19}
+.t-editorial .f1{left:1030px;top:190px;width:310px}
+.t-editorial .f2{left:1370px;top:190px;width:420px}
+.t-editorial .fig b{display:block;font:600 122px/1 "Newsreader","Noto Serif TC",serif;letter-spacing:-.03em}
+.t-editorial .fig.f2 b{font-size:96px}
+.t-editorial .fig span{display:block;margin-top:14px;font:400 26px/1.5 "Noto Sans TC",sans-serif;color:#6B5F52}
+.t-editorial .st{position:absolute;left:132px;right:132px;bottom:132px}
+.t-editorial .st li{display:flex;align-items:baseline;gap:36px;padding:21px 0;
+  border-top:1px solid rgba(36,31,25,.3);font-size:34px}
+.t-editorial .st li:last-child{border-bottom:1px solid rgba(36,31,25,.3)}
+.t-editorial .st i{font:600 22px/1 "IBM Plex Mono",monospace;color:#B23A2B;width:52px;flex:none}
+.t-editorial .st span{font-weight:500}
+
+/* ── 02 swiss 瑞士網格｜左窄標題欄＋右寬內容＋底部墨帶 ───────── */
+.t-swiss{background:#FBFBFB;color:#0B0B0B}
+.t-swiss .bar{position:absolute;left:0;top:0;width:452px;height:1080px;background:#EDEDEB}
+.t-swiss .ttl{position:absolute;left:82px;top:132px;width:300px;
+  font:400 46px/1.32 "Archivo","Noto Sans TC",sans-serif;letter-spacing:-.01em}
+.t-swiss .chno{position:absolute;left:78px;bottom:296px;
+  font:300 230px/1 "Archivo",sans-serif;color:#1D3FBF;letter-spacing:-.05em}
+.t-swiss .chname{position:absolute;left:86px;bottom:248px;
+  font:500 23px/1 "JetBrains Mono",monospace;letter-spacing:.14em;color:#6B6B6B}
+.t-swiss .nav{position:absolute;left:520px;top:132px;display:flex;gap:40px;
+  font:500 21px/1 "JetBrains Mono",monospace;letter-spacing:.06em;color:#9A9A9A}
+.t-swiss .nav .on{color:#1D3FBF}
+.t-swiss .key{position:absolute;left:520px;top:196px;width:1268px;
+  font:300 134px/1.12 "Archivo","Noto Sans TC",sans-serif;letter-spacing:-.025em}
+.t-swiss .key em{font-style:normal;font-weight:800;color:#1D3FBF}
+.t-swiss .ink{position:absolute;left:520px;right:0;top:600px;height:250px;background:#0B0B0B}
+.t-swiss .st{position:absolute;left:580px;right:80px;top:600px;height:250px;
+  display:flex;align-items:center;gap:84px;color:#FBFBFB;margin:0;padding:0;list-style:none}
+.t-swiss .st i{display:block;font:500 21px/1 "JetBrains Mono",monospace;color:#8FA8FF;margin-bottom:16px}
+.t-swiss .st span{font:800 46px/1.25 "Noto Sans TC",sans-serif}
+.t-swiss .figrow{position:absolute;left:520px;right:80px;bottom:120px;display:flex;gap:120px}
+.t-swiss .fig{padding-top:22px;border-top:2px solid #0B0B0B}
+.t-swiss .fig b{font:800 100px/1 "Archivo",sans-serif;letter-spacing:-.03em}
+.t-swiss .fig b em{font-style:normal;color:#1D3FBF}
+.t-swiss .fig span{display:block;margin-top:12px;font-size:27px;color:#5A5A5A}
+
+/* ── 03 geo 幾何構成｜滿版咬合色格 ───────────────────────────── */
+.t-geo{background:#FBFAE8;color:#13151B}
+.t-geo .cell{position:absolute;overflow:hidden}
+.t-geo .g-navy{left:0;top:0;width:736px;height:430px;background:#172A6E}
+.t-geo .g-red{left:736px;top:0;width:392px;height:430px;background:#C8301B}
+.t-geo .g-paper{left:1128px;top:0;width:792px;height:430px;background:#FBFAE8}
+.t-geo .g-amber{left:0;top:430px;width:392px;height:322px;background:#F2A71B}
+.t-geo .g-teal{left:392px;top:430px;width:344px;height:322px;background:#0A8F78}
+.t-geo .g-text{left:736px;top:430px;width:1184px;height:650px;background:#FBFAE8}
+.t-geo .g-dark{left:0;top:752px;width:736px;height:328px;background:#13151B}
+.t-geo .ttl{position:absolute;left:78px;top:110px;width:620px;
+  font:800 88px/1.14 "Jost","Noto Sans TC",sans-serif;color:#FBFAE8;letter-spacing:-.01em}
+.t-geo .ttl .sub{display:block;margin-top:20px;font:500 24px/1 "Jost",sans-serif;
+  letter-spacing:.2em;text-transform:uppercase;color:#F2A71B}
+.t-geo .nav{position:absolute;left:78px;top:46px;display:flex;gap:26px;
+  font:600 19px/1 "Jost",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(251,250,232,.62)}
+.t-geo .nav .on{color:#FBFAE8}
+.t-geo .num-big{position:absolute;left:1176px;top:96px;
+  font:800 240px/1 "Jost",sans-serif;color:#172A6E;letter-spacing:-.05em}
+.t-geo .num-big small{font-size:92px;font-weight:600}
+.t-geo .num-lab{position:absolute;left:1184px;top:344px;width:620px;
+  font-size:27px;color:#3A4258;line-height:1.5}
+.t-geo .circle{position:absolute;left:98px;top:502px;width:192px;height:192px;
+  border-radius:50%;background:#FBFAE8;opacity:.94}
+.t-geo .tri{position:absolute;left:600px;top:548px;width:0;height:0;
+  border-left:62px solid transparent;border-right:62px solid transparent;
+  border-bottom:108px solid #FBFAE8}
+.t-geo .key{position:absolute;left:800px;top:506px;width:1064px;
+  font:900 120px/1.2 "Noto Sans TC",sans-serif;letter-spacing:-.01em}
+.t-geo .key em{font-style:normal;color:#C8301B}
+.t-geo .keybar{position:absolute;left:800px;top:686px;width:132px;height:14px;background:#C8301B}
+.t-geo .st{position:absolute;left:800px;top:762px;width:1064px;display:grid;
+  grid-template-columns:repeat(3,1fr);margin:0;padding:0;list-style:none}
+.t-geo .st li{padding:28px 28px 28px 0;border-top:2px solid #13151B}
+.t-geo .st i{display:block;font:800 30px/1 "Jost",sans-serif;color:#0A8F78;margin-bottom:14px}
+.t-geo .st span{font:700 34px/1.3 "Noto Sans TC",sans-serif}
+.t-geo .darknum{position:absolute;left:78px;top:820px;font:800 162px/1 "Jost",sans-serif;color:#FBFAE8}
+.t-geo .darklab{position:absolute;left:344px;top:882px;width:330px;
+  font-size:25px;color:rgba(251,250,232,.86);line-height:1.5}
+
+/* ── 04 broadsheet 號外｜貼底巨字＋右下巨數 ─────────────────── */
+.t-broadsheet{background:#171717;color:#F1ECE4}
+.t-broadsheet .shortline{position:absolute;left:120px;top:120px;width:46px;height:4px;background:#E8572A}
+.t-broadsheet .nav{position:absolute;left:120px;top:76px;display:flex;gap:38px;
+  font:500 20px/1 "IBM Plex Mono",monospace;letter-spacing:.16em;text-transform:uppercase;color:#8A857D}
+.t-broadsheet .nav .on{color:#E8572A}
+.t-broadsheet .ttl{position:absolute;left:120px;top:150px;width:900px;
+  font:500 25px/1 "IBM Plex Mono","Noto Sans TC",monospace;letter-spacing:.14em;color:#B0AAA1}
+.t-broadsheet .key{position:absolute;left:120px;bottom:92px;width:1180px;
+  font:900 190px/1.06 "Barlow","Noto Sans TC",sans-serif;letter-spacing:-.03em}
+.t-broadsheet .key em{font-style:normal;color:#E8572A}
+.t-broadsheet .keyrule{position:absolute;left:120px;bottom:340px;width:100px;height:6px;background:#E8572A}
+.t-broadsheet .figs{position:absolute;right:120px;top:150px;width:560px}
+.t-broadsheet .fig{padding:34px 0;border-top:2px solid #F1ECE4}
+.t-broadsheet .fig b{font:900 152px/1 "Barlow",sans-serif;letter-spacing:-.045em}
+.t-broadsheet .fig.f2 b{font-size:114px;color:#E8572A}
+.t-broadsheet .fig span{display:block;margin-top:14px;font-size:28px;color:#B0AAA1;line-height:1.45}
+.t-broadsheet .stack{position:absolute;right:120px;bottom:150px;text-align:right;
+  font:900 60px/1.3 "Noto Sans TC",sans-serif;color:#4A4740}
+
+/* ── 05 midnight 深夜舞台｜內縮髮絲框＋直排章名 ─────────────── */
+.t-midnight{background:#16232C;color:#EDE8DE;
+  background-image:
+    radial-gradient(1500px 560px at 50% 106%,rgba(210,166,79,.30),transparent 66%),
+    radial-gradient(1100px 800px at 50% 40%,rgba(255,255,255,.045),transparent 70%)}
+.t-midnight .frame-in{position:absolute;inset:44px;border:1px solid rgba(237,232,222,.20)}
+.t-midnight .corner{position:absolute;width:26px;height:26px;border:1px solid rgba(210,166,79,.85)}
+.t-midnight .tl{left:44px;top:44px;border-right:0;border-bottom:0}
+.t-midnight .tr{right:44px;top:44px;border-left:0;border-bottom:0}
+.t-midnight .bl{left:44px;bottom:44px;border-right:0;border-top:0}
+.t-midnight .br{right:44px;bottom:44px;border-left:0;border-top:0}
+.t-midnight .chname{position:absolute;left:144px;top:150px;
+  writing-mode:vertical-rl;font:700 62px/1 "Noto Serif TC",serif;letter-spacing:.22em;color:#D2A64F}
+.t-midnight .chno{position:absolute;left:232px;top:150px;
+  writing-mode:vertical-rl;font:400 24px/1 "IBM Plex Mono",monospace;
+  letter-spacing:.3em;color:rgba(237,232,222,.55)}
+.t-midnight .nav{position:absolute;left:150px;right:150px;top:150px;display:flex;gap:44px;
+  font:400 21px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;color:#8C8A86}
+.t-midnight .nav .on{color:#EDE8DE}
+.t-midnight .rule{position:absolute;left:830px;top:230px;width:66px;height:2px;background:#D2A64F}
+.t-midnight .ttl{position:absolute;left:830px;top:276px;width:900px;
+  font:400 27px/1 "IBM Plex Mono",monospace;letter-spacing:.1em;color:#DDB466}
+.t-midnight .key{position:absolute;left:830px;top:340px;width:960px;
+  font:700 114px/1.3 "Noto Serif TC",serif;letter-spacing:.01em}
+.t-midnight .key em{font-style:normal;color:#D2A64F}
+.t-midnight .figs{position:absolute;left:830px;top:642px;width:960px;display:flex;gap:96px}
+.t-midnight .fig{padding-top:26px;border-top:1px solid rgba(210,166,79,.5)}
+.t-midnight .fig b{font:700 92px/1 "Noto Serif TC",serif}
+.t-midnight .fig span{display:block;margin-top:14px;font-size:25px;color:#B7B2A8}
+.t-midnight .st{position:absolute;left:830px;bottom:150px;width:960px;margin:0;padding:0;list-style:none}
+.t-midnight .st li{display:flex;align-items:baseline;gap:26px;padding:20px 0;
+  border-bottom:1px solid rgba(210,166,79,.32)}
+.t-midnight .st li:first-child{border-top:1px solid rgba(210,166,79,.32)}
+.t-midnight .st i{font:400 22px/1 "IBM Plex Mono",monospace;color:#D2A64F;width:56px;flex:none}
+.t-midnight .st span{font:500 34px/1.2 "Noto Sans TC",sans-serif}
+
+/* ── 06 clay 紙黏土｜漸層底＋貼邊黏土物件＋圓潤大卡 ─────────── */
+.t-clay{background:#FFE1DE;color:#4A3428;
+  background-image:
+    radial-gradient(1200px 900px at 6% 2%,#FFF3E6 0%,rgba(255,243,230,0) 58%),
+    radial-gradient(1500px 1100px at 98% 98%,#F6CBDA 0%,rgba(246,203,218,0) 62%),
+    radial-gradient(900px 700px at 62% 6%,#E8EEF7 0%,rgba(232,238,247,0) 60%)}
+.t-clay .nav{position:absolute;left:96px;top:72px;display:flex;gap:30px;
+  font:600 21px/1 "Hanken Grotesk","Noto Sans TC",sans-serif;color:#9B7F6C}
+.t-clay .nav .on{color:#8A5A3C}
+.t-clay .ttl{position:absolute;left:96px;top:134px;
+  font:800 40px/1.3 "Chiron Hei HK","Noto Sans TC",sans-serif}
+.t-clay .pill{position:absolute;left:96px;top:226px;padding:11px 26px;border-radius:99px;
+  background:rgba(255,255,255,.72);color:#A05A2E;
+  font:700 22px/1.4 "Hanken Grotesk","Noto Sans TC",sans-serif}
+.t-clay .key{position:absolute;left:96px;top:306px;width:900px;
+  font:900 124px/1.24 "Chiron Hei HK","Noto Sans TC",sans-serif;letter-spacing:-.015em}
+.t-clay .key em{font-style:normal;color:#C9633A}
+.t-clay .figs{position:absolute;left:96px;top:606px;width:900px;display:flex;gap:96px}
+.t-clay .fig{padding-top:26px;border-top:3px solid rgba(138,90,60,.42)}
+.t-clay .fig b{font:800 104px/1 "Hanken Grotesk","Noto Sans TC",sans-serif;letter-spacing:-.02em}
+.t-clay .fig span{display:block;margin-top:12px;font:600 25px/1.45 "Noto Sans TC",sans-serif;color:#8B6F5C}
+.t-clay .st{position:absolute;left:96px;bottom:104px;width:900px;margin:0;padding:0;list-style:none;
+  display:flex;gap:20px}
+.t-clay .st li{background:rgba(255,253,251,.86);border-radius:99px;padding:20px 30px;
+  box-shadow:0 12px 26px rgba(150,105,90,.16);display:flex;align-items:center;gap:16px}
+.t-clay .st i{flex:none;width:46px;height:46px;border-radius:50%;background:#FFD9C4;
+  color:#A05A2E;font:800 22px/46px "Hanken Grotesk",sans-serif;text-align:center;font-style:normal}
+.t-clay .st span{font:700 30px/1.25 "Chiron Hei HK","Noto Sans TC",sans-serif}
+/* 圖像層主導：右半一張大場景圖，物件貼邊 */
+.t-clay .scene{position:absolute;left:1060px;top:150px;width:1000px;height:780px;
+  border-radius:52px;border:3px dashed rgba(150,105,90,.5);background:rgba(255,255,255,.42);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font:600 24px/1.6 "JetBrains Mono",monospace;color:#8B6F5C;
+  box-shadow:0 30px 66px rgba(150,105,90,.20)}
+.t-clay .obj{position:absolute;border:2px dashed rgba(150,105,90,.5);border-radius:30px;
+  background:rgba(255,255,255,.40);display:flex;align-items:center;justify-content:center;
+  font:600 18px/1.4 "JetBrains Mono",monospace;color:#8B6F5C;text-align:center}
+.t-clay .obj-a{left:-56px;bottom:-30px;width:340px;height:290px}
+.t-clay .obj-b{left:800px;top:120px;width:230px;height:200px;border-radius:50%}
+.t-clay .phobj::after{content:none}
+
+/* ── 07 scroll 書卷刻本｜版框界欄、直排標題、朱印 ───────────── */
+.t-scroll{background:#EEC59D;color:#2A2119;
+  background-image:radial-gradient(1400px 900px at 50% 50%,rgba(255,244,225,.62),transparent 70%)}
+.t-scroll .outer{position:absolute;inset:56px;border:3px solid #8C2620}
+.t-scroll .inner{position:absolute;inset:70px;border:1px solid #8C2620}
+.t-scroll .cols{position:absolute;top:70px;bottom:70px;width:1px;background:rgba(140,38,32,.30)}
+.t-scroll .vc1{left:1262px}
+.t-scroll .nav{position:absolute;left:96px;top:96px;display:flex;gap:30px;
+  font:500 21px/1 "Noto Sans TC",sans-serif;color:#7A5A44}
+.t-scroll .nav .on{color:#8C2620;font-weight:700}
+.t-scroll .vttl{position:absolute;left:520px;top:118px;writing-mode:vertical-rl;
+  font:700 72px/1 "Noto Serif TC",serif;letter-spacing:.14em}
+.t-scroll .seal{position:absolute;left:404px;top:124px;width:100px;height:100px;
+  background:#8C2620;color:#F6E6D2;font:700 32px/1 "Noto Serif TC",serif;
+  display:flex;align-items:center;justify-content:center;
+  writing-mode:vertical-rl;letter-spacing:.1em;border-radius:4px}
+.t-scroll .key{position:absolute;left:700px;top:150px;width:520px;
+  font:900 94px/1.34 "Noto Serif TC",serif;letter-spacing:.02em}
+.t-scroll .key em{font-style:normal;color:#8C2620}
+.t-scroll .figs{position:absolute;left:1300px;top:150px;width:520px}
+.t-scroll .fig{padding:30px 0;border-bottom:1px solid rgba(140,38,32,.34)}
+.t-scroll .fig:first-child{border-top:1px solid rgba(140,38,32,.34)}
+.t-scroll .fig b{font:700 84px/1 "Noto Serif TC",serif;color:#8C2620}
+.t-scroll .fig span{display:block;margin-top:12px;font-size:24px;color:#6B5240;line-height:1.5}
+.t-scroll .st{position:absolute;left:700px;bottom:140px;width:1120px;margin:0;padding:0;list-style:none}
+.t-scroll .st li{display:flex;align-items:baseline;gap:30px;padding:22px 0;
+  border-bottom:1px solid rgba(140,38,32,.24)}
+.t-scroll .st i{flex:none;width:50px;height:50px;border:1px solid #8C2620;border-radius:50%;
+  font:600 22px/48px "Noto Serif TC",serif;color:#8C2620;text-align:center;font-style:normal}
+.t-scroll .st span{font:600 34px/1.35 "Noto Serif TC",serif}
+.t-scroll .quote-v{position:absolute;left:196px;top:200px;writing-mode:vertical-rl;
+  font:400 30px/2.1 "Noto Serif TC",serif;color:#6B5240;letter-spacing:.1em;height:620px}
+.t-scroll .seal-s{position:absolute;left:212px;bottom:180px;width:72px;height:72px;
+  border:2px solid #8C2620;color:#8C2620;font:600 22px/1 "Noto Serif TC",serif;
+  display:flex;align-items:center;justify-content:center;border-radius:3px}
+
+/* ── 08 counsel 顧問報告｜結論標題＋左證據右要點 ────────────── */
+.t-counsel{background:#E6EDF3;color:#152026}
+.t-counsel .band{position:absolute;left:0;top:0;right:0;height:104px;background:#16324F}
+.t-counsel .nav{position:absolute;left:112px;top:38px;display:flex;gap:38px;
+  font:600 20px/1 "Hanken Grotesk","Noto Sans TC",sans-serif;letter-spacing:.1em;color:rgba(255,255,255,.66)}
+.t-counsel .nav .on{color:#fff}
+.t-counsel .dri{position:absolute;right:112px;top:38px;
+  font:600 20px/1 "Hanken Grotesk",monospace;letter-spacing:.1em;color:rgba(255,255,255,.66)}
+.t-counsel .kicker{position:absolute;left:112px;top:138px;
+  font:700 22px/1 "DM Mono",monospace;letter-spacing:.2em;text-transform:uppercase;color:#5A7A99}
+.t-counsel .ttl{position:absolute;left:112px;top:176px;width:1500px;
+  font:800 74px/1.24 "Hanken Grotesk","Noto Sans TC",sans-serif;letter-spacing:-.015em}
+.t-counsel .ttl em{font-style:normal;color:#16324F;border-bottom:6px solid #16324F}
+.t-counsel .evid{position:absolute;left:112px;top:344px;width:1000px;height:520px;
+  background:#fff;border:1px solid #C9D6E0;border-radius:6px}
+.t-counsel .under{position:absolute;left:112px;right:112px;bottom:64px;height:130px;
+  background:#D6E1EA;border-radius:6px}
+.t-counsel .figrow{position:absolute;left:152px;right:112px;bottom:88px;
+  display:flex;justify-content:space-between;align-items:center}
+.t-counsel .fig{border-left:3px solid #16324F;padding-left:22px}
+.t-counsel .fig b{font:800 70px/1 "Hanken Grotesk","Noto Sans TC",sans-serif;color:#16324F}
+.t-counsel .fig span{display:block;margin-top:8px;font-size:23px;color:#5A6B78}
+.t-counsel .key{width:640px;text-align:right;
+  font:700 29px/1.4 "Noto Sans TC",sans-serif;color:#3E5568}
+.t-counsel .evid .cap{position:absolute;left:56px;top:52px;
+  font:700 24px/1.4 "Hanken Grotesk","Noto Sans TC",sans-serif;color:#16324F}
+.t-counsel .bare{position:absolute;left:56px;right:56px;bottom:96px;top:150px;
+  display:flex;align-items:flex-end;gap:56px}
+.t-counsel .bar{flex:1;background:#16324F;border-radius:3px 3px 0 0}
+.t-counsel .bar.b2{background:#4E7FA8}
+.t-counsel .bar.b3{background:#9BB7CE}
+.t-counsel .blab{position:absolute;left:56px;right:56px;bottom:62px;display:flex;gap:56px}
+.t-counsel .blab span{flex:1;text-align:center;font:600 21px/1 "Hanken Grotesk","Noto Sans TC",sans-serif;color:#5A7A99}
+.t-counsel .points{position:absolute;left:1176px;top:344px;width:632px;margin:0;padding:0;list-style:none}
+.t-counsel .points li{padding:26px 0;border-top:1px solid #C2D0DC}
+.t-counsel .points li:last-child{border-bottom:1px solid #C2D0DC}
+.t-counsel .points i{display:block;font:700 21px/1 "DM Mono",monospace;
+  letter-spacing:.14em;color:#4E7FA8;margin-bottom:14px;font-style:normal}
+.t-counsel .points b{display:block;font:800 36px/1.3 "Hanken Grotesk","Noto Sans TC",sans-serif;margin-bottom:10px}
+.t-counsel .points span{font:400 24px/1.55 "Noto Sans TC",sans-serif;color:#4A5A66}
+.t-counsel .src{position:absolute;left:56px;bottom:32px;
+  font:400 19px/1 "DM Mono",monospace;color:#7C8B99}
+
+/* ── 09 bento 便當格｜四種尺寸卡片拼成完整矩形 ─────────────── */
+.t-bento{background:#D5EAF8;color:#1C2733;
+  background-image:radial-gradient(1200px 800px at 90% 6%,#E9F4FC,transparent 62%)}
+.t-bento .nav{position:absolute;left:96px;top:64px;display:flex;gap:28px;
+  font:700 21px/1 "Hanken Grotesk","Noto Sans TC",sans-serif;color:#5E7C93}
+.t-bento .nav .on{color:#3D2FB8}
+.t-bento .ttl{position:absolute;left:96px;top:116px;
+  font:800 46px/1.3 "Chiron Hei HK","Noto Sans TC",sans-serif}
+.t-bento .card{position:absolute;background:#FBFDFF;border:1px solid #C6DCEC;border-radius:26px;
+  box-shadow:0 12px 28px rgba(70,110,150,.13)}
+.t-bento .c-key{left:96px;top:214px;width:848px;height:436px;padding:56px 60px}
+.t-bento .c-f1{left:976px;top:214px;width:848px;height:200px}
+.t-bento .c-f2{left:976px;top:450px;width:404px;height:200px}
+.t-bento .c-spark{left:1420px;top:450px;width:404px;height:200px}
+.t-bento .c-s1{left:96px;top:686px;width:536px;height:274px}
+.t-bento .c-s2{left:664px;top:686px;width:536px;height:274px}
+.t-bento .c-s3{left:1232px;top:686px;width:592px;height:274px}
+.t-bento .tag{position:absolute;left:56px;top:48px;padding:8px 20px;border-radius:99px;
+  background:#E4EEF7;color:#4A6B85;font:700 21px/1.4 "Hanken Grotesk","Noto Sans TC",sans-serif}
+.t-bento .key{position:absolute;left:60px;top:172px;width:720px;
+  font:900 92px/1.26 "Chiron Hei HK","Noto Sans TC",sans-serif;letter-spacing:-.01em}
+.t-bento .key em{font-style:normal;color:#3D2FB8}
+.t-bento .fig{padding:36px 48px;display:flex;align-items:baseline;gap:22px}
+.t-bento .fig b{font:800 98px/1 "Hanken Grotesk","Noto Sans TC",sans-serif;letter-spacing:-.02em}
+.t-bento .fig span{font:600 25px/1.4 "Noto Sans TC",sans-serif;color:#5E7C93}
+.t-bento .f2 b{font-size:82px}
+.t-bento .f2 span{font-size:23px}
+.t-bento .spark{padding:40px 44px}
+.t-bento .spark .lab{font:700 22px/1 "Hanken Grotesk",sans-serif;color:#5E7C93;margin-bottom:18px}
+.t-bento .spark .line{display:flex;align-items:flex-end;gap:12px;height:78px}
+.t-bento .spark .line i{flex:1;background:#3D2FB8;border-radius:4px 4px 0 0;opacity:.85}
+.t-bento .st{padding:44px 48px}
+.t-bento .st i{display:inline-block;padding:6px 16px;border-radius:99px;background:#EDE9FF;
+  color:#3D2FB8;font:700 21px/1.4 "Hanken Grotesk",sans-serif;margin-bottom:22px;font-style:normal}
+.t-bento .st span{display:block;font:800 42px/1.25 "Chiron Hei HK","Noto Sans TC",sans-serif}
+
+/* ── 10 riso 孔版小誌｜3px 黑框＋錯位色塊＋蓋歪的印章 ───────── */
+.t-riso{background:#EDE9E2;color:#161514}
+.t-riso .noise{position:absolute;inset:0;opacity:.28;
+  background-image:radial-gradient(rgba(22,21,20,.5) 1px,transparent 1.4px);
+  background-size:7px 7px}
+.t-riso .nav{position:absolute;left:104px;top:70px;display:flex;gap:32px;
+  font:700 21px/1 "Space Mono",monospace;color:#6A665E}
+.t-riso .nav .on{color:#FF4FA3}
+.t-riso .frame{position:absolute;left:104px;top:150px;width:1128px;height:572px;
+  border:3px solid #161514;background:rgba(255,255,255,.34);
+  box-shadow:18px 18px 0 rgba(43,59,208,.34)}
+.t-riso .pill{position:absolute;left:152px;top:206px;width:206px;height:46px;
+  border:3px solid #161514;background:#FF4FA3}
+.t-riso .pill span{display:block;transform:translate(9px,-3px);
+  font:700 22px/46px "Space Mono",monospace}
+.t-riso .ttl{position:absolute;left:152px;top:278px;
+  font:400 27px/1 "Space Mono","Noto Sans TC",monospace;letter-spacing:.06em;color:#5A564E}
+.t-riso .key{position:absolute;left:152px;top:326px;width:1020px;
+  font:900 108px/1.22 "Anton","Noto Sans TC",sans-serif}
+.t-riso .key em{font-style:normal;color:#FF4FA3}
+.t-riso .stamp{position:absolute;left:1030px;top:596px;width:152px;height:152px;
+  border:3px solid #2B3BD0;border-radius:50%;transform:rotate(-8deg);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font:700 25px/1.25 "Space Mono",monospace;color:#2B3BD0}
+.t-riso .stamp::after{content:"";position:absolute;inset:13px;border:1px dashed #2B3BD0;border-radius:50%}
+.t-riso .figs{position:absolute;left:1288px;top:150px;width:528px}
+.t-riso .fig{padding:32px 0 30px;border-bottom:3px solid #161514}
+.t-riso .fig:first-child{border-top:3px solid #161514}
+.t-riso .fig b{font:900 104px/1 "Anton",sans-serif}
+.t-riso .fig.f2 b{color:#2B3BD0}
+.t-riso .fig span{display:block;margin-top:10px;font:500 25px/1.45 "Noto Sans TC",sans-serif;color:#4E4A43}
+.t-riso .ledger{position:absolute;left:104px;bottom:104px;width:1712px;margin:0;padding:0;list-style:none}
+.t-riso .ledger li{display:flex;align-items:center;gap:30px;padding:19px 24px;
+  border-top:3px solid #161514;background:rgba(255,255,255,.30)}
+.t-riso .ledger li:last-child{border-bottom:3px solid #161514}
+.t-riso .ledger i{flex:none;width:54px;height:44px;border:3px solid #161514;
+  font:700 22px/40px "Space Mono",monospace;text-align:center;font-style:normal}
+.t-riso .ledger span{font:700 36px/1.2 "Noto Sans TC",sans-serif}
+.t-riso .ledger em{font-style:normal;margin-left:auto;font:700 24px/1 "Space Mono",monospace;color:#2B3BD0}
+"""
+
+HEAD = f"""<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<title>風格樣張板 v2 · 10 個風格系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="{FONTS}" rel="stylesheet">
+<style>
+*{{box-sizing:border-box}}
+body{{margin:0;background:#2A2A2E;font-family:"Noto Sans TC",sans-serif;color:#EDEDED}}
+header{{padding:40px 48px 8px}}
+h1{{margin:0 0 8px;font-size:26px;font-weight:900;letter-spacing:.02em}}
+header p{{margin:0;color:#A9A9AE;font-size:14px;line-height:1.7;max-width:1180px}}
+.note{{margin:14px 0 0;padding:12px 16px;border-left:3px solid #E8572A;background:#33333A;
+       color:#D6D6DA;font-size:13px;line-height:1.75;max-width:1180px;border-radius:0 6px 6px 0}}
+.grid{{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:26px;padding:26px 48px 64px}}
+figure.tile{{margin:0;background:#1E1E22;border-radius:12px;overflow:hidden;
+             box-shadow:0 6px 26px rgba(0,0,0,.42)}}
+.frame{{position:relative;width:100%;aspect-ratio:1920/1080;overflow:hidden}}
+.stage{{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;
+        transform-origin:0 0;line-height:1.5;font-synthesis:none;
+        -webkit-font-smoothing:antialiased;font-feature-settings:"halt" 1}}
+figcaption{{padding:14px 18px 18px;font-size:13px;line-height:1.7;color:#B9B9BF}}
+figcaption b{{color:#fff;font-size:15px;margin-right:6px}}
+figcaption code{{font-family:"JetBrains Mono",monospace;font-size:12px;color:#8FD8C0;
+                 background:#2A2A30;padding:2px 7px;border-radius:5px;margin:0 6px}}
+figcaption em{{font-style:normal;color:#F0A87A}}
+figcaption small{{display:block;margin-top:6px;color:#8A8A92}}
+@media (max-width:1100px){{.grid{{grid-template-columns:1fr}}}}
+{CSS}
+</style></head><body>
+<header>
+<h1>風格樣張板 v2 · 10 個風格系統</h1>
+<p>同一份虛構內容（一句重點、兩個數字、三個步驟），用 10 個風格系統各自的<strong>骨架</strong>畫一次。
+這次每一格的<strong>版面結構都不同</strong>——不是共用模板換皮。四層分開：背景層、圖像層、元素層、文字層。</p>
+<div class="note"><strong>這是定調用的草樣，不是完成的版型。</strong>每個風格之後會替 14 種內容結構各設計 3–5 種排法。
+括號內是骨架名稱；虛線框是等 AI 生成圖進來的佔位（見 IMAGE_TODO.md）。</div>
+</header>
+<div class="grid">
+"""
+
+TAIL = """</div>
+<script>
+function fit(){
+  document.querySelectorAll('.frame').forEach(function(f){
+    var s=f.querySelector('.stage'); if(!s) return;
+    s.style.transform='scale('+(f.clientWidth/1920)+')';
+  });
+}
+window.addEventListener('resize',fit); window.addEventListener('load',fit); fit();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+</script></body></html>
+"""
+
+
+
+NAV = ['為什麼', '怎麼做', '成果']
+
+BODIES = {}
+
+BODIES['editorial'] = """
+<div class="rule-t"></div><div class="rule-t2"></div>
+<div class="col c1"></div><div class="col c2"></div>
+<nav class="nav">{nav}</nav>
+<div class="ttl">常客為什麼重要</div>
+<div class="key">客人回來，<br>是因為<em>被記得</em></div>
+<div class="fig f1"><b>72<small>%</small></b><span>的常客每週來三次以上</span></div>
+<div class="fig f2"><b>1,840</b><span>位常客，每週至少來一次</span></div>
+<ol class="st">
+  <li><i>01</i><span>記下偏好</span></li>
+  <li><i>02</i><span>叫出名字</span></li>
+  <li><i>03</i><span>主動推薦</span></li>
+</ol>
+"""
+
+BODIES['swiss'] = """
+<div class="bar"></div>
+<nav class="nav">{nav}</nav>
+<div class="ttl">常客為什麼重要</div>
+<div class="chno">03</div>
+<div class="chname">WHY LOYALTY</div>
+<div class="key">客人回來，是因為<em>被記得</em></div>
+<div class="ink"></div>
+<ul class="st">
+  <li><i>01</i><span>記下偏好</span></li>
+  <li><i>02</i><span>叫出名字</span></li>
+  <li><i>03</i><span>主動推薦</span></li>
+</ul>
+<div class="figrow">
+  <div class="fig"><b>72<em>%</em></b><span>的常客每週來三次以上</span></div>
+  <div class="fig"><b>1,840</b><span>位常客，每週至少來一次</span></div>
+</div>
+"""
+
+BODIES['geo'] = """
+<div class="cell g-navy"></div><div class="cell g-red"></div><div class="cell g-paper"></div>
+<div class="cell g-amber"></div><div class="cell g-teal"></div>
+<div class="cell g-text"></div><div class="cell g-dark"></div>
+<nav class="nav">{nav}</nav>
+<div class="ttl">常客為什麼重要<span class="sub">Why Loyalty</span></div>
+<div class="num-big">72<small>%</small></div>
+<div class="num-lab">的常客每週來三次以上</div>
+<div class="circle"></div><div class="tri"></div>
+<div class="key">客人回來，<br>是因為<em>被記得</em></div>
+<div class="keybar"></div>
+<ol class="st">
+  <li><i>01</i><span>記下偏好</span></li>
+  <li><i>02</i><span>叫出名字</span></li>
+  <li><i>03</i><span>主動推薦</span></li>
+</ol>
+<div class="darknum">1,840</div>
+<div class="darklab">位常客，每週至少來一次</div>
+"""
+
+BODIES['broadsheet'] = """
+<div class="shortline"></div>
+<nav class="nav">{nav}</nav>
+<div class="ttl">常客為什麼重要</div>
+<div class="keyrule"></div>
+<div class="key">客人回來，<br>是因為<em>被記得</em></div>
+<div class="figs">
+  <div class="fig"><b>72%</b><span>的常客每週來三次以上</span></div>
+  <div class="fig f2"><b>1,840</b><span>位常客，每週至少來一次</span></div>
+</div>
+<div class="stack">記下偏好<br>叫出名字<br>主動推薦</div>
+"""
+
+BODIES['midnight'] = """
+<div class="frame-in"></div>
+<div class="corner tl"></div><div class="corner tr"></div>
+<div class="corner bl"></div><div class="corner br"></div>
+<nav class="nav">{nav}</nav>
+<div class="chname">常客</div>
+<div class="chno">03</div>
+<div class="rule"></div>
+<div class="ttl">常客為什麼重要</div>
+<div class="key">客人回來，<br>是因為<em>被記得</em></div>
+<div class="figs">
+  <div class="fig"><b>72%</b><span>的常客每週來三次以上</span></div>
+  <div class="fig"><b>1,840</b><span>位常客，每週至少來一次</span></div>
+</div>
+<ol class="st">
+  <li><i>01</i><span>記下偏好</span></li>
+  <li><i>02</i><span>叫出名字</span></li>
+  <li><i>03</i><span>主動推薦</span></li>
+</ol>
+"""
+
+BODIES['clay'] = """
+<nav class="nav">{nav}</nav>
+<div class="ttl">常客為什麼重要</div>
+<div class="key">客人回來，<br>是因為<em>被記得</em></div>
+<div class="pill">核心洞見</div>
+<div class="figs">
+  <div class="fig"><b>72%</b><span>的常客每週來三次以上</span></div>
+  <div class="fig"><b>1,840</b><span>位常客，每週至少來一次</span></div>
+</div>
+<ol class="st">
+  <li><i>1</i><span>記下偏好</span></li>
+  <li><i>2</i><span>叫出名字</span></li>
+  <li><i>3</i><span>主動推薦</span></li>
+</ol>
+<div class="scene phobj">AI 生成場景圖<br>（店員記得客人）</div>
+<div class="obj obj-a phobj">黏土物件</div>
+<div class="obj obj-b phobj">黏土物件</div>
+"""
+
+BODIES['scroll'] = """
+<div class="outer"></div><div class="inner"></div>
+<div class="cols vc1"></div>
+<nav class="nav">{nav}</nav>
+<div class="seal">常客</div>
+<div class="vttl">常客為什麼重要</div>
+<div class="quote-v">客人回來<br>是因為被記得</div>
+<div class="key">客人回來，<br>是因為<em>被記得</em></div>
+<div class="figs">
+  <div class="fig"><b>72%</b><span>的常客每週來三次以上</span></div>
+  <div class="fig"><b>1,840</b><span>位常客，每週至少來一次</span></div>
+</div>
+<ol class="st">
+  <li><i>一</i><span>記下偏好</span></li>
+  <li><i>二</i><span>叫出名字</span></li>
+  <li><i>三</i><span>主動推薦</span></li>
+</ol>
+<div class="seal-s">印</div>
+"""
+
+BODIES['counsel'] = """
+<div class="band"></div>
+<nav class="nav">{nav}</nav>
+<div class="dri">DRI: SW</div>
+<div class="kicker">Evidence</div>
+<div class="ttl">要留住營收，<em>先把常客服務做成制度</em></div>
+<div class="evid">
+  <div class="cap">常客回訪頻率（每週次數）</div>
+  <div class="bare">
+    <div class="bar" style="height:78%"></div>
+    <div class="bar b2" style="height:52%"></div>
+    <div class="bar b3" style="height:30%"></div>
+  </div>
+  <div class="blab"><span>三次以上</span><span>一至兩次</span><span>不固定</span></div>
+  <div class="src">資料來源：內部營運資料，2026 Q1–Q3｜範圍：全門市</div>
+</div>
+<ol class="points">
+  <li><i>FINDING 01</i><b>72% 的常客每週來三次以上</b><span>回訪不是靠促銷，是靠被認出來。</span></li>
+  <li><i>FINDING 02</i><b>1,840 位常客是主要營收基底</b><span>穩定性高於一次性客群。</span></li>
+  <li><i>FINDING 03</i><b>三個動作就能開始</b><span>記下偏好、叫出名字、主動推薦。</span></li>
+</ol>
+<div class="under"></div>
+<div class="figrow">
+  <div class="fig"><b>72%</b><span>常客每週三次以上</span></div>
+  <div class="key">建議：把「記得客人」寫進服務流程</div>
+</div>
+"""
+
+BODIES['bento'] = """
+<nav class="nav">{nav}</nav>
+<div class="ttl">常客為什麼重要</div>
+<div class="card c-key"><div class="tag">核心洞見</div>
+  <div class="key">客人回來，<br>是因為<em>被記得</em></div></div>
+<div class="card c-f1"><div class="fig"><b>72%</b><span>的常客每週來三次以上</span></div></div>
+<div class="card c-f2"><div class="fig f2"><b>1,840</b><span>位常客</span></div></div>
+<div class="card c-spark"><div class="spark"><div class="lab">每週回訪</div>
+  <div class="line"><i style="height:38%"></i><i style="height:56%"></i><i style="height:72%"></i>
+  <i style="height:64%"></i><i style="height:88%"></i><i style="height:100%"></i></div></div></div>
+<div class="card c-s1"><div class="st"><i>01</i><span>記下偏好</span></div></div>
+<div class="card c-s2"><div class="st"><i>02</i><span>叫出名字</span></div></div>
+<div class="card c-s3"><div class="st"><i>03</i><span>主動推薦</span></div></div>
+"""
+
+BODIES['riso'] = """
+<div class="noise"></div>
+<nav class="nav">{nav}</nav>
+<div class="frame"></div>
+<div class="pill"><span>核心洞見</span></div>
+<div class="ttl">常客為什麼重要</div>
+<div class="key">客人回來，<br>是因為<em>被記得</em></div>
+<div class="stamp">常客<br>認證</div>
+<div class="figs">
+  <div class="fig"><b>72%</b><span>的常客每週來三次以上</span></div>
+  <div class="fig f2"><b>1,840</b><span>位常客，每週至少來一次</span></div>
+</div>
+<ul class="ledger">
+  <li><i>01</i><span>記下偏好</span><em>NOW</em></li>
+  <li><i>02</i><span>叫出名字</span><em>NEXT</em></li>
+  <li><i>03</i><span>主動推薦</span><em>THEN</em></li>
+</ul>
+"""
+
+
+def build():
+    parts = [HEAD]
+    for i, (sid, zh, what, use, bg, ac, skel) in enumerate(STYLES, 1):
+        nav = "".join(
+            '<span class="on">%s</span>' % t if k == 0 else '<span>%s</span>' % t
+            for k, t in enumerate(NAV))
+        body = BODIES[sid].replace("{nav}", nav)
+        parts.append(
+            '<figure class="tile"><div class="frame"><div class="stage t-%s">%s</div></div>'
+            '<figcaption><b>%02d</b> <strong>%s</strong><code>%s</code><em>%s</em>'
+            '<br>%s<br><small>適合：%s</small></figcaption></figure>\n'
+            % (sid, body, i, zh, sid, skel, what, use))
+    parts.append(TAIL)
+    OUT.write_text("".join(parts), encoding="utf-8")
+    print("已輸出：%s（10 個風格，每個骨架不同）" % OUT)
+
+
+if __name__ == "__main__":
+    build()
