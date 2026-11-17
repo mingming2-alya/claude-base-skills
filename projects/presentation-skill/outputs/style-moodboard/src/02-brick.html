@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>02 積木｜平台分工</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Rubik:wght@600;800&display=block">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:#2A66DD}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;color:#fff;font-family:"Rubik","Noto Sans TC",sans-serif;
+    background:
+      radial-gradient(900px 700px at 72% 58%, rgba(120,180,255,.55) 0%, rgba(120,180,255,0) 70%),
+      radial-gradient(1100px 800px at 0% 0%, #3E86F4 0%, rgba(62,134,244,0) 70%),
+      linear-gradient(160deg,#2F72E8 0%,#2A63D8 55%,#2253C4 100%);}
+  svg.scene{position:absolute;inset:0}
+  nav{position:absolute;left:140px;top:66px;display:flex;gap:46px;font:500 24px/1 "Noto Sans TC";color:rgba(255,255,255,.86);letter-spacing:.04em}
+  nav b{color:#fff;font-weight:700;position:relative}
+  nav b::before{content:"";position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:3px;background:#FFD54A}
+  .copy{position:absolute;left:140px;top:200px;width:820px}
+  .copy h2{font:700 40px/1.2 "Noto Sans TC";color:#D6E4FF;letter-spacing:.06em}
+  .copy p.key{margin-top:28px;font:900 92px/1.22 "Noto Sans TC";letter-spacing:.02em}
+  .copy p.key em{font-style:normal;color:#FFD54A}
+  ol.layers{position:absolute;left:140px;top:612px;list-style:none;display:grid;gap:34px}
+  ol.layers li{display:grid;grid-template-columns:76px 1fr;column-gap:28px;align-items:center}
+  ol.layers i{width:76px;height:58px;border-radius:10px;position:relative;box-shadow:inset 0 -9px 0 rgba(0,0,0,.18), 0 8px 16px rgba(10,30,90,.25)}
+  ol.layers i::before,ol.layers i::after{content:"";position:absolute;top:-9px;width:22px;height:12px;border-radius:5px 5px 2px 2px;background:inherit;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
+  ol.layers i::before{left:12px} ol.layers i::after{right:12px}
+  ol.layers strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em}
+  ol.layers span{display:block;margin-top:4px;font:400 26px/1.35 "Noto Sans TC";color:#D3E2FF;letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" id="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="blur30" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>
+      <filter id="blur10" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+    </defs>
+    <ellipse cx="1430" cy="990" rx="470" ry="70" fill="#123A8C" opacity=".45" filter="url(#blur30)"/>
+    <g id="bricks"></g>
+  </svg>
+
+  <nav aria-label="章節"><span>為什麼要共用</span><b>平台分工</b><span>怎麼接上</span><span>時程</span></nav>
+
+  <div class="copy">
+    <h2>平台怎麼分工</h2>
+    <p class="key">底層<em>一起蓋</em>，<br>上層<em>各自長</em>。</p>
+  </div>
+
+  <ol class="layers">
+    <li><i style="background:#FFC928"></i><div><strong>各事業的應用</strong><span>依自己的需要往上加蓋</span></div></li>
+    <li><i style="background:#E8443A"></i><div><strong>共用服務</strong><span>登入、通知、報表，做一次大家用</span></div></li>
+    <li><i style="background:#3BAA5E"></i><div><strong>資料底座</strong><span>一份資料，全公司共用</span></div></li>
+  </ol>
+</div>
+<script>
+// Isometric brick builder. Units: studs on the floor plane, pixels for height.
+const U = 54, A = U * Math.cos(Math.PI / 6), B = U * 0.5, OX = 1376, OY = 492;
+const P = (x, y, z) => [OX + (x - y) * A, OY + (x + y) * B - z];
+const COLORS = {
+  green:  { top: '#55C477', left: '#38A65A', right: '#24813F', stud: '#62D184' },
+  red:    { top: '#F45E50', left: '#D9402F', right: '#A92B21', stud: '#FF7466' },
+  yellow: { top: '#FFD95A', left: '#F4BC0B', right: '#C99500', stud: '#FFE37E' },
+  white:  { top: '#FBFBF7', left: '#E1E2DA', right: '#BEC1BA', stud: '#FFFFFF' },
+  orange: { top: '#FFA552', left: '#F2831E', right: '#C26311', stud: '#FFB874' },
+};
+const poly = pts => pts.map(p => p.join(',')).join(' ');
+function brick(x, y, w, d, z, h, color) {
+  const c = COLORS[color], z1 = z + h;
+  let s = '';
+  // right face (+x) and left face (+y), then top
+  s += `<polygon points="${poly([P(x+w,y,z1),P(x+w,y+d,z1),P(x+w,y+d,z),P(x+w,y,z)])}" fill="${c.right}"/>`;
+  s += `<polygon points="${poly([P(x,y+d,z1),P(x+w,y+d,z1),P(x+w,y+d,z),P(x,y+d,z)])}" fill="${c.left}"/>`;
+  s += `<polygon points="${poly([P(x,y,z1),P(x+w,y,z1),P(x+w,y+d,z1),P(x,y+d,z1)])}" fill="${c.top}"/>`;
+  // glossy edge highlights along the lit edges
+  s += `<polyline points="${poly([P(x,y+d,z1),P(x,y,z1),P(x+w,y,z1)])}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5" stroke-linejoin="round"/>`;
+  s += `<line x1="${P(x,y+d,z1)[0]}" y1="${P(x,y+d,z1)[1]}" x2="${P(x+w,y+d,z1)[0]}" y2="${P(x+w,y+d,z1)[1]}" stroke="#fff" stroke-opacity=".28" stroke-width="2"/>`;
+  // studs, back to front
+  const studs = [];
+  for (let i = 0; i < w; i++) for (let j = 0; j < d; j++) studs.push([x + i + .5, y + j + .5]);
+  studs.sort((p, q) => (p[0] + p[1]) - (q[0] + q[1]));
+  const rx = Math.SQRT2 * 0.3 * A, ry = Math.SQRT2 * 0.3 * B, sh = 10;
+  for (const [sx, sy] of studs) {
+    const [cx, cy] = P(sx, sy, z1);
+    s += `<path d="M${cx-rx},${cy} v${-sh} a${rx},${ry} 0 0 0 ${2*rx},0 v${sh} a${rx},${ry} 0 0 1 ${-2*rx},0 z" fill="${c.left}"/>`;
+    s += `<path d="M${cx+rx*0.15},${cy+ry} a${rx},${ry} 0 0 0 ${rx*0.85},${-ry} v${-sh} a${rx},${ry} 0 0 1 ${-rx*0.85},${ry} z" fill="${c.right}" opacity=".9"/>`;
+    s += `<ellipse cx="${cx}" cy="${cy-sh}" rx="${rx}" ry="${ry}" fill="${c.stud}"/>`;
+    s += `<path d="M${cx-rx*0.7},${cy-sh-ry*0.25} a${rx*0.75},${ry*0.6} 0 0 1 ${rx*0.75},${-ry*0.55}" stroke="#fff" stroke-opacity=".7" stroke-width="2.4" fill="none" stroke-linecap="round"/>`;
+  }
+  return s;
+}
+const PLATE = 18, BRICK = 52;
+const list = [];
+const add = (x, y, w, d, layer, h, color, zOverride) => list.push({ x, y, w, d, z: zOverride ?? layer, h, color });
+// Layer 0: the shared data baseplate
+add(0, 0, 10, 8, 0, PLATE, 'green');
+// Layer 1: shared services, a solid red band
+for (const [x, y] of [[1,1],[5,1],[1,3],[5,3],[1,5],[5,5]]) add(x, y, 4, 2, PLATE, BRICK, 'red');
+// Layer 2+: each business grows its own stack
+const L2 = PLATE + BRICK, L3 = L2 + BRICK, L4 = L3 + BRICK;
+add(1, 1, 2, 2, L2, BRICK, 'yellow'); add(1, 1, 2, 2, L3, BRICK, 'yellow'); add(1, 1, 2, 2, L4, BRICK, 'orange');
+add(4, 1, 4, 2, L2, BRICK, 'white');
+add(1, 4, 2, 3, L2, BRICK, 'orange'); add(1, 4, 2, 3, L3, BRICK, 'white');
+add(5, 4, 4, 2, L2, BRICK, 'yellow');
+add(6, 4, 2, 2, L3, BRICK, 'white');
+list.sort((p, q) => (p.z - q.z) || ((p.x + p.y) - (q.x + q.y)));
+let svg = list.map(b => brick(b.x, b.y, b.w, b.d, b.z, b.h, b.color)).join('');
+// A brick being placed: soft drop shadow on the target, then the floating brick
+svg += brick(4, 1, 4, 2, L3 + 150, BRICK, 'yellow');
+svg += `<g stroke="#fff" stroke-opacity=".75" stroke-width="3" stroke-dasharray="2 12" stroke-linecap="round">` +
+  [[4,3],[8,3],[8,1]].map(([x,y]) => { const a = P(x,y,L3+150), b = P(x,y,L3+14); return `<line x1="${a[0]}" y1="${a[1]+6}" x2="${b[0]}" y2="${b[1]}"/>`; }).join('') + `</g>`;
+document.getElementById('bricks').innerHTML = svg;
+</script>
+</body>
+</html>

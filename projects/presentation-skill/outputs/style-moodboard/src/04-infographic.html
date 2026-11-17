@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>04 資訊圖表｜睡眠調查</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=block">
+<style>
+  :root{--bg:#F3F5F9;--ink:#1F2A44;--sub:#58627C;--coral:#F2604A;--coralText:#D8442D;--mint:#25A898;--mintSoft:#CDEDE7;--sky:#7DB9EC;--sun:#FFC53D}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque","Noto Sans TC",sans-serif}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:120px;top:64px;display:flex;gap:12px;font:500 23px/1 "Noto Sans TC";letter-spacing:.04em}
+  nav span,nav b{padding:12px 22px;border-radius:999px;color:#4F5872;background:#E4E8F0}
+  nav b{background:var(--ink);color:#fff;font-weight:700}
+  h2{position:absolute;left:120px;top:166px;font:900 46px/1.2 "Noto Sans TC";letter-spacing:.04em}
+  .hero{position:absolute;left:112px;top:236px;display:flex;align-items:flex-end;gap:18px}
+  .hero b{font:800 330px/.86 "Bricolage Grotesque";letter-spacing:-.04em;font-variation-settings:"opsz" 96}
+  .hero span{font:900 64px/1 "Noto Sans TC";margin-bottom:26px}
+  p.key{position:absolute;left:120px;top:600px;width:760px;font:700 52px/1.4 "Noto Sans TC";letter-spacing:.02em}
+  p.key em{font-style:normal;color:var(--coralText)}
+  p.src{position:absolute;left:120px;top:900px;font:400 23px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.03em}
+  .mod h3{font:700 28px/1.2 "Noto Sans TC";letter-spacing:.04em;display:flex;align-items:center;gap:14px}
+  .mod h3 i{width:12px;height:28px;border-radius:6px;display:inline-block}
+  .bars{position:absolute;left:1000px;top:170px;width:800px}
+  .row{display:grid;grid-template-columns:150px 1fr;align-items:center;height:76px;font:500 26px/1 "Noto Sans TC";color:var(--sub)}
+  .track{position:relative;height:44px}
+  .bar{position:absolute;left:0;top:0;height:44px;border-radius:0 22px 22px 0;background:var(--sky)}
+  .bar.hot{background:var(--coral)}
+  .val{position:absolute;top:5px;font:700 34px/1 "Bricolage Grotesque";color:var(--ink);white-space:nowrap}
+  .val small{font:700 24px/1 "Noto Sans TC"}
+  .ref{position:absolute;top:-14px;bottom:-14px;border-left:3px dashed var(--ink);opacity:.55}
+  .reflabel{position:absolute;font:700 22px/1 "Noto Sans TC";color:var(--ink);white-space:nowrap}
+  .donut{position:absolute;left:1000px;top:640px;width:400px}
+  .donut .num{position:absolute;left:-12px;top:76px;width:260px;text-align:center;font:800 56px/1 "Bricolage Grotesque";padding-top:96px}
+  .donut p{position:absolute;left:268px;top:150px;width:140px;font:700 30px/1.35 "Noto Sans TC"}
+  .people{position:absolute;left:1470px;top:640px;width:340px}
+  .people p{margin-top:26px;font:700 30px/1.4 "Noto Sans TC"}
+  .people p em{font-style:normal;color:var(--coralText)}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <!-- the moon behind the hero number tells the topic -->
+    <defs><mask id="crescent"><rect width="1920" height="1080" fill="#fff"/><circle cx="792" cy="300" r="190" fill="#000"/></mask></defs>
+    <circle cx="700" cy="380" r="220" fill="var(--sun)" mask="url(#crescent)"/>
+    <g fill="var(--sun)"><circle cx="880" cy="190" r="10"/><circle cx="930" cy="290" r="6"/><circle cx="560" cy="150" r="7"/></g>
+    <!-- soft colour fields that hold the right-hand charts -->
+    <rect x="960" y="150" width="880" height="420" rx="40" fill="#E2EEFA"/>
+    <rect x="960" y="604" width="456" height="366" rx="40" fill="#DCF1EC"/>
+    <rect x="1440" y="604" width="400" height="366" rx="40" fill="#FFF0CF"/>
+    <!-- donut: 72% -->
+    <g transform="translate(1118 816)">
+      <circle r="104" fill="none" stroke="#B5E2D9" stroke-width="46"/>
+      <circle r="104" fill="none" stroke="var(--mint)" stroke-width="46" stroke-dasharray="470.5 653.5" transform="rotate(-90)" stroke-linecap="butt"/>
+    </g>
+    <!-- pictogram: 3 in 10 wake up at night -->
+    <g id="ppl"></g>
+  </svg>
+
+  <nav aria-label="章節"><span>調查方法</span><b>睡多久</b><span>為什麼睡不好</span><span>怎麼改善</span></nav>
+  <h2>我們睡得夠嗎</h2>
+  <div class="hero"><b>6.4</b><span>小時</span></div>
+  <p class="key">這是每晚的平均睡眠，<br>比建議少了 <em>36 分鐘</em>。</p>
+  <p class="src">2026 年 10 月線上問卷，20 至 65 歲，共 2,000 人</p>
+
+  <div class="mod bars">
+    <h3><i style="background:var(--sky)"></i>離建議的 7 小時，還差多少</h3>
+    <div id="rows" style="margin-top:30px;position:relative"></div>
+  </div>
+
+  <div class="mod donut">
+    <h3 style="margin:-6px 0 0 30px"><i style="background:var(--mint)"></i>睡前會滑手機</h3>
+    <div class="num">72%</div>
+    <p>每 4 人<br>就有 3 人</p>
+  </div>
+
+  <div class="mod people">
+    <h3 style="margin-top:-6px"><i style="background:var(--coral)"></i>半夜會醒來</h3>
+    <div style="height:206px"></div>
+    <p>10 人裡有 <em>3 人</em></p>
+  </div>
+</div>
+<script>
+// average sleep per age group -> minutes short of the recommended 7 hours
+const data = [['20–29 歲', 6.1, true], ['30–39 歲', 6.2, false], ['40–49 歲', 6.5, false], ['50–65 歲', 6.9, false]];
+const W = 500, perMin = W / 60;
+let html = '';
+for (const [label, h, hot] of data) {
+  const gap = Math.round((7 - h) * 60);
+  html += `<div class="row"><span>${label}</span><div class="track"><div class="bar${hot ? ' hot' : ''}" style="width:${Math.max(gap * perMin, 8)}px"></div><b class="val" style="left:${gap * perMin + 16}px">${gap}<small> 分</small></b></div></div>`;
+}
+document.getElementById('rows').innerHTML = html;
+// pictograms: two rows of five
+let g = '';
+for (let i = 0; i < 10; i++) {
+  const x = 1484 + (i % 5) * 64, y = 712 + Math.floor(i / 5) * 92, c = i < 3 ? '#F2604A' : '#E9D6A6';
+  g += `<circle cx="${x + 22}" cy="${y + 14}" r="14" fill="${c}"/><path d="M${x} ${y + 72} v-16 a22 22 0 0 1 44 0 v16 z" fill="${c}"/>`;
+}
+document.getElementById('ppl').innerHTML = g;
+</script>
+</body>
+</html>

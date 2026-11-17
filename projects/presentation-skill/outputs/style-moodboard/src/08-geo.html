@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>08 幾何構成｜設計思考工作坊</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Jost:wght@500;700&family=Big+Shoulders+Display:wght@800;900&display=block">
+<style>
+  :root{--paper:#F1EDE2;--ink:#15171C;--red:#D23E26;--redText:#B9301B;--navy:#1B2A6B;--amber:#F0A920;--teal:#0E8C7A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--paper)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:"Jost","Noto Sans TC",sans-serif}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:110px;top:64px;display:flex;gap:40px;font:500 22px/1 "Noto Sans TC";letter-spacing:.08em;color:#6B6658}
+  nav b{color:var(--ink);font-weight:900}
+  nav b::before{content:"";display:inline-block;width:14px;height:14px;background:var(--red);margin-right:12px;vertical-align:1px}
+  h2{position:absolute;left:110px;top:176px;font:700 40px/1.2 "Noto Sans TC";letter-spacing:.08em}
+  h2::after{content:"";display:block;width:84px;height:12px;background:var(--red);margin-top:22px}
+  p.key{position:absolute;left:104px;top:290px;font:900 112px/1.16 "Noto Sans TC";letter-spacing:.02em}
+  p.key em{font-style:normal;color:var(--redText)}
+  .step{position:absolute;top:600px;width:384px;height:480px;padding:0 0 0 40px}
+  .step .n{position:absolute;left:40px;top:246px;font:900 64px/1 "Big Shoulders Display";letter-spacing:.02em}
+  .step h3{position:absolute;left:40px;top:312px;font:900 56px/1.1 "Noto Sans TC";letter-spacing:.06em}
+  .step p{position:absolute;left:40px;top:390px;width:310px;font:500 25px/1.45 "Noto Sans TC";letter-spacing:.02em}
+  .light{color:var(--paper)}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <clipPath id="c2"><rect x="1080" y="0" width="420" height="600"/></clipPath>
+      <clipPath id="c3"><rect x="1500" y="0" width="420" height="300"/></clipPath>
+      <clipPath id="c4"><rect x="1500" y="300" width="420" height="300"/></clipPath>
+      <clipPath id="s1"><rect x="0" y="600" width="384" height="480"/></clipPath>
+      <clipPath id="s3"><rect x="768" y="600" width="384" height="480"/></clipPath>
+      <clipPath id="s4"><rect x="1152" y="600" width="384" height="480"/></clipPath>
+      <clipPath id="s5"><rect x="1536" y="600" width="384" height="480"/></clipPath>
+      <pattern id="stripes" width="420" height="30" patternUnits="userSpaceOnUse"><rect width="420" height="15" fill="#15171C"/></pattern>
+    </defs>
+    <!-- performance cells, top right -->
+    <rect x="1080" y="0" width="420" height="600" fill="var(--navy)"/>
+    <g clip-path="url(#c2)"><circle cx="1290" cy="96" r="230" fill="var(--red)"/><rect x="1080" y="420" width="420" height="180" fill="var(--paper)"/><circle cx="1290" cy="600" r="150" fill="var(--amber)"/></g>
+    <rect x="1500" y="0" width="420" height="300" fill="var(--amber)"/>
+    <g clip-path="url(#c3)"><circle cx="1920" cy="300" r="260" fill="var(--teal)"/><circle cx="1600" cy="90" r="44" fill="var(--ink)"/></g>
+    <rect x="1500" y="300" width="420" height="300" fill="var(--paper)"/>
+    <g clip-path="url(#c4)"><rect x="1500" y="300" width="420" height="300" fill="url(#stripes)"/><circle cx="1710" cy="450" r="112" fill="var(--paper)"/><circle cx="1710" cy="450" r="64" fill="var(--red)"/></g>
+
+    <!-- five steps, each with its own shape -->
+    <rect x="0" y="600" width="384" height="480" fill="var(--teal)"/>
+    <g clip-path="url(#s1)"><circle cx="250" cy="720" r="110" fill="var(--paper)"/><circle cx="250" cy="720" r="46" fill="var(--ink)"/></g>
+    <rect x="384" y="600" width="384" height="480" fill="var(--paper)"/>
+    <polygon points="430,628 430,832 640,730" fill="var(--navy)"/><polygon points="560,628 560,832 760,730" fill="var(--red)" opacity="1"/>
+    <rect x="768" y="600" width="384" height="480" fill="var(--amber)"/>
+    <g clip-path="url(#s3)"><path d="M1152 600 v230 a230 230 0 0 1 -230 -230 z" fill="var(--paper)"/><path d="M1152 600 v150 a150 150 0 0 1 -150 -150 z" fill="var(--navy)"/><path d="M1152 600 v70 a70 70 0 0 1 -70 -70 z" fill="var(--ink)"/></g>
+    <rect x="1152" y="600" width="384" height="480" fill="var(--red)"/>
+    <g clip-path="url(#s4)"><rect x="1300" y="640" width="96" height="96" fill="var(--paper)"/><rect x="1396" y="736" width="96" height="96" fill="var(--ink)"/><rect x="1396" y="640" width="96" height="96" fill="var(--amber)"/></g>
+    <rect x="1536" y="600" width="384" height="480" fill="var(--navy)"/>
+    <g clip-path="url(#s5)"><path d="M1740 840 v-90 a110 110 0 0 1 220 0 v90 z" fill="var(--amber)"/><path d="M1790 840 v-90 a60 60 0 0 1 120 0 v90 z" fill="var(--navy)"/></g>
+  </svg>
+
+  <nav aria-label="章節"><span>為什麼要做</span><b>五個步驟</b><span>分組</span><span>時程</span></nav>
+  <h2>工作坊的五個步驟</h2>
+  <p class="key">先<em>理解人</em>，<br>再動手做。</p>
+
+  <div class="step" style="left:0"><div class="n">01</div><h3>同理</h3><p>訪談觀察，聽見真困擾</p></div>
+  <div class="step" style="left:384px"><div class="n">02</div><h3>定義</h3><p>把困擾寫成一句問題</p></div>
+  <div class="step" style="left:768px"><div class="n">03</div><h3>發想</h3><p>先求多，再求好</p></div>
+  <div class="step light" style="left:1152px"><div class="n">04</div><h3>原型</h3><p>用紙和膠帶，一小時做出來</p></div>
+  <div class="step light" style="left:1536px"><div class="n">05</div><h3>測試</h3><p>讓使用者試，再回到第一步</p></div>
+</div>
+</body>
+</html>

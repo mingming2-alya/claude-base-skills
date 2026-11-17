@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><title>十款意象總覽</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700&display=block">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:2000px;background:#EEEBE4;font-family:"Noto Sans TC",sans-serif;color:#2A2622;padding:40px 40px 20px}
+  .grid{display:grid;grid-template-columns:repeat(2,950px);gap:34px 20px}
+  figure img{display:block;width:950px;height:534px;border-radius:6px;box-shadow:0 1px 0 rgba(0,0,0,.08)}
+  figcaption{display:flex;gap:16px;align-items:baseline;margin-top:12px;font:700 28px/1 "Noto Sans TC"}
+  figcaption span{font:500 22px/1 "Noto Sans TC";color:#6E665C}
+</style></head><body><div class="grid" id="g"></div>
+<script>
+const items=[['01-clay','01 紙黏土','知識分享・新人引導'],['02-brick','02 積木','架構與分工'],['03-watercolor','03 水彩旅記','旅遊・活動・文化導覽'],['04-infographic','04 資訊圖表','調查與數據故事'],['05-glow','05 光幕發表','發表會・大會開場'],['06-scroll','06 書卷刻本','文化講座・讀書會'],['07-counsel','07 顧問報告','策略提案・決策會議'],['08-geo','08 幾何構成','課程・工作坊・方法論'],['09-riso','09 孔版小誌','社群活動・市集'],['10-deco','10 摩登金','頒獎・尾牙・典禮']];
+document.getElementById('g').innerHTML=items.map(([f,n,u])=>`<figure><img src="img/${f}.jpg"><figcaption>${n}<span>${u}</span></figcaption></figure>`).join('');
+</script></body></html>

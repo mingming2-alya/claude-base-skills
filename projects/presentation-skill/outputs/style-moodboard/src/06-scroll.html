@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>06 書卷刻本｜茶經導讀</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&family=Cactus+Classical+Serif&display=block">
+<style>
+  :root{--paper:#E3CC9C;--ink:#2B2420;--sub:#6E5E4E;--zhu:#B03A24;--leaf:#7E9C86}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--paper)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;color:var(--ink);font-family:"Noto Serif TC",serif;
+    background:radial-gradient(1300px 800px at 50% 45%, #EAD7AE 0%, #E1C997 70%, #D2B57F 100%)}
+  svg{position:absolute;inset:0}
+  .v{writing-mode:vertical-rl;text-orientation:upright}
+  .chap{position:absolute;left:1668px;top:150px;font:900 112px/1 "Noto Serif TC";letter-spacing:.16em}
+  .seal{position:absolute;left:1680px;top:640px;width:92px;height:92px;background:var(--zhu);border-radius:6px;display:grid;place-items:center;transform:rotate(-2deg);
+    box-shadow:inset 0 0 0 4px #B03A24, inset 0 0 0 7px rgba(234,220,189,.85)}
+  .seal span{writing-mode:vertical-rl;font:900 34px/1.05 "Noto Serif TC";color:#F4E6C8;letter-spacing:.06em}
+  .classic p{position:absolute;top:132px;writing-mode:vertical-rl;text-orientation:upright;width:120px;font:400 58px/120px "Cactus Classical Serif","Noto Serif TC";letter-spacing:.1em}
+  .classic p.pi{top:150px;font:400 36px/120px "Noto Serif TC";color:var(--zhu);letter-spacing:.2em}
+  .classic em{font-style:normal;color:var(--zhu);text-emphasis:filled sesame var(--zhu);text-emphasis-position:right}
+  .xin{position:absolute;left:930px;top:300px;font:500 26px/1 "Noto Serif TC";letter-spacing:.5em;color:var(--sub)}
+  nav{position:absolute;left:160px;top:136px;display:flex;gap:40px;font:500 24px/1 "Noto Serif TC";color:#7F6D58;letter-spacing:.12em}
+  nav b{color:var(--ink);font-weight:700}
+  nav b::before{content:"";display:inline-block;width:10px;height:10px;background:var(--zhu);margin-right:12px;vertical-align:3px}
+  .copy{position:absolute;left:160px;top:238px;width:700px}
+  .copy h2{font:700 40px/1.2 "Noto Serif TC";letter-spacing:.1em;color:var(--sub)}
+  .copy p.key{margin-top:30px;font:900 66px/1.38 "Noto Serif TC";letter-spacing:.04em}
+  .copy p.key em{font-style:normal;color:var(--zhu)}
+  dl{position:absolute;left:160px;top:604px;width:690px;display:grid;grid-template-columns:96px 1fr;row-gap:22px;column-gap:26px;font:500 27px/1.55 "Noto Serif TC";letter-spacing:.03em}
+  dt{font:900 30px/1.5 "Noto Serif TC";color:var(--zhu);letter-spacing:.12em}
+  dd{color:#3F352D}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="fiber" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".012 .5" numOctaves="2" seed="4" result="f"/>
+        <feColorMatrix in="f" type="matrix" values="0 0 0 0 .45  0 0 0 0 .36  0 0 0 0 .22  0 0 0 .9 -.32"/>
+      </filter>
+      <filter id="speck" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="1" seed="12" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 .3  0 0 0 0 .22  0 0 0 0 .14  0 0 0 4 -2.6"/>
+      </filter>
+      <!-- woodblock ink: slightly uneven edges -->
+      <filter id="block" x="-2%" y="-2%" width="104%" height="104%">
+        <feTurbulence type="fractalNoise" baseFrequency=".08" numOctaves="2" seed="6" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+    <rect width="1920" height="1080" filter="url(#fiber)" opacity=".35"/>
+    <rect width="1920" height="1080" filter="url(#speck)" opacity=".5"/>
+
+    <g filter="url(#block)" stroke="#2B2420" fill="none">
+      <!-- 版框: thick outer, thin inner -->
+      <rect x="96" y="84" width="1728" height="912" stroke-width="7"/>
+      <rect x="110" y="98" width="1700" height="884" stroke-width="2"/>
+      <!-- 版心 column with 魚尾 -->
+      <line x1="900" y1="98" x2="900" y2="982" stroke-width="2"/>
+      <line x1="1010" y1="98" x2="1010" y2="982" stroke-width="2"/>
+      <path d="M900 236 H1010 V262 L955 292 L900 262 Z" fill="#2B2420" stroke="none"/>
+      <path d="M900 806 H1010 V780 L955 750 L900 780 Z" fill="#2B2420" stroke="none"/>
+      <!-- 界欄 between the classical columns -->
+      <g stroke-width="1.6" opacity=".85">
+        <line x1="1040" y1="98" x2="1040" y2="982"/><line x1="1160" y1="98" x2="1160" y2="982"/>
+        <line x1="1280" y1="98" x2="1280" y2="982"/><line x1="1400" y1="98" x2="1400" y2="982"/>
+        <line x1="1520" y1="98" x2="1520" y2="982"/><line x1="1640" y1="98" x2="1640" y2="982"/>
+      </g>
+    </g>
+
+    <!-- tea branch in line-drawing, with a light celadon wash -->
+    <g transform="translate(566 702) rotate(-62 180 160) scale(.68)" filter="url(#block)">
+      <path d="M260 320 C200 230 140 170 40 110" stroke="#2B2420" stroke-width="4" fill="none"/>
+      <g fill="#A9BFA8" fill-opacity=".55" stroke="#2B2420" stroke-width="2.6">
+        <path d="M150 190 C160 120 220 80 290 92 C270 160 220 198 150 190 Z"/>
+        <path d="M98 150 C70 90 90 30 140 4 C160 66 140 120 98 150 Z"/>
+        <path d="M200 262 C250 220 320 222 360 262 C310 300 250 300 200 262 Z"/>
+        <path d="M60 126 C10 120 -24 80 -30 36 C20 44 52 80 60 126 Z"/>
+      </g>
+      <g stroke="#2B2420" stroke-width="1.6" fill="none" opacity=".8">
+        <path d="M160 186 C200 150 240 120 282 96"/><path d="M100 146 C108 100 120 50 138 10"/>
+        <path d="M206 262 C260 258 310 258 352 262"/><path d="M58 122 C30 96 0 66 -24 40"/>
+      </g>
+      <g transform="translate(36 108)">
+        <circle r="26" fill="#F6EEDC" stroke="#2B2420" stroke-width="2.4"/>
+        <circle r="9" fill="#E3B54A" stroke="#2B2420" stroke-width="1.6"/>
+      </g>
+    </g>
+  </svg>
+
+  <div class="chap v">一之源</div>
+  <div class="seal"><span>茶經</span></div>
+
+  <div class="classic">
+    <p style="left:1520px">茶者，南方之<em>嘉木</em>也。</p>
+    <p style="left:1400px">一尺、二尺，乃至數十尺。</p>
+    <p style="left:1280px">其巴山峽川，有兩人合抱者，</p>
+    <p style="left:1160px">伐而掇之。</p>
+    <p class="pi" style="left:1040px">先說樹，再說茶。</p>
+  </div>
+  <div class="xin v">茶經　卷上</div>
+
+  <nav aria-label="章節"><span>作者與時代</span><b>一之源</b><span>二之具</span><span>三之造</span></nav>
+  <div class="copy">
+    <h2>茶從哪裡來</h2>
+    <p class="key">開篇只說一件事：<br>茶，<em>是一棵樹</em>。</p>
+  </div>
+  <dl>
+    <dt>嘉木</dt><dd>好的樹木，陸羽一開頭就給茶最高的評價。</dd>
+    <dt>巴山</dt><dd>唐代的巴蜀與三峽一帶，產茶的老家。</dd>
+    <dt>合抱</dt><dd>要兩個人才抱得住，可見古茶樹之大。</dd>
+  </dl>
+</div>
+</body>
+</html>

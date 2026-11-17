@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>05 光幕發表｜AI 助理 3.0</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@200;300;400;500;700;900&family=Sora:wght@200;300;600&display=block">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:#06070A}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:#06070A;color:#F4F1EC;font-family:"Sora","Noto Sans TC",sans-serif}
+  svg{position:absolute;inset:0}
+  .grain{position:absolute;inset:0;opacity:.13;mix-blend-mode:screen}
+  nav{position:absolute;left:160px;top:66px;display:flex;gap:46px;font:400 22px/1 "Noto Sans TC";color:rgba(244,241,236,.6);letter-spacing:.08em}
+  nav b{font-weight:500;color:#F4F1EC}
+  .name{position:absolute;left:156px;top:236px;font:200 62px/1 "Sora","Noto Sans TC";letter-spacing:.02em;color:rgba(244,241,236,.86)}
+  .name span{font-family:"Noto Sans TC";font-weight:300;letter-spacing:.06em}
+  .name b{font-weight:300}
+  h1{position:absolute;left:152px;top:350px;font:700 112px/1.22 "Noto Sans TC";letter-spacing:.01em}
+  h1 em{font-style:normal;background:linear-gradient(92deg,#FFC277 0%,#FF8A55 48%,#FF6B6B 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  p.sub{position:absolute;left:158px;top:676px;font:300 32px/1.5 "Noto Sans TC";letter-spacing:.08em;color:rgba(244,241,236,.66)}
+  p.sub b{font:600 32px/1.5 "Sora";color:#F4F1EC;letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="b120" filterUnits="userSpaceOnUse" x="-600" y="-600" width="3120" height="2400"><feGaussianBlur stdDeviation="120"/></filter>
+      <filter id="b60" filterUnits="userSpaceOnUse" x="-600" y="-600" width="3120" height="2400"><feGaussianBlur stdDeviation="60"/></filter>
+      <filter id="b18" filterUnits="userSpaceOnUse" x="-600" y="-600" width="3120" height="2400"><feGaussianBlur stdDeviation="18"/></filter>
+      <filter id="b4" filterUnits="userSpaceOnUse" x="-600" y="-600" width="3120" height="2400"><feGaussianBlur stdDeviation="4"/></filter>
+      <linearGradient id="rim" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#3FD3C8" stop-opacity="0"/><stop offset=".22" stop-color="#3FD3C8"/>
+        <stop offset=".5" stop-color="#FFF4E2"/><stop offset=".74" stop-color="#FFB15C"/><stop offset="1" stop-color="#FF6B4A" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="orbBody" cx="38%" cy="32%" r="75%">
+        <stop offset="0" stop-color="#2A2F38"/><stop offset=".55" stop-color="#11141A"/><stop offset="1" stop-color="#07080B"/>
+      </radialGradient>
+      <radialGradient id="orbGlow" cx="50%" cy="100%" r="70%">
+        <stop offset="0" stop-color="#FFB15C" stop-opacity=".95"/><stop offset=".45" stop-color="#FF7A50" stop-opacity=".45"/><stop offset="1" stop-color="#FF7A50" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="orbRim" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#9FF3EA" stop-opacity=".9"/><stop offset=".45" stop-color="#ffffff" stop-opacity=".05"/><stop offset="1" stop-color="#FFB86B" stop-opacity=".95"/>
+      </linearGradient>
+      <filter id="noise" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="8"/>
+        <feColorMatrix type="saturate" values="0"/>
+      </filter>
+    </defs>
+
+    <!-- light rising behind the horizon -->
+    <ellipse cx="1260" cy="1070" rx="820" ry="200" fill="#FF8A4C" opacity=".55" filter="url(#b120)"/>
+    <ellipse cx="300" cy="1060" rx="420" ry="150" fill="#1FC9BE" opacity=".5" filter="url(#b120)"/>
+    <ellipse cx="1380" cy="1010" rx="480" ry="140" fill="#FFC06A" opacity=".5" filter="url(#b60)"/>
+    <ellipse cx="760" cy="1040" rx="260" ry="90" fill="#FFE7C4" opacity=".22" filter="url(#b60)"/>
+    <!-- the dark planet and its bright rim -->
+    <ellipse cx="980" cy="1880" rx="1700" ry="900" fill="#06070A"/>
+    <ellipse cx="980" cy="1880" rx="1700" ry="900" fill="none" stroke="url(#rim)" stroke-width="16" filter="url(#b18)" opacity=".9"/>
+    <ellipse cx="980" cy="1880" rx="1700" ry="900" fill="none" stroke="url(#rim)" stroke-width="3" opacity=".95"/>
+
+    <!-- glass orb, lit by the horizon -->
+    <circle cx="1450" cy="520" r="250" fill="#FF8A4C" opacity=".16" filter="url(#b60)"/>
+    <circle cx="1450" cy="500" r="190" fill="url(#orbBody)"/>
+    <circle cx="1450" cy="500" r="190" fill="url(#orbGlow)"/>
+    <circle cx="1450" cy="500" r="189" fill="none" stroke="url(#orbRim)" stroke-width="2.5"/>
+    <ellipse cx="1388" cy="402" rx="74" ry="34" fill="#ffffff" opacity=".22" transform="rotate(-32 1388 402)" filter="url(#b4)"/>
+    <ellipse cx="1370" cy="392" rx="22" ry="9" fill="#ffffff" opacity=".75" transform="rotate(-32 1370 392)" filter="url(#b4)"/>
+    <path d="M1300 600 a190 190 0 0 0 300 0" fill="none" stroke="#FFE1B0" stroke-opacity=".55" stroke-width="3" filter="url(#b4)"/>
+
+    <rect width="1920" height="1080" filter="url(#noise)" opacity=".07" style="mix-blend-mode:screen"/>
+  </svg>
+
+  <nav aria-label="章節"><b>開場</b><span>新功能</span><span>上線時程</span></nav>
+  <div class="name"><span>AI 助理</span> <b>3.0</b></div>
+  <h1>它不只回答問題，<br>還會<em>把事做完</em>。</h1>
+  <p class="sub"><b>12.01</b>　全公司開放使用</p>
+</div>
+</body>
+</html>
