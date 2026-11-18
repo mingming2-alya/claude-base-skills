@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>01b 插畫場景（手繪）｜新人報到第一週</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<style>
+  :root{--paper:#F7E6D6;--ink:#2E2620;--sub:#6F6257;--accent:#B4512F;--peach:#F6BFA2;--sage:#B8D1A8;--butter:#F7D88A;--sky:#BFD9EE}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--paper)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;color:var(--ink);font-family:"Noto Sans TC",sans-serif;background:var(--paper)}
+  svg.scene{position:absolute;inset:0}
+  nav{position:absolute;left:140px;top:66px;display:flex;gap:44px;font:500 24px/1 "Noto Sans TC";color:#86786A;letter-spacing:.04em}
+  nav b{color:var(--ink);font-weight:700;position:relative}
+  nav b::after{content:"";position:absolute;left:-4px;right:-4px;bottom:-12px;height:6px;border-radius:4px;background:var(--peach)}
+  .copy{position:absolute;left:140px;top:208px;width:900px}
+  .copy h2{font:700 40px/1.2 "Chiron GoRound TC";color:#8C6A55;letter-spacing:.06em}
+  .copy p.key{margin-top:30px;font:900 68px/1.32 "Chiron GoRound TC";letter-spacing:.02em}
+  .copy p.key em{font-style:normal;color:var(--accent)}
+  ul.people{position:absolute;left:140px;top:590px;list-style:none;display:grid;gap:34px}
+  ul.people li{display:grid;grid-template-columns:104px 1fr;align-items:center;column-gap:30px}
+  ul.people svg{width:104px;height:104px;overflow:visible}
+  ul.people strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em}
+  ul.people span{display:block;margin-top:6px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <!-- a pen line never sits perfectly still -->
+      <filter id="pen" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="9" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <!-- colour patches: soft wobbly edges, printed a little off the line -->
+      <filter id="patch" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="4" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <pattern id="hatch" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)">
+        <line x1="0" y1="0" x2="0" y2="12" stroke="#2E2620" stroke-width="2.2" stroke-opacity=".55"/>
+      </pattern>
+    </defs>
+
+    <!-- colour layer -->
+    <g filter="url(#patch)" transform="translate(-10 8)">
+      <path d="M1504 -40 L1540 -40 L1582 300 L1564 300 Z" fill="var(--sage)"/><path d="M1634 -40 L1670 -40 L1602 300 L1586 300 Z" fill="var(--sage)"/>
+      <g transform="rotate(7 1584 330)">
+        <rect x="1462" y="318" width="250" height="320" rx="30" fill="#FFF3DE"/>
+        <rect x="1462" y="318" width="250" height="86" rx="30" fill="var(--peach)"/>
+        <circle cx="1587" cy="482" r="58" fill="var(--butter)"/>
+      </g>
+      <rect x="1392" y="640" width="600" height="372" rx="30" fill="#F3EDE2"/>
+      <rect x="1424" y="672" width="560" height="306" rx="16" fill="var(--sky)"/>
+      <path d="M1338 1006 h640 v120 h-700 z" fill="#E7DCC8"/>
+      <g transform="rotate(-9 1330 690)"><rect x="1262" y="602" width="150" height="150" rx="10" fill="var(--butter)"/></g>
+      <path d="M1128 820 q0 -14 14 -14 h158 q14 0 14 14 l-10 182 q-4 34 -82 34 q-80 0 -84 -34 z" fill="var(--peach)"/>
+    </g>
+
+    <!-- ink layer -->
+    <g filter="url(#pen)" fill="none" stroke="#2E2620" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+      <!-- lanyard -->
+      <path d="M1508 -40 L1566 296"/><path d="M1540 -40 L1580 296"/>
+      <path d="M1668 -40 L1600 296"/><path d="M1636 -40 L1588 296"/>
+      <rect x="1560" y="284" width="48" height="44" rx="10"/>
+      <!-- badge -->
+      <g transform="rotate(7 1584 330)">
+        <rect x="1462" y="318" width="250" height="320" rx="30"/>
+        <path d="M1462 404 H1712"/>
+        <circle cx="1587" cy="482" r="58"/>
+        <circle cx="1587" cy="466" r="20"/><path d="M1551 520 q36 -42 72 0"/>
+        <path d="M1520 576 H1654" stroke-width="7"/><path d="M1540 606 H1630"/>
+        <rect x="1462" y="318" width="250" height="320" rx="30" fill="url(#hatch)" stroke="none" clip-path="inset(0 0 0 80%)"/>
+      </g>
+      <!-- laptop -->
+      <rect x="1392" y="640" width="600" height="372" rx="30"/>
+      <rect x="1424" y="672" width="560" height="306" rx="16"/>
+      <path d="M1338 1006 H1980 M1338 1006 L1290 1100"/>
+      <rect x="1460" y="708" width="236" height="232" rx="18"/>
+      <circle cx="1528" cy="772" r="32"/>
+      <path d="M1480 838 H1660 M1480 868 H1610 M1480 894 H1640" stroke-width="3.5"/>
+      <rect x="1716" y="708" width="250" height="108" rx="18"/><path d="M1740 740 H1850 M1740 772 H1926" stroke-width="3.5"/>
+      <rect x="1716" y="832" width="250" height="108" rx="18"/><path d="M1740 864 H1830 M1740 896 H1906" stroke-width="3.5"/>
+      <!-- sticky note -->
+      <g transform="rotate(-9 1330 690)">
+        <rect x="1262" y="602" width="150" height="150" rx="10"/>
+        <path d="M1300 668 q36 34 72 0"/><circle cx="1310" cy="644" r="4" fill="#2E2620"/><circle cx="1362" cy="644" r="4" fill="#2E2620"/>
+        <path d="M1380 752 L1412 720" stroke-width="3"/>
+      </g>
+      <!-- mug and steam -->
+      <path d="M1128 820 q0 -14 14 -14 h158 q14 0 14 14 l-10 182 q-4 34 -82 34 q-80 0 -84 -34 z"/>
+      <ellipse cx="1221" cy="818" rx="88" ry="16"/>
+      <path d="M1306 870 c86 -8 90 110 -8 102"/><path d="M1308 900 c40 2 40 50 -6 50" stroke-width="3.5"/>
+      <path d="M1196 760 c-20 -30 20 -46 0 -80" stroke-width="3.5"/><path d="M1246 770 c-20 -30 20 -46 0 -84" stroke-width="3.5"/>
+      <path d="M1150 860 v120" stroke-width="2.5" stroke-dasharray="2 14"/>
+      <!-- doodles -->
+      <g stroke-width="3.5">
+        <path d="M1380 240 v40 M1360 260 h40"/><path d="M1792 560 l14 14 M1806 560 l-14 14"/>
+        <path d="M1110 640 q20 -30 46 -8" /><path d="M1146 622 l12 10 -14 6"/>
+      </g>
+    </g>
+    <!-- hatching on the shadow sides -->
+    <g filter="url(#pen)" opacity=".9">
+      <path d="M1266 1000 q-4 34 -46 34 q-40 0 -60 -16 l14 -170 z" fill="url(#hatch)" clip-path="inset(0 0 0 0)"/>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，<br>先認識<em>這三個人</em>就好。</p>
+  </div>
+  <ul class="people">
+    <li><svg viewBox="0 0 104 104" aria-hidden="true"><circle cx="46" cy="58" r="44" fill="var(--peach)"/><g fill="none" stroke="#2E2620" stroke-width="3.5" stroke-linecap="round" filter="url(#pen)"><circle cx="52" cy="52" r="46"/><circle cx="52" cy="42" r="15"/><path d="M26 86 q26 -38 52 0"/></g></svg>
+      <div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div></li>
+    <li><svg viewBox="0 0 104 104" aria-hidden="true"><circle cx="46" cy="58" r="44" fill="var(--sage)"/><g fill="none" stroke="#2E2620" stroke-width="3.5" stroke-linecap="round" filter="url(#pen)"><circle cx="52" cy="52" r="46"/><circle cx="52" cy="42" r="15"/><path d="M26 86 q26 -38 52 0"/></g></svg>
+      <div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div></li>
+    <li><svg viewBox="0 0 104 104" aria-hidden="true"><circle cx="46" cy="58" r="44" fill="var(--butter)"/><g fill="none" stroke="#2E2620" stroke-width="3.5" stroke-linecap="round" filter="url(#pen)"><circle cx="52" cy="52" r="46"/><circle cx="52" cy="42" r="15"/><path d="M26 86 q26 -38 52 0"/></g></svg>
+      <div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div></li>
+  </ul>
+</div>
+</body>
+</html>

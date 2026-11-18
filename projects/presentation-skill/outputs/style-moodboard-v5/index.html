@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>風格意象圖｜十二款</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<style>
+  :root{--bg:#F1EEE8;--card:#FBFAF7;--ink:#24211D;--sub:#6B645B;--line:#DDD7CC;--accent:#B4512F}
+  @media (prefers-color-scheme: dark){:root{--bg:#1B1A18;--card:#252320;--ink:#EEEAE3;--sub:#A69F94;--line:#3A3733;--accent:#E28B6A}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:400 16px/1.7 "Noto Sans TC",system-ui,sans-serif;padding:40px 16px 64px}
+  main{max-width:1240px;margin:0 auto}
+  header h1{font:900 clamp(28px,4vw,40px)/1.25 "Noto Sans TC";letter-spacing:.02em}
+  header p{margin-top:10px;color:var(--sub);max-width:780px}
+  .how{margin:22px 0 34px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .how div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .how b{display:block;font-weight:700}
+  .how span{color:var(--sub);font-size:15px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:22px}
+  article{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  article a{display:block}
+  article img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#ccc}
+  .body{padding:18px 20px 20px}
+  .name{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .name b{font:900 24px/1.2 "Noto Sans TC"}
+  .name span{color:var(--sub);font-size:14px;letter-spacing:.06em}
+  .one{margin-top:6px;font-weight:500}
+  dl{margin-top:12px;display:grid;grid-template-columns:72px 1fr;row-gap:6px;column-gap:10px;font-size:15px}
+  dt{color:var(--sub)}
+  .sw{display:flex;flex-wrap:wrap;gap:6px}
+  .sw i{display:inline-flex;align-items:center;gap:6px;font-style:normal;font-size:13px;color:var(--sub)}
+  .sw i::before{content:"";width:18px;height:18px;border-radius:4px;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .seg{display:flex;flex-wrap:wrap;gap:6px;padding:12px 20px 0}
+  .seg button{font:500 14px/1 "Noto Sans TC",sans-serif;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:var(--sub);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  .name .new{display:inline-block;margin-left:6px;font-size:12px;padding:3px 9px;border-radius:999px;background:#9E4126;color:#fff;letter-spacing:.04em;vertical-align:3px}
+  footer{margin-top:36px;color:var(--sub);font-size:14px}
+  footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>風格意象圖：十二款</h1>
+    <p>依你的建議調整：插畫場景可切換畫風（霓虹併入），積木構成可選 2D 或 3D，水彩水墨可選黑白水墨、厚油彩、彩色水彩；科技暗色拿掉；顧問報告、日常工作款、攝影雜誌重做。用色都還沒定案。</p>
+  </header>
+  <section class="how" aria-label="怎麼看">
+    <div><b>切換畫風</b><span>有切換鈕的款式，點一下看同一頁換畫法的樣子。</span></div>
+    <div><b>重做的三款</b><span>顧問報告、日常工作款、攝影雜誌，有沒有讓你想用？</span></div>
+    <div><b>並排</b><span>看 <a href="overview.jpg" style="color:var(--accent)">十二款總覽圖</a>，哪些太像。</span></div>
+  </section>
+  <section class="grid" id="grid"></section>
+  <footer>
+    <p>圖片由 <code>src/</code> 裡的 HTML 以程式繪製，文字都是真文字；攝影雜誌的畫面是程式模擬，正式使用換成真實照片。重繪：<code>node render.cjs</code>；配色距離：<code>python3 measure.py</code>。清單見 <a href="../../inputs/style-list-v5.md">inputs/style-list-v5.md</a>，上一版在 <a href="../style-moodboard-v4/index.html">style-moodboard-v4</a>。</p>
+  </footer>
+</main>
+<script>
+const S = [
+  ['01','插畫場景','illustration','用摸得到的物件，把抽象的事講成故事；畫風可以整套切換。','知識分享、新人引導、內部宣導、夜間活動','溫暖、親切、好懂（霓虹版熱鬧）','物件貼邊、中央留給文字；換畫風時文字與版面不動','新人報到第一週','你的《AI 的第三次搬家》、NotebookLM 紙黏土、霓虹招牌',[['01a-illustration-clay','黏土'],['01b-illustration-hand','手繪'],['01c-illustration-neon','霓虹']],'霓虹版新畫'],
+  ['02','積木構成','blocks','把系統拆成一塊塊疊起來，版面像包浩斯海報。','系統架構、平台分工、方法論、工作坊','清楚、有秩序、有玩心','幾何色格咬合；圖像層可選平面幾何或立體積木','平台分工三層','PC 幾何風、包浩斯 1923 年積木玩具、Lego',[['02a-blocks-2d','2D 幾何'],['02b-blocks-3d-wood','3D 木'],['02c-blocks-3d-plastic','3D 塑膠']],'2D 版新畫'],
+  ['03','水彩水墨','paint','用畫筆帶路：同一張地圖，三種畫材。','旅遊與活動說明、文化與自然導覽、生活分享','人文、手感、有溫度','畫在紙或畫布上的地圖，地名與路線疊在畫上','員工旅遊・花蓮兩天一夜','你的水彩手繪圖、中國畫水墨、印象派油彩',[['03b-ink-oil','厚油彩'],['03a-ink-mono','黑白水墨'],['03c-ink-watercolor','彩色水彩']],'厚油彩新畫'],
+  ['04','Apple 發表','apple','黑色舞台、一句話、一個發光的產品。','產品發表、大會開場、主題演講','俐落、高級、期待','置中構圖、漸層關鍵字、邊緣發光的裝置','AI 助理 3.0 發表','你分享的 Apple Design、HS 黑底巨型數字劇場',[['04-apple','']]],
+  ['05','書卷刻本','scroll','像翻開一本線裝書：原文直排，講解橫排。','文化講座、讀書會、國學課','沉靜、典雅、書卷氣','版框、界欄、魚尾、朱印與朱批','讀書會・《茶經》導讀','HS 宋刻本、呂敬人、民國書衣',[['05-scroll','']]],
+  ['06','顧問報告','counsel','一條期限線，讓決策者一眼看出誰趕得上。','策略提案、決策會議、高階報告','精準、有說服力、冷靜','襯線大標、巨大關鍵數字、時程賽跑圖與期限線、三條佐證','新廠選址三方案','HS 斷言-證據、CDX 麥肯錫風、BHT signal',[['06-counsel','']],'重做'],
+  ['07','孔版小誌','riso','兩種油墨、套印不準的手作感。','社群活動、市集、社團招募','熱鬧、手作、有態度','只用兩色；網點、錯位、印章、帳冊列','週末換書市集','BHT retro-zine、peoples-platform',[['07-riso','']]],
+  ['08','摩登金','deco','1930 年代的燙金請帖，留給一年一次的大場面。','尾牙與頒獎、週年慶、晚宴','華麗、隆重、復古','對稱構圖、階梯框、放射扇形、金色雙線','年度最佳團隊頒獎','HS 上海摩登、FS Dark Botanical',[['08-deco','']]],
+  ['09','日常工作款','everyday','一頁便當格，看完本週進度和要你決定的事。','週會、進度回報、專案複盤','清爽、現代、一目了然','卡片拼成總覽：出狀況的專案拿最大格，附計畫與實際對照；準時的用進度環；決策卡用橘色','W46 專案週報','HS Bento 便當格、Linear 與 Notion 類產品介面、CDX 清爽專業風',[['09-everyday','']],'重做'],
+  ['10','攝影雜誌','photo','像電影的一格劇照：寬銀幕、逆光的人、字幕。','年度回顧、品牌故事、活動紀錄、開場','震撼、有情緒、有故事','上下黑邊的寬銀幕畫面、大字片名、三幕式目錄、字幕式重點、底片顆粒','年度回顧','電影劇照與片名卡、HS 雜誌編輯長文流',[['10-photo','']],'重做'],
+  ['11','年輕潮流','trend','粗黑框、硬陰影、貼紙到處貼。','行銷活動、社群內容、校園招募','大膽、好玩、有能量','螢光底、傾斜卡片、爆炸貼紙；和孔版小誌刻意拉開','暑期實習招募','OS Pommi、BHT block-frame、HS 新粗野主義',[['11-trend','']]],
+  ['12','在地懷舊','retro','老花磚、撕日曆、紅底招牌，一看就懂的台灣味。','週年回顧、在地文化、懷舊主題','溫暖、親切、有年代感','花磚牆、紅底招牌、火車票時間軸、撕頁日曆','創業五十年','台灣花磚與撕日曆、HS 民國書衣',[['12-retro','']]],
+];
+document.getElementById('grid').innerHTML = S.map(([n,name,id,one,use,tone,lang,topic,src,vars,tag], k) => `
+  <article>
+    <a href="img/${vars[0][0]}.jpg" id="a${k}"><img id="i${k}" src="img/${vars[0][0]}.jpg" alt="${name}意象圖：${topic}" loading="lazy"></a>
+    ${vars.length > 1 ? `<div class="seg" role="group" aria-label="${name}的畫風">${vars.map(([v,l], j) => `<button aria-pressed="${j === 0}" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>` : ''}
+    <div class="body">
+      <div class="name"><b>${n} ${name}</b><span>${id}</span>${tag ? `<span class="new">${tag}</span>` : ''}</div>
+      <p class="one">${one}</p>
+      <dl>
+        <dt>適合</dt><dd>${use}</dd>
+        <dt>調性</dt><dd>${tone}</dd>
+        <dt>畫面</dt><dd>${lang}</dd>
+        <dt>題材</dt><dd>${topic}</dd>
+        <dt>來源</dt><dd>${src}</dd>
+      </dl>
+    </div>
+  </article>`).join('');
+document.getElementById('grid').addEventListener('click', e => {
+  const b = e.target.closest('button[data-v]'); if (!b) return;
+  const k = b.dataset.k;
+  document.getElementById('i' + k).src = `img/${b.dataset.v}.jpg`;
+  document.getElementById('a' + k).href = `img/${b.dataset.v}.jpg`;
+  for (const x of b.parentNode.children) x.setAttribute('aria-pressed', x === b);
+});
+</script>
+</body>
+</html>

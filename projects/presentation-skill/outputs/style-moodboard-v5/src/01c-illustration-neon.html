@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>01c 插畫場景（霓虹）｜新人報到第一週</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<style>
+  :root{--bg:#0B0E1A;--fg:#F3F1FA;--sub:#A9AEC6;--pink:#FF4FB0;--cyan:#33E6F0;--yellow:#FFD84A;--orange:#FF8A3D}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;color:var(--fg);font-family:"Noto Sans TC",sans-serif;background:var(--bg)}
+  svg.scene{position:absolute;inset:0}
+  nav{position:absolute;left:140px;top:66px;display:flex;gap:44px;font:500 24px/1 "Noto Sans TC";color:var(--sub);letter-spacing:.04em}
+  nav b{color:var(--cyan);font-weight:700;text-shadow:0 0 10px rgba(51,230,240,.8)}
+  .copy{position:absolute;left:140px;top:208px;width:900px}
+  .copy h2{font:700 40px/1.2 "Chiron GoRound TC";color:var(--yellow);letter-spacing:.06em;text-shadow:0 0 6px rgba(255,216,74,.85),0 0 22px rgba(255,216,74,.45)}
+  .copy p.key{margin-top:30px;font:900 68px/1.32 "Chiron GoRound TC";letter-spacing:.02em}
+  .copy p.key em{font-style:normal;color:#FFE3F3;text-shadow:0 0 4px #FF4FB0,0 0 14px #FF4FB0,0 0 36px rgba(255,79,176,.8)}
+  ul.people{position:absolute;left:140px;top:590px;list-style:none;display:grid;gap:34px}
+  ul.people li{display:grid;grid-template-columns:104px 1fr;align-items:center;column-gap:30px}
+  ul.people svg{width:104px;height:104px;overflow:visible}
+  ul.people strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em}
+  ul.people span{display:block;margin-top:6px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <pattern id="brick" width="120" height="60" patternUnits="userSpaceOnUse"><rect width="120" height="60" fill="#10142A"/><path d="M0 0.5 H120 M0 30.5 H120 M0.5 0 V30 M60.5 30 V60" stroke="#1A2040" stroke-width="2"/></pattern>
+      <linearGradient id="wall" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#0B0E1A" stop-opacity=".92"/><stop offset=".5" stop-color="#0B0E1A" stop-opacity=".55"/><stop offset="1" stop-color="#0B0E1A" stop-opacity=".2"/></linearGradient>
+      <filter id="neon" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b1"/>
+        <feGaussianBlur in="SourceGraphic" stdDeviation="11" result="b2"/>
+        <feGaussianBlur in="SourceGraphic" stdDeviation="26" result="b3"/>
+        <feMerge><feMergeNode in="b3"/><feMergeNode in="b2"/><feMergeNode in="b1"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <filter id="haze" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480"><feGaussianBlur stdDeviation="70"/></filter>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#brick)"/>
+    <ellipse cx="1560" cy="520" rx="460" ry="420" fill="#FF4FB0" opacity=".12" filter="url(#haze)"/>
+    <ellipse cx="1700" cy="860" rx="360" ry="200" fill="#33E6F0" opacity=".12" filter="url(#haze)"/>
+    <rect width="1920" height="1080" fill="url(#wall)"/>
+
+    <!-- every object is a bent glass tube: a coloured glow, then a hot white core -->
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round" id="tubes">
+      <g data-c="#33E6F0">
+        <path d="M1508 -40 L1566 296 M1668 -40 L1600 296"/>
+        <rect x="1560" y="284" width="48" height="44" rx="10"/>
+      </g>
+      <g data-c="#FF4FB0" transform="rotate(7 1584 330)">
+        <rect x="1462" y="318" width="250" height="320" rx="30"/>
+        <path d="M1462 404 H1712"/>
+        <circle cx="1587" cy="482" r="58"/>
+        <circle cx="1587" cy="466" r="20"/><path d="M1551 520 q36 -42 72 0"/>
+        <path d="M1520 576 H1654 M1540 606 H1630"/>
+      </g>
+      <g data-c="#33E6F0">
+        <rect x="1392" y="640" width="600" height="372" rx="30"/>
+        <rect x="1424" y="672" width="560" height="306" rx="16"/>
+        <path d="M1338 1006 H1980"/>
+        <rect x="1460" y="708" width="236" height="232" rx="18"/><circle cx="1528" cy="772" r="32"/>
+        <path d="M1480 838 H1660 M1480 868 H1610"/>
+        <rect x="1716" y="708" width="250" height="108" rx="18"/><rect x="1716" y="832" width="250" height="108" rx="18"/>
+      </g>
+      <g data-c="#FFD84A" transform="rotate(-9 1330 690)">
+        <rect x="1262" y="602" width="150" height="150" rx="10"/>
+        <path d="M1300 668 q36 34 72 0"/><path d="M1310 640 v8 M1362 640 v8"/>
+      </g>
+      <g data-c="#FF8A3D">
+        <path d="M1128 820 q0 -14 14 -14 h158 q14 0 14 14 l-10 182 q-4 34 -82 34 q-80 0 -84 -34 z"/>
+        <path d="M1306 870 c86 -8 90 110 -8 102"/>
+        <path d="M1196 760 c-20 -30 20 -46 0 -80 M1246 770 c-20 -30 20 -46 0 -84"/>
+      </g>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，<br>先認識<em>這三個人</em>就好。</p>
+  </div>
+  <ul class="people">
+    <li><svg viewBox="0 0 104 104" aria-hidden="true" data-c="#FF4FB0"><g class="av"><circle cx="52" cy="52" r="46"/><circle cx="52" cy="42" r="15"/><path d="M26 86 q26 -38 52 0"/></g></svg>
+      <div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div></li>
+    <li><svg viewBox="0 0 104 104" aria-hidden="true" data-c="#33E6F0"><g class="av"><circle cx="52" cy="52" r="46"/><circle cx="52" cy="42" r="15"/><path d="M26 86 q26 -38 52 0"/></g></svg>
+      <div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div></li>
+    <li><svg viewBox="0 0 104 104" aria-hidden="true" data-c="#FFD84A"><g class="av"><circle cx="52" cy="52" r="46"/><circle cx="52" cy="42" r="15"/><path d="M26 86 q26 -38 52 0"/></g></svg>
+      <div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div></li>
+  </ul>
+</div>
+<script>
+// turn each group into a neon tube: glow pass in its colour, then a thin bright core on top
+for (const g of document.querySelectorAll('#tubes > g')) {
+  const c = g.dataset.c, core = g.cloneNode(true);
+  g.setAttribute('stroke', c); g.setAttribute('stroke-width', '7'); g.setAttribute('filter', 'url(#neon)');
+  core.removeAttribute('data-c'); core.setAttribute('stroke', '#FFF6FB'); core.setAttribute('stroke-width', '2.2');
+  g.after(core);
+}
+for (const svg of document.querySelectorAll('ul.people svg')) {
+  const c = svg.dataset.c, g = svg.querySelector('.av'), core = g.cloneNode(true);
+  g.setAttribute('fill', 'none'); g.setAttribute('stroke', c); g.setAttribute('stroke-width', '5'); g.setAttribute('filter', 'url(#neon)');
+  core.setAttribute('fill', 'none'); core.setAttribute('stroke', '#FFF6FB'); core.setAttribute('stroke-width', '1.6');
+  g.after(core);
+}
+</script>
+</body>
+</html>

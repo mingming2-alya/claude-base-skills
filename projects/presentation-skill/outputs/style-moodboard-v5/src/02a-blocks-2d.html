@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>02a 積木構成（2D 幾何）｜平台分工</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Big+Shoulders+Display:wght@800;900&display=block">
+<style>
+  :root{--paper:#F1EDE2;--ink:#15171C;--red:#D23E26;--redText:#B9301B;--navy:#1B2A6B;--amber:#F0A920;--teal:#0E8C7A;--wood:#D9BE8A}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--paper)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC",sans-serif}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:110px;top:64px;display:flex;gap:40px;font:500 22px/1 "Noto Sans TC";letter-spacing:.08em;color:#6B6658}
+  nav b{color:var(--ink);font-weight:900}
+  nav b::before{content:"";display:inline-block;width:14px;height:14px;background:var(--red);margin-right:12px;vertical-align:1px}
+  h2{position:absolute;left:110px;top:176px;font:700 40px/1.2 "Noto Sans TC";letter-spacing:.08em}
+  h2::after{content:"";display:block;width:84px;height:12px;background:var(--red);margin-top:22px}
+  p.key{position:absolute;left:104px;top:290px;font:900 104px/1.18 "Noto Sans TC";letter-spacing:.02em}
+  p.key em{font-style:normal;color:var(--redText)}
+  p.sub{position:absolute;left:110px;top:560px;width:600px;font:500 30px/1.6 "Noto Sans TC";letter-spacing:.03em}
+  .cell{position:absolute;top:720px;width:360px;height:360px;padding:44px 40px}
+  .cell b{display:block;font:900 60px/1 "Big Shoulders Display"}
+  .cell strong{display:block;margin-top:16px;font:900 42px/1.15 "Noto Sans TC";letter-spacing:.05em}
+  .cell span{display:block;margin-top:14px;font:500 25px/1.45 "Noto Sans TC";letter-spacing:.02em}
+  .light{color:var(--paper)}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs><clipPath id="cA"><rect x="0" y="0" width="840" height="1080"/></clipPath><clipPath id="cB"><rect x="840" y="0" width="1080" height="720"/></clipPath></defs>
+    <g clip-path="url(#cA)"><circle cx="0" cy="1080" r="250" fill="var(--red)"/><circle cx="0" cy="1080" r="120" fill="var(--amber)"/></g>
+    <rect x="840" y="0" width="1080" height="720" fill="var(--navy)"/>
+    <g clip-path="url(#cB)"><circle cx="1920" cy="0" r="190" fill="var(--teal)"/><rect x="840" y="0" width="22" height="720" fill="var(--amber)"/></g>
+    <rect x="840" y="720" width="360" height="360" fill="var(--amber)"/>
+    <rect x="1200" y="720" width="360" height="360" fill="var(--red)"/>
+    <rect id="baseCell" x="1560" y="720" width="360" height="360" fill="var(--wood)"/>
+    <g id="flat">
+      <!-- 03 data base: one long band -->
+      <rect x="980" y="560" width="820" height="70" fill="var(--wood)"/>
+      <!-- 02 shared services: three red squares sitting on it -->
+      <rect x="1010" y="380" width="180" height="180" fill="var(--red)"/>
+      <rect x="1250" y="380" width="180" height="180" fill="var(--red)"/>
+      <rect x="1490" y="380" width="180" height="180" fill="var(--red)"/>
+      <!-- 01 each business grows its own way -->
+      <circle cx="1100" cy="310" r="70" fill="var(--amber)"/>
+      <circle cx="1100" cy="186" r="54" fill="var(--paper)"/>
+      <polygon points="1250,380 1430,380 1340,230" fill="var(--teal)"/>
+      <rect x="1490" y="290" width="180" height="90" fill="var(--amber)"/>
+      <path d="M1490 290 a90 90 0 0 1 180 0 z" fill="var(--amber)" opacity="0"/>
+      <rect x="1505" y="110" width="150" height="110" fill="var(--paper)"/>
+      <g stroke="var(--paper)" stroke-width="4" stroke-dasharray="2 12" stroke-linecap="round"><line x1="1520" y1="232" x2="1520" y2="282"/><line x1="1640" y1="232" x2="1640" y2="282"/></g>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><span>為什麼要共用</span><b>平台分工</b><span>怎麼接上</span><span>時程</span></nav>
+  <h2>平台怎麼分工</h2>
+  <p class="key">底層<em>一起蓋</em>，<br>上層各自長。</p>
+  <p class="sub">新事業不用從地基蓋起，<br>接上共用服務就能開工。</p>
+
+  <div class="cell" style="left:840px"><b>01</b><strong>各事業的應用</strong><span>依自己的需要往上加蓋</span></div>
+  <div class="cell light" style="left:1200px"><b>02</b><strong>共用服務</strong><span>登入、通知、報表，做一次大家用</span></div>
+  <div class="cell" id="baseText" style="left:1560px"><b>03</b><strong>資料底座</strong><span>一份資料，全公司共用</span></div>
+</div>
+
+</body>
+</html>

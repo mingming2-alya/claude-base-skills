@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>03b 水彩水墨（厚油彩）｜花蓮兩天一夜</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@500;700&display=block">
+<style>
+  :root{--canvas:#EDE4D1;--ink:#2B241D;--sub:#6B5D4E;--hill:#2F6B45;--sea:#234E86;--zhu:#B0301F}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--canvas)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--canvas);color:var(--ink);font-family:"LXGW WenKai TC",serif}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:130px;top:64px;display:flex;gap:44px;font:400 25px/1 "LXGW WenKai TC";color:#7A6C5C;letter-spacing:.06em}
+  nav b{color:var(--ink);font-weight:700}
+  nav b::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--zhu);margin-right:10px;vertical-align:2px}
+  .copy{position:absolute;left:130px;top:196px;width:720px}
+  .copy h2{font:400 40px/1.2 "LXGW WenKai TC";color:#7A6A57;letter-spacing:.08em}
+  .copy p.key{margin-top:26px;font:700 78px/1.3 "LXGW WenKai TC";letter-spacing:.04em}
+  .copy p.key .hill{color:var(--hill)} .copy p.key .sea{color:var(--sea)}
+  .plan{position:absolute;left:130px;top:536px;width:640px;font-family:"Noto Serif TC",serif}
+  .plan h3{font:700 26px/1 "LXGW WenKai TC";letter-spacing:.12em;color:#8B5A44;margin:0 0 14px}
+  .plan h3:not(:first-child){margin-top:36px}
+  .plan ul{list-style:none;display:grid;gap:12px}
+  .plan li{display:grid;grid-template-columns:96px 1fr;font:500 27px/1.4 "Noto Serif TC";letter-spacing:.02em}
+  .plan time{font:700 27px/1.4 "Noto Serif TC";color:var(--sub)}
+  .label{position:absolute;padding:10px 16px 12px;background:#F6EFDF;border-radius:6px;box-shadow:0 4px 10px rgba(40,30,20,.28);font:700 28px/1.2 "LXGW WenKai TC";color:var(--ink);letter-spacing:.06em;white-space:nowrap}
+  .label small{display:block;font:400 21px/1.3 "LXGW WenKai TC";color:#4A3F35;letter-spacing:.04em;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <pattern id="weave" width="6" height="6" patternUnits="userSpaceOnUse">
+        <rect width="6" height="6" fill="none"/><path d="M0 1.5 H6 M1.5 0 V6" stroke="#8A7A5C" stroke-opacity=".14" stroke-width="1"/>
+      </pattern>
+      <filter id="speck" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="5"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .4  0 0 0 0 .34  0 0 0 0 .25  0 0 0 2.4 -1.4"/>
+      </filter>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#weave)"/>
+    <g id="paint"></g>
+    <rect width="1920" height="1080" fill="url(#weave)" opacity=".7" style="mix-blend-mode:multiply"/>
+    <rect width="1920" height="1080" filter="url(#speck)" opacity=".35"/>
+    <g id="marks"></g>
+  </svg>
+
+  <div class="label" style="left:690px;top:318px">太魯閣<small>砂卡礑步道，約 2 小時</small></div>
+  <div class="label" style="left:1488px;top:536px">東大門夜市<small>自由晚餐</small></div>
+  <div class="label" style="left:1462px;top:330px">七星潭<small>隔天看日出</small></div>
+  <div class="label" style="left:1460px;top:668px;font-size:24px">花蓮站<small>集合與解散</small></div>
+
+  <nav aria-label="章節"><span>集合與交通</span><b>路線</b><span>住宿</span><span>注意事項</span></nav>
+  <div class="copy">
+    <h2>兩天一夜怎麼走</h2>
+    <p class="key">第一天<span class="hill">進山</span>，<br>第二天<span class="sea">看海</span>。</p>
+  </div>
+  <div class="plan">
+    <h3>第一天・十一月二十八日</h3>
+    <ul>
+      <li><time>07:30</time><span>台北車站集合，搭火車往花蓮</span></li>
+      <li><time>10:40</time><span>太魯閣，走砂卡礑步道</span></li>
+      <li><time>18:30</time><span>東大門夜市，自由吃晚餐</span></li>
+    </ul>
+    <h3>第二天・十一月二十九日</h3>
+    <ul>
+      <li><time>05:50</time><span>七星潭看日出，自由參加</span></li>
+      <li><time>14:20</time><span>花蓮站搭車返回台北</span></li>
+    </ul>
+  </div>
+</div>
+<script>
+// Thick oil paint: thousands of short loaded-brush strokes, each with a shadow and a lit ridge.
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const coast = [[1450,-40],[1420,120],[1400,250],[1410,340],[1440,430],[1468,520],[1480,600],[1500,700],[1525,800],[1555,930],[1590,1120]];
+const coastX = y => { for (let i = 0; i < coast.length - 1; i++) { const [x0, y0] = coast[i], [x1, y1] = coast[i + 1]; if (y >= y0 && y <= y1) return x0 + (x1 - x0) * (y - y0) / (y1 - y0); } return 1590; };
+const edgeX = y => 880 + 26 * Math.sin(y / 37) + 18 * Math.sin(y / 11);       // ragged left edge of the painting
+const g = (x, c, w) => Math.exp(-(((x - c) / w) ** 2));
+const ridge = x => 470 - 260 * g(x, 1110, 150) - 170 * g(x, 1260, 110) - 120 * g(x, 980, 90);
+const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const tone = (c, k) => '#' + c.map(v => Math.max(0, Math.min(255, Math.round(v * k))).toString(16).padStart(2, '0')).join('');
+const pick = a => a[Math.floor(rnd() * a.length)];
+const SEA = ['#1F4A7A', '#2C5E95', '#3E77AE', '#2A5488', '#5B90C2'], SHORE = ['#4FA3B5', '#6CB9C4', '#3E8FA6'];
+const PEAK = ['#3E4A6B', '#4A5A7C', '#36425E'], HILL = ['#2F5E43', '#3F7650', '#4C8558', '#5A8A55'], FOOT = ['#8FAE5E', '#A3B866', '#7EA05A'];
+const PLAIN = ['#C9B86A', '#B5B062', '#D8C88A', '#9FAF62', '#CDBB78', '#8FA858', '#D9A75E'];
+let out = '';
+function stroke(x, y, ang, len, w, col) {
+  len *= .72; w *= 1.45;
+  const c = hex(col).map(v => v * (.9 + rnd() * .2)), dx = Math.cos(ang) * len / 2, dy = Math.sin(ang) * len / 2;
+  const bend = (rnd() - .5) * len * .35, mx = x - Math.sin(ang) * bend * .5, my = y + Math.cos(ang) * bend * .5;
+  const d = (ox, oy) => `M${(x - dx + ox).toFixed(1)} ${(y - dy + oy).toFixed(1)} Q${(mx + ox).toFixed(1)} ${(my + oy).toFixed(1)} ${(x + dx + ox).toFixed(1)} ${(y + dy + oy).toFixed(1)}`;
+  out += `<path d="${d(1.6, 2.2)}" stroke="${tone(c, .7)}" stroke-width="${w}" opacity=".5"/>`;
+  out += `<path d="${d(0, 0)}" stroke="${tone(c, 1)}" stroke-width="${w}"/>`;
+  if (rnd() < .55) out += `<path d="${d(-w * .18, -w * .22)}" stroke="${tone(c, 1.32)}" stroke-width="${(w * .22).toFixed(1)}" opacity=".38"/>`;
+}
+for (let y = -10; y < 1100; y += 10) for (let x = 840; x < 1940; x += 14) {
+  const px = x + (rnd() - .5) * 14, py = y + (rnd() - .5) * 10, e = edgeX(py);
+  if (px < e || (px < e + 40 && rnd() < .5)) continue;
+  const cx = coastX(py);
+  if (px > cx + 14) {                                    // sea: long horizontal swells
+    const near = px < cx + 70;
+    stroke(px, py, (rnd() - .5) * .25, 34 + rnd() * 30, 9 + rnd() * 6, near ? pick(SHORE) : (rnd() < .04 ? '#E9EEF0' : pick(SEA)));
+  } else if (px > cx - 10) {                             // foam on the shore
+    stroke(px, py, Math.PI / 2 + (rnd() - .5) * .4, 22 + rnd() * 16, 8, rnd() < .6 ? '#F2EFE6' : '#CFE3E6');
+  } else if (py < ridge(px) - 6) {
+    continue;                                            // bare canvas above the mountains
+  } else if (py < 640) {                                 // mountains, strokes following the slopes
+    const slope = Math.sign(1150 - px) * (.75 + rnd() * .35);
+    const h = (py - ridge(px)) / 260;
+    const pal = h < .25 ? PEAK : (py > 560 ? FOOT : HILL);
+    stroke(px, py, -slope + (rnd() - .5) * .3, 26 + rnd() * 22, 9 + rnd() * 5, pick(pal));
+  } else {                                               // plains
+    stroke(px, py, (rnd() - .5) * .35, 30 + rnd() * 26, 10 + rnd() * 5, pick(PLAIN));
+  }
+}
+// the river through the gorge
+for (let t = 0; t <= 1; t += .012) {
+  const x = 990 + t * 420, y = 330 + Math.sin(t * 9) * 18 - t * 20;
+  stroke(x + (rnd() - .5) * 6, y + (rnd() - .5) * 6, Math.cos(t * 9) * .4, 26, 9, rnd() < .5 ? '#7FB6CF' : '#D9ECF0');
+}
+document.getElementById('paint').innerHTML = `<g fill="none" stroke-linecap="round">${out}</g>`;
+// route and stops on top of the paint
+const m = `<g stroke="#2B241D" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="2 15">
+  <path d="M1128 362 C1210 440 1310 520 1398 580"/><path d="M1414 570 C1446 510 1430 440 1392 392"/><path d="M1408 600 C1420 630 1418 654 1410 676"/></g>
+  <path d="M944 340 C1000 344 1060 352 1104 358" stroke="#2B241D" stroke-width="2.5" fill="none"/>
+  <g stroke="#2B241D" stroke-width="4" fill="#F6EFDF"><circle cx="1128" cy="362" r="24"/><circle cx="1404" cy="574" r="24"/><circle cx="1392" cy="372" r="24"/><circle cx="1410" cy="690" r="13"/></g>
+  <circle cx="1410" cy="690" r="5" fill="#2B241D"/>
+  <g font-family="Noto Serif TC" font-weight="700" font-size="26" fill="#2B241D" text-anchor="middle"><text x="1128" y="371">1</text><text x="1404" y="583">2</text><text x="1392" y="381">3</text></g>`;
+document.getElementById('marks').innerHTML = m;
+</script>
+</body>
+</html>

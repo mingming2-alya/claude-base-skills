@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>03c 水彩水墨（彩色水彩）｜花蓮兩天一夜</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Serif+TC:wght@500;700&display=block">
+<style>
+  :root{--paper:#F7F2E8;--ink:#3E3026;--sub:#7C6A5B;--sea:#2E5E97;--hill:#3F7650}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--paper)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:"LXGW WenKai TC",serif}
+  svg{position:absolute;inset:0}
+  .wash{mix-blend-mode:multiply}
+  nav{position:absolute;left:130px;top:64px;display:flex;gap:44px;font:400 25px/1 "LXGW WenKai TC";color:#857160;letter-spacing:.06em}
+  nav b{color:var(--ink);font-weight:700;position:relative}
+  nav b::after{content:"";position:absolute;left:-6px;right:-6px;bottom:-12px;height:8px;border-radius:6px;background:#E8B86A;opacity:.55;filter:blur(1.5px)}
+  .copy{position:absolute;left:130px;top:196px;width:720px}
+  .copy h2{font:400 40px/1.2 "LXGW WenKai TC";color:#8A6F5A;letter-spacing:.08em}
+  .copy p.key{margin-top:26px;font:700 78px/1.3 "LXGW WenKai TC";letter-spacing:.04em}
+  .copy p.key .hill{color:var(--hill)} .copy p.key .sea{color:var(--sea)}
+  .plan{position:absolute;left:130px;top:536px;width:640px;font-family:"Noto Serif TC",serif}
+  .plan h3{font:700 26px/1 "LXGW WenKai TC";letter-spacing:.12em;color:#A0715A;margin:0 0 14px}
+  .plan h3:not(:first-child){margin-top:36px}
+  .plan ul{list-style:none;display:grid;gap:12px}
+  .plan li{display:grid;grid-template-columns:96px 1fr;font:500 27px/1.4 "Noto Serif TC";letter-spacing:.02em}
+  .plan time{font:700 27px/1.4 "Noto Serif TC";color:var(--sub)}
+  .label{position:absolute;font:700 30px/1.2 "LXGW WenKai TC";color:var(--ink);letter-spacing:.06em;white-space:nowrap}
+  .label small{display:block;font:400 22px/1.3 "LXGW WenKai TC";color:#45362B;letter-spacing:.04em;margin-top:4px}
+  .ocean{position:absolute;left:1640px;top:690px;font:400 46px/1 "LXGW WenKai TC";letter-spacing:.5em;color:#22477A}
+  .range{position:absolute;left:968px;top:112px;font:400 26px/1 "LXGW WenKai TC";letter-spacing:.6em;color:#3E5068;opacity:.85}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <!-- Wash: wobbly edges, pigment blooms, then granulation. -->
+      <filter id="wash" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency=".006 .009" numOctaves="4" seed="7" result="low"/>
+        <feDisplacementMap in="SourceGraphic" in2="low" scale="34" xChannelSelector="R" yChannelSelector="G" result="shape"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".016" numOctaves="2" seed="19" result="mid"/>
+        <feColorMatrix in="mid" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .7 .55" result="midA"/>
+        <feComposite in="shape" in2="midA" operator="in" result="bloom"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="1" seed="5" result="hi"/>
+        <feColorMatrix in="hi" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .8 .55" result="hiA"/>
+        <feComposite in="bloom" in2="hiA" operator="in"/>
+      </filter>
+      <filter id="washSm" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="3" result="low"/>
+        <feDisplacementMap in="SourceGraphic" in2="low" scale="12" xChannelSelector="R" yChannelSelector="G" result="shape"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="9" result="hi"/>
+        <feColorMatrix in="hi" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 .3" result="hiA"/>
+        <feComposite in="shape" in2="hiA" operator="in"/>
+      </filter>
+      <filter id="ink" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="21" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="paper" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="3" seed="2" result="t"/>
+        <feDiffuseLighting in="t" surfaceScale="1.6" lighting-color="#fffaf0" result="l"><feDistantLight azimuth="225" elevation="58"/></feDiffuseLighting>
+      </filter>
+      <filter id="maskBlur" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+      <mask id="sunHole" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <rect width="1920" height="1080" fill="#fff"/>
+        <circle cx="1612" cy="214" r="74" fill="#000" filter="url(#maskBlur)"/>
+      </mask>
+      <linearGradient id="landFade" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#D9D29B" stop-opacity="0"/><stop offset=".35" stop-color="#D9D29B" stop-opacity=".75"/><stop offset="1" stop-color="#CBD08E" stop-opacity=".9"/>
+      </linearGradient>
+      <linearGradient id="m1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6E8FB4"/><stop offset=".6" stop-color="#A9BED3" stop-opacity=".55"/><stop offset="1" stop-color="#A9BED3" stop-opacity="0"/></linearGradient>
+      <linearGradient id="m2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5E8F7B"/><stop offset=".6" stop-color="#9DC0AE" stop-opacity=".55"/><stop offset="1" stop-color="#9DC0AE" stop-opacity="0"/></linearGradient>
+      <linearGradient id="m3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7FA463"/><stop offset=".6" stop-color="#B9CF94" stop-opacity=".5"/><stop offset="1" stop-color="#B9CF94" stop-opacity="0"/></linearGradient>
+      <linearGradient id="seaGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#7FB0D8"/><stop offset=".55" stop-color="#5E93C8"/><stop offset="1" stop-color="#3F72AE"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Warm ochre glaze behind the title: the text sits inside the painting -->
+    <g class="wash" filter="url(#wash)" opacity=".5">
+      <path d="M92 300 C260 262 520 262 690 292 C752 304 760 420 690 446 C520 492 250 488 104 452 C52 438 44 316 92 300 Z" fill="#F0D49A" stroke="#E2B66A" stroke-width="6" stroke-opacity=".5"/>
+    </g>
+
+    <!-- Land, fading into the paper on the left -->
+    <g class="wash" filter="url(#wash)">
+      <path d="M780 -30 L1405 -30 L1372 120 L1342 262 L1356 334 L1398 404 L1424 474 L1444 562 L1466 662 L1494 782 L1534 922 L1566 1110 L780 1110 Z" fill="url(#landFade)" opacity=".75"/>
+    </g>
+    <!-- Mountains: far, middle, near ridges -->
+    <g class="wash" filter="url(#wash)" opacity=".62">
+      <path d="M870 372 L960 176 L1012 222 L1086 104 L1150 196 L1214 140 L1296 246 L1350 236 L1350 400 L870 400 Z" fill="url(#m1)"/>
+      <path d="M870 372 L960 176 L1012 222 L1086 104 L1150 196 L1214 140 L1296 246 L1350 236" fill="none" stroke="#5F7FA3" stroke-width="5" stroke-opacity=".5" stroke-linejoin="round"/>
+    </g>
+    <g class="wash" filter="url(#wash)" opacity=".62">
+      <path d="M880 500 L978 292 L1040 352 L1112 248 L1184 334 L1246 292 L1340 400 L1340 520 L880 520 Z" fill="url(#m2)"/>
+      <path d="M880 500 L978 292 L1040 352 L1112 248 L1184 334 L1246 292 L1340 400" fill="none" stroke="#4E806C" stroke-width="5" stroke-opacity=".5" stroke-linejoin="round"/>
+    </g>
+    <g class="wash" filter="url(#wash)" opacity=".6">
+      <path d="M910 600 L1006 456 L1078 506 L1150 432 L1232 504 L1300 474 L1362 530 L1362 640 L910 640 Z" fill="url(#m3)"/>
+      <path d="M910 600 L1006 456 L1078 506 L1150 432 L1232 504 L1300 474 L1362 530" fill="none" stroke="#6E9555" stroke-width="5" stroke-opacity=".45" stroke-linejoin="round"/>
+    </g>
+    <!-- Rice fields around the city -->
+    <g class="wash" filter="url(#washSm)" opacity=".55">
+      <path d="M1150 760 q80 -30 170 -8 q20 30 -30 44 q-90 14 -150 -6 q-20 -14 10 -30 z" fill="#C3CD6C" opacity=".6"/>
+      <path d="M1250 880 q90 -26 170 -4 q16 28 -34 40 q-90 12 -140 -8 q-20 -14 4 -28 z" fill="#B5C462" opacity=".5"/>
+      <circle cx="1100" cy="760" r="7" fill="#9DB45A"/><circle cx="1452" cy="980" r="6" fill="#7FA9CF"/><circle cx="1012" cy="640" r="5" fill="#9DB45A"/>
+    </g>
+    <!-- The Pacific, with the paper left white for the sun -->
+    <g mask="url(#sunHole)">
+    <g class="wash" filter="url(#wash)">
+      <path d="M1405 -40 L1372 120 L1342 262 L1356 334 L1398 404 L1424 474 L1444 562 L1466 662 L1494 782 L1534 922 L1566 1120 L1990 1120 L1990 -40 Z" fill="url(#seaGrad)" opacity=".7" stroke="#3E6EA8" stroke-width="7" stroke-opacity=".55"/>
+    </g>
+    <g class="wash" filter="url(#wash)" opacity=".3">
+      <path d="M1720 -40 C1700 200 1790 420 1750 640 C1720 820 1790 980 1810 1120 L1990 1120 L1990 -40 Z" fill="#2F5F9E"/>
+    </g>
+    </g>
+    <!-- Sunrise for day two -->
+    <g class="wash" filter="url(#washSm)" opacity=".75">
+      <circle cx="1612" cy="214" r="78" fill="#F8DDA0" opacity=".55"/>
+      <circle cx="1612" cy="214" r="50" fill="#F29A6B"/>
+    </g>
+    <!-- Taroko gorge river -->
+    <g class="wash" filter="url(#washSm)" opacity=".8">
+      <path d="M1010 262 C1060 300 1090 240 1140 278 C1190 316 1230 262 1280 284 C1310 296 1330 280 1350 262" stroke="#4F96A3" stroke-width="12" fill="none" stroke-linecap="round"/>
+    </g>
+    <!-- City blocks -->
+    <g class="wash" filter="url(#washSm)" opacity=".8">
+      <rect x="1384" y="560" width="26" height="22" fill="#D98C6E"/><rect x="1414" y="548" width="20" height="30" fill="#C9775C"/>
+      <rect x="1396" y="590" width="30" height="18" fill="#E2A07B"/><rect x="1370" y="600" width="18" height="24" fill="#C9775C"/>
+    </g>
+
+    <!-- Paper relief over everything -->
+    <rect width="1920" height="1080" filter="url(#paper)" opacity=".38" style="mix-blend-mode:multiply"/>
+
+    <!-- Ink layer: route, stops, waves, compass -->
+    <g filter="url(#ink)" fill="none" stroke="#5A4434" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M1128 292 C1210 380 1300 470 1398 568" stroke-width="5" stroke-dasharray="2 16"/>
+      <path d="M1412 560 C1440 500 1420 430 1376 376" stroke-width="5" stroke-dasharray="2 16"/>
+      <path d="M1414 600 C1424 630 1420 652 1412 672" stroke-width="4" stroke-dasharray="2 14"/>
+      <g stroke="#2C5285" stroke-width="3.5" opacity=".8">
+        <path d="M1560 300 q22 -22 44 0 q22 22 44 0"/><path d="M1610 360 q22 -22 44 0 q22 22 44 0"/>
+        <path d="M1590 880 q22 -22 44 0 q22 22 44 0"/><path d="M1700 940 q22 -22 44 0 q22 22 44 0"/>
+      </g>
+      <g transform="translate(1800 118)" stroke="#5A4434" stroke-width="3">
+        <path d="M0 -50 L14 10 L0 0 L-14 10 Z" fill="#5A4434"/><path d="M0 0 L0 46"/>
+      </g>
+    </g>
+    <g font-family="LXGW WenKai TC" font-size="30" font-weight="700" fill="#5A4434" text-anchor="middle"><text x="1800" y="58">北</text></g>
+    <!-- Stop markers -->
+    <g filter="url(#ink)" stroke="#4A3729" stroke-width="4" fill="#FBF6EC">
+      <circle cx="1128" cy="290" r="24"/><circle cx="1404" cy="574" r="24"/><circle cx="1372" cy="370" r="24"/>
+      <circle cx="1410" cy="690" r="14"/><circle cx="1410" cy="690" r="5" fill="#4A3729"/>
+    </g>
+    <g font-family="Noto Serif TC" font-weight="700" font-size="26" fill="#4A3729" text-anchor="middle">
+      <text x="1128" y="299">1</text><text x="1404" y="583">2</text><text x="1372" y="379">3</text>
+    </g>
+  </svg>
+
+  <div class="range">中央山脈</div>
+  <div class="ocean">太平洋</div>
+  <div class="label" style="left:944px;top:330px">太魯閣<small>砂卡礑步道，約 2 小時</small></div>
+  <div class="label" style="left:1446px;top:540px">東大門夜市<small>自由晚餐</small></div>
+  <div class="label" style="left:1416px;top:340px">七星潭<small>隔天看日出</small></div>
+  <div class="label" style="left:1440px;top:672px;font-size:26px">花蓮站<small>集合與解散</small></div>
+
+  <nav aria-label="章節"><span>集合與交通</span><b>路線</b><span>住宿</span><span>注意事項</span></nav>
+
+  <div class="copy">
+    <h2>兩天一夜怎麼走</h2>
+    <p class="key">第一天<span class="hill">進山</span>，<br>第二天<span class="sea">看海</span>。</p>
+  </div>
+
+  <div class="plan">
+    <h3>第一天・十一月二十八日</h3>
+    <ul>
+      <li><time>07:30</time><span>台北車站集合，搭火車往花蓮</span></li>
+      <li><time>10:40</time><span>太魯閣，走砂卡礑步道</span></li>
+      <li><time>18:30</time><span>東大門夜市，自由吃晚餐</span></li>
+    </ul>
+    <h3>第二天・十一月二十九日</h3>
+    <ul>
+      <li><time>05:50</time><span>七星潭看日出，自由參加</span></li>
+      <li><time>14:20</time><span>花蓮站搭車返回台北</span></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>

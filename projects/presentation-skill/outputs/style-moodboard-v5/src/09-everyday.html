@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>09 日常工作款｜專案週報（便當格）</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@500;600;700;800&display=block">
+<style>
+  :root{--bg:#E2E8F1;--card:#FCFCFB;--ink:#16181C;--sub:#5E646E;--line:#E0E3E8;--ok:#17704A;--okBg:#E2F1E9;--risk:#E8572A;--riskText:#B13E1C;--riskBg:#FFF0E8;--blue:#2D5BD8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Archivo","Noto Sans TC",sans-serif}
+  nav{position:absolute;left:120px;top:54px;display:flex;padding:6px;border-radius:14px;background:#DFE2E8;font:500 21px/1 "Noto Sans TC";color:var(--sub);letter-spacing:.04em}
+  nav span,nav b{padding:11px 22px;border-radius:10px}
+  nav b{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(20,30,50,.12)}
+  h2{position:absolute;left:120px;top:138px;font:700 30px/1 "Noto Sans TC";color:var(--sub);letter-spacing:.06em}
+  h2 b{font:700 30px/1 "Archivo";color:var(--ink);margin-right:12px}
+  p.key{position:absolute;left:118px;top:186px;font:900 64px/1.25 "Noto Sans TC";letter-spacing:.01em}
+  p.key em{font-style:normal;color:var(--riskText)}
+  .card{position:absolute;background:var(--card);border:1px solid var(--line);border-radius:28px;padding:30px 34px;box-shadow:0 1px 2px rgba(20,30,50,.04),0 10px 30px rgba(20,30,50,.06)}
+  .head{display:flex;align-items:center;gap:14px}
+  .head strong{font:700 30px/1.2 "Noto Sans TC";letter-spacing:.02em}
+  .head small{font:500 20px/1 "Noto Sans TC";color:var(--sub)}
+  .who{width:42px;height:42px;border-radius:50%;background:#E6E9EE;display:grid;place-items:center;font:700 19px/1 "Noto Sans TC";margin-left:auto}
+  .pill{display:inline-block;padding:9px 15px;border-radius:999px;font:700 20px/1 "Noto Sans TC";letter-spacing:.04em}
+  .ok{background:var(--okBg);color:var(--ok)} .risk{background:#C4441E;color:#fff}
+  .ring{position:relative;width:170px;height:170px;margin-top:22px}
+  .ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:800 46px/1 "Archivo"}
+  .ring b span{font-size:22px;margin-left:2px}
+  .next{margin-top:18px;font:500 22px/1.45 "Noto Sans TC";color:#3A3F47}
+  .next b{font:700 22px/1 "Archivo";color:var(--ink);margin-right:8px}
+  .big{font:800 150px/.9 "Archivo";letter-spacing:-.03em}
+  .big span{font:700 36px/1 "Noto Sans TC";letter-spacing:0;margin-left:8px}
+  .gantt{position:relative;margin-top:28px;height:150px}
+  .gl{position:absolute;font:500 19px/1 "Noto Sans TC";color:var(--sub)}
+  .bar{position:absolute;height:26px;border-radius:13px}
+  .opt{border-radius:18px;background:var(--card);border:1px solid #F3D3C2;padding:20px 22px}
+  .opt b{display:block;font:700 25px/1.3 "Noto Sans TC"}
+  .opt span{display:block;margin-top:8px;font:400 21px/1.45 "Noto Sans TC";color:#4B5058}
+  ul.todo{list-style:none;margin-top:18px;display:grid;gap:16px}
+  ul.todo li{display:flex;gap:14px;align-items:flex-start;font:500 23px/1.4 "Noto Sans TC"}
+  ul.todo i{flex:none;width:24px;height:24px;margin-top:4px;border:2.5px solid #A6ADB8;border-radius:7px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <nav aria-label="章節"><span>上週回顧</span><b>本週進度</b><span>風險</span><span>下週計畫</span></nav>
+  <h2><b>W46</b>三個專案的進度</h2>
+  <p class="key">兩個準時，<em>一個卡在供應商</em>。</p>
+
+  <!-- the one that needs attention gets the biggest card -->
+  <section class="card" style="left:120px;top:310px;width:780px;height:356px;border-color:#F3C9B5">
+    <div class="head"><span class="pill risk">延遲 2 週</span><strong>新包材導入</strong><small>生產部</small><span class="who">王</span></div>
+    <div class="gantt">
+      <div class="gl" style="left:0;top:0">計畫</div><div class="bar" style="left:80px;top:-4px;width:440px;background:#D5DAE1"></div>
+      <div class="gl" style="left:0;top:58px">實際</div><div class="bar" style="left:80px;top:54px;width:300px;background:var(--ink)"></div>
+      <div class="bar" style="left:380px;top:54px;width:220px;background:repeating-linear-gradient(-45deg,#F7C4AE 0 8px,#FBE2D6 8px 16px);border:2px dashed var(--risk)"></div>
+      <div class="gl" style="left:520px;top:-34px;color:var(--ink)">原訂 11/30</div>
+      <div class="gl" style="left:560px;top:94px;color:var(--riskText);font-weight:700">預估 12/14</div>
+      <div class="gl" style="left:80px;top:136px;font-size:22px;color:#3A3F47;line-height:1.6">卡點：等供應商寄樣品，已追兩次<br>完成度 30%</div>
+    </div>
+  </section>
+  <section class="card" style="left:924px;top:310px;width:426px;height:356px">
+    <div class="head"><strong>官網改版</strong><span class="pill ok" style="margin-left:auto">準時</span></div>
+    <div style="display:flex;gap:26px;align-items:center">
+      <div class="ring"><svg width="170" height="170" viewBox="0 0 170 170"><circle cx="85" cy="85" r="70" fill="none" stroke="#E6E9EE" stroke-width="16"/><circle cx="85" cy="85" r="70" fill="none" stroke="#2D5BD8" stroke-width="16" stroke-linecap="round" stroke-dasharray="351.9 439.8" transform="rotate(-90 85 85)"/></svg><b>80<span>%</span></b></div>
+      <p class="next"><b>11/24</b><br>上線前測試</p>
+    </div>
+  </section>
+  <section class="card" style="left:1374px;top:310px;width:426px;height:356px">
+    <div class="head"><strong>會員系統升級</strong><span class="pill ok" style="margin-left:auto">準時</span></div>
+    <div style="display:flex;gap:26px;align-items:center">
+      <div class="ring"><svg width="170" height="170" viewBox="0 0 170 170"><circle cx="85" cy="85" r="70" fill="none" stroke="#E6E9EE" stroke-width="16"/><circle cx="85" cy="85" r="70" fill="none" stroke="#2D5BD8" stroke-width="16" stroke-linecap="round" stroke-dasharray="241.9 439.8" transform="rotate(-90 85 85)"/></svg><b>55<span>%</span></b></div>
+      <p class="next"><b>12/01</b><br>搬移舊資料</p>
+    </div>
+  </section>
+
+  <section class="card" style="left:120px;top:690px;width:400px;height:330px">
+    <div class="head"><strong>本週完成</strong></div>
+    <p class="big" style="margin-top:22px">12<span>項</span></p>
+    <svg width="330" height="70" viewBox="0 0 330 70" style="margin-top:14px">
+      <g fill="#D5DAE1"><rect x="0" y="38" width="40" height="32" rx="6"/><rect x="56" y="30" width="40" height="40" rx="6"/><rect x="112" y="44" width="40" height="26" rx="6"/><rect x="168" y="24" width="40" height="46" rx="6"/><rect x="224" y="34" width="40" height="36" rx="6"/></g>
+      <rect x="280" y="4" width="40" height="66" rx="6" fill="#2D5BD8"/>
+    </svg>
+  </section>
+  <section class="card" style="left:544px;top:690px;width:820px;height:330px;background:var(--riskBg);border-color:#F3C9B5">
+    <div class="head"><strong>需要你決定：新包材要不要改找第二家？</strong></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px">
+      <div class="opt"><b>A．繼續等原廠</b><span>品質已驗證，但再延 2 週</span></div>
+      <div class="opt"><b>B．改找第二家</b><span>可以準時，成本多 8%</span></div>
+    </div>
+    <p style="margin-top:20px;font:500 22px/1 'Noto Sans TC';color:#4B5058">請在 <b style="font:700 22px/1 Archivo;color:var(--riskText)">11/20</b> 前回覆</p>
+  </section>
+  <section class="card" style="left:1388px;top:690px;width:412px;height:330px">
+    <div class="head"><strong>下週重點</strong></div>
+    <ul class="todo"><li><i></i>官網壓力測試</li><li><i></i>會員資料搬移演練</li><li><i></i>包材決策後通知產線</li></ul>
+  </section>
+</div>
+</body>
+</html>
