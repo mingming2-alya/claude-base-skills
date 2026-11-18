@@ -11,7 +11,7 @@
 </style></head><body><div class="grid" id="g"></div>
 <script>
 const items=[['01a-illustration-clay','01 插畫場景','可切換：黏土・手繪・霓虹'],['02b-blocks-3d-wood','02 積木構成','可切換：2D 幾何・3D 積木'],['03b-ink-oil','03 水彩水墨','可切換：黑白水墨・厚油彩・彩色水彩'],
-['04-apple','04 Apple 發表','產品發表・大會開場'],['05-scroll','05 書卷刻本','文化講座・讀書會'],['06a-counsel-boardroom','06 顧問報告 A','深色董事會（待選）'],['06b-counsel-blocks','06 顧問報告 B','色塊策略（待選）'],['06c-counsel-swiss','06 顧問報告 C','瑞士大數字（待選）'],
+['04-apple','04 Apple 發表','產品發表・大會開場'],['05-scroll','05 書卷刻本','文化講座・讀書會'],['06-counsel','06 顧問報告','色塊策略・數據說話'],
 ['07-riso','07 孔版小誌','社群活動・市集'],['08-deco','08 摩登金','尾牙・頒獎・典禮'],['09-everyday','09 日常工作款','週會・進度回報（重做）'],
 ['10-photo','10 攝影雜誌','年度回顧・電影劇照（重做）'],['11-trend','11 年輕潮流','行銷・社群・招募'],['12-retro','12 在地懷舊','週年回顧・在地文化']];
 document.getElementById('g').innerHTML=items.map(([f,n,u])=>`<figure><img src="img/${f}.jpg"><figcaption>${n}<span>${u}</span></figcaption></figure>`).join('');
