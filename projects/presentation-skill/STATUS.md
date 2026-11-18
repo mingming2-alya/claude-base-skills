@@ -1,6 +1,6 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-18）**：依使用者建議調整成 **12 款**並畫好意象圖（`outputs/style-moodboard-v5/`，清單 [`inputs/style-list-v5.md`](inputs/style-list-v5.md)）。插畫場景可切換黏土、手繪、霓虹；積木構成可選 2D 或 3D；水彩水墨可選黑白水墨、厚油彩、彩色水彩；科技暗色移除；顧問報告、日常工作款、攝影雜誌重做。**等使用者看過後討論調整。** 插畫十三種子風格的四個問題仍保留未答。用色另議。
+> **最新接手點（2026-11-18）**：十二款意象圖已依「總結不當主標題」全部修正（`outputs/style-moodboard-v5/`）。**顧問報告有三個新方向待使用者選**（A 深色董事會、B 色塊策略、C 瑞士大數字），詳見 [`inputs/style-list-v5.md`](inputs/style-list-v5.md) 最後兩節。插畫十三種子風格的四個問題仍保留未答。用色另議。
 
 > 主軸文件：`ROADMAP.md`（三個支柱＋全流程＋階段）。
 
