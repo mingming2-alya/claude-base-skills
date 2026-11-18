@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><title>用色彈性示範</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=block">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:2000px;background:#EEEBE4;font-family:"Noto Sans TC",sans-serif;color:#2A2622;padding:36px 40px 30px}
+  h1{font:900 34px/1.2 "Noto Sans TC";margin-bottom:6px}
+  p.lede{font:500 21px/1.5 "Noto Sans TC";color:#5F584E;margin-bottom:26px}
+  .row{display:grid;grid-template-columns:220px repeat(3,580px);gap:18px;align-items:start;margin-bottom:26px}
+  .row h2{font:900 26px/1.3 "Noto Sans TC";padding-top:8px}
+  .row h2 small{display:block;margin-top:10px;font:500 18px/1.5 "Noto Sans TC";color:#5F584E}
+  figure img{display:block;width:580px;height:326px;border-radius:5px}
+  figcaption{margin-top:8px;font:700 19px/1 "Noto Sans TC";color:#3A342E}
+</style></head><body>
+<h1>用色不定死：鎖規則，不鎖色碼</h1>
+<p class="lede">同一款風格、同一頁，換三組配色。版面、字體與每款的用色規則都不動，只換規則允許的顏色。</p>
+<div id="rows"></div>
+<script>
+const rows=[
+ ['顧問報告','規則：一個焦點色，其餘中性；警示色固定',[['counsel-a-green','綠（原版）'],['counsel-b-blue','藍'],['counsel-c-ink','墨黑']]],
+ ['Apple 發表','規則：黑色舞台不動；關鍵字、裝置光、地面光同一組漸層',[['apple-a-warm','暖橘（原版）'],['apple-b-ice','冰藍'],['apple-c-leaf','翠綠']]],
+ ['插畫場景','規則：背景與物件同一色相家族，整組一起換',[['illustration-a-peach','蜜桃（原版）'],['illustration-b-sage','鼠尾草'],['illustration-c-sky','天青']]],
+];
+document.getElementById('rows').innerHTML=rows.map(([n,rule,v])=>`<div class="row"><h2>${n}<small>${rule}</small></h2>${v.map(([f,l])=>`<figure><img src="img/${f}.jpg"><figcaption>${l}</figcaption></figure>`).join('')}</div>`).join('');
+</script></body></html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>04 Apple 發表｜AI 助理 3.0</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Geist:wght@400;500;600;700&display=block">
+<style>
+  :root{--fg:#F5F5F7;--sub:#9A9AA0;--warm:linear-gradient(90deg,#8BE6FF 0%,#2E9BFF 45%,#2F6BFF 100%)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:#000}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:#000;color:var(--fg);font-family:"Geist","Noto Sans TC",sans-serif;text-align:center}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:0;right:0;top:56px;display:flex;justify-content:center;gap:40px;font:500 21px/1 "Noto Sans TC";color:#8E8E93;letter-spacing:.06em}
+  nav b{color:var(--fg);font-weight:500}
+  h1{position:absolute;left:0;right:0;top:150px;font:700 136px/1.05 "Noto Sans TC";letter-spacing:-.01em}
+  h1 span{font:700 136px/1 "Geist";background:var(--warm);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em}
+  p.tag{position:absolute;left:0;right:0;top:340px;font:500 46px/1.4 "Noto Sans TC";color:#D9D9DE;letter-spacing:.02em}
+  p.tag em{font-style:normal;font-weight:700;background:var(--warm);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .ui{position:absolute;left:776px;top:668px;width:368px;text-align:left}
+  .ui small{display:block;font:500 20px/1 "Noto Sans TC";color:#8E8E93;letter-spacing:.06em;margin-bottom:22px}
+  .row{display:grid;grid-template-columns:44px 1fr;align-items:center;height:74px;border-top:1px solid rgba(255,255,255,.09);font:500 26px/1 "Noto Sans TC"}
+  .row i{width:28px;height:28px;border-radius:50%;border:2.5px solid #4A4A50;display:block}
+  .row.done i{border:0;background:linear-gradient(135deg,#8BE6FF,#2F6BFF);position:relative}
+  .row.done i::after{content:"";position:absolute;left:9px;top:6px;width:7px;height:12px;border:solid #000;border-width:0 3px 3px 0;transform:rotate(45deg)}
+  .row.done span{color:#8E8E93}
+  .row.now i{border-color:#2E9BFF;border-right-color:transparent}
+  .side{position:absolute;width:380px;text-align:left}
+  .side h3{font:700 32px/1.25 "Noto Sans TC";letter-spacing:.02em}
+  .side p{margin-top:10px;font:400 23px/1.5 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="g40" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2720" height="1880"><feGaussianBlur stdDeviation="40"/></filter>
+      <filter id="g12" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2720" height="1880"><feGaussianBlur stdDeviation="12"/></filter>
+      <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#A5F3FF"/><stop offset=".35" stop-color="#5AC8FA"/><stop offset=".6" stop-color="#2E9BFF"/><stop offset="1" stop-color="#33D1B0"/>
+      </linearGradient>
+      <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1C1C1F"/><stop offset="1" stop-color="#0A0A0B"/></linearGradient>
+      <radialGradient id="floor" cx="50%" cy="0%" r="60%"><stop offset="0" stop-color="#FF7A3D" stop-opacity=".28"/><stop offset="1" stop-color="#FF7A3D" stop-opacity="0"/></radialGradient>
+    </defs>
+    <!-- light spilling from the device -->
+    <ellipse cx="960" cy="1080" rx="560" ry="180" fill="#2E9BFF" opacity=".22" filter="url(#g40)"/>
+    <rect x="730" y="610" width="460" height="700" rx="76" fill="none" stroke="url(#edge)" stroke-width="40" opacity=".55" filter="url(#g40)"/>
+    <rect x="730" y="610" width="460" height="700" rx="76" fill="none" stroke="url(#edge)" stroke-width="10" opacity=".9" filter="url(#g12)"/>
+    <!-- the device: dark glass, edge lit -->
+    <rect x="730" y="610" width="460" height="700" rx="76" fill="url(#glass)"/>
+    <rect x="730" y="610" width="460" height="700" rx="76" fill="none" stroke="url(#edge)" stroke-width="3"/>
+    <rect x="744" y="624" width="432" height="672" rx="64" fill="none" stroke="#ffffff" stroke-opacity=".06" stroke-width="2"/>
+    <!-- hairlines to the callouts -->
+    <g stroke="#ffffff" stroke-opacity=".22" stroke-width="1.5">
+      <line x1="600" y1="676" x2="730" y2="676"/><line x1="1190" y1="676" x2="1280" y2="676"/><line x1="1190" y1="866" x2="1280" y2="866"/>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><b>開場</b><span>新功能</span><span>上線時程</span></nav>
+  <h1>AI 助理 <span>3.0</span></h1>
+  <p class="tag">交給它，它會<em>把事做完</em>。</p>
+
+  <div class="ui">
+    <small>今天上午</small>
+    <div class="row done"><i></i><span>整理本週週報</span></div>
+    <div class="row done"><i></i><span>預約週四會議室</span></div>
+    <div class="row now"><i></i><span>寄出報價單</span></div>
+  </div>
+
+  <div class="side" style="left:260px;top:654px"><h3>自己排好順序</h3><p>一句話交代，<br>它拆成步驟、排好時間。</p></div>
+  <div class="side" style="left:1300px;top:654px"><h3>跨系統操作</h3><p>郵件、行事曆、表單，<br>不用再切換。</p></div>
+  <div class="side" style="left:1300px;top:844px"><h3>隨時可以打斷</h3><p>做到一半想改，<br>直接說，它會接著改。</p></div>
+</div>
+</body>
+</html>

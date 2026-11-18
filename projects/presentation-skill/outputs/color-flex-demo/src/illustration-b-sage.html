@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>01 紙黏土｜新人報到第一週</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Nunito:wght@700;800&display=block">
+<style>
+  :root{
+    --bg:#F5E1D6; --ink:#3B332D; --sub:#7A6A5E; --accent:#B4512F;
+    --peach:#F0B394; --terra:#D9795A; --sage:#A3BC92; --butter:#F3CF78; --cream:#FBF3E2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;background:var(--bg);overflow:hidden}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;font-family:"Nunito","Noto Sans TC",sans-serif;color:var(--ink);
+    background:
+      radial-gradient(900px 640px at 8% 6%, #FFF1DA 0%, rgba(255,241,218,0) 70%),
+      radial-gradient(820px 760px at 96% 40%, #F1CBC2 0%, rgba(241,203,194,0) 72%),
+      radial-gradient(760px 520px at 12% 100%, #E2E3C6 0%, rgba(226,227,198,0) 70%),
+      linear-gradient(135deg,#F7E6D6 0%,#F4DCD2 55%,#F1D2CC 100%);}
+  .grain{position:absolute;inset:0;pointer-events:none;opacity:.5;mix-blend-mode:multiply}
+  svg.scene{position:absolute;inset:0;width:1920px;height:1080px}
+  nav{position:absolute;left:140px;top:66px;display:flex;gap:44px;font:500 24px/1 "Noto Sans TC";color:#867362;letter-spacing:.04em}
+  nav b{color:var(--ink);font-weight:700;position:relative}
+  nav b::before{content:"";position:absolute;left:-20px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--terra)}
+  .copy{position:absolute;left:140px;top:190px;width:900px}
+  .copy h2{font:900 76px/1.2 "Chiron GoRound TC";color:var(--ink);letter-spacing:.03em}
+  .copy p.key{margin-top:30px;font:700 34px/1.5 "Noto Sans TC";color:#5E4F45;letter-spacing:.03em}
+  .copy p.key em{font-style:normal;color:var(--accent)}
+  ul.people{position:absolute;left:140px;top:470px;list-style:none;display:grid;gap:34px}
+  ul.people li{display:grid;grid-template-columns:104px 1fr;align-items:center;column-gap:30px}
+  ul.people svg{width:104px;height:104px;overflow:visible}
+  ul.people strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em}
+  ul.people span{display:block;margin-top:6px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+  .slide{filter:hue-rotate(72deg)}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <!-- One light source for every object: upper left. Rims and shadows all agree with it. -->
+      <filter id="clay" x="-40%" y="-40%" width="200%" height="210%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="18" result="sb"/>
+        <feOffset in="sb" dx="22" dy="30" result="so"/>
+        <feFlood flood-color="#8A5638" flood-opacity=".26"/><feComposite in2="so" operator="in" result="shadow"/>
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="cb"/>
+        <feOffset in="cb" dx="4" dy="7" result="co"/>
+        <feFlood flood-color="#6E3F25" flood-opacity=".22"/><feComposite in2="co" operator="in" result="contact"/>
+        <feGaussianBlur in="SourceAlpha" stdDeviation="9" result="rim"/>
+        <feOffset in="rim" dx="-9" dy="-11" result="rimTL"/>
+        <feComposite in="SourceAlpha" in2="rimTL" operator="out" result="edgeBR"/>
+        <feFlood flood-color="#6B3A22" flood-opacity=".30"/><feComposite in2="edgeBR" operator="in" result="shadeBR"/>
+        <feOffset in="rim" dx="9" dy="11" result="rimBR"/>
+        <feComposite in="SourceAlpha" in2="rimBR" operator="out" result="edgeTL"/>
+        <feFlood flood-color="#FFF8EA" flood-opacity=".62"/><feComposite in2="edgeTL" operator="in" result="lightTL"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="4" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 .32  0 0 0 0 .2  0 0 0 0 .12  0 0 0 .11 0" result="na"/>
+        <feComposite in="na" in2="SourceAlpha" operator="in" result="grain"/>
+        <feMerge><feMergeNode in="shadow"/><feMergeNode in="contact"/><feMergeNode in="SourceGraphic"/><feMergeNode in="shadeBR"/><feMergeNode in="lightTL"/><feMergeNode in="grain"/></feMerge>
+      </filter>
+      <filter id="claySm" x="-60%" y="-60%" width="240%" height="250%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="9" result="sb"/>
+        <feOffset in="sb" dx="9" dy="13" result="so"/>
+        <feFlood flood-color="#8A5638" flood-opacity=".24"/><feComposite in2="so" operator="in" result="shadow"/>
+        <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="rim"/>
+        <feOffset in="rim" dx="-6" dy="-7" result="rimTL"/>
+        <feComposite in="SourceAlpha" in2="rimTL" operator="out" result="edgeBR"/>
+        <feFlood flood-color="#6B3A22" flood-opacity=".28"/><feComposite in2="edgeBR" operator="in" result="shadeBR"/>
+        <feOffset in="rim" dx="6" dy="7" result="rimBR"/>
+        <feComposite in="SourceAlpha" in2="rimBR" operator="out" result="edgeTL"/>
+        <feFlood flood-color="#FFF8EA" flood-opacity=".6"/><feComposite in2="edgeTL" operator="in" result="lightTL"/>
+        <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/><feMergeNode in="shadeBR"/><feMergeNode in="lightTL"/></feMerge>
+      </filter>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter>
+      <radialGradient id="gTerra" cx="30%" cy="25%" r="85%"><stop offset="0" stop-color="#F2A585"/><stop offset=".55" stop-color="#DB7C5C"/><stop offset="1" stop-color="#C2624A"/></radialGradient>
+      <radialGradient id="gCream" cx="30%" cy="25%" r="90%"><stop offset="0" stop-color="#FFFBF1"/><stop offset="1" stop-color="#EFE2C9"/></radialGradient>
+      <radialGradient id="gSage" cx="30%" cy="25%" r="90%"><stop offset="0" stop-color="#C6D8B4"/><stop offset="1" stop-color="#93AE83"/></radialGradient>
+      <radialGradient id="gButter" cx="30%" cy="25%" r="90%"><stop offset="0" stop-color="#FCE3A1"/><stop offset="1" stop-color="#EEC264"/></radialGradient>
+      <radialGradient id="gPeach" cx="30%" cy="25%" r="90%"><stop offset="0" stop-color="#F9CDB3"/><stop offset="1" stop-color="#E9A283"/></radialGradient>
+      <linearGradient id="gBase" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3E8D4"/><stop offset="1" stop-color="#DCCBAE"/></linearGradient>
+      <linearGradient id="gScreen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#DCE7CC"/><stop offset="1" stop-color="#C5D6B4"/></linearGradient>
+    </defs>
+
+    <!-- Lanyard and badge, hanging in from the top edge -->
+    <g filter="url(#clay)">
+      <path d="M1508 -40 L1566 300" stroke="#9EB78C" stroke-width="34" stroke-linecap="round" fill="none"/>
+      <path d="M1668 -40 L1600 300" stroke="#8FAA7E" stroke-width="34" stroke-linecap="round" fill="none"/>
+      <rect x="1556" y="282" width="56" height="50" rx="16" fill="url(#gButter)"/>
+    </g>
+    <g transform="rotate(7 1584 330)" filter="url(#clay)">
+      <rect x="1462" y="318" width="250" height="320" rx="34" fill="url(#gCream)"/>
+      <path d="M1462 352 a34 34 0 0 1 34 -34 h182 a34 34 0 0 1 34 34 v52 h-250 z" fill="url(#gTerra)"/>
+      <circle cx="1587" cy="482" r="58" fill="url(#gPeach)"/>
+      <circle cx="1587" cy="462" r="24" fill="#FBEBDD"/>
+      <path d="M1547 520 q40 -46 80 0 z" fill="#FBEBDD"/>
+      <rect x="1512" y="566" width="150" height="20" rx="10" fill="url(#gButter)"/>
+      <rect x="1532" y="600" width="110" height="14" rx="7" fill="#E5D6BC"/>
+    </g>
+
+    <!-- Laptop, cropped by the bottom-right corner -->
+    <g filter="url(#clay)">
+      <rect x="1392" y="640" width="600" height="372" rx="34" fill="url(#gCream)"/>
+      <rect x="1424" y="672" width="560" height="306" rx="18" fill="url(#gScreen)"/>
+      <path d="M1338 1006 h640 v120 h-700 z" fill="url(#gBase)"/>
+    </g>
+    <g>
+      <rect x="1460" y="708" width="236" height="232" rx="22" fill="#F7F0DF" opacity=".92"/>
+      <circle cx="1528" cy="772" r="34" fill="#EFB596"/>
+      <rect x="1478" y="830" width="196" height="16" rx="8" fill="#EDD08C"/>
+      <rect x="1478" y="860" width="140" height="12" rx="6" fill="#DCCDB3"/>
+      <rect x="1478" y="886" width="168" height="12" rx="6" fill="#DCCDB3"/>
+      <rect x="1716" y="708" width="250" height="108" rx="22" fill="#F7F0DF" opacity=".92"/>
+      <rect x="1740" y="736" width="120" height="16" rx="8" fill="#A9C196"/>
+      <rect x="1740" y="768" width="190" height="12" rx="6" fill="#DCCDB3"/>
+      <rect x="1716" y="832" width="250" height="108" rx="22" fill="#F7F0DF" opacity=".92"/>
+      <rect x="1740" y="860" width="96" height="16" rx="8" fill="#E99F80"/>
+      <rect x="1740" y="892" width="170" height="12" rx="6" fill="#DCCDB3"/>
+    </g>
+
+    <!-- Sticky notes on the laptop corner -->
+    <g transform="rotate(-9 1330 690)" filter="url(#clay)">
+      <rect x="1254" y="612" width="150" height="150" rx="16" fill="#F5D88E"/>
+      <rect x="1262" y="602" width="150" height="150" rx="16" fill="url(#gButter)"/>
+      <path d="M1300 668 q36 34 72 0" stroke="#C88F43" stroke-width="9" stroke-linecap="round" fill="none"/>
+      <circle cx="1310" cy="644" r="7" fill="#C88F43"/><circle cx="1362" cy="644" r="7" fill="#C88F43"/>
+    </g>
+
+    <!-- Mug of coffee with steam -->
+    <g opacity=".7" filter="url(#soft)">
+      <path d="M1200 770 c-26 -38 26 -58 0 -100" stroke="#FFFDF7" stroke-width="16" stroke-linecap="round" fill="none"/>
+      <path d="M1250 780 c-26 -38 26 -58 0 -108" stroke="#FFFDF7" stroke-width="14" stroke-linecap="round" fill="none"/>
+    </g>
+    <g filter="url(#clay)">
+      <path d="M1300 878 c92 -10 96 112 -6 104" stroke="#D27556" stroke-width="30" stroke-linecap="round" fill="none"/>
+      <path d="M1128 820 q0 -14 14 -14 h158 q14 0 14 14 l-10 182 q-4 34 -82 34 q-80 0 -84 -34 z" fill="url(#gTerra)"/>
+      <ellipse cx="1221" cy="818" rx="92" ry="20" fill="#B65A3F"/>
+      <ellipse cx="1221" cy="824" rx="76" ry="13" fill="#6E4632"/>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，先認識<em>這三個人</em>就好。</p>
+  </div>
+
+  <ul class="people">
+    <li>
+      <svg viewBox="0 0 104 104" aria-hidden="true"><g filter="url(#claySm)"><circle cx="52" cy="52" r="50" fill="url(#gPeach)"/></g><circle cx="52" cy="40" r="17" fill="#FDF0E4"/><path d="M22 86 q30 -42 60 0 z" fill="#FDF0E4"/></svg>
+      <div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div>
+    </li>
+    <li>
+      <svg viewBox="0 0 104 104" aria-hidden="true"><g filter="url(#claySm)"><circle cx="52" cy="52" r="50" fill="url(#gSage)"/></g><circle cx="52" cy="40" r="17" fill="#F4F7EC"/><path d="M22 86 q30 -42 60 0 z" fill="#F4F7EC"/></svg>
+      <div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div>
+    </li>
+    <li>
+      <svg viewBox="0 0 104 104" aria-hidden="true"><g filter="url(#claySm)"><circle cx="52" cy="52" r="50" fill="url(#gButter)"/></g><circle cx="52" cy="40" r="17" fill="#FFF7E2"/><path d="M22 86 q30 -42 60 0 z" fill="#FFF7E2"/></svg>
+      <div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div>
+    </li>
+  </ul>
+</div>
+</body>
+</html>
