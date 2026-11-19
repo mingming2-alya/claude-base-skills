@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>插畫場景融合版 C｜內容住進場景：三個人各在自己的位置</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#F3DFD3;--ink:#3B332D;--ink2:#5E4F45;--sub:#6A5C50;--accent:#B4512F}
+  /* the list becomes three labels, each standing over its person */
+  ul.items.people{top:438px;width:1660px;grid-template-columns:repeat(3,1fr);gap:0 40px}
+  ul.items.people li{grid-template-columns:30px 1fr;column-gap:16px;align-items:start}
+  ul.items.people .badge{width:30px;height:30px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs id="defs">
+      <radialGradient id="wall" cx="420" cy="160" r="1700" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#F9E9DD"/><stop offset=".6" stop-color="#F2DACD"/><stop offset="1" stop-color="#E8C9B9"/>
+      </radialGradient>
+      <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E2C7A6"/><stop offset="1" stop-color="#D2B28E"/></linearGradient>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#CFE3EA"/><stop offset="1" stop-color="#F3EBDD"/></linearGradient>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#wall)"/>
+    <rect width="1920" height="1080" filter="url(#grain)" opacity=".3" style="mix-blend-mode:multiply"/>
+    <g id="objs"></g>
+  </svg>
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，先認識<em>這三個人</em>就好。</p>
+  </div>
+  <ul class="items people">
+    <li><svg class="badge" viewBox="0 0 30 30" data-c="gPeach" aria-hidden="true"></svg><div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div></li>
+    <li><svg class="badge" viewBox="0 0 30 30" data-c="gSage" aria-hidden="true"></svg><div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div></li>
+    <li><svg class="badge" viewBox="0 0 30 30" data-c="gButter" aria-hidden="true"></svg><div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div></li>
+  </ul>
+</div>
+<script src="clay.js"></script>
+<script>
+// One room: wall, window, floor. Each person stands at the place you will find them, under their own label.
+const FLOOR = 905;
+let s = '';
+// window high on the right wall
+s += `<g filter="url(#clay)"><rect x="1250" y="92" width="560" height="296" rx="26" fill="url(#gCream)"/></g>`;
+s += `<rect x="1276" y="118" width="508" height="244" rx="14" fill="url(#sky)"/><rect x="1524" y="118" width="12" height="244" fill="#EFE2C9"/>`;
+s += `<g filter="url(#claySm)"><path d="M1330 240 c-30 0 -34 -40 -4 -44 c4 -30 50 -34 60 -8 c24 -16 56 4 46 30 c28 4 26 40 -4 40 z" fill="#FBF5EA"/></g>`;
+s += `<g filter="url(#claySm)"><path d="M1600 300 c-24 0 -26 -30 -2 -34 c4 -24 40 -26 48 -6 c20 -12 44 4 36 24 c22 4 20 30 -4 30 z" fill="#FBF5EA"/></g>`;
+// floor and skirting
+s += `<rect x="0" y="${FLOOR}" width="1920" height="${1080 - FLOOR}" fill="url(#floor)"/>`;
+for (let x = 0; x < 1920; x += 160) s += `<path d="M${x} ${FLOOR + 6} L${x - 90} 1080" stroke="#C7A47E" stroke-width="3" opacity=".6"/>`;
+s += `<g filter="url(#claySm)"><rect x="-20" y="${FLOOR - 14}" width="1960" height="20" rx="6" fill="url(#gCream)"/></g>`;
+
+// a clay person, front view, feet on the floor
+function person(cx, shirt, pose) {
+  const arm = (d) => `<path d="${d}" fill="none" stroke="url(#${shirt})" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const hand = (x, y) => `<circle cx="${x}" cy="${y}" r="17" fill="url(#gSkin)"/>`;
+  let a = '', front = '';
+  if (pose === 'wave') { a += arm(`M${cx - 54} 690 L${cx - 78} 790`) + hand(cx - 80, 798); front += arm(`M${cx + 54} 690 L${cx + 96} 640 L${cx + 106} 582`) + hand(cx + 108, 572); }
+  if (pose === 'point') { a += arm(`M${cx + 54} 690 L${cx + 78} 790`) + hand(cx + 80, 798); front += arm(`M${cx - 54} 690 L${cx - 120} 668 L${cx - 168} 650`) + hand(cx - 176, 646); }
+  if (pose === 'mug') { a += arm(`M${cx - 54} 690 L${cx - 78} 790`) + hand(cx - 80, 798); front += arm(`M${cx + 54} 690 L${cx + 84} 760 L${cx + 52} 772`) + `<g><rect x="${cx + 24}" y="${742}" width="46" height="54" rx="10" fill="url(#gTerra)"/><path d="M${cx + 70} 756 c18 0 18 26 0 26" stroke="#D27556" stroke-width="8" fill="none"/></g>` + hand(cx + 46, 772); }
+  return `<g filter="url(#clay)">
+    <rect x="${cx - 32}" y="808" width="30" height="${FLOOR - 812}" rx="15" fill="#7A6A5E"/><rect x="${cx + 2}" y="808" width="30" height="${FLOOR - 812}" rx="15" fill="#7A6A5E"/>
+    <ellipse cx="${cx - 22}" cy="${FLOOR - 4}" rx="26" ry="12" fill="#5E4F45"/><ellipse cx="${cx + 22}" cy="${FLOOR - 4}" rx="26" ry="12" fill="#5E4F45"/>
+    ${a}
+    <rect x="${cx - 64}" y="664" width="128" height="170" rx="54" fill="url(#${shirt})"/>
+    <circle cx="${cx}" cy="606" r="52" fill="url(#gSkin)"/>
+    <path d="M${cx - 52} 600 C${cx - 52} 548 ${cx + 52} 540 ${cx + 52} 592 C${cx + 30} 574 ${cx - 20} 572 ${cx - 52} 600 Z" fill="#7A5A48"/>
+    ${front}
+  </g>
+  <circle cx="${cx - 17}" cy="612" r="5.5" fill="#4A3A30"/><circle cx="${cx + 17}" cy="612" r="5.5" fill="#4A3A30"/>
+  <path d="M${cx - 14} 632 q14 12 28 0" stroke="#B4512F" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <circle cx="${cx - 30}" cy="628" r="9" fill="#F2A585" opacity=".45"/><circle cx="${cx + 30}" cy="628" r="9" fill="#F2A585" opacity=".45"/>`;
+}
+// station 1: the mentor at the desk with your laptop
+const X1 = 140, X2 = 700, X3 = 1260;
+s += `<g filter="url(#clay)"><rect x="${X1 + 20}" y="716" width="290" height="24" rx="10" fill="url(#gButter)"/><rect x="${X1 + 40}" y="736" width="22" height="${FLOOR - 736}" rx="8" fill="#E3BE86"/><rect x="${X1 + 268}" y="736" width="22" height="${FLOOR - 736}" rx="8" fill="#E3BE86"/></g>`;
+s += `<g filter="url(#clay)"><rect x="${X1 + 86}" y="594" width="168" height="114" rx="12" fill="url(#gCream)"/><rect x="${X1 + 70}" y="704" width="200" height="14" rx="7" fill="url(#gBase)"/></g><rect x="${X1 + 98}" y="606" width="144" height="90" rx="8" fill="url(#gScreen)"/>`;
+s += person(X1 + 400, 'gPeach', 'wave');
+// station 2: the manager at the board, pointing at Friday
+s += `<g filter="url(#clay)"><path d="M${X2 + 80} 772 L${X2 + 56} ${FLOOR}" stroke="#E3BE86" stroke-width="16" stroke-linecap="round"/><path d="M${X2 + 250} 772 L${X2 + 274} ${FLOOR}" stroke="#E3BE86" stroke-width="16" stroke-linecap="round"/><rect x="${X2 + 30}" y="586" width="270" height="190" rx="16" fill="url(#gCream)"/></g>`;
+let cal = '';
+for (let r = 0; r < 3; r++) for (let c = 0; c < 5; c++) cal += `<rect x="${X2 + 54 + c * 46}" y="${616 + r * 46}" width="36" height="34" rx="6" fill="${r === 1 && c === 4 ? '#F2B79C' : '#EFE3CC'}"/>`;
+s += cal + `<circle cx="${X2 + 256}" cy="${679}" r="27" fill="none" stroke="#C2624A" stroke-width="5"/>`;
+s += person(X2 + 470, 'gSage', 'point');
+// station 3: the buddy by the coffee machine and printer
+s += `<g filter="url(#clay)"><rect x="${X3 + 10}" y="740" width="300" height="${FLOOR - 740}" rx="14" fill="url(#gCream)"/><rect x="${X3}" y="728" width="320" height="22" rx="10" fill="url(#gButter)"/></g>`;
+s += `<path d="M${X3 + 160} 760 V${FLOOR - 20}" stroke="#E5D6BC" stroke-width="4"/>`;
+s += `<g filter="url(#clay)"><rect x="${X3 + 40}" y="590" width="120" height="140" rx="16" fill="url(#gTerra)"/><rect x="${X3 + 60}" y="610" width="80" height="34" rx="8" fill="#6E4632"/><rect x="${X3 + 80}" y="660" width="40" height="14" rx="4" fill="#5E4F45"/><rect x="${X3 + 76}" y="694" width="48" height="36" rx="8" fill="url(#gCream)"/></g>`;
+s += `<g filter="url(#clay)"><rect x="${X3 + 186}" y="640" width="120" height="90" rx="14" fill="url(#gBase)"/><rect x="${X3 + 200}" y="626" width="92" height="22" rx="6" fill="#F8F1E3"/></g>`;
+s += person(X3 + 420, 'gButter', 'mug');
+document.getElementById('objs').innerHTML = s;
+document.querySelectorAll('svg.badge').forEach(el => { el.innerHTML = `<g filter="url(#claySm)"><circle cx="15" cy="15" r="13" fill="url(#${el.dataset.c})"/></g>`; });
+</script>
+</body>
+</html>

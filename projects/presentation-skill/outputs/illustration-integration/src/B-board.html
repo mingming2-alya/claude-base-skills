@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>插畫場景融合版 B｜文字在物件上：佈告欄</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#F3DFD3;--ink:#3B332D;--ink2:#5E4F45;--sub:#6A5C50;--accent:#B4512F}
+  ul.items{gap:40px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs id="defs">
+      <radialGradient id="wall" cx="420" cy="200" r="1700" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#F8E7DA"/><stop offset=".6" stop-color="#F1D8CB"/><stop offset="1" stop-color="#E6C6B6"/>
+      </radialGradient>
+      <pattern id="cork" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="5" cy="6" r="1.6" fill="#B98A5E" opacity=".55"/><circle cx="15" cy="16" r="1.3" fill="#F6DDBE" opacity=".7"/><circle cx="17" cy="4" r="1" fill="#A97B52" opacity=".5"/></pattern>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#wall)"/>
+    <rect width="1920" height="1080" filter="url(#grain)" opacity=".3" style="mix-blend-mode:multiply"/>
+    <g id="objs"></g>
+  </svg>
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，先認識<em>這三個人</em>就好。</p>
+  </div>
+  <ul class="items">
+    <li><svg class="badge" viewBox="0 0 104 104" data-t="gPeach|#FDF0E4" aria-hidden="true"></svg><div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div></li>
+    <li><svg class="badge" viewBox="0 0 104 104" data-t="gSage|#F4F7EC" aria-hidden="true"></svg><div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div></li>
+    <li><svg class="badge" viewBox="0 0 104 104" data-t="gButter|#FFF7E2" aria-hidden="true"></svg><div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div></li>
+  </ul>
+</div>
+<script src="clay.js"></script>
+<script>
+// The words are pinned to a board on the wall; the board, its pins and the shelf share the room's light.
+const pin = (x, y, col) => `<g filter="url(#claySm)"><circle cx="${x}" cy="${y}" r="15" fill="url(#${col})"/></g><circle cx="${x - 4}" cy="${y - 5}" r="4" fill="#FFF8EA" opacity=".8"/>`;
+let s = '';
+// the shelf along the bottom
+s += `<g filter="url(#clay)"><rect x="-40" y="948" width="2000" height="34" rx="10" fill="url(#gButter)"/><rect x="-40" y="978" width="2000" height="120" fill="#E3BE86"/></g>`;
+// the corkboard
+s += `<g filter="url(#clay)"><rect x="92" y="126" width="1404" height="796" rx="38" fill="url(#gButter)"/></g>`;
+s += `<rect x="116" y="150" width="1356" height="748" rx="24" fill="url(#gCork)"/><rect x="116" y="150" width="1356" height="748" rx="24" fill="url(#cork)"/>`;
+// paper for the title, cards for the people
+s += `<g filter="url(#clay)"><rect x="118" y="168" width="900" height="250" rx="16" fill="url(#gCream)"/></g>`;
+s += `<rect x="92" y="160" width="92" height="26" rx="4" fill="#F2B79C" opacity=".85" transform="rotate(-38 138 173)"/>` + pin(992, 196, 'gSage');
+[456, 600, 744].forEach((y, i) => {
+  s += `<g filter="url(#claySm)"><rect x="122" y="${y}" width="820" height="132" rx="16" fill="url(#gCream)"/></g>`;
+  s += `<rect x="${430 + i * 40}" y="${y - 12}" width="96" height="26" rx="4" fill="${['#F2B79C', '#BBD0A8', '#F5D58C'][i]}" opacity=".85" transform="rotate(${[-4, 3, -2][i]} ${478 + i * 40} ${y})"/>`;
+});
+// the rest of the board: the lanyard on a pin, a calendar, a sticky note
+s += pin(1270, 212, 'gTerra');
+s += `<g filter="url(#clay)"><path d="M1262 214 L1206 360" stroke="#9EB78C" stroke-width="22" stroke-linecap="round" fill="none"/><path d="M1278 214 L1334 360" stroke="#8FAA7E" stroke-width="22" stroke-linecap="round" fill="none"/><rect x="1240" y="346" width="60" height="40" rx="12" fill="url(#gButter)"/></g>`;
+s += `<g transform="rotate(4 1270 520)" filter="url(#clay)">
+  <rect x="1150" y="372" width="240" height="296" rx="30" fill="url(#gCream)"/>
+  <path d="M1150 402 a30 30 0 0 1 30 -30 h180 a30 30 0 0 1 30 30 v46 h-240 z" fill="url(#gTerra)"/>
+  <circle cx="1270" cy="526" r="52" fill="url(#gPeach)"/><circle cx="1270" cy="508" r="21" fill="#FBEBDD"/><path d="M1234 560 q36 -42 72 0 z" fill="#FBEBDD"/>
+  <rect x="1200" y="598" width="140" height="16" rx="8" fill="url(#gButter)"/><rect x="1218" y="626" width="104" height="11" rx="5" fill="#E5D6BC"/>
+</g>`;
+s += `<g transform="rotate(-3 1180 790)" filter="url(#clay)"><rect x="1062" y="704" width="230" height="170" rx="14" fill="url(#gCream)"/><rect x="1062" y="704" width="230" height="40" rx="14" fill="url(#gSage)"/></g>`;
+let cal = '';
+for (let r = 0; r < 3; r++) for (let c = 0; c < 5; c++) cal += `<rect x="${1082 + c * 40}" y="${758 + r * 34}" width="30" height="24" rx="5" fill="${r === 0 && c === 0 ? '#E99F80' : '#EFE3CC'}"/>`;
+s += `<g transform="rotate(-3 1180 790)">${cal}<circle cx="1097" cy="770" r="20" fill="none" stroke="#C2624A" stroke-width="4"/></g>`;
+s += pin(1176, 712, 'gSage');
+s += `<g transform="rotate(6 1390 790)" filter="url(#clay)"><rect x="1322" y="716" width="140" height="140" rx="14" fill="url(#gButter)"/><path d="M1356 790 q36 30 72 0" stroke="#C88F43" stroke-width="8" stroke-linecap="round" fill="none"/><circle cx="1366" cy="764" r="6" fill="#C88F43"/><circle cx="1418" cy="764" r="6" fill="#C88F43"/></g>`;
+// beside the board: a clock on the wall, a plant and a mug on the shelf
+s += `<g filter="url(#clay)"><circle cx="1716" cy="250" r="118" fill="url(#gCream)"/></g><circle cx="1716" cy="250" r="96" fill="#FBF3E2"/>`;
+for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6; s += `<circle cx="${1716 + Math.cos(a) * 80}" cy="${250 + Math.sin(a) * 80}" r="${k % 3 ? 4 : 7}" fill="#D9B48F"/>`; }
+s += `<path d="M1716 250 L1716 186 M1716 250 L1764 270" stroke="#7A5A48" stroke-width="10" stroke-linecap="round"/><circle cx="1716" cy="250" r="9" fill="#C2624A"/>`;
+s += `<g filter="url(#clay)"><path d="M1586 948 L1602 836 H1756 L1772 948 Z" fill="url(#gTerra)"/></g>`;
+[[-2.4, 100], [-1.9, 128], [-1.4, 140], [-1.0, 124], [-.6, 104], [-2.8, 80], [-.25, 84]].forEach(([a, r]) => s += `<g filter="url(#claySm)"><ellipse cx="${1680 + Math.cos(a) * r * .55}" cy="${836 + Math.sin(a) * r * .55}" rx="${r * .5}" ry="20" transform="rotate(${a * 180 / Math.PI} ${1680 + Math.cos(a) * r * .55} ${836 + Math.sin(a) * r * .55})" fill="url(#gSage)"/></g>`);
+s += `<g filter="url(#clay)"><path d="M1878 870 c56 -6 58 66 -4 62" stroke="#D27556" stroke-width="20" stroke-linecap="round" fill="none"/><path d="M1792 846 h96 l-8 98 q-2 10 -40 10 q-40 0 -42 -10 z" fill="url(#gTerra)"/></g>`;
+s += `<g filter="url(#clay)"><rect x="1540" y="560" width="300" height="200" rx="24" fill="url(#gScreen)"/><rect x="1566" y="588" width="248" height="144" rx="14" fill="#F4F0E2"/><path d="M1600 690 L1650 640 L1690 676 L1730 620 L1786 690 Z" fill="#BBD0A8"/><circle cx="1610" cy="624" r="14" fill="#F5D58C"/></g>`;
+document.getElementById('objs').innerHTML = s;
+document.querySelectorAll('svg.badge').forEach(el => { const [f, i] = el.dataset.t.split('|'); el.innerHTML = token(f, i); });
+</script>
+</body>
+</html>
