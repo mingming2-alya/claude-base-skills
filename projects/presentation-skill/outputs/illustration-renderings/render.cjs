@@ -73,8 +73,9 @@ const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
       const ctx = c.getContext('2d'); ctx.drawImage(img, 0, 0);
       const lin = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
       return runs.map(r => {
-        const x = Math.max(0, Math.floor(r.x)), y = Math.max(0, Math.floor(r.y));
-        const w = Math.min(1920 - x, Math.ceil(r.w)), h = Math.min(1080 - y, Math.ceil(r.h));
+        // the glyphs sit in the middle of the line box: skip the ascent/descent padding
+        const x = Math.max(0, Math.floor(r.x + r.w * 0.02)), y = Math.max(0, Math.floor(r.y + r.h * 0.18));
+        const w = Math.min(1920 - x, Math.ceil(r.w * 0.96)), h = Math.min(1080 - y, Math.ceil(r.h * 0.64));
         if (w <= 0 || h <= 0) return null;
         const d = ctx.getImageData(x, y, w, h).data, ls = [];
         for (let i = 0; i < d.length; i += 8) ls.push(0.2126 * lin(d[i]) + 0.7152 * lin(d[i + 1]) + 0.0722 * lin(d[i + 2]));
