@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>手繪深色版（C）｜第一週會遇到的人：深色紙上的白色墨線</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#2A231F;--ink:#F6EEE4;--ink2:#E6DCCF;--sub:#C4B7A9;--accent:#F2A27F}
+  ul.items.people{top:438px;width:1660px;grid-template-columns:repeat(3,1fr);gap:0 40px}
+  ul.items.people li{grid-template-columns:34px 1fr;column-gap:14px;align-items:start}
+  ul.items.people .badge{width:34px;height:34px;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="tooth" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="9"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .92  0 0 0 0 .88  0 0 0 0 .82  0 0 0 -1 .55"/>
+      </filter>
+      <filter id="pen" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="9" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <filter id="patch" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="4" result="n"/>
+        <feDisplacementMap in="SourceGraphic" in2="n" scale="14" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <pattern id="hatch" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><line x1="0" y1="0" x2="0" y2="14" stroke="#F6EEE4" stroke-width="2" stroke-opacity=".3"/></pattern>
+    </defs>
+    <!-- the same drawing on dark paper: a white gel pen for the line, markers for the colour -->
+    <rect width="1920" height="1080" fill="#2A231F"/>
+    <rect width="1920" height="1080" filter="url(#tooth)" opacity=".1"/>
+    <g id="room"></g>
+  </svg>
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，先認識<em>這三個人</em>就好。</p>
+  </div>
+  <ul class="items people">
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#F6BFA2" aria-hidden="true"></svg><div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div></li>
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#B8D1A8" aria-hidden="true"></svg><div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div></li>
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#F7D88A" aria-hidden="true"></svg><div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div></li>
+  </ul>
+</div>
+<script src="office.js"></script>
+<script>
+// Hand-drawn: a wobbly ink line, and the colour laid down a little off it.
+const INK = '#F3EADF';
+// marker colours on dark paper: the same hues, a step deeper so the big cream areas do not glare
+const P = { wall: '#2A231F', floor: '#3A302A', frame: INK, glass: '#7FA6C6', wood: '#D9B566', cream: '#9E907D', screen: '#93B585', peach: '#E3A184', sage: '#93B585', butter: '#D9B566', terra: '#D0805F', skin: '#E6BEA2', hair: '#8C6650', dark: '#6A5A4D', cal: '#7D7064', accent: '#F2A27F', white: '#D8D2C6' };
+const S = {
+  fill: (frag, c) => `<g filter="url(#patch)" transform="translate(-8 6)" fill="${c === 'frame' ? '#5A4E44' : P[c]}">${frag}</g><g fill="none" stroke="${INK}" stroke-width="3.5" stroke-linejoin="round" filter="url(#pen)">${frag}</g>`,
+  line: (d, c, w) => w > 12
+    ? `<path d="${d}" fill="none" stroke="${P[c]}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" filter="url(#patch)" transform="translate(-6 5)"/><path d="${d}" fill="none" stroke="${INK}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" filter="url(#pen)" transform="translate(0 0)"/>`
+    : `<path d="${d}" fill="none" stroke="${c === 'accent' ? P.accent : INK}" stroke-width="${Math.min(w, 5)}" stroke-linecap="round" filter="url(#pen)"/>`,
+  dot: (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${INK}"/>`,
+  floor: (y) => `<rect x="-10" y="${y}" width="1940" height="190" fill="url(#hatch)"/><path d="M0 ${y + 60} C400 ${y + 52} 900 ${y + 70} 1920 ${y + 58}" fill="none" stroke="${INK}" stroke-width="2" opacity=".5" filter="url(#pen)"/>`,
+};
+let r = officeScene(S);
+// signature: little doodles in the margins of the wall
+const star = (x, y, s) => { let d = ''; for (let k = 0; k < 5; k++) { const a = -Math.PI / 2 + k * 4 * Math.PI / 5; d += (k ? ' L' : 'M') + `${x + Math.cos(a) * s} ${y + Math.sin(a) * s}`; } return d + ' Z'; };
+r += `<g fill="none" stroke="${INK}" stroke-width="3" filter="url(#pen)"><path d="${star(1040, 150, 26)}"/><path d="M960 330 c40 -30 90 -30 120 0 m-18 -22 l18 22 l-26 6"/><path d="M1880 470 c-12 -16 -36 -6 -24 12 l24 22 l24 -22 c12 -18 -12 -28 -24 -12 z"/><path d="${star(70, 1000, 18)}"/></g>`;
+document.getElementById('room').innerHTML = r;
+document.querySelectorAll('svg.badge').forEach(el => el.innerHTML = `<circle cx="15" cy="19" r="13" fill="${el.dataset.c}"/><circle cx="18" cy="16" r="13" fill="none" stroke="${INK}" stroke-width="2.5"/>`);
+</script>
+</body>
+</html>
