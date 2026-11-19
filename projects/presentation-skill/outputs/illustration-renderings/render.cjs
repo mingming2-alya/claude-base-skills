@@ -20,7 +20,10 @@ const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
   const proxy = process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY } : undefined;
   const browser = await chromium.launch(proxy ? { proxy } : {});
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  let jsErrors = [];
+  page.on('pageerror', e => jsErrors.push(e.message));
   for (const f of files) {
+    jsErrors = [];
     await page.goto('file://' + path.join(here, 'src', f), { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
     await page.waitForTimeout(400);
@@ -39,6 +42,7 @@ const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
       if (missing.length) out.push('font errors: ' + [...new Set(missing)].join(', '));
       return out;
     });
+    issues.push(...jsErrors.map(m => 'script error: ' + m));
     await page.screenshot({ path: path.join(here, 'img', f.replace('.html', '.jpg')), type: 'jpeg', quality: 90 });
 
     // Every text run with its colour and size (SVG text uses its fill).

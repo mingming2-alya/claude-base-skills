@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>插畫場景（兒童手繪）｜家庭日一日行程</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root{--bg:#F7F3EA;--ink:#2A2A2A;--ink2:#383633;--sub:#57534D;--accent:#C2362B}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg id="tmp" width="0" height="0" style="position:absolute"></svg>
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs id="defs">
+      <filter id="tooth" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="9"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .5  0 0 0 0 .46  0 0 0 0 .38  0 0 0 -1 .56"/>
+      </filter>
+      <!-- wax on paper: wobbly, and skipping where the paper grain is high -->
+      <filter id="crayon" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="5" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="5" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".95 .3" numOctaves="2" seed="11" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.3 0 0 0 1.85" result="ga"/>
+        <feComposite in="d" in2="ga" operator="in"/>
+      </filter>
+      <filter id="crayonS" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="5" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="3" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".95 .3" numOctaves="2" seed="11" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.3 0 0 0 1.85" result="ga"/>
+        <feComposite in="d" in2="ga" operator="in"/>
+      </filter>
+    </defs>
+    <rect width="1920" height="1080" fill="#F7F3EA"/>
+    <rect width="1920" height="1080" filter="url(#tooth)" opacity=".45"/>
+    <g id="art" filter="url(#crayon)" style="mix-blend-mode:multiply"></g>
+    <!-- signature frame: masking tape holding the drawing up -->
+    <g id="tape"></g>
+  </svg>
+
+  <nav aria-label="章節"><span>活動介紹</span><b>一日行程</b><span>報名方式</span><span>注意事項</span></nav>
+  <div class="copy">
+    <h2>家庭日一日行程</h2>
+    <p class="key">把孩子帶來，看看<em>爸媽工作的地方</em>。</p>
+  </div>
+  <ul class="items">
+    <li><svg class="badge" viewBox="0 0 104 104" data-k="craft" aria-hidden="true"></svg><div><strong>上午：親子手作</strong><span>一起畫公司的吉祥物</span></div></li>
+    <li><svg class="badge" viewBox="0 0 104 104" data-k="lunch" aria-hidden="true"></svg><div><strong>中午：草地野餐</strong><span>便當和飲料公司準備</span></div></li>
+    <li><svg class="badge" viewBox="0 0 104 104" data-k="map" aria-hidden="true"></svg><div><strong>下午：尋寶遊戲</strong><span>跟著地圖找到爸媽的座位</span></div></li>
+  </ul>
+</div>
+<script>
+let seed = 21;
+const rand = () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const NS = 'http://www.w3.org/2000/svg', tmp = document.getElementById('tmp');
+const C = { red: '#E0453A', orange: '#F28C28', yellow: '#F5C518', green: '#3FA34D', lgreen: '#8BCB5A', blue: '#2F7FD1', sky: '#7EC8E3', brown: '#8B5A2B', pink: '#F07CA0', black: '#2E2B28', skin: '#F5B98C' };
+let defs = '', cid = 0;
+function bbox(d) { const p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); tmp.appendChild(p); const b = p.getBBox(); tmp.removeChild(p); return b; }
+// colouring in: back-and-forth strokes, clipped to the shape but pushed a little off it
+function fill(d, col, ang = -32, gap = 10, off = [6, 5]) {
+  const b = bbox(d), id = 'c' + (cid++);
+  defs += `<clipPath id="${id}"><path d="${d}" transform="translate(${off[0]} ${off[1]})"/></clipPath>`;
+  const L = Math.hypot(b.width, b.height) + 30, cx = b.x + b.width / 2 + off[0], cy = b.y + b.height / 2 + off[1];
+  let z = '';
+  for (let i = 0, n = Math.ceil(L / gap); i <= n; i++) z += (i ? ' L' : 'M') + `${(-L / 2 + i * gap + (rand() - .5) * gap * .5).toFixed(1)} ${((i % 2 ? L : -L) / 2 + (rand() - .5) * 10).toFixed(1)}`;
+  return `<g clip-path="url(#${id})"><path d="${z}" transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${ang})" fill="none" stroke="${col}" stroke-width="${(gap * .95).toFixed(1)}" stroke-linejoin="round" opacity=".9"/></g>`;
+}
+const line = (d, col, w = 6) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const circ = (x, y, r) => `M${x - r} ${y} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0`;
+const wob = (x, y, r, k = 7) => { let d = ''; for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2 + .2, rr = r + Math.sin(i * 2.3) * k * .5 + (rand() - .5) * k; d += (i ? ' L' : 'M') + `${(x + Math.cos(a) * rr).toFixed(1)} ${(y + Math.sin(a) * rr).toFixed(1)}`; } return d + ' Z'; };
+
+let a = '';
+// sun, smiling, with uneven rays
+a += fill(wob(1774, 176, 68), C.yellow, -20, 11) + line(wob(1774, 176, 68, 5), C.orange, 7);
+for (let k = 0; k < 12; k++) { const t = k * Math.PI / 6 + .15, r1 = 88, r2 = 128 + (k % 2) * 22; a += line(`M${1774 + Math.cos(t) * r1} ${176 + Math.sin(t) * r1} L${1774 + Math.cos(t) * r2} ${176 + Math.sin(t) * r2}`, C.orange, 8); }
+a += `<circle cx="1752" cy="160" r="7" fill="${C.black}"/><circle cx="1796" cy="160" r="7" fill="${C.black}"/>` + line('M1746 194 Q1774 222 1802 194', C.black, 6);
+// clouds
+const cloud = (x, y, s) => `M${x} ${y} c${-40 * s} 0 ${-50 * s} ${-44 * s} ${-12 * s} ${-52 * s} c${6 * s} ${-36 * s} ${62 * s} ${-42 * s} ${78 * s} ${-12 * s} c${20 * s} ${-30 * s} ${74 * s} ${-20 * s} ${70 * s} ${18 * s} c${40 * s} ${0} ${44 * s} ${46 * s} ${4 * s} ${46 * s} Z`;
+[[1196, 220, 1.05], [1452, 156, .85]].forEach(([x, y, s]) => a += fill(cloud(x, y, s), C.sky, 28, 11) + line(cloud(x, y, s), C.blue, 6));
+// grass and flowers along the bottom
+let g = 'M0 948'; for (let x = 0; x <= 1920; x += 18) g += ` L${x} ${948 + (x / 18 % 2 ? -22 : 0) + (rand() - .5) * 8}`;
+a += fill(`${g} L1920 1080 L0 1080 Z`, C.lgreen, 70, 12) + line(g, C.green, 7);
+[[1080, 980], [1150, 1010], [1700, 1000], [1860, 975], [520, 1000], [760, 985], [300, 1010]].forEach(([x, y], i) => {
+  const col = [C.red, C.pink, C.yellow, C.orange][i % 4];
+  a += line(`M${x} ${y} L${x + 4} ${y + 44}`, C.green, 5);
+  for (let k = 0; k < 5; k++) { const t = k * 1.256; a += `<circle cx="${x + Math.cos(t) * 14}" cy="${y + Math.sin(t) * 14}" r="10" fill="${col}"/>`; }
+  a += `<circle cx="${x}" cy="${y}" r="8" fill="${C.yellow}"/>`;
+});
+// a tree with apples
+a += fill('M1786 940 L1792 720 L1830 720 L1840 940 Z', C.brown, 10, 9) + line('M1786 940 L1792 720 M1830 720 L1840 940', C.brown, 6);
+a += fill(wob(1812, 640, 118, 22), C.green, -40, 12) + line(wob(1812, 640, 118, 18), '#2E7D3A', 7);
+[[1770, 600], [1850, 620], [1800, 690], [1868, 560], [1748, 670]].forEach(([x, y]) => a += `<circle cx="${x}" cy="${y}" r="13" fill="${C.red}"/>`);
+
+// the family, holding hands; the little one has the balloons
+const fam = [
+  { x: 1236, h: 176, body: 'dress', col: C.pink, hair: C.brown },
+  { x: 1372, h: 272, body: 'dress', col: C.red, hair: C.black, long: true },
+  { x: 1524, h: 306, body: 'shirt', col: C.blue, hair: C.black },
+  { x: 1662, h: 214, body: 'shirt', col: C.orange, hair: C.brown },
+];
+const FEET = 926;
+const hand = (p, side) => [p.x + side * p.h * .3, FEET - p.h * .52];
+const grip = fam.slice(0, -1).map((p, i) => { const r = hand(p, 1), l = hand(fam[i + 1], -1); return [(r[0] + l[0]) / 2, (r[1] + l[1]) / 2]; });
+fam.forEach((p, i) => {
+  const hr = p.h * .15, hy = FEET - p.h + hr, sy = FEET - p.h * .7, by = FEET - p.h * .3;
+  // legs
+  a += line(`M${p.x - p.h * .08} ${by} L${p.x - p.h * .12} ${FEET} l-16 2`, C.black, 6) + line(`M${p.x + p.h * .08} ${by} L${p.x + p.h * .12} ${FEET} l16 2`, C.black, 6);
+  // body
+  const body = p.body === 'dress' ? `M${p.x} ${sy - 6} L${p.x + p.h * .2} ${by} L${p.x - p.h * .2} ${by} Z` : `M${p.x - p.h * .11} ${sy - 6} L${p.x + p.h * .11} ${sy - 6} L${p.x + p.h * .12} ${by} L${p.x - p.h * .12} ${by} Z`;
+  a += fill(body, p.col, -35, 10) + line(body, p.col, 6);
+  // arms to the neighbours' hands, or up to the balloons
+  const L = i ? grip[i - 1] : [p.x - p.h * .34, FEET - p.h * .98], R = i < fam.length - 1 ? grip[i] : [p.x + p.h * .34, FEET - p.h * .62];
+  a += line(`M${p.x - p.h * .06} ${sy} L${L[0]} ${L[1]}`, C.black, 6) + line(`M${p.x + p.h * .06} ${sy} L${R[0]} ${R[1]}`, C.black, 6);
+  // head, hair, face
+  a += fill(circ(p.x, hy, hr), C.skin, 20, 9, [3, 3]) + line(wob(p.x, hy, hr, 3), C.brown, 5);
+  a += line(p.long ? `M${p.x - hr} ${hy} C${p.x - hr * 1.2} ${hy - hr * 1.4} ${p.x + hr * 1.2} ${hy - hr * 1.4} ${p.x + hr} ${hy} M${p.x - hr} ${hy} l-6 ${hr * 1.3} M${p.x + hr} ${hy} l6 ${hr * 1.3}` : `M${p.x - hr * .9} ${hy - hr * .4} C${p.x - hr * .6} ${hy - hr * 1.3} ${p.x + hr * .6} ${hy - hr * 1.3} ${p.x + hr * .9} ${hy - hr * .4}`, p.hair, 8);
+  a += `<circle cx="${p.x - hr * .38}" cy="${hy - hr * .1}" r="${hr * .12}" fill="${C.black}"/><circle cx="${p.x + hr * .38}" cy="${hy - hr * .1}" r="${hr * .12}" fill="${C.black}"/>` + line(`M${p.x - hr * .45} ${hy + hr * .35} Q${p.x} ${hy + hr * .8} ${p.x + hr * .45} ${hy + hr * .35}`, C.red, 5);
+});
+// balloons
+const bh = [fam[0].x - fam[0].h * .34, FEET - fam[0].h * .98];
+[[1110, 470, C.red], [1186, 420, C.yellow], [1262, 480, C.blue]].forEach(([x, y, col]) => {
+  const d = `M${x} ${y - 52} C${x + 40} ${y - 52} ${x + 42} ${y + 30} ${x} ${y + 50} C${x - 42} ${y + 30} ${x - 40} ${y - 52} ${x} ${y - 52} Z`;
+  a += line(`M${x} ${y + 52} C${x + 10} ${y + 90} ${bh[0] - 10} ${bh[1] - 40} ${bh[0]} ${bh[1]}`, C.black, 3) + fill(d, col, -25, 10) + line(d, col, 6);
+});
+document.getElementById('defs').insertAdjacentHTML('beforeend', defs);
+document.getElementById('art').innerHTML = a;
+
+// tape in the corners
+let t = '';
+[[54, 44, -38], [1866, 44, 38], [54, 1036, 38], [1866, 1036, -38]].forEach(([x, y, r]) => {
+  let edge = (side) => { let d = ''; for (let k = 0; k <= 8; k++) d += ` L${side * (90 + (k % 2 ? 6 : -4))} ${-26 + k * 6.5}`; return d; };
+  t += `<g transform="translate(${x} ${y}) rotate(${r})"><path d="M-90 -26 ${edge(1).slice(1)} ${edge(-1).split(' L').reverse().join(' L')} Z" fill="#E8DCB0" opacity=".82"/><path d="M-86 -20 H86" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="3"/></g>`;
+});
+document.getElementById('tape').innerHTML = t;
+
+// list badges: little crayon drawings
+const B = {
+  craft: () => fill('M22 78 L70 30 L84 44 L36 92 Z', C.red, -45, 8, [3, 2]) + line('M22 78 L70 30 L84 44 L36 92 Z', C.red, 5) + fill('M22 78 L36 92 L14 98 Z', C.yellow, 0, 6, [1, 1]) + line('M36 50 L50 64 M56 42 L66 52', '#7A1F18', 4),
+  lunch: () => fill('M14 74 L52 20 L90 74 Z', C.yellow, -30, 8, [3, 2]) + line('M14 74 L52 20 L90 74 Z', C.orange, 5) + line('M20 66 Q52 56 84 66', C.green, 7) + line('M24 80 Q52 72 80 80', C.red, 6),
+  map: () => fill('M12 24 L40 16 L64 26 L92 18 L92 82 L64 90 L40 80 L12 88 Z', '#F2D49B', -20, 9, [3, 2]) + line('M12 24 L40 16 L64 26 L92 18 L92 82 L64 90 L40 80 L12 88 Z', C.brown, 5) + `<path d="M24 70 Q40 40 58 58 T80 36" fill="none" stroke="${C.blue}" stroke-width="4" stroke-dasharray="6 7" stroke-linecap="round"/>` + line('M70 28 L86 44 M86 28 L70 44', C.red, 6),
+};
+document.querySelectorAll('svg.badge').forEach(el => {
+  defs = '';
+  const art = B[el.dataset.k]();
+  el.innerHTML = `<defs>${defs}</defs><g filter="url(#crayonS)" style="mix-blend-mode:multiply">${art}</g>`;
+});
+</script>
+</body>
+</html>
