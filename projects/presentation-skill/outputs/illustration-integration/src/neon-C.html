@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>霓虹融合版（C）｜第一週會遇到的人：三個人各在自己的位置</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#151827;--ink:#F3F1FA;--ink2:#E2E0EE;--sub:#B9BED6;--accent:#FF6FBF}
+  ul.items.people{top:438px;width:1660px;grid-template-columns:repeat(3,1fr);gap:0 40px}
+  ul.items.people li{grid-template-columns:34px 1fr;column-gap:14px;align-items:start}
+  ul.items.people .badge{width:34px;height:34px;margin-top:6px;overflow:visible}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="glow" filterUnits="userSpaceOnUse" x="-100" y="-100" width="2120" height="1280"><feGaussianBlur stdDeviation="7"/></filter>
+      <pattern id="brick" width="120" height="60" patternUnits="userSpaceOnUse"><rect width="120" height="60" fill="#151827"/><path d="M0 0 H120 M0 30 H120 M30 0 V30 M90 30 V60" stroke="#21253A" stroke-width="3"/></pattern>
+      <linearGradient id="floorG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1B1F33"/><stop offset="1" stop-color="#0E1018"/></linearGradient>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#brick)"/>
+    <g id="room"></g>
+  </svg>
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，先認識<em>這三個人</em>就好。</p>
+  </div>
+  <ul class="items people">
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#FF6FB5" aria-hidden="true"></svg><div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div></li>
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#5CFFB0" aria-hidden="true"></svg><div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div></li>
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#FFD84A" aria-hidden="true"></svg><div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div></li>
+  </ul>
+</div>
+<script src="office.js"></script>
+<script>
+// Neon: every shape is a bent glass tube, coloured glow around a white-hot core, on one brick wall.
+const P = { frame: '#6F7BA8', glass: '#33E6F0', wood: '#FF8A3D', cream: '#F3F1FA', screen: '#33E6F0', peach: '#FF6FB5', sage: '#5CFFB0', butter: '#FFD84A', terra: '#FF7A5C', skin: '#FFD9C2', hair: '#FF8A3D', dark: '#8F96C8', cal: '#5A6A9A', accent: '#FF4FB0', white: '#F3F1FA', floor: '#6F7BA8' };
+const tube = (frag, c, w = 4) => `<g fill="none" stroke="${c}" stroke-width="${w + 9}" opacity=".5" filter="url(#glow)" stroke-linecap="round" stroke-linejoin="round">${frag}</g><g fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round">${frag}</g><g fill="none" stroke="#FFFFFF" stroke-width="1.4" opacity=".8" stroke-linecap="round" stroke-linejoin="round">${frag}</g>`;
+const S = {
+  fill: (frag, c) => `<g fill="${P[c]}" opacity=".07">${frag}</g>` + tube(frag, P[c]),
+  line: (d, c, w) => tube(`<path d="${d}"/>`, P[c], w > 12 ? 5 : Math.min(w, 4)),
+  dot: (x, y, r, c) => `<circle cx="${x}" cy="${y}" r="${r}" fill="${P[c]}"/>`,
+  floor: (y) => `<rect x="-10" y="${y}" width="1940" height="190" fill="url(#floorG)"/>`,
+};
+let r = officeScene(S);
+// signature: a sign frame of tubes around the title
+r += tube('<rect x="104" y="160" width="880" height="232" rx="34"/>', '#FF6FB5', 4) + tube('<rect x="122" y="178" width="844" height="196" rx="24"/>', '#33E6F0', 2);
+// the window shows the night: a moon in tube
+r += tube('<path d="M1700 170 a40 40 0 1 0 30 70 a32 32 0 1 1 -30 -70 z"/>', '#FFD84A', 3);
+document.getElementById('room').innerHTML = r;
+document.querySelectorAll('svg.badge').forEach(el => el.innerHTML = `<circle cx="17" cy="17" r="11" fill="none" stroke="${el.dataset.c}" stroke-width="9" opacity=".5" filter="url(#glow)"/><circle cx="17" cy="17" r="11" fill="none" stroke="${el.dataset.c}" stroke-width="4"/><circle cx="17" cy="17" r="11" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity=".8"/>`);
+</script>
+</body>
+</html>
