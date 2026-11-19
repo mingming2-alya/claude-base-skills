@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>8bit 像素深色版（C）｜資安闖關地圖：地下關卡，每一階就是一關</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#121828;--ink:#F4F6FA;--ink2:#E2E7F0;--sub:#C3CCE0;--accent:#F2C14E}
+  svg rect{shape-rendering:crispEdges}
+  /* each level's words hang on a pixel sign right above its own step */
+  .lab{position:absolute;width:404px;height:116px;padding:17px 16px 0 96px}
+  .lab strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em;color:var(--ink)}
+  .lab span{display:block;margin-top:5px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+  .talk{position:absolute;left:150px;top:617px;font:700 28px/1 "Noto Sans TC";color:#F4F6FA;letter-spacing:.06em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" id="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true"></svg>
+  <nav aria-label="章節"><span>為什麼要考</span><b>四個關卡</b><span>過關之後</span><span>求助管道</span></nav>
+  <div class="copy">
+    <h2>資安闖關地圖</h2>
+    <p class="key">四關都過，才拿得到<em>正式帳號</em>。</p>
+  </div>
+  <div class="lab" style="left:130px;top:736px"><strong>認出釣魚信</strong><span>寄件人和連結，先看再點</span></div>
+  <div class="lab" style="left:550px;top:628px"><strong>開啟雙重驗證</strong><span>密碼外洩也登不進去</span></div>
+  <div class="lab" style="left:970px;top:520px"><strong>密碼交給管理器</strong><span>每個系統一組，不用背</span></div>
+  <div class="lab" style="left:1390px;top:412px"><strong>回報可疑狀況</strong><span>一鍵通知資安小組</span></div>
+  <div class="talk">出發吧！</div>
+</div>
+<script>
+let seed = 7;
+const rand = () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const R = (x, y, w, h, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+function px(x, y, s, rows, pal) {
+  let out = '';
+  rows.forEach((row, j) => { let i = 0; while (i < row.length) { const ch = row[i]; if (!pal[ch]) { i++; continue; } let k = i; while (k < row.length && row[k] === ch) k++; out += R(x + i * s, y + j * s, (k - i) * s, s, pal[ch]); i = k; } });
+  return out;
+}
+const DIG = { 1: ['..#..', '.##..', '..#..', '..#..', '..#..', '..#..', '.###.'], 2: ['.###.', '#...#', '....#', '...#.', '..#..', '.#...', '#####'], 3: ['####.', '....#', '....#', '.###.', '....#', '....#', '####.'], 4: ['...#.', '..##.', '.#.#.', '#..#.', '#####', '...#.', '...#.'] };
+const D = '#2B2F36', D2 = '#C9D2E0', GROUND = 930;
+let g = '<defs><pattern id="scan" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="2" fill="#000000" opacity=".16"/></pattern></defs>';
+// the sky is one pixel gradient from edge to edge, title included
+['#0E1220', '#101526', '#12182B', '#141B30', '#161E34', '#182138'].forEach((c, i) => g += R(0, i * 155, 1920, 156, c));
+function ridge(color, amp, f, ph) { let out = ''; for (let x = 0; x < 1920; x += 16) { const env = .25 + .75 * Math.pow(x / 1920, 1.3); const h = Math.max(16, Math.round(amp * env * (.72 + .28 * Math.sin(x * f + ph)) / 16) * 16); out += R(x, GROUND - h, 16, h, color); } return out; }
+g += ridge('#1A2440', 380, .006, 1.3) + ridge('#222E50', 240, .011, 4.1);
+const cloud = ['.....WWWW.......', '...WWWWWWWW.....', '..WWWWWWWWWWWW..', '.WWWWWWWWWWWWWW.', 'WWWWWWWWWWWWWWWW', '.SSSSSSSSSSSSSS.'];
+
+// the stairs: one step per level, rising left to right under its sign
+const block = ['LLLLLK', 'LFFFFK', 'LFFFFK', 'LFFFFK', 'LFFFFK', 'KKKKKK'];
+const steps = [[140, 868], [560, 760], [980, 652], [1400, 544]];
+steps.forEach(([x, top], n) => {
+  for (let y = top; y < GROUND; y += 48) for (let b = 0; b < 6; b++) g += px(x + b * 48, y, 8, block, { L: '#6E8FD8', F: '#3F5FAE', K: '#22356E' });
+  g += R(x - 4, top - 8, 296, 16, '#9DB8EE') + R(x - 4, top + 8, 296, 6, '#5A7CC8');
+  if (GROUND - top > 90) { g += R(x + 116, top + 22, 56, 72, '#3A3128') + R(x + 120, top + 26, 48, 64, '#F3EBDD') + px(x + 124, top + 30, 8, DIG[n + 1], { '#': '#3A3128' }); }
+  else g += px(x + 252, top + 14, 6, DIG[n + 1], { '#': '#F3EBDD' });
+});
+// the ground goes over the foot of every step
+g += R(0, GROUND, 1920, 150, '#2A3F7A') + R(0, GROUND, 1920, 16, '#9DB8EE') + R(0, GROUND + 16, 1920, 8, '#5A7CC8');
+for (let x = 0; x < 1920; x += 48) g += px(x, -12, 8, block, { L: '#6E8FD8', F: '#3F5FAE', K: '#22356E' });
+for (let x = 0; x < 1920; x += 40) g += R(x + 8, GROUND - 8, 8, 8, '#9DB8EE');
+for (let i = 0; i < 240; i++) g += R(Math.floor(rand() * 240) * 8, GROUND + 36 + Math.floor(rand() * 13) * 8, 8, 8, rand() < .5 ? '#22356E' : '#4A68B8');
+// the signs: pixel windows with a pointer down to their own step
+const WB = '#EEF1F6';
+function sign(x, y, w, h) {
+  return R(x + 6, y, w - 12, 6, WB) + R(x + 6, y + h - 6, w - 12, 6, WB) + R(x, y + 6, 6, h - 12, WB) + R(x + w - 6, y + 6, 6, h - 12, WB) + R(x + 6, y + 6, w - 12, h - 12, '#15215A')
+    + R(x + 60, y + h - 6, 30, 6, '#15215A') + R(x + 54, y + h - 6, 6, 6, WB) + R(x + 90, y + h - 6, 6, 6, WB) + R(x + 60, y + h, 6, 6, WB) + R(x + 66, y + h, 18, 6, '#15215A') + R(x + 84, y + h, 6, 6, WB) + R(x + 66, y + h + 6, 6, 6, WB) + R(x + 72, y + h + 6, 6, 6, '#15215A') + R(x + 78, y + h + 6, 6, 6, WB) + R(x + 72, y + h + 12, 6, 6, WB);
+}
+[[130, 736], [550, 628], [970, 520], [1390, 412]].forEach(([x, y]) => g += sign(x, y, 404, 116));
+// each sign carries the icon of its level
+const env = ['DDDDDDDDDDDDDD', 'DWWWWWWWWWWWWD', 'DFWWWWWWWWWWFD', 'DWFWWWWWWWWFWD', 'DWWFWWWWWWFWWD', 'DWWWFFWWFFWWWD', 'DWWWWWFFWWWWWD', 'DWWWWWWWWWWWWD', 'DDDDDDDDDDDDDD'];
+const phone = ['DDDDDDDD', 'DSSSSSSD', 'DSSSSSGD', 'DSSSSGSD', 'DGSSGSSD', 'DSGGSSSD', 'DSSSSSSD', 'DSSSSSSD', 'DDDDDDDD', 'DDDBBDDD', 'DDDDDDDD'];
+const lock = ['...AAAA...', '..A....A..', '.A......A.', '.A......A.', 'DDDDDDDDDD', 'DYYYYYYYYD', 'DYYYDDYYYD', 'DYYYDDYYYD', 'DYYYYDYYYD', 'DDDDDDDDDD'];
+const bell = ['....DD....', '...DYYD...', '..DYYYYD..', '..DYYYYD..', '.DYYYYYYD.', '.DYYYYYYD.', 'DYYYYYYYYD', 'DDDDDDDDDD', '....DD....'];
+g += px(150, 772, 5, env, { D: D2, W: '#FFFDF6', F: '#9AA3AD' }) + px(160, 760, 4, ['.RR.', 'RWWR', 'RWWR', '.RR.'], { R: '#E0453A', W: '#FFFDF6' });
+g += px(584, 656, 5, phone, { D: D2, S: '#A8DDF0', G: '#2E9D5B', B: '#6B7480' });
+g += px(998, 552, 5, lock, { A: '#AEB8C4', D: D2, Y: '#F2B84B' });
+g += px(1416, 446, 5, bell, { D: D2, Y: '#F2C14E' });
+// the goal: a tower at the top of the stairs
+const T = 1800;
+for (let y = 300; y < GROUND; y += 48) for (let b = 0; b < 3; b++) g += px(T + b * 48, y, 8, block, { L: '#6E8FD8', F: '#3F5FAE', K: '#22356E' });
+for (let b = 0; b < 3; b++) g += R(T + b * 48, 276, 32, 24, '#3F5FAE') + R(T + b * 48, 276, 32, 6, '#6E8FD8');
+g += R(T + 18, 470, 60, 74, '#3A3128') + R(T + 26, 478, 44, 66, '#5E4F45');
+g += px(T + 30, 500, 4, ['.DDDDDDDD.', 'DBBBBBBBBD', 'DDDDGGDDDD', 'DBBBBBBBBD', 'DDDDDDDDDD'], { D, B: '#A0602F', G: '#F2C14E' });
+g += R(T + 70, 196, 6, 82, D2) + px(T + 76, 196, 8, ['RRRR.', 'RRRRR', 'RRRR.'], { R: '#E0453A' });
+// the hero sets off from the left, with a word and three hearts
+const hero = ['....HHHH....', '...HHHHHH...', '...HSSSSH...', '...SESSES...', '...SSSSSS...', '....SSSS....', '..TTTTTTTT..', '.STTTTTTTTSA', '.STTTTTTTAAA', '..TTTTTTTAKA', '..TTTTTTTAAA', '...BBBBBB...', '...PP..PP...', '...PP..PP...', '..OOO..OOO..', '..OOO..OOO..'];
+g += px(30, GROUND - 128, 8, hero, { H: '#4A3424', S: '#F2C29B', E: D, T: '#2F8F8A', A: '#C9D3DC', K: D, B: '#7A5232', P: '#33465A', O: '#4A3424' });
+g += sign(26, 598, 264, 64).replace(/x="86"/g, 'x="86"');
+const heart = ['.HH.HH.', 'HHHHHHH', 'HHHHHHH', '.HHHHH.', '..HHH..', '...H...'];
+[0, 1, 2].forEach(i => g += px(44 + i * 30, 613, 3, heart, { H: '#E0453A' }));
+g += '<rect width="1920" height="1080" fill="url(#scan)"/>';
+document.getElementById('scene').innerHTML = g;
+</script>
+</body>
+</html>
