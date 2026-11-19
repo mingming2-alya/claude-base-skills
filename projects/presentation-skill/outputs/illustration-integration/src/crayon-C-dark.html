@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>兒童手繪深色版（C）｜家庭日一日行程：蠟筆畫在黑色圖畫紙上</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#25231F;--ink:#F4F0E7;--ink2:#E5E0D5;--sub:#C4BEB2;--accent:#F4806C}
+  /* each activity's words stand over the place it happens */
+  .spot{position:absolute;width:440px;display:grid;grid-template-columns:72px 1fr;column-gap:16px;align-items:center}
+  .spot svg{width:72px;height:72px;overflow:visible}
+  .spot strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em;color:var(--ink)}
+  .spot span{display:block;margin-top:5px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg id="tmp" width="0" height="0" style="position:absolute"></svg>
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs id="defs">
+      <filter id="tooth" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" seed="9"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .8  0 0 0 0 .78  0 0 0 0 .74  0 0 0 -1 .56"/>
+      </filter>
+      <!-- wax on paper: wobbly, and skipping where the paper grain is high -->
+      <filter id="crayon" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="2" seed="5" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="5" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".95 .3" numOctaves="2" seed="11" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.3 0 0 0 1.85" result="ga"/>
+        <feComposite in="d" in2="ga" operator="in"/>
+      </filter>
+      <filter id="crayonS" x="-20%" y="-20%" width="140%" height="140%">
+        <feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="5" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="3" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".95 .3" numOctaves="2" seed="11" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.3 0 0 0 1.85" result="ga"/>
+        <feComposite in="d" in2="ga" operator="in"/>
+      </filter>
+    </defs>
+    <!-- black construction paper: the wax sits on top of it, and the paper shows where the crayon skips -->
+    <rect width="1920" height="1080" fill="#25231F"/>
+    <rect width="1920" height="1080" filter="url(#tooth)" opacity=".14"/>
+    <g id="art" filter="url(#crayon)"></g>
+    <!-- signature frame: masking tape holding the drawing up -->
+    <g id="tape"></g>
+  </svg>
+  <nav aria-label="章節"><span>活動介紹</span><b>一日行程</b><span>報名方式</span><span>注意事項</span></nav>
+  <div class="copy">
+    <h2>家庭日一日行程</h2>
+    <p class="key">把孩子帶來，看看<em>爸媽工作的地方</em>。</p>
+  </div>
+  <div class="spot" style="left:120px;top:640px"><svg viewBox="0 0 104 104" data-k="craft" aria-hidden="true"></svg><div><strong>上午：親子手作</strong><span>一起畫公司的吉祥物</span></div></div>
+  <div class="spot" style="left:690px;top:716px"><svg viewBox="0 0 104 104" data-k="lunch" aria-hidden="true"></svg><div><strong>中午：草地野餐</strong><span>便當和飲料公司準備</span></div></div>
+  <div class="spot" style="left:1290px;top:560px"><svg viewBox="0 0 104 104" data-k="map" aria-hidden="true"></svg><div><strong>下午：尋寶遊戲</strong><span>跟著地圖找爸媽的座位</span></div></div>
+</div>
+<script>
+
+let seed = 21;
+const rand = () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const NS = 'http://www.w3.org/2000/svg', tmp = document.getElementById('tmp');
+const C = { red: '#EE5444', orange: '#F7953A', yellow: '#F5C518', green: '#4DB85B', lgreen: '#8BCB5A', blue: '#4C95E6', sky: '#7EC8E3', brown: '#B47E48', pink: '#F27FA4', black: '#ECE8DF', skin: '#F5B98C' };
+let defs = '', cid = 0;
+function bbox(d) { const p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); tmp.appendChild(p); const b = p.getBBox(); tmp.removeChild(p); return b; }
+// colouring in: back-and-forth strokes, clipped to the shape but pushed a little off it
+function fill(d, col, ang = -32, gap = 10, off = [6, 5]) {
+  const b = bbox(d), id = 'c' + (cid++);
+  defs += `<clipPath id="${id}"><path d="${d}" transform="translate(${off[0]} ${off[1]})"/></clipPath>`;
+  const L = Math.hypot(b.width, b.height) + 30, cx = b.x + b.width / 2 + off[0], cy = b.y + b.height / 2 + off[1];
+  let z = '';
+  for (let i = 0, n = Math.ceil(L / gap); i <= n; i++) z += (i ? ' L' : 'M') + `${(-L / 2 + i * gap + (rand() - .5) * gap * .5).toFixed(1)} ${((i % 2 ? L : -L) / 2 + (rand() - .5) * 10).toFixed(1)}`;
+  return `<g clip-path="url(#${id})"><path d="${z}" transform="translate(${cx.toFixed(1)} ${cy.toFixed(1)}) rotate(${ang})" fill="none" stroke="${col}" stroke-width="${(gap * .95).toFixed(1)}" stroke-linejoin="round" opacity=".9"/></g>`;
+}
+const line = (d, col, w = 6) => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const circ = (x, y, r) => `M${x - r} ${y} a${r} ${r} 0 1 0 ${2 * r} 0 a${r} ${r} 0 1 0 ${-2 * r} 0`;
+const wob = (x, y, r, k = 7) => { let d = ''; for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2 + .2, rr = r + Math.sin(i * 2.3) * k * .5 + (rand() - .5) * k; d += (i ? ' L' : 'M') + `${(x + Math.cos(a) * rr).toFixed(1)} ${(y + Math.sin(a) * rr).toFixed(1)}`; } return d + ' Z'; };
+
+
+// one drawing: a path walks from the craft table to the picnic to the treasure
+let a = '';
+a += fill(wob(1774, 176, 68), C.yellow, -20, 11) + line(wob(1774, 176, 68, 5), C.orange, 7);
+for (let k = 0; k < 12; k++) { const t = k * Math.PI / 6 + .15, r1 = 88, r2 = 128 + (k % 2) * 22; a += line(`M${1774 + Math.cos(t) * r1} ${176 + Math.sin(t) * r1} L${1774 + Math.cos(t) * r2} ${176 + Math.sin(t) * r2}`, C.orange, 8); }
+a += `<circle cx="1752" cy="160" r="7" fill="${C.black}"/><circle cx="1796" cy="160" r="7" fill="${C.black}"/>` + line('M1746 194 Q1774 222 1802 194', C.black, 6);
+const cloud = (x, y, s) => `M${x} ${y} c${-40 * s} 0 ${-50 * s} ${-44 * s} ${-12 * s} ${-52 * s} c${6 * s} ${-36 * s} ${62 * s} ${-42 * s} ${78 * s} ${-12 * s} c${20 * s} ${-30 * s} ${74 * s} ${-20 * s} ${70 * s} ${18 * s} c${40 * s} ${0} ${44 * s} ${46 * s} ${4 * s} ${46 * s} Z`;
+[[1120, 250, .95], [1420, 160, .8], [860, 120, .7]].forEach(([x, y, s]) => a += fill(cloud(x, y, s), C.sky, 28, 11) + line(cloud(x, y, s), C.blue, 6));
+let g = 'M0 948'; for (let x = 0; x <= 1920; x += 18) g += ` L${x} ${948 + (x / 18 % 2 ? -22 : 0) + (rand() - .5) * 8}`;
+a += fill(`${g} L1920 1080 L0 1080 Z`, C.lgreen, 70, 12) + line(g, C.green, 7);
+// the path, dashed, from morning to afternoon
+a += `<path d="M300 1000 C520 1040 640 1010 760 1000 C960 984 1100 1030 1260 1000 C1380 978 1460 950 1560 940" fill="none" stroke="${C.orange}" stroke-width="9" stroke-dasharray="26 20" stroke-linecap="round"/>`;
+// a stick person, as a child draws one
+function kid(x, h, col, body, la, ra, hair) {
+  const FEET = 940, hr = h * .15, hy = FEET - h + hr, sy = FEET - h * .7, by = FEET - h * .3;
+  let o = line(`M${x - h * .08} ${by} L${x - h * .12} ${FEET} l-14 2`, C.black, 6) + line(`M${x + h * .08} ${by} L${x + h * .12} ${FEET} l14 2`, C.black, 6);
+  const b = body === 'dress' ? `M${x} ${sy - 6} L${x + h * .2} ${by} L${x - h * .2} ${by} Z` : `M${x - h * .11} ${sy - 6} L${x + h * .11} ${sy - 6} L${x + h * .12} ${by} L${x - h * .12} ${by} Z`;
+  o += fill(b, col, -35, 10) + line(b, col, 6);
+  o += line(`M${x - h * .06} ${sy} L${la[0]} ${la[1]}`, C.black, 6) + line(`M${x + h * .06} ${sy} L${ra[0]} ${ra[1]}`, C.black, 6);
+  o += fill(circ(x, hy, hr), C.skin, 20, 9, [3, 3]) + line(wob(x, hy, hr, 3), C.brown, 5);
+  o += line(`M${x - hr * .9} ${hy - hr * .4} C${x - hr * .6} ${hy - hr * 1.3} ${x + hr * .6} ${hy - hr * 1.3} ${x + hr * .9} ${hy - hr * .4}`, hair, 8);
+  o += `<circle cx="${x - hr * .38}" cy="${hy - hr * .1}" r="${hr * .12}" fill="${C.black}"/><circle cx="${x + hr * .38}" cy="${hy - hr * .1}" r="${hr * .12}" fill="${C.black}"/>` + line(`M${x - hr * .45} ${hy + hr * .35} Q${x} ${hy + hr * .8} ${x + hr * .45} ${hy + hr * .35}`, C.red, 5);
+  return o;
+}
+// morning: the craft table
+a += fill('M250 820 L500 820 L500 842 L250 842 Z', C.brown, 10, 8) + line('M250 820 L500 820 L500 842 L250 842 Z M270 842 L262 930 M480 842 L488 930', C.brown, 6);
+a += fill('M300 790 L400 784 L404 820 L304 822 Z', '#FFF6D8', 0, 6, [2, 2]) + line('M300 790 L400 784 L404 820 L304 822 Z', C.black, 4) + line('M330 806 q14 -12 28 0 q14 12 28 0', C.red, 4);
+[[420, C.red], [438, C.blue], [456, C.green]].forEach(([x, col]) => a += line(`M${x} 816 L${x + 14} 790`, col, 8));
+a += kid(200, 180, C.pink, 'dress', [150, 760], [262, 822], C.brown) + kid(580, 270, C.blue, 'shirt', [520, 760], [492, 822], C.black);
+// noon: the picnic blanket
+a += fill('M720 900 L1110 900 L1160 962 L680 962 Z', C.red, 0, 14, [2, 2]);
+a += `<path d="M760 900 L730 962 M840 900 L820 962 M920 900 L910 962 M1000 900 L1000 962 M1080 900 L1090 962 M700 930 L1135 930" stroke="#FFF6D8" stroke-width="7" opacity=".85"/>` + line('M720 900 L1110 900 L1160 962 L680 962 Z', '#B8302A', 6);
+a += fill('M1010 860 L1100 860 L1090 904 L1020 904 Z', C.brown, 10, 8) + line('M1010 860 L1100 860 L1090 904 L1020 904 Z M1020 860 C1030 826 1080 826 1090 860', C.brown, 6);
+a += fill('M800 896 L850 846 L880 896 Z', C.yellow, -20, 7, [2, 2]) + line('M800 896 L850 846 L880 896 Z', C.orange, 5) + fill('M900 898 L944 856 L968 898 Z', C.yellow, -20, 7, [2, 2]) + line('M900 898 L944 856 L968 898 Z', C.orange, 5);
+// afternoon: the treasure hunt
+a += fill('M1520 880 L1640 880 L1640 940 L1520 940 Z', C.brown, 10, 9) + line('M1520 880 L1640 880 L1640 940 L1520 940 Z M1520 880 C1530 846 1630 846 1640 880', C.brown, 6) + `<rect x="1570" y="890" width="22" height="20" fill="${C.yellow}"/>`;
+a += line('M1330 960 L1380 1000 M1380 960 L1330 1000', C.red, 9);
+a += fill('M1360 870 L1450 862 L1456 920 L1366 928 Z', '#F2D49B', -20, 8, [2, 2]) + line('M1360 870 L1450 862 L1456 920 L1366 928 Z', C.brown, 4) + `<path d="M1376 912 Q1400 880 1420 900 T1444 874" fill="none" stroke="${C.blue}" stroke-width="3" stroke-dasharray="5 6"/>`;
+a += kid(1740, 200, C.orange, 'shirt', [1690, 700], [1800, 700], C.brown);
+[[1700, 640, C.red], [1790, 610, C.yellow], [1850, 650, C.blue]].forEach(([x, y, col]) => {
+  const d = `M${x} ${y - 46} C${x + 36} ${y - 46} ${x + 38} ${y + 26} ${x} ${y + 44} C${x - 38} ${y + 26} ${x - 36} ${y - 46} ${x} ${y - 46} Z`;
+  a += line(`M${x} ${y + 46} C${x + 8} ${y + 70} ${1745} ${684} ${x < 1760 ? 1690 : 1800} 700`, C.black, 3) + fill(d, col, -25, 10) + line(d, col, 6);
+});
+// flowers along the bottom
+[[120, 1000], [640, 1010], [1220, 1020], [1880, 1000]].forEach(([x, y], i) => {
+  const col = [C.red, C.pink, C.yellow, C.orange][i % 4];
+  a += line(`M${x} ${y} L${x + 4} ${y + 44}`, C.green, 5);
+  for (let k = 0; k < 5; k++) { const t = k * 1.256; a += `<circle cx="${x + Math.cos(t) * 14}" cy="${y + Math.sin(t) * 14}" r="10" fill="${col}"/>`; }
+  a += `<circle cx="${x}" cy="${y}" r="8" fill="${C.yellow}"/>`;
+});
+document.getElementById('defs').insertAdjacentHTML('beforeend', defs);
+document.getElementById('art').innerHTML = a;
+// tape in the corners
+let t = '';
+[[54, 44, -38], [1866, 44, 38], [54, 1036, 38], [1866, 1036, -38]].forEach(([x, y, r]) => {
+  let edge = (side) => { let d = ''; for (let k = 0; k <= 8; k++) d += ` L${side * (90 + (k % 2 ? 6 : -4))} ${-26 + k * 6.5}`; return d; };
+  t += `<g transform="translate(${x} ${y}) rotate(${r})"><path d="M-90 -26 ${edge(1).slice(1)} ${edge(-1).split(' L').reverse().join(' L')} Z" fill="#E8DCB0" opacity=".82"/><path d="M-86 -20 H86" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="3"/></g>`;
+});
+document.getElementById('tape').innerHTML = t;
+
+// list badges: little crayon drawings
+const B = {
+  craft: () => fill('M22 78 L70 30 L84 44 L36 92 Z', C.red, -45, 8, [3, 2]) + line('M22 78 L70 30 L84 44 L36 92 Z', C.red, 5) + fill('M22 78 L36 92 L14 98 Z', C.yellow, 0, 6, [1, 1]) + line('M36 50 L50 64 M56 42 L66 52', '#FFD9CF', 4),
+  lunch: () => fill('M14 74 L52 20 L90 74 Z', C.yellow, -30, 8, [3, 2]) + line('M14 74 L52 20 L90 74 Z', C.orange, 5) + line('M20 66 Q52 56 84 66', C.green, 7) + line('M24 80 Q52 72 80 80', C.red, 6),
+  map: () => fill('M12 24 L40 16 L64 26 L92 18 L92 82 L64 90 L40 80 L12 88 Z', '#F2D49B', -20, 9, [3, 2]) + line('M12 24 L40 16 L64 26 L92 18 L92 82 L64 90 L40 80 L12 88 Z', C.brown, 5) + `<path d="M24 70 Q40 40 58 58 T80 36" fill="none" stroke="${C.blue}" stroke-width="4" stroke-dasharray="6 7" stroke-linecap="round"/>` + line('M70 28 L86 44 M86 28 L70 44', C.red, 6),
+};
+document.querySelectorAll('.spot svg').forEach(el => {
+  defs = '';
+  const art = B[el.dataset.k]();
+  el.innerHTML = `<defs>${defs}</defs><g filter="url(#crayonS)">${art}</g>`;
+});
+</script>
+</body>
+</html>
