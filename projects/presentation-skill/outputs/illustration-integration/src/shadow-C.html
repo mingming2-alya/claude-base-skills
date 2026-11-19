@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>皮影戲融合版（C）｜說好一個故事的三幕：一幕一組戲偶</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#E9C58E;--ink:#2A1A10;--ink2:#3B2716;--sub:#5A3F28;--accent:#A3261B}
+  .dye{mix-blend-mode:multiply}
+  /* each act's caption stands over its own scene on the screen */
+  .act{position:absolute;width:520px;display:grid;grid-template-columns:76px 1fr;column-gap:18px;align-items:center}
+  .act svg{width:76px;height:76px;overflow:visible}
+  .act strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em;color:var(--ink)}
+  .act span{display:block;margin-top:5px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <!-- the lamp sits behind the cloth, a little right of centre -->
+      <radialGradient id="lamp" cx="1180" cy="470" r="1250" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#FBE7C2"/><stop offset=".45" stop-color="#F1D29E"/><stop offset=".8" stop-color="#DDAE6C"/><stop offset="1" stop-color="#C08745"/>
+      </radialGradient>
+      <filter id="cloth" x="0" y="0" width="1920" height="1080" filterUnits="userSpaceOnUse">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 .42  0 0 0 0 .28  0 0 0 0 .14  0 0 0 -1.1 .62"/>
+      </filter>
+      <pattern id="weave" width="5" height="5" patternUnits="userSpaceOnUse"><rect width="5" height="1" fill="#6B4320" opacity=".06"/><rect width="1" height="5" fill="#6B4320" opacity=".05"/></pattern>
+      <!-- the leather sits a finger's width off the cloth -->
+      <filter id="lift" x="0" y="0" width="1920" height="1080" filterUnits="userSpaceOnUse">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="5"/><feOffset dx="9" dy="10"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .16  0 0 0 0 .09  0 0 0 0 .04  0 0 0 .32 0"/>
+        <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <clipPath id="robeClip"><path d="M118 232 C140 220 205 220 228 234 L262 498 C214 516 128 516 92 498 Z"/></clipPath>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#lamp)"/>
+    <rect width="1920" height="1080" filter="url(#cloth)" opacity=".5"/>
+    <rect width="1920" height="1080" fill="url(#weave)"/>
+    <g id="acts"></g>
+    <!-- signature frame: the stage, curtain and valance -->
+    <g id="stage">
+      <path d="M1830 28 C1852 300 1818 420 1846 520 C1874 640 1838 860 1858 1052 L1906 1052 L1906 28 Z" fill="#8E1F1A"/>
+      <path d="M1852 40 C1866 300 1846 430 1864 520 C1884 650 1856 860 1872 1050 M1878 40 C1888 300 1872 430 1884 520 C1898 650 1880 860 1890 1050" fill="none" stroke="#5E120E" stroke-width="5" opacity=".7"/>
+      <ellipse cx="1856" cy="522" rx="34" ry="14" fill="#C99A3A" stroke="#5E3A12" stroke-width="3"/>
+      <g id="valance"></g>
+      <rect x="14" y="14" width="1892" height="1052" fill="none" stroke="#3A2010" stroke-width="28"/>
+      <rect x="31" y="31" width="1858" height="1018" fill="none" stroke="#8A5A30" stroke-width="3"/>
+      <g fill="#C99A3A" stroke="#3A2010" stroke-width="3"><circle cx="14" cy="14" r="20"/><circle cx="1906" cy="14" r="20"/><circle cx="14" cy="1066" r="20"/><circle cx="1906" cy="1066" r="20"/></g>
+    </g>
+  
+  </svg>
+  <nav aria-label="章節"><span>為什麼要說故事</span><b>三幕結構</b><span>練習</span><span>範例</span></nav>
+  <div class="copy">
+    <h2>說好一個故事的三幕</h2>
+    <p class="key">聽眾記住的不是數字，是<em>主角怎麼改變</em>。</p>
+  </div>
+  <div class="act" style="left:140px;top:452px"><svg class="badge" viewBox="0 0 104 104" data-n="1" data-c="#B8301F" aria-hidden="true"></svg><div><strong>第一幕：主角想要什麼</strong><span>先讓人在乎這個人</span></div></div>
+  <div class="act" style="left:720px;top:452px"><svg class="badge" viewBox="0 0 104 104" data-n="2" data-c="#2F7A55" aria-hidden="true"></svg><div><strong>第二幕：遇到什麼阻礙</strong><span>衝突越具體，越有張力</span></div></div>
+  <div class="act" style="left:1300px;top:452px"><svg class="badge" viewBox="0 0 104 104" data-n="3" data-c="#D49A2A" aria-hidden="true"></svg><div><strong>第三幕：最後變成怎樣</strong><span>這個改變，就是你的重點</span></div></div>
+</div>
+<script>
+const SC = '#FBE7C2', INK = '#2A1A10';
+let h = '';
+const HERO = `<path d="M150 95 C110 50 60 35 20 55 C50 55 85 70 140 110 Z M152 85 C120 20 80 0 40 10 C75 20 105 45 145 100 Z" fill="#2F7A55" class="dye" stroke="#2A1A10" stroke-width="4"/>
+<path d="M130 250 C100 300 90 360 100 420 C112 430 130 428 138 420 C136 360 146 300 160 262 Z" fill="#A4281A" class="dye" stroke="#2A1A10" stroke-width="4"/>
+<path d="M128 500 L124 560 L98 590 L100 600 L148 600 L150 566 L156 506 Z M196 500 L214 560 L250 586 L252 600 L196 600 L186 566 L176 506 Z" fill="#3A2414" stroke="#2A1A10" stroke-width="4"/>
+<circle cx="132" cy="580" r="5" fill="#FBE7C2"/><circle cx="222" cy="584" r="5" fill="#FBE7C2"/>
+<path d="M118 232 C140 220 205 220 228 234 L262 498 C214 516 128 516 92 498 Z" fill="#B8301F" class="dye"/>
+<g clip-path="url(#robeClip)" id="robeHoles" fill="#FBE7C2" stroke="#2A1A10" stroke-width="2.5"></g>
+<path d="M118 232 C140 220 205 220 228 234 L262 498 C214 516 128 516 92 498 Z" fill="none" stroke="#2A1A10" stroke-width="5"/>
+<path d="M96 480 C128 498 214 498 258 480 L262 498 C214 516 128 516 92 498 Z" fill="#2F7A55" class="dye" stroke="#2A1A10" stroke-width="4"/>
+<path d="M106 340 C150 352 210 352 246 340 L248 362 C210 374 150 374 104 362 Z" fill="#D49A2A" class="dye" stroke="#2A1A10" stroke-width="4"/>
+<path d="M150 226 L182 290 L214 226" fill="none" stroke="#2A1A10" stroke-width="18"/>
+<path d="M150 226 L182 290 L214 226" fill="none" stroke="#3F9A6C" stroke-width="11"/>
+<path d="M168 200 L196 200 L198 228 L166 228 Z" fill="#FBE7C2" stroke="#2A1A10" stroke-width="4"/>
+<path d="M152 128 L220 128 C224 140 230 150 240 162 C236 166 230 167 226 168 C229 178 226 188 216 196 C200 208 172 210 152 200 Z" fill="#FBE7C2" stroke="#2A1A10" stroke-width="4"/>
+<path d="M140 128 L156 128 L156 200 C146 196 140 184 140 170 Z" fill="#2A1A10"/>
+<path d="M200 148 C207 143 217 144 222 149 C214 152 206 152 200 148 Z" fill="#2A1A10"/>
+<path d="M196 140 C205 134 216 135 224 140" fill="none" stroke="#2A1A10" stroke-width="3"/>
+<path d="M138 128 C130 85 150 55 182 52 C214 50 232 75 226 110 L220 130 Z" fill="#D49A2A" class="dye" stroke="#2A1A10" stroke-width="4"/>
+<circle cx="165" cy="88" r="10" fill="#FBE7C2" stroke="#2A1A10" stroke-width="3"/><circle cx="196" cy="82" r="10" fill="#FBE7C2" stroke="#2A1A10" stroke-width="3"/><circle cx="183" cy="110" r="7" fill="#FBE7C2" stroke="#2A1A10" stroke-width="3"/>
+<circle cx="184" cy="44" r="11" fill="#B8301F" class="dye" stroke="#2A1A10" stroke-width="4"/>
+<path d="M200 236 C236 236 268 270 290 310 C280 330 262 336 248 330 C236 300 218 280 196 270 Z" fill="#B8301F" class="dye" stroke="#2A1A10" stroke-width="4"/>
+<path d="M262 318 C290 300 310 280 330 262 L344 278 C324 300 300 322 278 338 Z" fill="#B8301F" class="dye" stroke="#2A1A10" stroke-width="4"/>
+<circle cx="338" cy="268" r="13" fill="#FBE7C2" stroke="#2A1A10" stroke-width="4"/>
+<g fill="#2A1A10"><circle cx="210" cy="246" r="7"/><circle cx="270" cy="322" r="7"/><circle cx="182" cy="524" r="6"/></g>
+<g fill="#FBE7C2"><circle cx="210" cy="246" r="2.5"/><circle cx="270" cy="322" r="2.5"/><circle cx="182" cy="524" r="2.5"/></g>`;
+const SWORD = `<path d="M346 258 L446 174 L462 168 L456 184 L356 270 Z" fill="#E8EEF0" stroke="#2A1A10" stroke-width="4"/>
+<path d="M352 263 L452 176" stroke="#2A1A10" stroke-width="2" opacity=".6"/>
+<path d="M326 252 L356 286" stroke="#2A1A10" stroke-width="12" stroke-linecap="round"/><path d="M326 252 L356 286" stroke="#D49A2A" stroke-width="6" stroke-linecap="round" class="dye"/>
+<path d="M340 272 L322 288" stroke="#2A1A10" stroke-width="9" stroke-linecap="round"/>`;
+// the robe's cut-outs, drawn once and repeated inside every hero
+let holes = '';
+for (let y = 252, r = 0; y < 500; y += 34, r++) for (let x = 96 + (r % 2) * 17; x < 270; x += 34) if (y < 332 || y > 372) holes += `<circle cx="${x}" cy="${y}" r="7"/><circle cx="${x}" cy="${y}" r="2" fill="${INK}" stroke="none"/>`;
+const HERO_FULL = HERO.replace('id="robeHoles" fill="#FBE7C2" stroke="#2A1A10" stroke-width="2.5"></g>', 'fill="#FBE7C2" stroke="#2A1A10" stroke-width="2.5">' + holes + '</g>');
+// the same hero in each act; only what he holds changes
+function hero(x, y, s, extra) {
+  return `<g filter="url(#lift)" transform="translate(${x} ${y}) scale(${s})">${HERO_FULL}${extra || ''}</g>`;
+}
+const lantern = (x, y, r, lit) => `<path d="M${x} ${y - r - 40} V${y - r}" stroke="${INK}" stroke-width="4"/><circle cx="${x}" cy="${y}" r="${r}" fill="${lit ? '#F2B43A' : '#B9862F'}" class="dye" opacity="${lit ? .9 : .55}" stroke="${INK}" stroke-width="5"/><circle cx="${x}" cy="${y}" r="${r * .72}" fill="${SC}" stroke="${INK}" stroke-width="3"/>` + [0, 1, 2, 3, 4, 5, 6, 7].map(k => `<circle cx="${x + Math.cos(k * .785) * r * .86}" cy="${y + Math.sin(k * .785) * r * .86}" r="${r * .06}" fill="${SC}" stroke="${INK}" stroke-width="2"/>`).join('');
+// the ground ledge runs under all three acts
+h += `<path d="M40 1052 L40 960 C200 944 360 958 520 948 C700 936 880 956 1060 946 C1240 936 1420 954 1600 942 C1700 936 1780 946 1832 940 L1832 1052 Z" fill="#7A4A26" class="dye" stroke="${INK}" stroke-width="5" filter="url(#lift)"/>`;
+for (let x = 70; x < 1820; x += 46) h += `<circle cx="${x}" cy="${1000 + (x % 92 ? 12 : -6)}" r="9" fill="${SC}" stroke="${INK}" stroke-width="3"/>`;
+// act one: the hero looks up at the lantern he wants
+h += hero(150, 650, .5) + `<g filter="url(#lift)">${lantern(520, 690, 54, false)}</g>`;
+h += `<path d="M300 760 C360 730 420 712 470 700" stroke="${INK}" stroke-width="3" stroke-dasharray="8 10" fill="none" opacity=".6"/>`;
+// act two: the dragon stands between him and it
+h += hero(720, 650, .5, SWORD);
+// dragon: one tapered body along a spline, belly band, scales, spikes and openwork
+function spline(P, n) {
+  const out = [];
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[Math.max(i - 1, 0)], p1 = P[i], p2 = P[i + 1], p3 = P[Math.min(i + 2, P.length - 1)];
+    for (let k = 0; k < n; k++) {
+      const t = k / n, t2 = t * t, t3 = t2 * t;
+      out.push([0, 1].map(j => 0.5 * (2 * p1[j] + (-p0[j] + p2[j]) * t + (2 * p0[j] - 5 * p1[j] + 4 * p2[j] - p3[j]) * t2 + (-p0[j] + 3 * p1[j] - 3 * p2[j] + p3[j]) * t3)));
+    }
+  }
+  out.push(P[P.length - 1]);
+  return out;
+}
+const S = spline([[1600, 520], [1676, 480], [1734, 412], [1752, 330], [1720, 256], [1668, 206], [1676, 140], [1744, 104], [1822, 118], [1862, 150]], 14);
+const N = S.length, r0 = 50, r1 = 9;
+const nrm = S.map((p, i) => { const a = S[Math.max(i - 1, 0)], b = S[Math.min(i + 1, N - 1)]; const tx = b[0] - a[0], ty = b[1] - a[1], l = Math.hypot(tx, ty); return [-ty / l, tx / l, tx / l, ty / l]; });
+const rad = i => r0 + (r1 - r0) * Math.pow(i / (N - 1), 0.8);
+const off = (i, k) => [S[i][0] + nrm[i][0] * rad(i) * k, S[i][1] + nrm[i][1] * rad(i) * k];
+const poly = (k1, k2, i0 = 0, i1 = N - 1) => { const A = [], B = []; for (let i = i0; i <= i1; i++) { A.push(off(i, k1)); B.push(off(i, k2)); } return 'M' + A.concat(B.reverse()).map(p => p.map(v => v.toFixed(1)).join(' ')).join(' L') + ' Z'; };
+dh = `<clipPath id="bodyClip"><path d="${poly(1, -1)}"/></clipPath>`;
+// spikes on the outer side
+for (let i = 8; i < N - 3; i += 5) {
+  const r = rad(i), [px, py, tx, ty] = nrm[i], [bx, by] = off(i, -0.92), L = 16 + r * 0.55;
+  dh += `<path d="M${bx - tx * r * .32} ${by - ty * r * .32} L${bx - px * L + tx * 6} ${by - py * L + ty * 6} L${bx + tx * r * .32} ${by + ty * r * .32} Z" fill="#C2571F" class="dye" stroke="${INK}" stroke-width="3"/>`;
+}
+dh += `<path d="${poly(1, -1)}" fill="#2D7F86" class="dye"/>`;
+dh += `<path d="${poly(0.92, 0.38, 0, N - 4)}" fill="#D49A2A" class="dye" stroke="${INK}" stroke-width="2.5"/>`;
+let sc = '';
+for (let i = 3; i < N - 2; i += 3) {
+  const [px, py, tx, ty] = nrm[i];
+  for (const k of [-0.62, -0.12]) {
+    const [cx, cy] = off(i, k), r = rad(i) * 0.26;
+    sc += `<path d="M${cx - px * r} ${cy - py * r} A${r} ${r} 0 0 0 ${cx + px * r} ${cy + py * r}" transform="rotate(0)" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
+  }
+  const [bx, by] = off(i, 0.92), [cx2, cy2] = off(i, 0.38);
+  sc += `<path d="M${bx} ${by} L${cx2} ${cy2}" stroke="${INK}" stroke-width="2"/>`;
+}
+for (let i = 6; i < N - 6; i += 10) { const [cx, cy] = off(i, -0.36); sc += `<circle cx="${cx}" cy="${cy}" r="${rad(i) * 0.17}" fill="${SC}" stroke="${INK}" stroke-width="2"/>`; }
+dh += `<g clip-path="url(#bodyClip)">${sc}</g><path d="${poly(1, -1)}" fill="none" stroke="${INK}" stroke-width="4.5"/>`;
+// legs with three claws
+function leg(i, side, len, ang) {
+  const [x, y] = off(i, side * 0.7), a = ang * Math.PI / 180;
+  const kx = x + Math.cos(a) * len, ky = y + Math.sin(a) * len, fx = kx + Math.cos(a + .9) * len * .7, fy = ky + Math.sin(a + .9) * len * .7;
+  const limb = `M${x} ${y} L${kx} ${ky} L${fx} ${fy}`;
+  let claws = '';
+  [-0.7, 0, 0.7].forEach(d => claws += `M${fx} ${fy} l${(Math.cos(a + .9 + d) * 16).toFixed(1)} ${(Math.sin(a + .9 + d) * 16).toFixed(1)} `);
+  return `<path d="${limb}" fill="none" stroke="${INK}" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/><path d="${limb}" fill="none" stroke="#2D7F86" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" class="dye"/><path d="${claws}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/>`;
+}
+// legs left out: at this size they read as dark scribbles at the neck
+// head, facing the hero
+dh += `<g transform="translate(1606 516)">
+  <path d="M-6 -36 C14 -70 40 -96 78 -104 C52 -86 34 -64 22 -34 Z M8 -26 C40 -50 70 -62 104 -60 C76 -48 52 -34 34 -14 Z" fill="#C2571F" class="dye" stroke="${INK}" stroke-width="4"/>
+  <path d="M-4 -12 C20 -30 46 -18 52 6 C60 30 40 56 14 52 C30 40 30 20 16 12 C10 34 -6 44 -18 40 Z" fill="#C2571F" class="dye" stroke="${INK}" stroke-width="4"/>
+  <path d="M10 -46 C-30 -62 -92 -60 -142 -40 C-162 -32 -178 -22 -172 -8 L-112 -6 C-72 -6 -32 0 6 8 Z" fill="#2D7F86" class="dye" stroke="${INK}" stroke-width="4"/>
+  <path d="M6 24 C-30 20 -72 22 -122 32 C-142 36 -144 48 -128 50 C-82 50 -32 44 8 38 Z" fill="#2D7F86" class="dye" stroke="${INK}" stroke-width="4"/>
+  <path d="M-158 -8 L-150 6 L-142 -6 L-134 8 L-126 -5 L-118 8 L-110 -5 M-120 32 L-112 20 L-104 31 L-96 19 L-88 30" fill="none" stroke="${INK}" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M-98 -40 C-80 -62 -50 -64 -36 -46 C-54 -54 -72 -50 -86 -38 Z" fill="#C2571F" class="dye" stroke="${INK}" stroke-width="3"/>
+  <ellipse cx="-62" cy="-30" rx="15" ry="10" fill="${SC}" stroke="${INK}" stroke-width="3.5"/><circle cx="-66" cy="-30" r="5" fill="${INK}"/>
+  <circle cx="-150" cy="-28" r="9" fill="${SC}" stroke="${INK}" stroke-width="3"/>
+  <circle cx="-24" cy="-14" r="8" fill="${SC}" stroke="${INK}" stroke-width="2.5"/><circle cx="-40" cy="28" r="6" fill="${SC}" stroke="${INK}" stroke-width="2.5"/>
+  <path d="M-150 -10 C-180 -24 -204 -56 -236 -60 M-130 44 C-160 60 -186 84 -222 88" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round"/>
+</g>`;
+
+h += `<g filter="url(#lift)" transform="translate(212 590) scale(.56)">${dh}</g>`;
+
+
+// act three: he comes back changed, the lantern lit in his hand
+h += hero(1330, 650, .5) + `<g filter="url(#lift)">${lantern(1530, 742, 44, true)}</g>`;
+for (let k = 0; k < 9; k++) { const a = -Math.PI * (.1 + k * .1); h += `<path d="M${1530 + Math.cos(a) * 64} ${742 + Math.sin(a) * 64} L${1530 + Math.cos(a) * 92} ${742 + Math.sin(a) * 92}" stroke="#D49A2A" stroke-width="7" stroke-linecap="round" class="dye"/>`; }
+h += `<path d="M1520 790 L1500 690" stroke="${INK}" stroke-width="4"/>`;
+// rods from below, two for each puppet
+h += `<g stroke="${INK}" stroke-width="5" stroke-linecap="round" opacity=".7"><path d="M241 757 L230 1052"/><path d="M319 784 L360 1052"/><path d="M811 757 L800 1052"/><path d="M889 784 L930 1052"/><path d="M1421 757 L1410 1052"/><path d="M1499 784 L1540 1052"/><path d="M1160 840 L1180 1052"/></g>`;
+document.getElementById('acts').innerHTML = h;
+// valance over the right half: scallops with a fringe
+h = '<rect x="1060" y="28" width="846" height="26" fill="#8E1F1A"/>';
+for (let x = 1060; x < 1906; x += 60) h += `<path d="M${x} 54 a30 26 0 0 0 60 0 Z" fill="#8E1F1A"/><path d="M${x + 4} 54 a26 22 0 0 0 52 0" fill="none" stroke="#C99A3A" stroke-width="3"/>`;
+document.getElementById('valance').innerHTML = h;
+// list badges: leather medallions with 一 二 三 cut through
+document.querySelectorAll('svg.badge').forEach(el => {
+  const n = +el.dataset.n, c = el.dataset.c;
+  let s = `<circle cx="52" cy="52" r="47" fill="${c}" style="mix-blend-mode:multiply" stroke="${INK}" stroke-width="4"/>`;
+  for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6; s += `<circle cx="${52 + Math.cos(a) * 38}" cy="${52 + Math.sin(a) * 38}" r="4.5" fill="${SC}" stroke="${INK}" stroke-width="2"/>`; }
+  s += `<circle cx="52" cy="52" r="27" fill="${SC}" stroke="${INK}" stroke-width="3"/>`;
+  const ys = n === 1 ? [52] : n === 2 ? [43, 61] : [38, 52, 66];
+  ys.forEach((y, i) => { const w = n === 3 && i === 1 ? 26 : 34; s += `<rect x="${52 - w / 2}" y="${y - 4}" width="${w}" height="8" rx="3" fill="${INK}"/>`; });
+  el.innerHTML = s;
+});
+
+</script>
+</body>
+</html>
