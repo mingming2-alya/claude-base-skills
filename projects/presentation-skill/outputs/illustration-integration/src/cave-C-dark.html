@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>山洞岩畫深色版（C）｜團隊分工的四種角色：火把照亮的洞穴深處</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#33281F;--ink:#F3EBDD;--ink2:#E6DBCA;--sub:#CBBDA8;--accent:#EC8E62}
+  .pig{mix-blend-mode:normal}
+  /* each role's words are painted beside the person doing it */
+  .role{position:absolute;width:390px;display:grid;grid-template-columns:52px 1fr;column-gap:14px;align-items:start}
+  .role svg{width:52px;height:70px;overflow:visible}
+  .role strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em;color:var(--ink)}
+  .role span{display:block;margin-top:5px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#5A4636"/><stop offset=".55" stop-color="#46372B"/><stop offset="1" stop-color="#30261E"/>
+      </linearGradient>
+      <!-- the wall: noise lit from the upper left, multiplied into the stone colour -->
+      <filter id="relief" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".004 .006" numOctaves="4" seed="11" result="n1"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".028" numOctaves="2" seed="3" result="n2"/>
+        <feComposite in="n1" in2="n2" operator="arithmetic" k2=".78" k3=".22" result="n"/>
+        <feDiffuseLighting in="n" surfaceScale="20" diffuseConstant="1" lighting-color="#FFFFFF" result="d">
+          <feDistantLight azimuth="225" elevation="42"/>
+        </feDiffuseLighting>
+        <feComposite in="d" in2="SourceGraphic" operator="arithmetic" k1=".9" k2="0" k3=".2" k4="0"/>
+      </filter>
+      <filter id="grain" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="5"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .88  0 0 0 0 .8  0 0 0 0 .68  0 0 0 -1.4 .78"/>
+      </filter>
+      <filter id="stain" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".0028" numOctaves="3" seed="21"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .52  0 0 0 0 .36  0 0 0 0 .2  1.7 0 0 0 -.78"/>
+      </filter>
+      <radialGradient id="calm" cx="520" cy="330" r="820" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#1A140F" stop-opacity=".45"/><stop offset=".7" stop-color="#1A140F" stop-opacity=".2"/><stop offset="1" stop-color="#1A140F" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="dark" cx="900" cy="520" r="1180" gradientUnits="userSpaceOnUse">
+        <stop offset=".5" stop-color="#090604" stop-opacity="0"/><stop offset="1" stop-color="#090604" stop-opacity=".72"/>
+      </radialGradient>
+      <radialGradient id="torch" cx="1000" cy="660" r="980" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#F0A256" stop-opacity=".2"/><stop offset=".45" stop-color="#E08A40" stop-opacity=".08"/><stop offset="1" stop-color="#E08A40" stop-opacity="0"/>
+      </radialGradient>
+      <!-- pigment: ragged edges and the stone showing through -->
+      <filter id="paint" x="-15%" y="-15%" width="130%" height="130%">
+        <feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="4" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="7" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="1" seed="8" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2.6 0 0 0 2.05" result="ga"/>
+        <feComposite in="d" in2="ga" operator="in"/>
+      </filter>
+      <!-- sprayed pigment around a hand -->
+      <filter id="spray" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="14" result="b"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".6" numOctaves="1" seed="2" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -2 0 0 0 1.8" result="ga"/>
+        <feComposite in="b" in2="ga" operator="in"/>
+      </filter>
+      <path id="hand" d="M30 170 C20 140 18 120 22 104 L4 80 C0 72 6 64 14 68 L34 92 L30 30 C30 20 42 20 44 30 L48 84 L52 14 C52 4 64 4 66 14 L68 84 L74 22 C76 12 88 14 88 24 L86 88 L96 46 C98 38 110 40 108 50 L100 104 C100 130 96 150 90 170 Z"/>
+      <mask id="m1" maskUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><rect width="1920" height="1080" fill="#fff"/><use href="#hand" transform="translate(1744 64) rotate(18 60 85)" fill="#000"/><use href="#hand" transform="translate(1806 760) rotate(-24 60 85)" fill="#000"/><use href="#hand" transform="translate(28 896) rotate(-12 60 85)" fill="#000"/></mask>
+    </defs>
+
+    <rect width="1920" height="1080" fill="url(#base)" filter="url(#relief)"/>
+    <rect width="1920" height="1080" filter="url(#stain)" opacity=".35" style="mix-blend-mode:multiply"/>
+    <rect width="1920" height="1080" filter="url(#grain)" opacity=".12"/>
+    <!-- deep in the cave: the only light is a torch held below the bison -->
+    <rect width="1920" height="1080" fill="url(#torch)"/>
+    <rect width="1920" height="1080" fill="url(#calm)"/>
+    <g fill="none" stroke="#120D0A" stroke-linecap="round" opacity=".55">
+      <path d="M1100 1080 C1120 1010 1090 960 1130 900 C1150 870 1140 840 1170 810" stroke-width="3"/>
+      <path d="M1920 300 C1880 320 1870 360 1830 372 C1800 380 1790 410 1760 420" stroke-width="2.5"/>
+      <path d="M1260 0 C1270 40 1250 70 1280 104" stroke-width="2.5"/>
+    </g>
+
+    <!-- signature frame: hands sprayed against the wall -->
+    <g mask="url(#m1)" class="pig">
+      <circle cx="1804" cy="150" r="104" fill="#C4583A" filter="url(#spray)" opacity=".85"/>
+      <circle cx="1866" cy="846" r="104" fill="#DDA44A" filter="url(#spray)" opacity=".7"/>
+      <circle cx="88" cy="982" r="100" fill="#C4583A" filter="url(#spray)" opacity=".75"/>
+    </g>
+
+    <g id="art" class="pig" filter="url(#paint)"></g>
+    <rect width="1920" height="1080" fill="url(#dark)"/>
+  </svg>
+  <nav aria-label="章節"><span>為什麼要分工</span><b>四種角色</b><span>怎麼搭配</span><span>常見問題</span></nav>
+  <div class="copy">
+    <h2>團隊分工的四種角色</h2>
+    <p class="key">一萬年前打獵就靠分工：每個人做<em>最擅長的那件事</em>。</p>
+  </div>
+  <div class="role" style="left:1220px;top:262px"><svg viewBox="0 0 52 70" data-n="1" aria-hidden="true"></svg><div><strong>探路的人</strong><span>先看清楚方向與風險</span></div></div>
+  <div class="role" style="left:1400px;top:486px"><svg viewBox="0 0 52 70" data-n="2" aria-hidden="true"></svg><div><strong>出手的人</strong><span>在關鍵時刻把事做完</span></div></div>
+  <div class="role" style="left:400px;top:820px"><svg viewBox="0 0 52 70" data-n="3" aria-hidden="true"></svg><div><strong>支援的人</strong><span>補位、搬運、照顧大家</span></div></div>
+  <div class="role" style="left:300px;top:470px"><svg viewBox="0 0 52 70" data-n="4" aria-hidden="true"></svg><div><strong>記錄的人</strong><span>把經驗留給下一隊</span></div></div>
+</div>
+<script>
+const RED = '#C4583A', DEEP = '#A84A2E', COAL = '#E4D8C4', OCHRE = '#DDA44A';
+// a running figure in the Levantine manner: triangle chest, long legs, joints in local units
+function figure(x, y, s, pose, col = DEEP, fx = 1) {
+  const P = {
+    spear: { head: [8, -80], legs: [[0, 0, 22, 26, 38, 54], [0, 0, -18, 24, -40, 40]], arms: [[3, -60, -14, -44, -24, -62], [3, -60, 24, -52, 38, -58]], tool: 'M-62 -38 L96 -112' },
+    point: { head: [5, -80], legs: [[0, 0, -8, 30, -14, 58], [0, 0, 12, 30, 16, 58]], arms: [[3, -60, 36, -68, 70, -76], [3, -60, -8, -34, -14, -12]], tool: '' },
+    carry: { head: [10, -78], legs: [[0, 0, 16, 28, 26, 56], [0, 0, -10, 28, -22, 54]], arms: [[3, -60, 18, -44, 30, -36], [3, -60, -10, -66, -18, -76]], tool: 'M-34 -92 C-30 -110 -2 -110 0 -92 C-2 -82 -30 -80 -34 -92 Z' },
+    bow: { head: [6, -80], legs: [[0, 0, 24, 22, 40, 50], [0, 0, -20, 20, -34, 46]], arms: [[3, -60, 30, -64, 52, -66], [3, -60, 12, -58, 18, -60]], tool: 'M52 -100 C76 -78 76 -50 52 -30' },
+  }[pose];
+  let o = `<g transform="translate(${x} ${y}) scale(${s * fx} ${s})" stroke="${col}" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round" fill="none">`;
+  o += `<circle cx="${P.head[0]}" cy="${P.head[1]}" r="9" fill="${col}" stroke="none"/>`;
+  o += `<path d="M-9 -66 L15 -66 L2 -18 Z" fill="${col}" stroke-width="3"/><path d="M2 -20 L0 0"/>`;
+  [...P.legs, ...P.arms].forEach(a => o += `<path d="M${a[0]} ${a[1]} L${a[2]} ${a[3]} L${a[4]} ${a[5]}"/>`);
+  if (P.tool) o += `<path d="${P.tool}" stroke-width="4.5"${pose === 'carry' ? ` fill="${OCHRE}"` : ''}/>`;
+  return o + '</g>';
+}
+function deer(x, y, s, flip) {
+  return `<g transform="translate(${x} ${y}) scale(${flip ? -s : s} ${s})">
+    <path d="M-62 2 C-60 -20 -20 -28 20 -24 C44 -22 58 -16 66 -8 L80 -44 C84 -54 96 -56 104 -50 L114 -42 L100 -38 C92 -30 86 -16 74 0 C60 16 30 22 -6 20 C-40 18 -62 16 -62 2 Z" fill="${RED}"/>
+    <path d="M90 -52 L84 -88 M86 -74 L70 -92 M86 -76 L100 -96 M96 -52 L104 -84 M102 -72 L118 -86" stroke="${COAL}" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <path d="M52 8 L84 24 L106 26 M40 12 L70 34 L90 44 M-46 10 L-80 22 L-102 18 M-34 14 L-62 32 L-84 38" stroke="${RED}" stroke-width="7" stroke-linecap="round" fill="none"/>
+    <path d="M-62 -2 L-74 -14" stroke="${RED}" stroke-width="6" stroke-linecap="round"/>
+  </g>`;
+}
+
+// one hunt around one bison; each person stands where their job is
+let a = '';
+a += `<g transform="translate(820 520) scale(1.16)">
+  <path d="M70 92 C96 50 120 22 156 18 C200 14 260 40 320 62 C360 76 392 92 404 118 C412 140 404 166 390 182 L398 248 L384 250 L368 196 L354 246 L340 248 L340 196 C300 204 220 206 170 198 L160 250 L146 250 L146 198 L132 250 L118 248 L122 192 C106 196 92 204 82 214 C70 222 56 220 52 206 C40 196 30 184 26 168 C22 150 36 120 70 92 Z" fill="${RED}"/>
+  <path d="M70 92 C96 50 120 22 156 18 C176 16 196 20 214 28 C190 60 160 96 132 150 C110 170 92 196 82 214 C70 222 56 220 52 206 C40 196 30 184 26 168 C22 150 36 120 70 92 Z" fill="#7E3020" opacity=".85"/>
+  <path d="M156 18 C200 14 260 40 320 62 C360 76 392 92 404 118 C412 140 404 166 390 182" fill="none" stroke="${COAL}" stroke-width="8" stroke-linecap="round"/>
+  <path d="M74 96 C62 74 58 54 70 36 C72 56 80 74 88 92 Z M92 86 C92 64 100 46 116 36 C108 54 104 72 102 90 Z" fill="${COAL}"/>
+  <path d="M404 124 C420 140 424 170 414 196" fill="none" stroke="${COAL}" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="58" cy="140" r="6" fill="${OCHRE}"/>
+  <path d="M200 120 C230 110 270 112 300 124" fill="none" stroke="${DEEP}" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+</g>`;
+
+// the scout up on the ridge, pointing at the herd
+a += `<path d="M960 400 C1040 380 1120 392 1200 384" fill="none" stroke="${DEEP}" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 16" opacity=".8"/>`;
+a += figure(1140, 380, 1.05, 'point', COAL, -1);
+a += deer(1660, 210, .7) + deer(1500, 160, .55);
+// the hunters closing in from the right
+a += figure(1560, 830, 1.2, 'spear') + figure(1680, 880, 1.05, 'spear', COAL) + figure(1500, 920, .95, 'bow');
+// the one who carries, bringing up the rear
+a += figure(330, 960, 1.05, 'carry') + figure(250, 980, .9, 'carry', COAL);
+// the one who records, leaving hands and tallies on the wall
+a += figure(210, 640, 1, 'point', DEEP);
+[[150, 520], [196, 560]].forEach(([x, y], i) => a += `<use href="#hand" transform="translate(${x} ${y}) scale(.36) rotate(${i ? 12 : -8} 60 85)" fill="${RED}"/>`);
+for (let i = 0; i < 9; i++) a += `<circle cx="${980 + i * 26}" cy="${170 + Math.sin(i) * 4}" r="7" fill="${RED}"/>`;
+document.getElementById('art').innerHTML = a;
+
+// the numbers are tallies, painted like everything else
+document.querySelectorAll('.role svg').forEach(el => {
+  const n = +el.dataset.n;
+  let t = '';
+  for (let i = 0; i < n; i++) t += `<path d="M${10 + i * 11} 10 L${8 + i * 11} 58" stroke="${RED}" stroke-width="7" stroke-linecap="round"/>`;
+  el.innerHTML = `<g class="pig" filter="url(#paint)">${t}</g>`;
+});
+</script>
+</body>
+</html>
