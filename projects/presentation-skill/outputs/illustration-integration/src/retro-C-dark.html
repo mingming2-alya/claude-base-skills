@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>復古卡通深色版（C）｜尾牙當天流程：放映廳暗下來，膠片被放映機照亮</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Bungee&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#261C15;--ink:#F5EAD3;--ink2:#E8DAC0;--sub:#CDBB9B;--accent:#F2825F}
+  .cd{font:400 40px/1 "Bungee";fill:#231F1A}
+  /* each time slot is captioned over its own film frame */
+  .cap{position:absolute;width:410px;display:grid;grid-template-columns:72px 1fr;column-gap:14px;align-items:center}
+  .cap svg{width:72px;height:72px}
+  .cap strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em;color:var(--ink)}
+  .cap span{display:block;margin-top:5px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.4" fill="#6A5236"/></pattern>
+      <pattern id="dotsBig" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(20)"><circle cx="6" cy="6" r="2.6" fill="#E59A5B"/></pattern>
+      <filter id="grain" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .95  0 0 0 0 .88  0 0 0 0 .74  0 0 0 -1.2 .62"/>
+      </filter>
+      <radialGradient id="vig" cx="960" cy="540" r="1150" gradientUnits="userSpaceOnUse">
+        <stop offset=".55" stop-color="#0A0603" stop-opacity="0"/><stop offset="1" stop-color="#0A0603" stop-opacity=".55"/>
+      </radialGradient>
+      <!-- old ink: a touch of wobble on every line -->
+      <filter id="ink" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="8" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <radialGradient id="bulb" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFD98A" stop-opacity=".55"/><stop offset="1" stop-color="#FFD98A" stop-opacity="0"/></radialGradient>
+      <clipPath id="disc"><circle cx="1460" cy="556" r="356"/></clipPath>
+    </defs>
+    <!-- the screening room with the house lights down: only what the projector lights is bright -->
+    <rect width="1920" height="1080" fill="#261C15"/>
+    <rect width="1920" height="1080" fill="url(#dots)" opacity=".35"/>
+    <g id="host" filter="url(#ink)"></g>
+    <g id="strip" filter="url(#ink)"></g>
+    <g id="notes" filter="url(#ink)"></g>
+    <rect width="1920" height="1080" filter="url(#grain)" opacity=".16"/>
+    <g stroke="#FFF6E0" stroke-opacity=".2" stroke-width="2" fill="none"><path d="M1196 0 C1194 300 1199 700 1195 1080"/><path d="M640 0 C642 260 637 600 641 1080" stroke-width="1.4"/></g>
+    <rect width="1920" height="1080" fill="url(#vig)"/>
+  </svg>
+  <nav aria-label="章節"><span>時間地點</span><b>當天流程</b><span>獎項</span><span>交通</span></nav>
+  <div class="copy">
+    <h2>尾牙當天流程</h2>
+    <p class="key">抽獎八點半開始，<em>人在現場才算數</em>。</p>
+  </div>
+  <div class="cap" style="left:96px;top:472px"><svg viewBox="0 0 86 86" data-n="1" aria-hidden="true"></svg><div><strong>18:00　報到</strong><span>憑員工證領摸彩券</span></div></div>
+  <div class="cap" style="left:536px;top:472px"><svg viewBox="0 0 86 86" data-n="2" aria-hidden="true"></svg><div><strong>18:30　開場致詞</strong><span>總經理五分鐘</span></div></div>
+  <div class="cap" style="left:976px;top:472px"><svg viewBox="0 0 86 86" data-n="3" aria-hidden="true"></svg><div><strong>19:00　上菜與表演</strong><span>各部門輪流上台</span></div></div>
+  <div class="cap" style="left:1416px;top:472px"><svg viewBox="0 0 86 86" data-n="4" aria-hidden="true"></svg><div><strong>20:30　抽獎</strong><span>頭獎現場開出</span></div></div>
+</div>
+<script>
+
+const K = '#231F1A', CR = '#FFF8EA', RED = '#C8432B', TEAL = '#2F8C7E';
+const hose = (d, w = 17) => `<path d="${d}" fill="none" stroke="${K}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+// white four-finger glove, drawn pointing up, then turned
+function glove(x, y, rot, s = 1) {
+  const f = (x1, y1, x2, y2, w = 14) => `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${K}" stroke-width="${w + 6}" stroke-linecap="round"/><path d="M${x1} ${y1} L${x2} ${y2}" stroke="${CR}" stroke-width="${w}" stroke-linecap="round"/>`;
+  return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})">
+    ${f(-18, 6, -32, -6)}${f(-13, -6, -16, -32)}${f(-4, -10, -5, -40)}${f(6, -10, 7, -40)}${f(14, -6, 17, -30)}
+    <circle cy="6" r="21" fill="${CR}" stroke="${K}" stroke-width="4"/>
+    <path d="M-15 0 h0 M-9 -4 C-6 4 -6 12 -8 18 M0 -5 C2 4 2 12 0 18 M9 -4 C11 4 11 12 9 18" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="-19" y="24" width="38" height="18" rx="8" fill="${CR}" stroke="${K}" stroke-width="4"/>
+    <path d="M-14 31 H14" stroke="${K}" stroke-width="2.5"/>
+  </g>`;
+}
+const shoe = (x, y, flip) => `<g transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1)"><path d="M-14 -10 C-10 -26 30 -30 48 -14 C62 -2 56 14 34 16 L-14 16 C-26 14 -24 -2 -14 -10 Z" fill="${K}"/><ellipse cx="26" cy="-12" rx="12" ry="5" fill="#8B7E70" transform="rotate(-12 26 -12)"/></g>`;
+const pieEye = (x, y, rx = 13, ry = 21) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${K}"/><path d="M${x + 1} ${y - 4} L${x + rx + 2} ${y - ry * .8} L${x + rx + 3} ${y + 2} Z" fill="${CR}"/>`;
+
+
+// the host, inside the rings an old cartoon opens with
+let h = `<circle cx="1590" cy="236" r="214" fill="${K}"/><circle cx="1590" cy="236" r="202" fill="${RED}"/><circle cx="1590" cy="236" r="186" fill="#F1E6CC"/><circle cx="1590" cy="236" r="180" fill="${K}"/><circle cx="1590" cy="236" r="172" fill="#F6D7A7"/>`;
+for (let k = 0; k < 24; k++) { const a1 = k * Math.PI / 12, a2 = a1 + Math.PI / 24; h += `<path d="M1590 236 L${1590 + Math.cos(a1) * 172} ${236 + Math.sin(a1) * 172} A172 172 0 0 1 ${1590 + Math.cos(a2) * 172} ${236 + Math.sin(a2) * 172} Z" fill="#EDB777" opacity=".55"/>`; }
+let c = '';
+// the MC: a ribbon microphone that came to life
+c += hose('M1420 744 C1424 800 1390 840 1364 872') + hose('M1440 744 C1450 800 1478 832 1500 866') + shoe(1352, 880, true) + shoe(1508, 872, false);
+c += `<path d="M1418 590 L1442 590 L1446 750 L1414 750 Z" fill="#8B7E70" stroke="${K}" stroke-width="5"/>`;
+c += hose('M1352 520 C1300 520 1262 470 1258 400') + glove(1258, 384, -12, 1.05);
+c += hose('M1508 530 C1556 536 1592 580 1604 616') + glove(1612, 632, 150, 1);
+c += `<ellipse cx="1430" cy="470" rx="96" ry="124" fill="#CFC6B4" stroke="${K}" stroke-width="7"/>`;
+for (let y = 372; y <= 572; y += 16) { const hw = 92 * Math.sqrt(Math.max(0, 1 - Math.pow((y - 470) / 122, 2))); c += `<path d="M${1430 - hw + 6} ${y} H${1430 + hw - 6}" stroke="#8B7E70" stroke-width="3"/>`; }
+c += `<path d="M1336 452 C1360 440 1500 440 1524 452 L1524 488 C1500 500 1360 500 1336 488 Z" fill="${RED}" stroke="${K}" stroke-width="6"/>`;
+c += `<ellipse cx="1430" cy="420" rx="62" ry="40" fill="${CR}" stroke="${K}" stroke-width="5"/>` + pieEye(1408, 418, 11, 18) + pieEye(1452, 418, 11, 18);
+c += `<path d="M1384 520 C1400 590 1460 590 1476 520 C1450 534 1410 534 1384 520 Z" fill="${K}"/><ellipse cx="1430" cy="562" rx="22" ry="11" fill="${RED}"/>`;
+
+h += `<g transform="translate(1590 236) scale(.36) translate(-1430 -660)">${c}</g>`;
+document.getElementById('host').innerHTML = h;
+
+// the strip: four frames, one per time slot, sprocket holes top and bottom
+let s = `<rect x="40" y="586" width="1840" height="312" rx="10" fill="#120E0B" stroke="#4A3A2A" stroke-width="2"/>`;
+for (let x = 60; x < 1870; x += 46) s += `<rect x="${x}" y="598" width="26" height="18" rx="5" fill="#F2D9A8"/><rect x="${x}" y="868" width="26" height="18" rx="5" fill="#F2D9A8"/>`;
+const FX = [96, 536, 976, 1416];
+FX.forEach(x => s += `<rect x="${x}" y="628" width="410" height="228" rx="16" fill="#F6D7A7"/><rect x="${x}" y="628" width="410" height="228" rx="16" fill="url(#dotsBig)" opacity=".3"/>`);
+// 1 check-in: a raffle ticket with a face, and the clock at six
+s += `<g transform="translate(${FX[0] + 70} 690) rotate(-8)"><path d="M0 0 H180 V36 a16 16 0 0 0 0 32 V104 H0 V68 a16 16 0 0 0 0 -32 Z" fill="${RED}" stroke="${K}" stroke-width="5"/><path d="M40 8 V96" stroke="#F1E6CC" stroke-width="3" stroke-dasharray="8 7"/>${pieEye(100, 44, 9, 14)}${pieEye(134, 44, 9, 14)}<path d="M98 74 C110 92 128 92 140 74 C126 80 112 80 98 74 Z" fill="${K}"/></g>`;
+s += hose(`M${FX[0] + 250} 712 C${FX[0] + 290} 690 ${FX[0] + 296} 664 ${FX[0] + 290} 650`, 12) + glove(FX[0] + 290, 640, 10, .6);
+s += `<circle cx="${FX[0] + 340}" cy="770" r="48" fill="#F1E6CC" stroke="${K}" stroke-width="6"/><path d="M${FX[0] + 340} 770 V738 M${FX[0] + 340} 770 V806" stroke="${K}" stroke-width="6" stroke-linecap="round"/>`;
+// 2 the welcome speech: the host's microphone on a stand, sound waves out
+s += `<g transform="translate(${FX[1] + 205} 742) scale(.32) translate(-1430 -560)">${c}</g>`;
+s += `<path d="M${FX[1] + 290} 700 c18 14 18 40 0 54 M${FX[1] + 316} 684 c30 24 30 64 0 88 M${FX[1] + 120} 700 c-18 14 -18 40 0 54 M${FX[1] + 94} 684 c-30 24 -30 64 0 88" fill="none" stroke="${K}" stroke-width="6" stroke-linecap="round"/>`;
+// 3 dinner and the show: a steaming dish and the band's notes
+s += `<ellipse cx="${FX[2] + 170}" cy="800" rx="130" ry="34" fill="#F1E6CC" stroke="${K}" stroke-width="5"/><ellipse cx="${FX[2] + 170}" cy="796" rx="104" ry="22" fill="none" stroke="${TEAL}" stroke-width="5"/>`;
+s += `<path d="M${FX[2] + 96} 790 C${FX[2] + 130} 752 ${FX[2] + 200} 752 ${FX[2] + 226} 786 L${FX[2] + 252} 766 L${FX[2] + 248} 804 L${FX[2] + 226} 792 C${FX[2] + 200} 820 ${FX[2] + 130} 820 ${FX[2] + 96} 790 Z" fill="${RED}" stroke="${K}" stroke-width="5"/><circle cx="${FX[2] + 128}" cy="784" r="6" fill="${K}"/>`;
+s += `<path d="M${FX[2] + 140} 740 c-14 -20 14 -30 0 -52 M${FX[2] + 180} 736 c-14 -20 14 -30 0 -52" stroke="#FFF6E0" stroke-width="8" stroke-linecap="round" fill="none"/>`;
+const note = (x, y, sc, col) => `<g transform="translate(${x} ${y}) scale(${sc})"><ellipse cx="0" cy="0" rx="16" ry="12" transform="rotate(-24)" fill="${col}" stroke="${K}" stroke-width="3"/><path d="M14 -4 V-70 C30 -60 44 -52 40 -30" fill="none" stroke="${K}" stroke-width="6" stroke-linecap="round"/></g>`;
+s += note(FX[2] + 320, 760, .9, TEAL) + note(FX[2] + 370, 720, .7, RED);
+// 4 the draw: the red envelope jumps out of the lottery box
+s += `<rect x="${FX[3] + 210}" y="760" width="170" height="90" fill="${TEAL}" stroke="${K}" stroke-width="5"/><rect x="${FX[3] + 262}" y="752" width="66" height="14" rx="6" fill="${K}"/>`;
+let e = '';
+// a red envelope, jumping for joy
+e += `<g transform="translate(1640 700) rotate(9)">
+  ${hose('M-30 70 C-40 110 -70 120 -88 112')}${hose('M24 70 C40 104 30 132 50 150')}${shoe(-96, 118, true)}${shoe(58, 154, false)}
+  ${hose('M-56 -20 C-96 -40 -110 -86 -100 -118')}${glove(-100, -132, -18, .82)}
+  ${hose('M56 -16 C90 -40 108 -76 104 -110')}${glove(104, -126, 16, .82)}
+  <rect x="-62" y="-92" width="124" height="166" rx="10" fill="${RED}" stroke="${K}" stroke-width="6"/>
+  <path d="M-62 -60 L0 -26 L62 -60" fill="none" stroke="${K}" stroke-width="5"/>
+  <circle cx="0" cy="-26" r="17" fill="#E9B949" stroke="${K}" stroke-width="4"/><rect x="-6" y="-32" width="12" height="12" fill="${RED}"/>
+  ${pieEye(-20, 12, 9, 15)}${pieEye(20, 12, 9, 15)}
+  <path d="M-26 40 C-14 64 14 64 26 40 C10 48 -10 48 -26 40 Z" fill="${K}"/>
+</g>`;
+
+s += `<g transform="translate(${FX[3] + 292} 704) scale(.4) translate(-1640 -700)">${e}</g>`;
+document.getElementById('strip').innerHTML = s;
+
+let n = '';
+const noteD = (x, y, sc, col) => `<g transform="translate(${x} ${y}) scale(${sc})"><ellipse cx="0" cy="0" rx="16" ry="12" transform="rotate(-24)" fill="${col}" stroke="#F1E6CC" stroke-width="3"/><path d="M14 -4 V-70 C30 -60 44 -52 40 -30" fill="none" stroke="#F1E6CC" stroke-width="6" stroke-linecap="round"/></g>`;
+n += noteD(1160, 260, 1, TEAL) + noteD(1300, 420, .8, RED) + noteD(80, 960, .9, RED);
+// the party is in the evening, so the content allows a moon: an old-cartoon crescent with a face
+n += `<g transform="translate(985 168) rotate(-14)"><path d="M0 -58 A58 58 0 1 0 0 58 A75 75 0 0 1 0 -58 Z" fill="#F6E3B4" stroke="#F1E6CC" stroke-width="3"/><circle cx="-41" cy="-12" r="4.5" fill="${K}"/><path d="M-50 12 q8 9 17 3" stroke="${K}" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>`;
+[[1040, 120, RED, 20], [1240, 330, TEAL, -30], [1832, 470, '#E9B949', 40], [700, 980, RED, -15], [1060, 960, '#E9B949', 60], [1500, 1000, TEAL, 10], [360, 1010, '#E9B949', -40]].forEach(([x, y, col, r]) => n += `<rect x="${x}" y="${y}" width="22" height="12" fill="${col}" stroke="#F1E6CC" stroke-opacity=".8" stroke-width="2" transform="rotate(${r} ${x} ${y})"/>`);
+for (let x = 120; x < 1840; x += 120) n += `<circle cx="${x}" cy="956" r="46" fill="url(#bulb)"/><circle cx="${x}" cy="960" r="13" fill="#FBE3A0" stroke="#7A5A2A" stroke-width="3"/><path d="M${x} 936 v-14 M${x - 18} 944 l-10 -10 M${x + 18} 944 l10 -10" stroke="#F6D27A" stroke-width="3" stroke-linecap="round"/>`;
+document.getElementById('notes').innerHTML = n;
+// list badges: film countdown leaders
+document.querySelectorAll('.cap svg').forEach(el => {
+  const k = +el.dataset.n, a = -Math.PI / 2 + k * Math.PI / 2;
+  el.innerHTML = `<circle cx="43" cy="43" r="40" fill="#F6D7A7" stroke="${K}" stroke-width="4"/>
+    <path d="M43 43 L43 7 A36 36 0 ${k > 2 ? 1 : 0} 1 ${43 + Math.cos(a) * 36} ${43 + Math.sin(a) * 36} Z" fill="#E3A866"/>
+    <circle cx="43" cy="43" r="31" fill="none" stroke="${K}" stroke-width="2"/><path d="M3 43 H83 M43 3 V83" stroke="${K}" stroke-width="2"/>
+    <circle cx="43" cy="43" r="21" fill="#F6D7A7" stroke="${K}" stroke-width="2"/><text class="cd" x="43" y="58" text-anchor="middle">${k}</text>`;
+});
+
+</script>
+</body>
+</html>
