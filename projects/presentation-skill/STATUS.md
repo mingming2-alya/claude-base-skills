@@ -143,7 +143,7 @@ _最後更新：2026-11-19_
 6. 通過後階段 2 才算驗收，進入階段 3。ROADMAP 待辦清單還有 14 項未處理。
 
 **素材與動態的狀態**：
-- 生圖僅在具體效果需要時列單。目前沒有指派給使用者的生圖任務；意象圖都是程式繪製。條件式分工與檔名說明仍在 `outputs/style-board-v2/IMAGE_TODO.md`。
+- 生圖僅在具體效果需要時列單。目前有一份選擇性的生圖需求：埃及壁畫、瑪雅抄本各一張（`outputs/illustration-renderings/IMAGE_TODO.md`），交回的圖放 `outputs/illustration-renderings/img-src/`，目前尚未收到。其餘意象圖都是程式繪製。通用的分工與交圖方式見 `outputs/style-board-v2/IMAGE_TODO.md`。
 - 可打斷的動態（Apple Design，MIT）尚未實作，會在進入製作階段時處理 `assets/runtime.js`；若要用 GSAP 需先問使用者。
 
 ## 待使用者決定
