@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>埃及壁畫深色版（C）｜金字塔怎麼蓋：墓室天頂的深藍底，每一層就是一個步驟</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#1C2948;--ink:#F2EBDC;--ink2:#E2DACB;--sub:#C1C4CC;--accent:#EDBB52}
+  /* each step sits inside its own register of the wall */
+  ul.items.reg{top:450px;gap:82px}
+  ul.items.reg li{grid-template-columns:86px 1fr}
+  ul.items.reg .badge{width:86px;height:86px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="stone" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".008" numOctaves="4" seed="17" result="m"/>
+        <feColorMatrix in="m" type="matrix" values="0 0 0 0 .24  0 0 0 0 .32  0 0 0 0 .52  1.3 0 0 0 -.55"/>
+      </filter>
+      <filter id="grit" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" seed="6"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .85  0 0 0 0 .82  0 0 0 0 .74  0 0 0 -1.2 .6"/>
+      </filter>
+      <filter id="aged" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".11" numOctaves="2" seed="23" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -6 0 0 0 4.9" result="ga"/>
+        <feComposite in="SourceGraphic" in2="ga" operator="in"/>
+      </filter>
+    </defs>
+    <!-- the same plaster, painted the deep blue of a tomb ceiling (no stars: dark is not night) -->
+    <rect width="1920" height="1080" fill="#1C2948"/>
+    <rect width="1920" height="1080" filter="url(#stone)" opacity=".45"/>
+    <rect width="1920" height="1080" filter="url(#grit)" opacity=".12"/>
+    <g id="mural" filter="url(#aged)"></g>
+  </svg>
+
+  <nav aria-label="章節"><span>背景</span><b>四個階段</b><span>人力與時程</span><span>今天的啟示</span></nav>
+  <div class="copy">
+    <h2>金字塔怎麼蓋</h2>
+    <p class="key">四千五百年前的大工程，靠的是<em>先算清楚再動工</em>。</p>
+  </div>
+  <ul class="items reg">
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="1" aria-hidden="true"></svg><div><strong>規劃：書記官先算</strong><span>石材、人力、口糧都記在莎草紙上</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="2" aria-hidden="true"></svg><div><strong>採石：就近開採</strong><span>大部分石塊來自工地旁的採石場</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="3" aria-hidden="true"></svg><div><strong>運輸：雪橇加濕沙</strong><span>在沙上潑水，拉起來省一半力</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="4" aria-hidden="true"></svg><div><strong>堆砌：沿坡道往上</strong><span>一層一層推上去</span></div></li>
+  </ul>
+</div>
+<script>
+const K = '#1A120C', SKIN = '#C2683F', LIN = '#F2EBDC', BLK = '#14100D', BLUE = '#5E8FD4', GRN = '#4FAF9A', RED = '#D0583A', YEL = '#E8B54C', WOOD = '#C9A26A';
+const lim = (d, w = 10) => `<path d="${d}" fill="none" stroke="${K}" stroke-width="${w + 3}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${SKIN}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+function man(x, y, s, pose) {
+  const arms = {
+    pull: ['M-22 -136 L-42 -118 L-58 -108', 'M20 -136 L-6 -116 L-36 -104'],
+    point: ['M-22 -136 L-30 -100 L-30 -74', 'M20 -136 L46 -140 L72 -142'],
+    pour: ['M-22 -136 L4 -118 L30 -122', 'M20 -136 L38 -124 L52 -130'],
+    carry: ['M-22 -136 L-34 -170 L-20 -206', 'M20 -136 L34 -172 L24 -208'],
+    work: ['M-22 -136 L0 -112 L30 -112', 'M20 -136 L44 -118 L62 -132'],
+  }[pose];
+  let o = `<g transform="translate(${x} ${y}) scale(${s})">` + lim(arms[0]);
+  o += `<path d="M-6 -52 L-16 -6 L-22 -2 L-24 0 L4 0 L0 -6 L8 -52 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/><path d="M8 -52 L22 -8 L18 -2 L44 0 L44 -4 L30 -10 L22 -52 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>`;
+  o += `<path d="M-28 -140 C-28 -118 -16 -100 -14 -92 L16 -92 C18 -100 30 -118 30 -140 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>`;
+  o += `<path d="M-18 -94 L22 -94 L34 -48 L-12 -48 Z" fill="${LIN}" stroke="${K}" stroke-width="2"/><path d="M10 -94 L34 -48 L22 -48 Z" fill="#E2D8C2" stroke="${K}" stroke-width="1.5"/><path d="M-18 -94 L22 -94 L22 -88 L-18 -88 Z" fill="${RED}"/>`;
+  o += `<path d="M-30 -142 C-24 -126 26 -126 32 -142 C20 -134 -18 -134 -30 -142 Z" fill="${BLUE}" stroke="${K}" stroke-width="1.5"/>`;
+  o += `<path d="M2 -150 L14 -150 L14 -140 L2 -140 Z" fill="${SKIN}"/><path d="M6 -196 C14 -194 22 -188 24 -178 L30 -172 L24 -168 C25 -162 23 -156 18 -152 L4 -150 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>`;
+  o += `<path d="M-14 -206 C2 -212 18 -206 20 -196 L8 -192 L6 -150 C-4 -148 -14 -150 -22 -154 L-22 -186 C-22 -198 -20 -204 -14 -206 Z" fill="${BLK}"/>`;
+  o += `<path d="M10 -182 C14 -186 20 -186 22 -182 C20 -178 14 -178 10 -182 Z" fill="${LIN}" stroke="${BLK}" stroke-width="2"/><circle cx="17" cy="-182" r="2.2" fill="${BLK}"/>`;
+  o += lim(arms[1]);
+  if (pose === 'point') o += `<path d="M74 -200 L74 -20" stroke="${WOOD}" stroke-width="5" stroke-linecap="round"/>`;
+  if (pose === 'pour') o += `<path d="M44 -146 C60 -150 72 -136 66 -120 C60 -108 44 -110 40 -122 Z" fill="${RED}" stroke="${K}" stroke-width="2"/><path d="M66 -118 C72 -100 74 -80 78 -40" stroke="${BLUE}" stroke-width="5" stroke-dasharray="9 8" fill="none" stroke-linecap="round"/>`;
+  if (pose === 'carry') o += `<rect x="-34" y="-246" width="72" height="40" fill="#D8C9A2" stroke="${K}" stroke-width="2.5"/>`;
+  if (pose === 'work') o += `<path d="M62 -132 L80 -150" stroke="${WOOD}" stroke-width="7" stroke-linecap="round"/><path d="M72 -162 L92 -142" stroke="${WOOD}" stroke-width="12"/>`;
+  return o + '</g>';
+}
+function scribe(x, y, s) {
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="M-44 0 C-48 -30 -30 -44 0 -44 C34 -44 52 -30 50 0 Z" fill="${LIN}" stroke="${K}" stroke-width="2"/>
+    <path d="M-24 -120 C-24 -98 -16 -60 -16 -44 L18 -44 C18 -60 26 -98 26 -120 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>
+    <path d="M-26 -122 C-20 -106 22 -106 28 -122 C18 -114 -16 -114 -26 -122 Z" fill="${BLUE}" stroke="${K}" stroke-width="1.5"/>
+    <path d="M4 -176 C12 -174 20 -168 22 -158 L28 -152 L22 -148 C23 -142 21 -136 16 -132 L2 -130 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>
+    <path d="M-16 -186 C0 -192 16 -186 18 -176 L6 -172 L4 -130 C-6 -128 -16 -130 -24 -134 L-24 -166 C-24 -178 -22 -184 -16 -186 Z" fill="${BLK}"/>
+    <path d="M8 -162 C12 -166 18 -166 20 -162 C18 -158 12 -158 8 -162 Z" fill="${LIN}" stroke="${BLK}" stroke-width="2"/><circle cx="15" cy="-162" r="2" fill="${BLK}"/>
+    <rect x="-8" y="-62" width="64" height="18" fill="#F4ECD4" stroke="${K}" stroke-width="2"/>
+    ${lim('M24 -112 L40 -84 L40 -64', 9)}${lim('M-20 -112 L-10 -80 L16 -66', 9)}<path d="M40 -64 L54 -90" stroke="${WOOD}" stroke-width="3"/>
+  </g>`;
+}
+// a few made-up signs for the caption columns
+const glyphs = [
+  (x, y) => `<circle cx="${x}" cy="${y}" r="9" fill="${RED}" stroke="${K}" stroke-width="1.5"/>`,
+  (x, y) => `<path d="M${x - 12} ${y + 4} L${x - 6} ${y - 4} L${x} ${y + 4} L${x + 6} ${y - 4} L${x + 12} ${y + 4}" fill="none" stroke="${BLUE}" stroke-width="3"/>`,
+  (x, y) => `<path d="M${x} ${y - 12} C${x + 9} ${y - 2} ${x + 9} ${y + 6} ${x} ${y + 12} C${x - 9} ${y + 6} ${x - 9} ${y - 2} ${x} ${y - 12} Z" fill="${GRN}" stroke="${K}" stroke-width="1.5"/>`,
+  (x, y) => `<path d="M${x - 11} ${y + 6} A11 11 0 0 1 ${x + 11} ${y + 6} Z" fill="${YEL}" stroke="${K}" stroke-width="1.5"/>`,
+  (x, y) => `<path d="M${x} ${y - 12} V${y + 12} M${x - 8} ${y - 2} H${x + 8} M${x} ${y - 12} C${x - 7} ${y - 14} ${x - 7} ${y - 22} ${x} ${y - 22} C${x + 7} ${y - 22} ${x + 7} ${y - 14} ${x} ${y - 12}" fill="none" stroke="${YEL}" stroke-width="3" stroke-linecap="round"/>`,
+  (x, y) => `<path d="M${x - 12} ${y} C${x - 4} ${y - 9} ${x + 4} ${y - 9} ${x + 12} ${y} C${x + 4} ${y + 6} ${x - 4} ${y + 6} ${x - 12} ${y} Z" fill="${LIN}" stroke="${BLK}" stroke-width="2"/>`,
+];
+const column = (x, y0, n, seed) => { let s = `<path d="M${x - 20} ${y0 - 8} V${y0 + n * 34 - 6} M${x + 20} ${y0 - 8} V${y0 + n * 34 - 6}" stroke="${YEL}" stroke-width="2" opacity=".6"/>`; for (let i = 0; i < n; i++) s += glyphs[(seed + i * 3) % glyphs.length](x, y0 + 12 + i * 34); return s; };
+const band = (y, h, cols) => cols.map((c, i) => `<rect x="0" y="${y + i * h / cols.length}" width="1920" height="${h / cols.length + .5}" fill="${c}"/>`).join('');
+
+let m = '';
+// the frieze along the top edge
+for (let x = -6, k = 0; x < 1930; x += 26, k++) m += `<path d="M${x + 2} 34 V18 C${x + 2} 4 ${x + 22} 4 ${x + 22} 18 V34 Z" fill="${[BLUE, GRN, RED][k % 3]}" stroke="${K}" stroke-width="1.5"/><circle cx="${x + 12}" cy="18" r="4" fill="${YEL}"/>`;
+m += `<rect x="0" y="34" width="1920" height="4" fill="${YEL}"/>`;
+// the heading register: a winged sun over an inscription, beside the title
+m += `<g transform="translate(1500 128)">
+  <path d="M-36 0 C-120 -30 -250 -26 -330 4 C-250 0 -140 10 -40 22 Z M36 0 C120 -30 250 -26 330 4 C250 0 140 10 40 22 Z" fill="${BLUE}" stroke="${K}" stroke-width="2.5"/>
+  <path d="M-40 10 C-130 -8 -230 -6 -300 12 M40 10 C130 -8 230 -6 300 12" fill="none" stroke="${GRN}" stroke-width="5"/>
+  <path d="M-44 18 C-130 6 -210 10 -270 22 M44 18 C130 6 210 10 270 22" fill="none" stroke="${RED}" stroke-width="4"/>
+  <circle r="36" fill="${RED}" stroke="${K}" stroke-width="3"/><circle r="24" fill="none" stroke="${YEL}" stroke-width="4"/>
+</g>`;
+for (let i = 0; i < 6; i++) m += column(1270 + i * 90, 214, 5, i * 2 + 1);
+// four registers, one per step; the bands between them are the list separators
+const REG = [418, 586, 754, 922], H = 150;
+m += band(400, 18, [BLUE, RED, BLUE]) + band(568, 18, [GRN, RED, GRN]) + band(736, 18, [BLUE, YEL, BLUE]) + band(904, 18, [GRN, RED, GRN]) + band(1072, 8, [BLUE]);
+// a caption column ties each step's words to its picture
+REG.forEach((y, i) => m += column(700, y + 22, 3, i * 5 + 2));
+const S = .6;
+// 1 planning: scribes write it all down, the overseer shows the plan
+m += scribe(800, REG[0] + H - 6, S) + scribe(910, REG[0] + H - 6, S) + man(1040, REG[0] + H - 6, S, 'point');
+m += `<g transform="translate(1110 ${REG[0] + 14})"><rect width="170" height="110" fill="#F4ECD4" stroke="${K}" stroke-width="2.5"/><path d="M18 96 L85 24 L152 96 Z" fill="none" stroke="${RED}" stroke-width="3.5"/><path d="M36 78 H134 M54 58 H116" stroke="${RED}" stroke-width="2" stroke-dasharray="5 4"/></g>`;
+m += `<g transform="translate(1360 ${REG[0] + 30})">${[0, 1, 2, 3].map(k => `<rect x="${k * 44}" y="${60 - (k % 2) * 6}" width="34" height="${44 + (k % 2) * 6}" rx="6" fill="${[RED, YEL, GRN, YEL][k]}" stroke="${K}" stroke-width="2"/>`).join('')}<path d="M0 108 H170" stroke="${WOOD}" stroke-width="2"/></g>`;
+m += `<g transform="translate(1600 ${REG[0] + 20})"><rect width="230" height="104" fill="${LIN}" stroke="${K}" stroke-width="2"/>${[0, 1, 2, 3, 4].map(k => `<path d="M${20 + k * 44} 14 V90" stroke="${K}" stroke-width="1.5" opacity=".6"/>`).join('')}${[0, 1, 2, 3].map(k => glyphs[(k * 2 + 1) % 6](42 + k * 44, 40 + (k % 2) * 26)).join('')}</g>`;
+// 2 quarrying: two men at the rock face, cut blocks stacked behind them
+m += `<path d="M1520 ${REG[1]} H1920 V${REG[1] + H} H1520 C1540 ${REG[1] + 110} 1508 ${REG[1] + 60} 1530 ${REG[1]} Z" fill="#CDBE9C" stroke="${K}" stroke-width="2.5"/>`;
+m += `<path d="M1560 ${REG[1] + 40} H1700 M1600 ${REG[1] + 40} V${REG[1] + 90} M1540 ${REG[1] + 90} H1760 M1680 ${REG[1] + 90} V${REG[1] + H}" stroke="#A8966C" stroke-width="3"/>`;
+m += man(1380, REG[1] + H - 6, S, 'work') + man(1460, REG[1] + H - 6, S, 'work');
+[[800, 0], [870, 0], [940, 0], [835, 1], [905, 1], [870, 2]].forEach(([x, r]) => m += `<rect x="${x}" y="${REG[1] + H - 6 - (r + 1) * 40}" width="64" height="40" fill="#D8C9A2" stroke="${K}" stroke-width="2"/>`);
+m += man(1120, REG[1] + H - 6, .54, 'carry');
+// 3 transport: a block on a sledge, water poured ahead, a team on the rope
+m += `<path d="M770 ${REG[2] + H - 8} H930 L944 ${REG[2] + H} H766 Z" fill="#8A5A30" stroke="${K}" stroke-width="2"/><rect x="780" y="${REG[2] + 50}" width="140" height="${H - 58}" fill="#D8C9A2" stroke="${K}" stroke-width="2.5"/>`;
+m += `<path d="M944 ${REG[2] + 82} L1740 ${REG[2] + 70}" stroke="${WOOD}" stroke-width="4"/>`;
+m += man(990, REG[2] + H - 6, S, 'pour') + man(1260, REG[2] + H - 6, S, 'pull') + man(1420, REG[2] + H - 6, S, 'pull') + man(1580, REG[2] + H - 6, S, 'pull') + man(1740, REG[2] + H - 6, S, 'pull');
+m += `<path d="M1010 ${REG[2] + H - 4} C1060 ${REG[2] + H - 10} 1110 ${REG[2] + H - 2} 1160 ${REG[2] + H - 8}" stroke="${BLUE}" stroke-width="4" fill="none" opacity=".7"/>`;
+// 4 building: up the ramp beside the rising pyramid
+m += `<path d="M1460 ${REG[3] + H} L1650 ${REG[3] + 4} L1840 ${REG[3] + H} Z" fill="#E8D49A" stroke="${K}" stroke-width="2.5"/>`;
+for (let k = 1; k < 6; k++) { const y = REG[3] + H - k * 24, half = 190 * (1 - k * 24 / (H - 4)); m += `<path d="M${1650 - half} ${y} H${1650 + half}" stroke="#B89E62" stroke-width="2"/>`; }
+m += `<path d="M880 ${REG[3] + H} L1540 ${REG[3] + 78} L1556 ${REG[3] + 92} L944 ${REG[3] + H} Z" fill="#C9AE78" stroke="${K}" stroke-width="2"/>`;
+m += man(1050, REG[3] + H - 21, .45, 'carry') + man(1250, REG[3] + H - 42, .45, 'carry');
+m += `<circle cx="1860" cy="${REG[3] + 36}" r="22" fill="${RED}" stroke="${K}" stroke-width="2"/>`;
+document.getElementById('mural').innerHTML = m;
+
+document.querySelectorAll('svg.badge').forEach(el => {
+  const n = +el.dataset.n;
+  let s = `<rect x="15" y="4" width="56" height="74" rx="28" fill="${LIN}" stroke="${K}" stroke-width="3.5"/><rect x="11" y="78" width="64" height="6" fill="${YEL}"/>`;
+  const gap = 10, x0 = 43 - (n - 1) * gap / 2;
+  for (let i = 0; i < n; i++) s += `<rect x="${x0 + i * gap - 2.5}" y="24" width="5" height="34" rx="2" fill="${BLUE}"/>`;
+  el.innerHTML = s;
+});
+</script>
+</body>
+</html>
