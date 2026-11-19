@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>漢畫像石拓片深色版（C）｜絲路上的物流：烏金拓，四格就是四站</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@900&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#1A1815;--ink:#EFEBE1;--ink2:#DCD7CC;--sub:#B9B4A9;--accent:#E3674E}
+  .seal{font:900 46px/1 "Noto Serif TC";fill:#F4E9DC;letter-spacing:0}
+  /* each station is written in the blank title cartouche of its own panel */
+  .tag{position:absolute;width:370px;height:118px;display:grid;grid-template-columns:70px 1fr;column-gap:14px;align-items:center;padding:0 12px}
+  .tag svg{width:70px;height:70px}
+  .tag strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em;color:var(--ink)}
+  .tag span{display:block;margin-top:4px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <!-- wujin rubbing: the ink is laid on thick and even; only faint thinner patches and pinholes show the paper -->
+      <filter id="paper" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".03" numOctaves="3" seed="2" result="m"/>
+        <feColorMatrix in="m" type="matrix" values="0 0 0 0 .2  0 0 0 0 .19  0 0 0 0 .17  1.3 0 0 0 -.5"/>
+      </filter>
+      <filter id="pits" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="21" result="n"/>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 .86  0 0 0 0 .83  0 0 0 0 .78  9 0 0 0 -6.2"/>
+      </filter>
+      <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".06"/><stop offset=".45" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+      <filter id="ink" x="-4%" y="-4%" width="108%" height="108%">
+        <feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="6" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="d"/>
+        <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="2" seed="9" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -1.9 0 0 0 1.82" result="ga"/>
+        <feComposite in="d" in2="ga" operator="in"/>
+      </filter>
+      <filter id="ground" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".011 .03" numOctaves="3" seed="13" result="m"/>
+        <feColorMatrix in="m" type="matrix" values="0 0 0 0 .14  0 0 0 0 .135  0 0 0 0 .125  1.05 0 0 0 -.3" result="c"/>
+        <feComposite in="c" in2="SourceAlpha" operator="in"/>
+      </filter>
+      <clipPath id="p0"><rect x="122" y="640" width="402" height="334"/></clipPath>
+      <clipPath id="p1"><rect x="546" y="640" width="402" height="334"/></clipPath>
+      <clipPath id="p2"><rect x="970" y="640" width="402" height="334"/></clipPath>
+      <clipPath id="p3"><rect x="1394" y="640" width="402" height="334"/></clipPath>
+    </defs>
+    <!-- one sheet rubbed edge to edge with heavy ink: the flat stone prints black, every groove prints as paper -->
+    <rect width="1920" height="1080" fill="#1A1815"/>
+    <rect width="1920" height="1080" filter="url(#paper)" opacity=".26"/>
+    <g id="fibres" stroke="#4A463F" stroke-width="1" fill="none" opacity=".3"></g>
+    <rect width="1920" height="1080" filter="url(#pits)" opacity=".5"/>
+    <g id="grounds"></g>
+    <g id="chisel" stroke="#D9D4C9" fill="none" opacity=".13"></g>
+    <!-- flat parts (frame, tile end): inked black, their carved lines print light -->
+    <g filter="url(#ink)" fill="#1A1815">
+      <g id="frame"></g><g id="tile"></g>
+    </g>
+    <!-- the figures are cut sunken into the stone, so they print as pale silhouettes; their details stay inked -->
+    <g filter="url(#ink)" fill="#D2CCC0">
+      <g clip-path="url(#p0)" id="f0"></g><g clip-path="url(#p1)" id="f1"></g><g clip-path="url(#p2)" id="f2"></g><g clip-path="url(#p3)" id="f3"></g>
+    </g>
+    <rect width="1920" height="1080" fill="url(#sheen)"/>
+    <g transform="translate(1428 314) rotate(-2)">
+      <rect width="92" height="92" rx="6" fill="#CF4733"/>
+      <rect x="6" y="6" width="80" height="80" rx="3" fill="none" stroke="#F4E9DC" stroke-width="3"/>
+      <text class="seal" x="46" y="44" text-anchor="middle">絲</text>
+      <text class="seal" x="46" y="86" text-anchor="middle" font-size="40">路</text>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><span>路線</span><b>物流四站</b><span>成本</span><span>啟示</span></nav>
+  <div class="copy">
+    <h2>絲路上的物流</h2>
+    <p class="key">兩千年前的貨要走半年，靠的是<em>每一站換對工具</em>。</p>
+  </div>
+  <div class="tag" style="left:138px;top:512px"><svg viewBox="0 0 86 86" data-k="wheel" aria-hidden="true"></svg><div><strong>集貨：長安</strong><span>絲綢裝車，馬車出城</span></div></div>
+  <div class="tag" style="left:562px;top:512px"><svg viewBox="0 0 86 86" data-k="horse" aria-hidden="true"></svg><div><strong>轉運：河西走廊</strong><span>沿途驛站換馬補給</span></div></div>
+  <div class="tag" style="left:986px;top:512px"><svg viewBox="0 0 86 86" data-k="camel" aria-hidden="true"></svg><div><strong>換乘：敦煌</strong><span>進沙漠前改用駱駝</span></div></div>
+  <div class="tag" style="left:1410px;top:512px"><svg viewBox="0 0 86 86" data-k="coin" aria-hidden="true"></svg><div><strong>交易：西域市集</strong><span>換回香料與玉石</span></div></div>
+</div>
+<script>
+let seed = 31;
+const rand = () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const L = '#D9D4C9', W = '#1A1815', FIG = '#D2CCC0';
+const cutL = (d, w = 3) => `<path d="${d}" fill="none" stroke="${L}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const cut = (d, w = 3) => `<path d="${d}" fill="none" stroke="${W}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const edge = (d, w = 2.4) => `<path d="${d}" fill="none" stroke="${L}" stroke-width="${w}"/>`;
+let f = '';
+for (let i = 0; i < 300; i++) { const x = rand() * 1920, y = rand() * 1080, a = rand() * 6.28, l = 20 + rand() * 60; f += `<path d="M${x.toFixed(0)} ${y.toFixed(0)} q${(Math.cos(a) * l / 2 + 6).toFixed(0)} ${(Math.sin(a) * l / 2 - 5).toFixed(0)} ${(Math.cos(a) * l).toFixed(0)} ${(Math.sin(a) * l).toFixed(0)}"/>`; }
+document.getElementById('fibres').innerHTML = f;
+
+// four panels side by side: east to west, one station each
+const PX = [122, 546, 970, 1394], PW = 402;
+let gr = '', ch = '';
+PX.forEach(x => {
+  gr += `<rect x="${x}" y="640" width="${PW}" height="334" fill="#000" filter="url(#ground)"/>`;
+  for (let xx = x; xx < x + PW; xx += 3 + rand() * 6) ch += `<path d="M${xx.toFixed(1)} 640 l${(rand() * 8 - 4).toFixed(1)} 334" stroke-width="${(0.8 + rand() * 1.6).toFixed(1)}"/>`;
+});
+document.getElementById('grounds').innerHTML = gr;
+document.getElementById('chisel').innerHTML = ch;
+
+// the frame: outer border, dividers between stations, and a blank cartouche at the top of each panel
+const zig = (x0, x1, y, h) => { let d = `M${x0} ${y}`; for (let x = x0, k = 0; x <= x1; x += h, k++) d += ` L${x} ${y + (k % 2 ? h / 2 : -h / 2)}`; return d; };
+const loz = (x, y0, y1) => { let d = ''; for (let y = y0; y < y1; y += 28) d += `M${x} ${y} L${x + 7} ${y + 14} L${x} ${y + 28} L${x - 7} ${y + 14} Z `; return d; };
+let fr = '<path fill-rule="evenodd" d="M96 470 H1824 V1000 H96 Z M122 496 H1798 V974 H122 Z"/>' + edge('M96 470 H1824 V1000 H96 Z M122 496 H1798 V974 H122 Z', 3);
+[524, 948, 1372].forEach(x => fr += `<rect x="${x}" y="496" width="22" height="478"/>` + edge(`M${x} 496 V974 M${x + 22} 496 V974`) + cutL(loz(x + 11, 500, 970), 2));
+fr += cutL(zig(104, 1816, 483, 18), 2.2) + cutL(zig(104, 1816, 987, 18), 2.2);
+PX.forEach(x => fr += `<path fill-rule="evenodd" d="M${x} 496 H${x + PW} V640 H${x} Z M${x + 16} 512 H${x + PW - 16} V630 H${x + 16} Z"/>` + edge(`M${x + 16} 512 H${x + PW - 16} V630 H${x + 16} Z`) + cutL(`M${x + 8} 636 H${x + PW - 8}`, 2));
+document.getElementById('frame').innerHTML = fr;
+// a roof-tile end, rubbed: cloud scrolls in four quarters
+let t = `<circle cx="1660" cy="230" r="150"/><circle cx="1660" cy="230" r="150" fill="none" stroke="${L}" stroke-width="3"/>` + cutL('M1660 80 V380 M1510 230 H1810', 5) + `<circle cx="1660" cy="230" r="126" fill="none" stroke="${L}" stroke-width="3"/><circle cx="1660" cy="230" r="30" fill="none" stroke="${L}" stroke-width="3"/><circle cx="1660" cy="230" r="9" fill="${L}"/>`;
+[[1, 1], [1, -1], [-1, 1], [-1, -1]].forEach(([sx, sy]) => { const cx = 1660 + sx * 66, cy = 230 + sy * 66; t += cutL(`M${cx} ${cy} m-20 0 a20 20 0 1 1 20 20 a12 12 0 1 1 -12 -12 a5 5 0 1 1 5 5`, 3); });
+document.getElementById('tile').innerHTML = t;
+
+function horse(x, y, s, rider) {
+  let o = `<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="M40 60 C60 40 120 38 150 46 C160 30 170 14 186 10 L190 0 L196 9 C204 12 208 16 210 22 L220 34 C212 38 202 37 194 33 C184 40 178 52 172 62 C168 72 160 78 150 80 L196 104 L212 118 L202 124 L180 110 L142 92 C120 94 92 94 70 90 L32 110 L10 126 L3 118 L24 100 L38 82 C30 77 26 70 28 64 C18 62 8 70 0 82 C4 66 18 54 40 60 Z"/>
+    ${cut('M176 22 C170 34 166 46 160 58 M184 18 C178 30 172 42 168 52', 2)}
+    <circle cx="198" cy="20" r="2.6" fill="${W}"/>`;
+  if (rider) o += `<path d="M96 46 C94 30 98 14 110 4 C116 -2 126 -2 128 6 L132 22 C128 30 120 34 116 44 L124 66 L104 70 Z"/><path d="M106 -8 C112 -18 126 -20 132 -12 L136 -2 L108 2 Z"/><circle cx="120" cy="-6" r="2" fill="${W}"/>
+    <path d="M124 22 L170 8" stroke="${FIG}" stroke-width="5" stroke-linecap="round"/>`;
+  return o + '</g>';
+}
+function carriage(x, y, s) {
+  let spokes = '';
+  for (let k = 0; k < 12; k++) { const a = k * Math.PI / 6; spokes += `M${100 + Math.cos(a) * 12} ${200 + Math.sin(a) * 12} L${100 + Math.cos(a) * 60} ${200 + Math.sin(a) * 60} `; }
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <circle cx="100" cy="200" r="70"/>${cut(spokes, 2.5)}<circle cx="100" cy="200" r="62" fill="none" stroke="${W}" stroke-width="2.5"/><circle cx="100" cy="200" r="10" fill="none" stroke="${W}" stroke-width="2.5"/>
+    <path d="M56 118 H176 V168 H56 Z"/>${cut('M64 130 H168 M72 130 V160 M96 130 V160 M120 130 V160 M144 130 V160', 2)}
+    <path d="M168 150 C210 150 250 140 296 112" fill="none" stroke="${FIG}" stroke-width="8" stroke-linecap="round"/>
+    <path d="M110 118 V40" stroke="${FIG}" stroke-width="6"/>
+    <path d="M30 64 C70 26 150 24 192 62 L182 70 C144 44 78 44 40 72 Z"/><path d="M34 70 v16 M188 66 v18" stroke="${FIG}" stroke-width="4"/>
+    <path d="M84 116 C82 100 84 90 94 84 L110 84 C120 90 124 100 122 116 Z"/><circle cx="102" cy="74" r="11"/><path d="M92 66 L110 54 L116 60 L102 70 Z"/>
+    ${cut('M90 104 C98 98 108 98 116 104', 2)}
+  </g>`;
+}
+function person(x, y, s, tool) {
+  let o = `<g transform="translate(${x} ${y}) scale(${s})">
+    <circle cx="30" cy="24" r="12"/><path d="M24 12 L40 2 L46 8 L34 14 Z"/>
+    <path d="M20 40 C28 34 40 36 46 44 L54 100 C58 120 62 136 64 146 L2 146 C6 130 10 110 14 92 Z"/>
+    ${cut('M22 60 C30 70 42 70 48 62 M14 120 C30 126 46 126 60 120', 2)}`;
+  if (tool === 'banner') o += `<path d="M48 70 L60 -70" stroke="${FIG}" stroke-width="5" stroke-linecap="round"/><path d="M60 -70 C76 -64 92 -70 104 -62 L100 -34 C88 -40 74 -36 58 -42 Z"/>${cut('M66 -60 L94 -56 M64 -50 L92 -46', 2)}`;
+  if (tool === 'pole') o += `<path d="M-40 46 L110 46" stroke="${FIG}" stroke-width="6" stroke-linecap="round"/><path d="M-50 56 H-18 V96 H-50 Z M84 56 H116 V96 H84 Z"/>${cut('M-34 56 V96 M100 56 V96 M-50 76 H-18 M84 76 H116', 2)}`;
+  return o + '</g>';
+}
+function camel(x, y, s) {
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="M20 110 C30 70 60 60 80 70 C90 30 120 30 128 66 C140 40 170 40 176 72 C190 76 200 80 206 90 C214 70 216 50 226 40 C236 34 250 36 256 44 L262 52 C254 56 244 56 236 56 C230 72 226 92 220 108 C214 124 206 130 196 132 L206 196 L192 198 L182 138 L176 196 L164 198 L166 134 C140 138 100 138 76 134 L72 196 L58 198 L56 136 L46 196 L34 198 L36 128 C26 124 18 118 20 110 Z"/>
+    <path d="M22 108 C10 118 8 132 14 146" fill="none" stroke="${FIG}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M118 52 H184 V86 H118 Z"/>${cut('M118 60 L184 80 M118 80 L184 60 M151 52 V86', 2)}
+    <circle cx="244" cy="46" r="2.6" fill="${W}"/>${cut('M60 110 C90 118 140 118 180 110', 2)}
+  </g>`;
+}
+function tower(x, y, s) {
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="M30 120 H110 V292 H30 Z"/>
+    <path d="M-6 120 C30 108 110 108 146 120 L134 98 H6 Z"/><path d="M20 98 V70 H120 V98 Z"/>
+    <path d="M-14 70 C26 54 114 54 154 70 L140 44 H0 Z"/><path d="M40 44 C50 20 90 20 100 44 Z"/>
+    ${cut('M30 150 H110 M30 200 H110 M30 250 H110 M70 150 V292 M28 84 H112 M10 108 H130 M2 60 H138', 2)}
+  </g>`;
+}
+
+// figures, all facing west (right): what happens at each station
+document.getElementById('f0').innerHTML = person(150, 816, .78, 'banner') + carriage(210, 694, .72) + `<g transform="translate(436 900)"><path d="M0 0 H70 V-36 H0 Z M8 -36 H62 V-66 H8 Z"/>${cut('M0 -18 H70 M35 0 V-36 M8 -50 H62', 2)}</g>`;
+document.getElementById('f1').innerHTML = tower(560, 676, .9) + horse(700, 806, .78) + person(880, 826, .72);
+document.getElementById('f2').innerHTML = person(990, 832, .7, 'pole') + camel(1090, 780, .72);
+document.getElementById('f3').innerHTML = tower(1660, 676, .9) + person(1430, 830, .7) + `<g transform="translate(1540 900)"><path d="M0 0 C-6 -40 6 -60 22 -62 C38 -60 50 -40 44 0 Z M60 0 C56 -30 64 -46 76 -46 C88 -46 96 -30 92 0 Z"/>${cut('M4 -30 H40 M64 -22 H88', 2)}</g>`;
+// road line through all four panels
+PX.forEach(x => document.getElementById('f' + PX.indexOf(x)).insertAdjacentHTML('beforeend', `<path d="M${x} 962 H${x + PW}" stroke="${FIG}" stroke-width="6"/>`));
+
+const B = {
+  wheel: (() => { let d = ''; for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; d += `M${43 + Math.cos(a) * 6} ${43 + Math.sin(a) * 6} L${43 + Math.cos(a) * 24} ${43 + Math.sin(a) * 24} `; } return cutL(d, 3) + `<circle cx="43" cy="43" r="27" fill="none" stroke="${L}" stroke-width="3.5"/>`; })(),
+  horse: `<g transform="translate(9 22) scale(.31)" fill="${L}"><path d="M40 60 C60 40 120 38 150 46 C160 30 170 14 186 10 L190 0 L196 9 C204 12 208 16 210 22 L220 34 C212 38 202 37 194 33 C184 40 178 52 172 62 C168 72 160 78 150 80 L196 104 L212 118 L202 124 L180 110 L142 92 C120 94 92 94 70 90 L32 110 L10 126 L3 118 L24 100 L38 82 C30 77 26 70 28 64 C18 62 8 70 0 82 C4 66 18 54 40 60 Z"/></g>`,
+  camel: `<g transform="translate(9 16) scale(.26)" fill="${L}"><path d="M20 110 C30 70 60 60 80 70 C90 30 120 30 128 66 C140 40 170 40 176 72 C190 76 200 80 206 90 C214 70 216 50 226 40 C236 34 250 36 256 44 L262 52 C254 56 244 56 236 56 C230 72 226 92 220 108 C214 124 206 130 196 132 L206 196 L192 198 L182 138 L176 196 L164 198 L166 134 C140 138 100 138 76 134 L72 196 L58 198 L56 136 L46 196 L34 198 L36 128 C26 124 18 118 20 110 Z"/></g>`,
+  coin: `<circle cx="43" cy="43" r="26" fill="none" stroke="${L}" stroke-width="4"/><rect x="34" y="34" width="18" height="18" fill="none" stroke="${L}" stroke-width="3.5"/>${cutL('M24 43 H32 M54 43 H62', 3)}`,
+};
+
+document.querySelectorAll('.tag svg').forEach(el => {
+  el.innerHTML = `<g filter="url(#ink)"><rect x="3" y="3" width="80" height="80" fill="#1A1815" stroke="${L}" stroke-width="2.4"/>${B[el.dataset.k]}</g>`;
+});
+</script>
+</body>
+</html>
