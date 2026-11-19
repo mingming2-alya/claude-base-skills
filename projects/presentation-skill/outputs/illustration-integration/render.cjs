@@ -97,12 +97,15 @@ const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
     console.log(f, issues.length ? issues.join(' | ') : 'ok', `(min contrast ${worst.toFixed(2)}, ${runs.length} runs)`);
   }
   if (!filters.length) {
-    const sheet = await browser.newPage({ viewport: { width: 2000, height: 800 } });
-    await sheet.goto('file://' + path.join(here, 'sheet.html'), { waitUntil: 'networkidle' });
-    await sheet.evaluate(() => document.fonts.ready);
-    await sheet.waitForTimeout(300);
-    await sheet.screenshot({ path: path.join(here, 'sheet.jpg'), type: 'jpeg', quality: 86, fullPage: true });
-    console.log('sheet.jpg ok');
+    // every sheet*.html next to this script becomes a JPG of the same name
+    for (const name of readdirSync(here).filter(f => /^sheet.*\.html$/.test(f))) {
+      const sheet = await browser.newPage({ viewport: { width: 2000, height: 800 } });
+      await sheet.goto('file://' + path.join(here, name), { waitUntil: 'networkidle' });
+      await sheet.evaluate(() => document.fonts.ready);
+      await sheet.waitForTimeout(300);
+      await sheet.screenshot({ path: path.join(here, name.replace('.html', '.jpg')), type: 'jpeg', quality: 86, fullPage: true });
+      console.log(name.replace('.html', '.jpg'), 'ok');
+    }
   }
   await browser.close();
 })();

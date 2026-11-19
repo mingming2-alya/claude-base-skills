@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>浮世繪融合版（B）｜東京展會參展準備：字寫在畫裡的和紙題箋上</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#EFE4CC;--ink:#24201B;--ink2:#302A23;--sub:#554A3E;--accent:#2B4C7E}
+  .slip{font:900 50px/1 "Noto Serif TC";fill:#24201B}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="washi" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" seed="2"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .5  0 0 0 0 .42  0 0 0 0 .3  0 0 0 -1 .52"/>
+      </filter>
+      <!-- the woodblock shows its grain in flat colour -->
+      <filter id="wood" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".003 .09" numOctaves="2" seed="7"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .2  0 0 0 0 .2  0 0 0 0 .25  1.6 0 0 0 -.68"/>
+      </filter>
+      <linearGradient id="bokashi" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2B4C7E"/><stop offset=".45" stop-color="#5E83A8" stop-opacity=".75"/><stop offset="1" stop-color="#EFE4CC" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="fujiG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2B4C7E"/><stop offset="1" stop-color="#8FB3C9"/></linearGradient>
+      <pattern id="seigaiha" width="40" height="20" patternUnits="userSpaceOnUse">
+        <g fill="none" stroke="#DCE8EE" stroke-width="2"><path d="M0 20 a20 20 0 0 1 40 0 M8 20 a12 12 0 0 1 24 0 M15 20 a5 5 0 0 1 10 0"/><path d="M-20 10 a20 20 0 0 1 40 0 M20 10 a20 20 0 0 1 40 0" opacity=".9"/></g>
+      </pattern>
+      <clipPath id="scene"><rect x="0" y="0" width="1920" height="1080"/></clipPath>
+      <clipPath id="card"><rect x="92" y="30" width="908" height="888" rx="6"/></clipPath>
+    </defs>
+    <rect width="1920" height="1080" fill="#EFE4CC"/>
+    <rect width="1920" height="1080" filter="url(#washi)" opacity=".4"/>
+    <g clip-path="url(#scene)">
+      <rect x="0" y="0" width="1920" height="560" fill="url(#bokashi)"/>
+      <g id="print"></g>
+      <rect x="0" y="0" width="1920" height="1080" filter="url(#wood)" opacity=".35" style="mix-blend-mode:multiply"/>
+    </g>
+    <g id="label"></g>
+    <g id="front"></g>
+    <!-- signature frame: the vertical title slip and the publisher's seal -->
+    <g transform="translate(1806 54)">
+      <rect width="78" height="276" fill="#F4ECD8" stroke="#24201B" stroke-width="3"/>
+      <rect x="6" y="6" width="66" height="264" fill="none" stroke="#C8452E" stroke-width="2"/>
+      <text class="slip" x="39" y="70" text-anchor="middle">東</text><text class="slip" x="39" y="128" text-anchor="middle">京</text>
+      <text class="slip" x="39" y="186" text-anchor="middle">參</text><text class="slip" x="39" y="244" text-anchor="middle">展</text>
+      <rect x="18" y="290" width="42" height="54" rx="4" fill="#C8452E"/><path d="M28 302 H50 M28 314 H50 M39 302 V336 M28 326 H50" stroke="#F4ECD8" stroke-width="4"/>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><span>展會資訊</span><b>參展準備</b><span>攤位配置</span><span>會後追蹤</span></nav>
+  <div class="copy">
+    <h2>東京展會參展準備</h2>
+    <p class="key">東京買家看細節，<em>三件事提前兩週備齊</em>。</p>
+  </div>
+  <ul class="items">
+    <li><svg class="badge" viewBox="0 0 104 104" data-k="ship" aria-hidden="true"></svg><div><strong>樣品</strong><span>提前兩週海運寄出</span></div></li>
+    <li><svg class="badge" viewBox="0 0 104 104" data-k="book" aria-hidden="true"></svg><div><strong>日文型錄</strong><span>規格與價格都要寫清楚</span></div></li>
+    <li><svg class="badge" viewBox="0 0 104 104" data-k="lantern" aria-hidden="true"></svg><div><strong>會議排程</strong><span>每天先約好四場</span></div></li>
+  </ul>
+</div>
+<script>
+const K = '#2A2620', IND = '#2B4C7E', LB = '#8FB3C9', VER = '#C8452E', OCH = '#D9A86A', PINK = '#E8B6A0', CR = '#F4ECD8', BRN = '#6B4A2E', GRN = '#6E8B5A';
+let p = '';
+// Fuji behind the mist
+p += `<path d="M1030 650 C1150 560 1250 420 1300 310 L1360 310 C1410 420 1510 560 1640 650 Z" fill="url(#fujiG)" stroke="${K}" stroke-width="3"/>`;
+p += `<path d="M1300 310 L1360 310 C1376 346 1392 378 1410 408 L1392 400 L1380 420 L1364 398 L1348 426 L1334 398 L1318 420 L1304 396 L1288 416 L1276 400 L1260 408 C1278 378 1290 346 1300 310 Z" fill="${CR}" stroke="${K}" stroke-width="2.5"/>`;
+// mist bands
+const band = (x, y, w, h) => `<path d="M${x + h / 2} ${y} H${x + w - h / 2} A${h / 2} ${h / 2} 0 0 1 ${x + w - h / 2} ${y + h} H${x + h / 2} A${h / 2} ${h / 2} 0 0 1 ${x + h / 2} ${y} Z" fill="${PINK}" stroke="${K}" stroke-width="2.5"/>`;
+p += band(1010, 548, 300, 44) + band(1240, 600, 420, 46) + band(1060, 640, 260, 40) + band(1380, 216, 260, 34) + band(1080, 150, 200, 30) + band(-60, 470, 260, 40);
+// the sea, patterned, with a ship carrying the samples
+p += `<path d="M0 680 H1620 V1080 H0 Z" fill="#4E7AA3"/><path d="M0 680 H1620 V1080 H0 Z" fill="url(#seigaiha)" opacity=".55"/><path d="M0 680 H1620" stroke="${K}" stroke-width="2.5"/>`;
+p += `<g transform="translate(1180 600)">
+  <path d="M110 -2 V182" stroke="${K}" stroke-width="7"/>
+  <path d="M20 0 H200 C206 50 206 110 200 168 H20 C14 110 14 50 20 0 Z" fill="${CR}" stroke="${K}" stroke-width="3"/>
+  <path d="M56 4 V166 M92 4 V166 M128 4 V166 M164 4 V166" stroke="#B9AD92" stroke-width="2.5"/>
+  <circle cx="110" cy="82" r="30" fill="none" stroke="${IND}" stroke-width="8"/><path d="M92 82 H128 M110 64 V100" stroke="${IND}" stroke-width="7"/>
+  <path d="M-20 190 H250 C238 222 206 236 160 238 H40 C6 236 -14 220 -20 190 Z" fill="${BRN}" stroke="${K}" stroke-width="3"/>
+  <path d="M-12 206 H244" stroke="#4A3220" stroke-width="3"/>
+  <rect x="20" y="160" width="46" height="32" fill="${OCH}" stroke="${K}" stroke-width="2.5"/><rect x="156" y="164" width="40" height="28" fill="${OCH}" stroke="${K}" stroke-width="2.5"/>
+  <path d="M30 168 H56 M166 172 H186" stroke="${K}" stroke-width="2"/>
+</g>`;
+// breaking waves in front: indigo bodies, white claws of foam
+function crest(x, y, w, h) {
+  let s = `<path d="M${x} ${y + h} C${x + w * .1} ${y + h * .4} ${x + w * .45} ${y - h * .1} ${x + w * .78} ${y + h * .12} C${x + w * .92} ${y + h * .22} ${x + w * .96} ${y + h * .42} ${x + w * .86} ${y + h * .5} C${x + w * .8} ${y + h * .36} ${x + w * .66} ${y + h * .34} ${x + w * .58} ${y + h * .52} C${x + w * .7} ${y + h * .6} ${x + w * .8} ${y + h * .78} ${x + w} ${y + h} Z" fill="${IND}" stroke="${K}" stroke-width="3"/>`;
+  for (let k = 1; k < 4; k++) s += `<path d="M${x + w * .08 * k} ${y + h} C${x + w * (.1 + .06 * k)} ${y + h * (.5 + .1 * k)} ${x + w * .45} ${y + h * (.1 + .12 * k)} ${x + w * .7} ${y + h * (.2 + .1 * k)}" fill="none" stroke="${LB}" stroke-width="2.5"/>`;
+  for (let k = 0; k < 7; k++) { const t = .42 + k * .075, cx = x + w * t, cy = y + h * (.02 + Math.pow(t - .42, 2) * 1.6) - 6; s += `<path d="M${cx - 9} ${cy + 6} C${cx - 10} ${cy - 8} ${cx + 6} ${cy - 14} ${cx + 12} ${cy - 2} C${cx + 4} ${cy - 6} ${cx} ${cy} ${cx + 2} ${cy + 6} Z" fill="${CR}" stroke="${K}" stroke-width="2"/>`; }
+  return s;
+}
+p += crest(560, 930, 300, 160) + crest(800, 950, 260, 140) + crest(990, 900, 300, 180) + crest(1210, 940, 260, 150) + crest(1420, 960, 220, 130);
+// the booth on the quay: roof, noren with our mark, two lanterns
+p += `<path d="M1600 940 H1920 V1080 H1600 Z" fill="${OCH}" stroke="${K}" stroke-width="3"/>`;
+for (let x = 1620; x < 1920; x += 44) p += `<path d="M${x} 940 V1080" stroke="#A8783E" stroke-width="2.5"/>`;
+p += `<g>
+  <path d="M1632 560 V940 M1888 560 V940" stroke="${BRN}" stroke-width="16"/>
+  <path d="M1590 560 C1680 540 1840 540 1930 560 L1904 500 C1820 486 1700 486 1616 500 Z" fill="#3A3D44" stroke="${K}" stroke-width="3"/>
+  <path d="M1606 522 C1700 508 1820 508 1918 522" stroke="#5B606A" stroke-width="3" fill="none"/>
+  <path d="M1640 576 H1880 V716 H1640 Z" fill="${IND}" stroke="${K}" stroke-width="3"/>
+  <path d="M1720 576 V716 M1800 576 V716" stroke="${CR}" stroke-width="5"/>
+  <circle cx="1760" cy="646" r="34" fill="none" stroke="${CR}" stroke-width="7"/><path d="M1742 646 H1778 M1760 628 V664" stroke="${CR}" stroke-width="6"/>
+  <path d="M1650 860 H1872 V884 H1650 Z" fill="${BRN}" stroke="${K}" stroke-width="3"/>
+  <rect x="1676" y="814" width="52" height="46" fill="${OCH}" stroke="${K}" stroke-width="2.5"/><rect x="1746" y="826" width="38" height="34" fill="${CR}" stroke="${K}" stroke-width="2.5"/><rect x="1800" y="808" width="44" height="52" fill="${VER}" stroke="${K}" stroke-width="2.5"/>
+</g>`;
+const lantern = (x, y) => `<path d="M${x} ${y - 30} V${y - 14}" stroke="${K}" stroke-width="3"/><rect x="${x - 22}" y="${y - 16}" width="44" height="10" rx="3" fill="${K}"/><path d="M${x - 26} ${y - 6} C${x - 34} ${y + 30} ${x - 34} ${y + 50} ${x - 26} ${y + 76} H${x + 26} C${x + 34} ${y + 50} ${x + 34} ${y + 30} ${x + 26} ${y - 6} Z" fill="${VER}" stroke="${K}" stroke-width="3"/><path d="M${x - 30} ${y + 22} H${x + 30} M${x - 31} ${y + 46} H${x + 31}" stroke="#8E2A1C" stroke-width="2.5"/><rect x="${x - 22}" y="${y + 74}" width="44" height="10" rx="3" fill="${K}"/>`;
+p += lantern(1662, 588) + lantern(1858, 588);
+// a pine branch reaching in from the top
+p += `<path d="M1920 440 C1880 424 1840 440 1800 416 C1780 404 1760 404 1744 410" fill="none" stroke="${BRN}" stroke-width="11" stroke-linecap="round"/>`;
+[[1780, 404], [1830, 428], [1748, 404], [1880, 432]].forEach(([x, y]) => { let n = ''; for (let k = 0; k < 9; k++) { const a = Math.PI * (1.05 + k * .1); n += `M${x} ${y} L${x + Math.cos(a) * 42} ${y + Math.sin(a) * 42} `; } p += `<path d="${n}" stroke="${GRN}" stroke-width="3.5" stroke-linecap="round"/>`; });
+document.getElementById('print').innerHTML = p;
+
+// the label carrying the words: washi pasted onto the print, with printed rules between the items
+let c = `<rect x="92" y="30" width="908" height="888" rx="6" fill="#F4ECD8"/>`;
+c += `<g clip-path="url(#card)"><rect width="1920" height="1080" filter="url(#washi)" opacity=".55"/></g>`;
+c += `<rect x="92" y="30" width="908" height="888" rx="6" fill="none" stroke="${IND}" stroke-width="5"/><rect x="104" y="42" width="884" height="864" rx="3" fill="none" stroke="${VER}" stroke-width="2"/>`;
+c += `<path d="M140 594 H900 M140 600 H900 M140 732 H900 M140 738 H900" stroke="${IND}" stroke-width="1.6" opacity=".7"/>`;
+c += `<path d="M104 132 H988" stroke="${IND}" stroke-width="1.6" opacity=".5"/>`;
+document.getElementById("label").innerHTML = c;
+// one wave breaks over the corner of the label: it belongs to the picture
+document.getElementById('front').innerHTML = crest(-30, 860, 300, 220);
+
+// list badges: crests in indigo, like family mon
+const B = {
+  ship: `<path d="M52 18 V70" stroke="${CR}" stroke-width="5"/><path d="M30 22 H74 C76 38 76 54 74 66 H30 C28 54 28 38 30 22 Z" fill="${CR}"/><path d="M22 74 H82 C78 84 70 88 60 88 H44 C34 88 26 84 22 74 Z" fill="${CR}"/>`,
+  book: `<path d="M22 30 C34 26 46 28 52 34 C58 28 70 26 82 30 V78 C70 74 58 76 52 82 C46 76 34 74 22 78 Z" fill="${CR}"/><path d="M52 34 V82" stroke="${IND}" stroke-width="3"/><path d="M30 42 H44 M30 52 H44 M60 42 H74 M60 52 H74" stroke="${IND}" stroke-width="3"/>`,
+  lantern: `<path d="M52 16 V26" stroke="${CR}" stroke-width="4"/><rect x="38" y="24" width="28" height="7" rx="2" fill="${CR}"/><path d="M36 32 C30 50 30 62 36 78 H68 C74 62 74 50 68 32 Z" fill="${CR}"/><path d="M33 48 H71 M33 62 H71" stroke="${IND}" stroke-width="3"/><rect x="38" y="78" width="28" height="7" rx="2" fill="${CR}"/>`,
+};
+document.querySelectorAll('svg.badge').forEach(el => {
+  el.innerHTML = `<circle cx="52" cy="52" r="48" fill="${IND}"/><circle cx="52" cy="52" r="42" fill="none" stroke="${CR}" stroke-width="2.5"/>${B[el.dataset.k]}`;
+});
+</script>
+</body>
+</html>
