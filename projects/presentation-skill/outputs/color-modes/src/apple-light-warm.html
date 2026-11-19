@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>Apple 發表｜AI 助理 3.0</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Geist:wght@400;500;600;700&display=block">
+<style>
+  /* Colour roles. The variant files override this block: mode (dark or light stage) times palette. */
+  :root{
+    --stage:#0B0B0D;--stageTop:#0B0B0D;--stageBot:#0B0B0D;
+    --fg:#F5F5F7;--tagc:#D9D9DE;--sub:#9A9AA0;--nav:#8E8E93;--hair:rgba(255,255,255,.22);
+    --g1:#FFB340;--g2:#FF7A3D;--g3:#FF4D6A;
+    --e1:#3FE0D0;--e2:#9BE15D;--e3:#FFC233;--e4:#FF5A5F;
+    --auraOp:.55;--rimOp:.9;--floorOp:.22;--shadowOp:0;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--stage)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;color:var(--fg);font-family:"Geist","Noto Sans TC",sans-serif;text-align:center;
+    background:linear-gradient(180deg,var(--stageTop) 0%,var(--stage) 55%,var(--stageBot) 100%)}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:0;right:0;top:56px;display:flex;justify-content:center;gap:40px;font:500 21px/1 "Noto Sans TC";color:var(--nav);letter-spacing:.06em}
+  nav b{color:var(--fg);font-weight:500}
+  h1{position:absolute;left:0;right:0;top:150px;font:700 136px/1.05 "Noto Sans TC";letter-spacing:-.01em}
+  h1 span{font:700 136px/1 "Geist";background:linear-gradient(90deg,var(--g1) 0%,var(--g2) 45%,var(--g3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em}
+  p.tag{position:absolute;left:0;right:0;top:340px;font:500 46px/1.4 "Noto Sans TC";color:var(--tagc);letter-spacing:.02em}
+  p.tag em{font-style:normal;font-weight:700;background:linear-gradient(90deg,var(--g1) 0%,var(--g2) 45%,var(--g3) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* the device keeps its own dark glass in both modes, so its UI stays light on dark */
+  .ui{position:absolute;left:776px;top:668px;width:368px;text-align:left;color:#F5F5F7}
+  .ui small{display:block;font:500 20px/1 "Noto Sans TC";color:#8E8E93;letter-spacing:.06em;margin-bottom:22px}
+  .row{display:grid;grid-template-columns:44px 1fr;align-items:center;height:74px;border-top:1px solid rgba(255,255,255,.09);font:500 26px/1 "Noto Sans TC"}
+  .row i{width:28px;height:28px;border-radius:50%;border:2.5px solid #4A4A50;display:block}
+  .row.done i{border:0;background:linear-gradient(135deg,var(--g1),var(--g3));position:relative}
+  .row.done i::after{content:"";position:absolute;left:9px;top:6px;width:7px;height:12px;border:solid #0B0B0D;border-width:0 3px 3px 0;transform:rotate(45deg)}
+  .row.done span{color:#8E8E93}
+  .row.now i{border-color:var(--g2);border-right-color:transparent}
+  .side{position:absolute;width:380px;text-align:left}
+  .side h3{font:700 32px/1.25 "Noto Sans TC";letter-spacing:.02em}
+  .side p{margin-top:10px;font:400 23px/1.5 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+</style>
+<style>:root{--stage:#F2F2F5;--stageTop:#F7F7F9;--stageBot:#E6E6EB;--fg:#1D1D1F;--tagc:#3A3A3C;--sub:#5E5E63;--nav:#5E5E63;--hair:rgba(29,29,31,.2);--auraOp:.42;--rimOp:.7;--floorOp:.07;--shadowOp:.18;--g1:#E8590C;--g2:#E03131;--g3:#C2255C;--e1:#12B886;--e2:#82C91E;--e3:#FAB005;--e4:#FA5252}</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="g40" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2720" height="1880"><feGaussianBlur stdDeviation="40"/></filter>
+      <filter id="g24" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2720" height="1880"><feGaussianBlur stdDeviation="24"/></filter>
+      <filter id="g12" filterUnits="userSpaceOnUse" x="-400" y="-400" width="2720" height="1880"><feGaussianBlur stdDeviation="12"/></filter>
+      <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" style="stop-color:var(--e1)"/><stop offset=".35" style="stop-color:var(--e2)"/><stop offset=".6" style="stop-color:var(--e3)"/><stop offset="1" style="stop-color:var(--e4)"/>
+      </linearGradient>
+      <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1C1C1F"/><stop offset="1" stop-color="#0A0A0B"/></linearGradient>
+    </defs>
+    <!-- on a light stage the device also sits on a soft contact shadow -->
+    <ellipse cx="960" cy="1076" rx="430" ry="70" fill="#1D1D1F" filter="url(#g24)" style="opacity:var(--shadowOp)"/>
+    <!-- light spilling from the device -->
+    <ellipse cx="960" cy="1080" rx="560" ry="180" filter="url(#g40)" style="fill:var(--g2);opacity:var(--floorOp)"/>
+    <rect x="730" y="610" width="460" height="700" rx="76" fill="none" stroke="url(#edge)" stroke-width="40" filter="url(#g40)" style="opacity:var(--auraOp)"/>
+    <rect x="730" y="610" width="460" height="700" rx="76" fill="none" stroke="url(#edge)" stroke-width="10" filter="url(#g12)" style="opacity:var(--rimOp)"/>
+    <!-- the device: dark glass, edge lit -->
+    <rect x="730" y="610" width="460" height="700" rx="76" fill="url(#glass)"/>
+    <rect x="730" y="610" width="460" height="700" rx="76" fill="none" stroke="url(#edge)" stroke-width="3"/>
+    <rect x="744" y="624" width="432" height="672" rx="64" fill="none" stroke="#ffffff" stroke-opacity=".06" stroke-width="2"/>
+    <!-- hairlines to the callouts -->
+    <g stroke-width="1.5" style="stroke:var(--hair)">
+      <line x1="600" y1="676" x2="730" y2="676"/><line x1="1190" y1="676" x2="1280" y2="676"/><line x1="1190" y1="866" x2="1280" y2="866"/>
+    </g>
+  </svg>
+
+  <nav aria-label="章節"><b>開場</b><span>新功能</span><span>上線時程</span></nav>
+  <h1>AI 助理 <span>3.0</span></h1>
+  <p class="tag">交給它，它會<em>把事做完</em>。</p>
+
+  <div class="ui">
+    <small>今天上午</small>
+    <div class="row done"><i></i><span>整理本週週報</span></div>
+    <div class="row done"><i></i><span>預約週四會議室</span></div>
+    <div class="row now"><i></i><span>寄出報價單</span></div>
+  </div>
+
+  <div class="side" style="left:260px;top:654px"><h3>自己排好順序</h3><p>一句話交代，<br>它拆成步驟、排好時間。</p></div>
+  <div class="side" style="left:1300px;top:654px"><h3>跨系統操作</h3><p>郵件、行事曆、表單，<br>不用再切換。</p></div>
+  <div class="side" style="left:1300px;top:844px"><h3>隨時可以打斷</h3><p>做到一半想改，<br>直接說，它會接著改。</p></div>
+</div>
+</body>
+</html>

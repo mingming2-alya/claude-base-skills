@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>顧問報告（色塊策略）｜選址三方案</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@600;700;800;900&display=block">
+<style>
+  /* Colour roles. The variant files override this block: mode (light paper or dark slate) times palette. */
+  :root{
+    --bg:#F1EFEA;--ink:#141619;--nav:#585D66;--desc:#3F444B;--src:#5D6168;--rule:#D3CFC6;
+    --lead:#141619;--em:#0B5E45;
+    --focus:#0D6B4F;--focusText:#0B5E45;--onFocus:#F4F2EC;--onFocusSub:#CFE5DB;
+    --gray:#CFCAC1;--gray2:#BDB7AC;--onGray:#141619;--onGraySub:#3F444B;
+    --late:#B5381F;--lateTint:#E8C2B6;--lateLine:#B5381F;--lateLineOp:.55;--peak:#141619;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  .slide{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Archivo","Noto Sans TC",sans-serif}
+  svg{position:absolute;inset:0}
+  nav{position:absolute;left:120px;top:58px;display:flex;gap:34px;font:500 21px/1 "Noto Sans TC";color:var(--nav);letter-spacing:.06em}
+  nav b{color:var(--ink);font-weight:900}
+  h2{position:absolute;left:116px;top:136px;font:900 86px/1.12 "Noto Sans TC";letter-spacing:.01em}
+  p.lead{position:absolute;left:120px;top:292px;width:640px;font:500 32px/1.55 "Noto Sans TC";letter-spacing:.02em;color:var(--lead)}
+  p.lead em{font-style:normal;font-weight:900;color:var(--em)}
+  .ev{position:absolute;left:120px;top:470px;width:640px;border-top:2px solid var(--ink)}
+  .ev div{display:grid;grid-template-columns:230px 1fr;align-items:center;padding:20px 0;border-bottom:1px solid var(--rule)}
+  .ev b{font:900 76px/1 "Archivo";letter-spacing:-.03em;color:var(--focusText)}
+  .ev b small{font:900 28px/1 "Noto Sans TC";letter-spacing:0;margin-left:6px}
+  .ev strong{display:block;font:900 26px/1.3 "Noto Sans TC";letter-spacing:.08em}
+  .ev span{display:block;margin-top:6px;font:500 22px/1.45 "Noto Sans TC";color:var(--desc)}
+  .src{position:absolute;left:120px;top:1010px;font:400 18px/1 "Noto Sans TC";color:var(--src);letter-spacing:.04em}
+  .blk{position:absolute;bottom:0;width:300px;padding:0 30px 40px;display:flex;flex-direction:column;justify-content:flex-end}
+  .blk b{display:block;font:900 176px/.84 "Archivo";letter-spacing:-.05em}
+  .blk em{display:block;margin-top:14px;font:700 24px/1 "Noto Sans TC";font-style:normal;letter-spacing:.06em}
+  .blk strong{display:block;margin-top:22px;font:900 40px/1.2 "Noto Sans TC";letter-spacing:.06em}
+  .blk small{display:block;margin-top:8px;font:500 22px/1.45 "Noto Sans TC"}
+  .blk.f{background:var(--focus);color:var(--onFocus)} .blk.f em,.blk.f small{color:var(--onFocusSub)}
+  .blk.g{background:var(--gray);color:var(--onGray)} .blk.g2{background:var(--gray2);color:var(--onGray)}
+  .blk.g em,.blk.g small,.blk.g2 em,.blk.g2 small{color:var(--onGraySub)}
+  .over{position:absolute;width:190px;margin-left:55px;padding:16px 0 14px;background:var(--bg);text-align:center;font:900 54px/1 "Archivo";color:var(--late);letter-spacing:-.02em}
+  .over small{display:block;margin-top:8px;font:700 21px/1 "Noto Sans TC";letter-spacing:.08em}
+  .peak{position:absolute;left:820px;width:1100px;border-top:4px dashed var(--peak)}
+  .peak span{position:absolute;left:30px;top:-46px;font:900 24px/1 "Noto Sans TC";letter-spacing:.06em;background:var(--bg);color:var(--ink);padding:6px 12px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <pattern id="late" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="14" height="14" style="fill:var(--lateTint)"/><line x1="0" y1="0" x2="0" y2="14" stroke-width="5" style="stroke:var(--lateLine);stroke-opacity:var(--lateLineOp)"/>
+      </pattern>
+    </defs>
+    <rect x="1180" y="360" width="300" height="180" fill="url(#late)"/>
+    <rect x="1500" y="144" width="300" height="396" fill="url(#late)"/>
+  </svg>
+
+  <nav aria-label="章節"><span>背景</span><b>三個方案</b><span>風險</span><span>下一步</span></nav>
+  <h2>三個選址方案</h2>
+  <p class="lead">只有<em>台中</em>能在 2028 年第一季的訂單高峰前量產，高雄與越南都會錯過。</p>
+  <div class="ev">
+    <div><b>30<small>公里</small></b><p><strong>人才</strong><span>招募半徑內就有產線熟手</span></p></div>
+    <div><b>0<small>次</small></b><p><strong>跨國審批</strong><span>只需國內核准，時程最不會變</span></p></div>
+    <div><b>48<small>億</small></b><p><strong>投資</strong><span>介於高雄 62 億與越南 35 億之間</span></p></div>
+  </div>
+  <p class="src">資料：2026 年第三季內部評估；金額為新台幣</p>
+
+  <section class="blk f" style="left:860px;height:504px"><b>14</b><em>個月量產</em><strong>B　台中</strong><small>2028.02</small></section>
+  <section class="blk g" style="left:1180px;height:540px;top:540px"><b>20</b><em>個月量產</em><strong>A　高雄</strong><small>2028.08</small></section>
+  <section class="blk g2" style="left:1500px;height:540px;top:540px"><b>26</b><em>個月量產</em><strong>C　越南</strong><small>2029.02</small></section>
+  <div class="over" style="left:1180px;top:392px">+5<small>個月，錯過高峰</small></div>
+  <div class="over" style="left:1500px;top:288px">+11<small>個月，錯過高峰</small></div>
+  <div class="peak" style="top:538px"><span>2028 Q1 訂單高峰</span></div>
+</div>
+</body>
+</html>
