@@ -933,3 +933,21 @@
   - `outputs/color-modes/`：範本、`make.py`、十二個變體、十二張圖、`sheet.jpg`、`README.md`。
   - `outputs/illustration-integration/`：`src/clay.js`、A、B、C 三個原始檔、三張圖、`sheet.jpg`、`README.md`、`render.cjs`。
   - 更新 `outputs/style-specs/`（apple、counsel、color-system）、`outputs/color-flex-demo/README.md`、`inputs/presentation-principles.md`、`STATUS.md`、`ROADMAP.md`。
+
+## 2026-11-19｜插畫版面與明暗範圍定案
+
+- **使用者的選擇**（互動表單）：
+  1. **插畫場景的版面**：A 為主，B、C 依內容穿插（Claude 推薦）。
+     - 每頁預設 A 全景環繞。
+     - 人物、步驟、地點、時間軸用 C 內容住進場景。
+     - 標題頁與重點清單用 B 文字在物件上。
+  2. **明暗範圍**：全部風格都要淺、深兩種底。Claude 原本推薦依風格決定，使用者選全部。
+- **寫進文件**：
+  - `inputs/presentation-principles.md`：第 19 條補上「全部風格都要淺、深兩種底」，新增第 20 條「插畫場景的背景與元素要融在一起」。
+  - `outputs/style-specs/illustration.md`：
+    - 共用規則從六條改成十條。新增背景是一個地方、包圍不並排、文字在場景裡、元素同材質、比例一致。「物件貼邊、中央留給文字」被「包圍，不並排」取代。
+    - 新增版面一節，含十五張樣張的版面對照表。
+    - 新增明暗一節。
+    - 鐵律與禁忌跟著改。
+  - `outputs/style-specs/color-system.md`：每款風格都要淺、深兩種底；插畫場景標出待補。
+- **下一步**：依對照表重排十五種插畫畫風並補另一種明暗；其他九款風格寫規格時一併定兩套用色。
