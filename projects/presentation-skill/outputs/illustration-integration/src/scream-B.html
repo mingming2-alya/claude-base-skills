@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>吶喊融合版（B）｜職場壓力的五個訊號：字寫在畫裡的木牌上</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#D9BC8E;--ink:#22201C;--ink2:#2E2A24;--sub:#4A3F31;--accent:#A8321C}
+  .bn{font:900 30px/1 "Chiron GoRound TC";fill:#22201C}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <!-- unprimed cardboard: fibres and blotches -->
+      <filter id="board" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".9 .08" numOctaves="2" seed="4" result="f"/>
+        <feColorMatrix in="f" type="matrix" values="0 0 0 0 .45  0 0 0 0 .32  0 0 0 0 .18  0 0 0 -1.3 .7"/>
+      </filter>
+      <filter id="blot" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".006" numOctaves="3" seed="9"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .55  0 0 0 0 .38  0 0 0 0 .2  1.5 0 0 0 -.72"/>
+      </filter>
+      <!-- everything painted bends a little -->
+      <filter id="wave" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".008 .012" numOctaves="2" seed="2" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="18" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <clipPath id="canvas"><path id="edge"/></clipPath>
+    </defs>
+
+    <rect width="1920" height="1080" fill="#D9BC8E"/>
+    <rect width="1920" height="1080" filter="url(#blot)" opacity=".55"/>
+    <rect width="1920" height="1080" filter="url(#board)" opacity=".5"/>
+
+    <g>
+      <g filter="url(#wave)" id="paint"></g>
+    </g>
+    <!-- signature frame: the wavy double edge of the painting -->
+    <g id="border" fill="none" stroke-linecap="round"></g>
+  </svg>
+
+  <nav aria-label="章節"><span>為什麼要談</span><b>五個訊號</b><span>怎麼求助</span><span>資源</span></nav>
+  <div class="copy">
+    <h2>職場壓力的五個訊號</h2>
+    <p class="key">撐不住之前，身體會先<em>發出訊號</em>。</p>
+  </div>
+  <ul class="items five">
+    <li><svg class="badge" viewBox="0 0 72 72" data-n="1" aria-hidden="true"></svg><div><strong>睡不好</strong><span>躺了很久還是睡不著</span></div></li>
+    <li><svg class="badge" viewBox="0 0 72 72" data-n="2" aria-hidden="true"></svg><div><strong>容易煩躁</strong><span>小事也會被激怒</span></div></li>
+    <li><svg class="badge" viewBox="0 0 72 72" data-n="3" aria-hidden="true"></svg><div><strong>一直拖延</strong><span>明知道該做，卻動不了</span></div></li>
+    <li><svg class="badge" viewBox="0 0 72 72" data-n="4" aria-hidden="true"></svg><div><strong>不想見人</strong><span>推掉聚會，只想獨處</span></div></li>
+    <li><svg class="badge" viewBox="0 0 72 72" data-n="5" aria-hidden="true"></svg><div><strong>身體不舒服</strong><span>頭痛、胃痛，找不到原因</span></div></li>
+  </ul>
+</div>
+<script>
+let seed = 44;
+const rand = () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const f1 = n => n.toFixed(1);
+// the painting's left edge: a slow wave, not a ruler line
+const edgeX = y => 990 + 34 * Math.sin(y * .011 + .6) + 14 * Math.sin(y * .031);
+let e = 'M1920 0 L' + f1(edgeX(0)) + ' 0';
+for (let y = 0; y <= 1080; y += 12) e += ` L${f1(edgeX(y))} ${y}`;
+e += ' L1920 1080 Z';
+document.getElementById('edge').setAttribute('d', e);
+
+let p = '';
+// sky: undulating bands of orange, red and yellow
+const sky = ['#E8742E', '#D2482A', '#EBB23A', '#E8742E', '#F0D27A', '#D2482A', '#E89A3A', '#C9442A', '#EBB23A', '#E8742E', '#F0C66A', '#D2602E'];
+const yb = (k, x) => -60 + k * 52 + 30 * Math.sin(x * .0058 + k * .55) + 16 * Math.sin(x * .016 + k * 1.3) + (x - 900) * .06;
+for (let k = 0; k < 13; k++) {
+  let d = '';
+  for (let x = -20; x <= 1940; x += 20) d += (x === -20 ? 'M' : ' L') + `${x} ${f1(yb(k, x))}`;
+  for (let x = 1940; x >= -20; x -= 20) d += ` L${x} ${f1(yb(k + 1, x) + 2)}`;
+  p += `<path d="${d} Z" fill="${sky[k % sky.length]}"/>`;
+  for (let j = 0; j < 3; j++) {
+    let s = '';
+    const t = .25 + j * .25, x0 = -20 + rand() * 300;
+    for (let x = x0; x <= 1940; x += 20) s += (x === x0 ? 'M' : ' L') + `${f1(x)} ${f1(yb(k, x) * (1 - t) + yb(k + 1, x) * t)}`;
+    p += `<path d="${s}" fill="none" stroke="${j % 2 ? '#F6D58A' : '#A63A20'}" stroke-width="${2 + rand() * 3}" stroke-opacity=".45" stroke-linecap="round"/>`;
+  }
+}
+// the water below: swirls of blue and green around one point
+const water = ['#1F3343', '#2D5470', '#3E6C8C', '#2B4A5E', '#4F7F6E', '#24394A', '#3A6A86', '#1F3343'];
+for (let k = 0; k < 9; k++) {
+  const r = 760 - k * 70;
+  let d = '';
+  for (let i = 0; i <= 90; i++) {
+    const a = i / 90 * Math.PI * 2, rr = r * (1 + .12 * Math.sin(a * 3 + k) + .05 * Math.sin(a * 7 + k * 2));
+    d += (i ? ' L' : 'M') + `${f1(1180 + Math.cos(a) * rr * 1.5)} ${f1(960 + Math.sin(a) * rr * .55)}`;
+  }
+  p += `<path d="${d} Z" fill="${water[k % water.length]}"/>`;
+  p += `<path d="${d} Z" fill="none" stroke="#7FA6B8" stroke-opacity=".35" stroke-width="3" transform="translate(0 6)"/>`;
+}
+// the worker, hands to face, behind the desk
+p += `<g transform="translate(1440 540) scale(1.45)">
+  <path d="M-34 66 C-70 110 -112 200 -128 330 L128 330 C112 200 72 110 34 66 Z" fill="#22303C"/>
+  <path d="M-60 140 C-50 200 -56 260 -70 320 M50 130 C60 190 58 260 70 320 M-10 120 C-4 200 -8 260 -2 320" stroke="#3E5468" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M-22 74 L0 150 L22 74" fill="none" stroke="#B8322A" stroke-width="7"/>
+  <rect x="-18" y="148" width="36" height="46" rx="4" fill="#EDE6D2" stroke="#22303C" stroke-width="3"/><rect x="-10" y="156" width="20" height="16" fill="#8FA6B4"/>
+  <path d="M-58 150 C-90 126 -88 90 -66 56 M58 150 C90 126 88 90 66 56" fill="none" stroke="#22303C" stroke-width="30" stroke-linecap="round"/>
+  <path d="M-38 -70 C-20 -98 20 -98 38 -70 C52 -40 48 20 30 54 C16 80 -16 80 -30 54 C-48 20 -52 -40 -38 -70 Z" fill="#D9D1A0" stroke="#3A3A2A" stroke-width="3"/>
+  <path d="M-30 -60 C-10 -76 14 -74 32 -58" fill="none" stroke="#B8B07E" stroke-width="5"/>
+  <ellipse cx="-15" cy="-14" rx="8" ry="12" fill="#3A3326"/><ellipse cx="15" cy="-14" rx="8" ry="12" fill="#3A3326"/>
+  <circle cx="-4" cy="14" r="2.4" fill="#3A3326"/><circle cx="4" cy="14" r="2.4" fill="#3A3326"/>
+  <ellipse cx="0" cy="38" rx="9" ry="14" fill="#3A3326"/>
+  <path d="M-62 58 C-68 34 -62 4 -48 -16 C-40 -4 -38 18 -34 38 C-36 52 -48 64 -62 58 Z M62 58 C68 34 62 4 48 -16 C40 -4 38 18 34 38 C36 52 48 64 62 58 Z" fill="#CFC694" stroke="#3A3A2A" stroke-width="3"/>
+  <path d="M-52 -6 C-50 10 -48 24 -46 36 M-44 2 C-42 16 -41 28 -40 38 M52 -6 C50 10 48 24 46 36 M44 2 C42 16 41 28 40 38" fill="none" stroke="#8F8758" stroke-width="2.5" stroke-linecap="round"/>
+</g>`;
+// the desk cuts across like a railing, with the day's pile on it
+const dt = x => 960 - (x - 900) * .25;
+p += `<path d="M880 ${f1(dt(880))} L1940 ${f1(dt(1940))} L1940 1100 L880 1100 Z" fill="#A8582E"/>`;
+for (let k = 1; k < 8; k++) { let d = ''; for (let x = 880; x <= 1940; x += 20) d += (x === 880 ? 'M' : ' L') + `${x} ${f1(dt(x) + k * 20 + 6 * Math.sin(x * .02 + k))}`; p += `<path d="${d}" fill="none" stroke="${k % 2 ? '#7E3C1E' : '#C9773E'}" stroke-width="${3 + k % 3}" stroke-opacity=".6"/>`; }
+p += `<path d="M880 ${f1(dt(880))} L1940 ${f1(dt(1940))}" stroke="#4A2412" stroke-width="10"/>`;
+p += `<g transform="translate(1180 ${f1(dt(1180) - 4)}) rotate(-14)"><path d="M0 0 L150 0 L168 -116 L22 -116 Z" fill="#2B2F36"/><path d="M14 -10 L142 -10 L156 -104 L30 -104 Z" fill="#6E9EC0"/><path d="M-20 0 L190 0 L176 16 L-8 16 Z" fill="#4A4F57"/></g>`;
+p += `<g transform="translate(1700 ${f1(dt(1700) - 4)}) rotate(-14)"><path d="M0 0 L48 0 L54 -70 L-6 -70 Z" fill="#EDE6D2" stroke="#3A3A2A" stroke-width="3"/><path d="M52 -54 C76 -54 76 -20 50 -18" fill="none" stroke="#3A3A2A" stroke-width="7"/></g>`;
+p += `<g transform="translate(1800 ${f1(dt(1800) - 4)}) rotate(-14)"><rect x="0" y="-60" width="110" height="60" fill="#EDE6D2" stroke="#3A3A2A" stroke-width="3"/><path d="M6 -46 H100 M6 -32 H100 M6 -18 H90" stroke="#9A8E78" stroke-width="3"/><rect x="-6" y="-78" width="110" height="20" fill="#E6DCC2" stroke="#3A3A2A" stroke-width="3" transform="rotate(5)"/></g>`;
+p += `<g transform="translate(1040 ${f1(dt(1040) - 2)}) rotate(-14)"><rect x="0" y="-22" width="70" height="22" rx="5" fill="#22303C"/><circle cx="62" cy="-24" r="12" fill="#C9332A"/></g>`;
+document.getElementById('paint').innerHTML = p;
+
+// the words hang on a wooden plaque in the painting, with the same wavy hand
+const PX0 = 84, PX1 = 952, PY0 = 44, PY1 = 962;
+const wavyRect = (dx) => { let d = ''; for (let x = PX0; x <= PX1; x += 12) d += (x === PX0 ? 'M' : ' L') + `${f1(x)} ${f1(PY0 - dx + 5 * Math.sin(x * .03))}`; for (let y = PY0; y <= PY1; y += 12) d += ` L${f1(PX1 + dx + 5 * Math.sin(y * .03))} ${y}`; for (let x = PX1; x >= PX0; x -= 12) d += ` L${f1(x)} ${f1(PY1 + dx + 5 * Math.sin(x * .03 + 1))}`; for (let y = PY1; y >= PY0; y -= 12) d += ` L${f1(PX0 - dx + 5 * Math.sin(y * .03 + 2))} ${y}`; return d + ' Z'; };
+let b = `<path d="M232 -10 L240 ${PY0 + 4}" stroke="#4A2412" stroke-width="7"/><path d="M806 -10 L798 ${PY0 + 4}" stroke="#4A2412" stroke-width="7"/>`;
+b += `<path d="${wavyRect(0)}" fill="#E4C597"/>`;
+for (let k = 0; k < 34; k++) { let d = ''; const y0 = PY0 + 14 + k * 27; for (let x = PX0 + 6; x <= PX1 - 6; x += 16) d += (x === PX0 + 6 ? 'M' : ' L') + `${x} ${f1(y0 + 6 * Math.sin(x * .012 + k * .7) + 3 * Math.sin(x * .05 + k))}`; b += `<path d="${d}" fill="none" stroke="${k % 3 ? '#C9A06A' : '#B88A55'}" stroke-width="${k % 3 ? 2 : 3}" stroke-opacity=".45"/>`; }
+b += `<path d="${wavyRect(0)}" fill="none" stroke="#22303C" stroke-width="9"/><path d="${wavyRect(-16)}" fill="none" stroke="#A8321C" stroke-width="4"/>`;
+b += `<circle cx="240" cy="${PY0 + 6}" r="9" fill="#4A2412"/><circle cx="798" cy="${PY0 + 6}" r="9" fill="#4A2412"/>`;
+// wavy painted dividers between the five signals
+[533, 632, 731, 830].forEach(y => { let d = ''; for (let x = 140; x <= 860; x += 12) d += (x === 140 ? 'M' : ' L') + `${x} ${f1(y + 4 * Math.sin(x * .04))}`; b += `<path d="${d}" fill="none" stroke="#8A5A30" stroke-width="3" stroke-opacity=".7"/>`; });
+document.getElementById('border').innerHTML = b;
+
+// list badges: a swirl around each number
+document.querySelectorAll('svg.badge').forEach(el => {
+  let s = '';
+  ['#E8742E', '#D2482A', '#EBB23A'].forEach((col, k) => {
+    let d = ''; const r = 34 - k * 6;
+    for (let i = 0; i <= 40; i++) { const a = i / 40 * Math.PI * 2, rr = r + 2.5 * Math.sin(a * 5 + k); d += (i ? ' L' : 'M') + `${f1(36 + Math.cos(a) * rr)} ${f1(36 + Math.sin(a) * rr)}`; }
+    s += `<path d="${d} Z" fill="${col}"/>`;
+  });
+  s += `<circle cx="36" cy="36" r="17" fill="#F3DDA8"/><text class="bn" x="36" y="47" text-anchor="middle">${el.dataset.n}</text>`;
+  el.innerHTML = s;
+});
+</script>
+</body>
+</html>
