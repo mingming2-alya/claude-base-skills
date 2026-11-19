@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>插畫場景畫風審閱</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<style>
+  :root{--bg:#F2EFE8;--card:#FBF9F4;--ink:#22201C;--sub:#57534D;--line:#D9D3C6;--tag:#8A5A22;--tagbg:#F3E3C8}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1C1B19;--card:#262421;--ink:#EEE9DF;--sub:#B8B1A4;--line:#3A3732;--tag:#F0C27A;--tagbg:#3A2E1E}}
+  :root[data-theme="dark"]{--bg:#1C1B19;--card:#262421;--ink:#EEE9DF;--sub:#B8B1A4;--line:#3A3732;--tag:#F0C27A;--tagbg:#3A2E1E}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",sans-serif;padding:40px 16px 64px}
+  main{max-width:1400px;margin:0 auto}
+  h1{font-weight:900;font-size:clamp(26px,4vw,40px);letter-spacing:.03em}
+  p.lead{margin-top:10px;color:var(--sub);font-size:17px;line-height:1.7;max-width:62em}
+  h2{margin:40px 0 16px;font-size:20px;letter-spacing:.06em;color:var(--sub)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,560px),1fr));gap:24px}
+  article{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  article a{display:block}
+  article img{display:block;width:100%;aspect-ratio:16/9}
+  .meta{padding:16px 18px 18px}
+  .meta h3{font-size:20px;font-weight:900;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .tag{font-size:13px;font-weight:700;color:var(--tag);background:var(--tagbg);padding:3px 9px;border-radius:999px}
+  dl{margin-top:10px;display:grid;grid-template-columns:5.2em 1fr;gap:6px 10px;font-size:15px;line-height:1.6}
+  dt{color:var(--sub)}
+</style>
+</head>
+<body>
+<main>
+  <h1>插畫場景：十五種畫風</h1>
+  <p class="lead">文字層全部共用；每種畫風換畫法、底紋、配色與一個招牌框飾。新增的十二種題材各自挑選，全部用程式畫，對比與溢出都已檢查。標「建議生圖」的兩款，需求寫在 <code>IMAGE_TODO.md</code>。點圖看原尺寸。</p>
+  <h2>已有（v5）</h2>
+  <div class="grid" id="old"></div>
+  <h2>新增十二種</h2>
+  <div class="grid" id="new"></div>
+</main>
+<script>
+const old = [
+  ['../style-moodboard-v5/img/01a-illustration-clay.jpg', '紙黏土', '新人報到第一週', '條列', '霧面黏土、柔和投影、細顆粒', '物件從邊緣伸入'],
+  ['../style-moodboard-v5/img/01b-illustration-hand.jpg', '手繪', '新人報到第一週', '條列', '抖動墨線、錯位粉彩色塊', '小塗鴉'],
+  ['../style-moodboard-v5/img/01c-illustration-neon.jpg', '霓虹', '新人報到第一週', '條列', '燈管線條、暗磚牆', '招牌框'],
+];
+const neu = [
+  ['img/01-retro-cartoon.jpg', '01 復古卡通', '尾牙當天流程', '步驟', '橡皮管手臂、白手套、派餅眼；米黃紙與網點', '同心圓片頭框；膠片倒數徽章'],
+  ['img/02-crayon.jpg', '02 兒童手繪', '家庭日一日行程', '條列', '蠟筆來回塗色、塗出界', '四角紙膠帶'],
+  ['img/03-sketch.jpg', '03 素描', '新品設計構想', '圖文標註', '鉛筆重描、排線、藍色構圖線、紅鉛筆標註', '線圈裝訂、尺規刻度'],
+  ['img/04-cave.jpg', '04 山洞岩畫', '團隊分工的四種角色', '條列', '打光岩壁、赭紅與炭黑顏料', '噴印手印'],
+  ['img/05-egypt.jpg', '05 埃及壁畫', '金字塔怎麼蓋', '步驟', '側臉正眼人物、礦物平塗、石灰岩', '三層分欄、王名圈', true],
+  ['img/06-han-rubbing.jpg', '06 漢畫像石拓片', '絲路上的物流', '步驟', '墨拓斑駁、鑿紋、白色陰刻線', '菱紋邊框、朱印'],
+  ['img/07-maya.jpg', '07 瑪雅抄本', '年度行事曆', '時間軸', '摺頁、字符方塊、玉米四季', '摺頁分格、點槓數字', true],
+  ['img/08-shadow-puppet.jpg', '08 皮影戲', '說好一個故事的三幕', '步驟', '背光布幕、半透明染色皮革、鏤空', '戲台框與布幔'],
+  ['img/09-ukiyoe.jpg', '09 浮世繪', '東京展會參展準備', '條列', '木刻輪廓、平塗、普魯士藍漸層', '直式題簽與版元印'],
+  ['img/10-vangogh.jpg', '10 梵谷筆觸', '創意工作坊', '條列', '沿漩渦流場的厚塗短筆觸', '厚塗筆觸畫框'],
+  ['img/11-scream.jpg', '11 吶喊', '職場壓力的五個訊號', '條列', '波動色帶、漩渦水面、硬紙板', '波動的雙線邊'],
+  ['img/12-pixel.jpg', '12 8bit 像素', '資安闖關地圖', '關卡地圖', '8 px 格、有限色盤、掃描線', '像素對話框與生命值'],
+];
+const card = ([src, name, topic, struct, tech, frame, gen]) => `<article><a href="${src}"><img src="${src}" alt="${name}：${topic}" loading="lazy"></a><div class="meta"><h3>${name}${gen ? '<span class="tag">建議生圖</span>' : ''}</h3><dl><dt>題材</dt><dd>${topic}（${struct}）</dd><dt>畫法</dt><dd>${tech}</dd><dt>招牌框飾</dt><dd>${frame}</dd></dl></div></article>`;
+document.getElementById('old').innerHTML = old.map(card).join('');
+document.getElementById('new').innerHTML = neu.map(card).join('');
+</script>
+</body>
+</html>

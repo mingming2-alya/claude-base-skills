@@ -7,7 +7,7 @@
 | `color-system.md` | 共用：每款鎖用色規則，做簡報時依主題推薦三組配色 | `../color-flex-demo/sheet.jpg` | 完成 |
 | `apple.md` | Apple 發表 | `../style-moodboard-v5/img/04-apple.jpg` | 完成 |
 | `counsel.md` | 顧問報告 | `../style-moodboard-v5/img/06-counsel.jpg` | 完成 |
-| `illustration.md` | 插畫場景：共用融入規則與十五種畫風 | `../style-moodboard-v5/img/01a`–`01c` | 新增十二種畫風的意象圖製作中 |
+| `illustration.md` | 插畫場景：共用融入規則與十五種畫風 | `../illustration-renderings/overview.jpg` | 完成；埃及、瑪雅建議生圖 |
 
 每份風格規格的段落依序是：
 
