@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>插畫場景（復古卡通）｜尾牙當天流程</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&family=Bungee&display=block">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root{--bg:#F1E6CC;--ink:#231F1A;--ink2:#332C24;--sub:#5A4D3E;--accent:#B23A26}
+  .cd{font:400 40px/1 "Bungee";fill:#231F1A}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.4" fill="#B98F5E"/></pattern>
+      <pattern id="dotsBig" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(20)"><circle cx="6" cy="6" r="2.6" fill="#E59A5B"/></pattern>
+      <filter id="grain" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="3"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .3  0 0 0 0 .22  0 0 0 0 .14  0 0 0 -1.2 .62"/>
+      </filter>
+      <radialGradient id="vig" cx="960" cy="540" r="1150" gradientUnits="userSpaceOnUse">
+        <stop offset=".6" stop-color="#5A3A1C" stop-opacity="0"/><stop offset="1" stop-color="#5A3A1C" stop-opacity=".42"/>
+      </radialGradient>
+      <!-- old ink: a touch of wobble on every line -->
+      <filter id="ink" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="8" result="w"/>
+        <feDisplacementMap in="SourceGraphic" in2="w" scale="3" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+      <clipPath id="disc"><circle cx="1460" cy="556" r="356"/></clipPath>
+    </defs>
+
+    <rect width="1920" height="1080" fill="#F1E6CC"/>
+    <rect width="1920" height="1080" fill="url(#dots)" opacity=".28"/>
+
+    <!-- signature frame: the rings an old cartoon opens with -->
+    <g filter="url(#ink)">
+      <circle cx="1460" cy="556" r="424" fill="#231F1A"/>
+      <circle cx="1460" cy="556" r="404" fill="#C8432B"/>
+      <circle cx="1460" cy="556" r="376" fill="#F1E6CC"/>
+      <circle cx="1460" cy="556" r="368" fill="#231F1A"/>
+      <circle cx="1460" cy="556" r="356" fill="#F6D7A7"/>
+      <g clip-path="url(#disc)" id="burst"></g>
+      <circle cx="1460" cy="556" r="356" fill="url(#dotsBig)" opacity=".35" clip-path="url(#disc)"/>
+      <g clip-path="url(#disc)" id="cast"></g>
+    </g>
+    <g id="notes" filter="url(#ink)"></g>
+
+    <rect width="1920" height="1080" filter="url(#grain)" opacity=".5"/>
+    <g stroke="#FFF6E0" stroke-opacity=".45" stroke-width="2" fill="none"><path d="M1196 0 C1194 300 1199 700 1195 1080"/><path d="M1774 0 C1777 260 1772 600 1776 1080"/><path d="M1012 380 C1012 520 1014 640 1011 760" stroke-width="1.4"/></g>
+    <rect width="1920" height="1080" fill="url(#vig)"/>
+  </svg>
+
+  <nav aria-label="章節"><span>時間地點</span><b>當天流程</b><span>獎項</span><span>交通</span></nav>
+  <div class="copy">
+    <h2>尾牙當天流程</h2>
+    <p class="key">抽獎八點半開始，<em>人在現場才算數</em>。</p>
+  </div>
+  <ul class="items four">
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="1" aria-hidden="true"></svg><div><strong>18:00　報到</strong><span>憑員工證領摸彩券</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="2" aria-hidden="true"></svg><div><strong>18:30　開場致詞</strong><span>總經理五分鐘</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="3" aria-hidden="true"></svg><div><strong>19:00　上菜與表演</strong><span>各部門輪流上台</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="4" aria-hidden="true"></svg><div><strong>20:30　抽獎</strong><span>頭獎現場開出</span></div></li>
+  </ul>
+</div>
+<script>
+const K = '#231F1A', CR = '#FFF8EA', RED = '#C8432B', TEAL = '#2F8C7E';
+// sunburst behind the cast
+let b = '';
+for (let k = 0; k < 24; k++) { const a1 = k * Math.PI / 12, a2 = a1 + Math.PI / 24; b += `<path d="M1460 556 L${1460 + Math.cos(a1) * 520} ${556 + Math.sin(a1) * 520} L${1460 + Math.cos(a2) * 520} ${556 + Math.sin(a2) * 520} Z" fill="#EDB777" opacity=".55"/>`; }
+document.getElementById('burst').innerHTML = b;
+
+const hose = (d, w = 17) => `<path d="${d}" fill="none" stroke="${K}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+// white four-finger glove, drawn pointing up, then turned
+function glove(x, y, rot, s = 1) {
+  const f = (x1, y1, x2, y2, w = 14) => `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${K}" stroke-width="${w + 6}" stroke-linecap="round"/><path d="M${x1} ${y1} L${x2} ${y2}" stroke="${CR}" stroke-width="${w}" stroke-linecap="round"/>`;
+  return `<g transform="translate(${x} ${y}) rotate(${rot}) scale(${s})">
+    ${f(-18, 6, -32, -6)}${f(-13, -6, -16, -32)}${f(-4, -10, -5, -40)}${f(6, -10, 7, -40)}${f(14, -6, 17, -30)}
+    <circle cy="6" r="21" fill="${CR}" stroke="${K}" stroke-width="4"/>
+    <path d="M-15 0 h0 M-9 -4 C-6 4 -6 12 -8 18 M0 -5 C2 4 2 12 0 18 M9 -4 C11 4 11 12 9 18" stroke="${K}" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="-19" y="24" width="38" height="18" rx="8" fill="${CR}" stroke="${K}" stroke-width="4"/>
+    <path d="M-14 31 H14" stroke="${K}" stroke-width="2.5"/>
+  </g>`;
+}
+const shoe = (x, y, flip) => `<g transform="translate(${x} ${y}) scale(${flip ? -1 : 1} 1)"><path d="M-14 -10 C-10 -26 30 -30 48 -14 C62 -2 56 14 34 16 L-14 16 C-26 14 -24 -2 -14 -10 Z" fill="${K}"/><ellipse cx="26" cy="-12" rx="12" ry="5" fill="#8B7E70" transform="rotate(-12 26 -12)"/></g>`;
+const pieEye = (x, y, rx = 13, ry = 21) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${K}"/><path d="M${x + 1} ${y - 4} L${x + rx + 2} ${y - ry * .8} L${x + rx + 3} ${y + 2} Z" fill="${CR}"/>`;
+
+let c = '';
+// the MC: a ribbon microphone that came to life
+c += hose('M1420 744 C1424 800 1390 840 1364 872') + hose('M1440 744 C1450 800 1478 832 1500 866') + shoe(1352, 880, true) + shoe(1508, 872, false);
+c += `<path d="M1418 590 L1442 590 L1446 750 L1414 750 Z" fill="#8B7E70" stroke="${K}" stroke-width="5"/>`;
+c += hose('M1352 520 C1300 520 1262 470 1258 400') + glove(1258, 384, -12, 1.05);
+c += hose('M1508 530 C1556 536 1592 580 1604 616') + glove(1612, 632, 150, 1);
+c += `<ellipse cx="1430" cy="470" rx="96" ry="124" fill="#CFC6B4" stroke="${K}" stroke-width="7"/>`;
+for (let y = 372; y <= 572; y += 16) { const hw = 92 * Math.sqrt(Math.max(0, 1 - Math.pow((y - 470) / 122, 2))); c += `<path d="M${1430 - hw + 6} ${y} H${1430 + hw - 6}" stroke="#8B7E70" stroke-width="3"/>`; }
+c += `<path d="M1336 452 C1360 440 1500 440 1524 452 L1524 488 C1500 500 1360 500 1336 488 Z" fill="${RED}" stroke="${K}" stroke-width="6"/>`;
+c += `<ellipse cx="1430" cy="420" rx="62" ry="40" fill="${CR}" stroke="${K}" stroke-width="5"/>` + pieEye(1408, 418, 11, 18) + pieEye(1452, 418, 11, 18);
+c += `<path d="M1384 520 C1400 590 1460 590 1476 520 C1450 534 1410 534 1384 520 Z" fill="${K}"/><ellipse cx="1430" cy="562" rx="22" ry="11" fill="${RED}"/>`;
+// a red envelope, jumping for joy
+c += `<g transform="translate(1640 700) rotate(9)">
+  ${hose('M-30 70 C-40 110 -70 120 -88 112')}${hose('M24 70 C40 104 30 132 50 150')}${shoe(-96, 118, true)}${shoe(58, 154, false)}
+  ${hose('M-56 -20 C-96 -40 -110 -86 -100 -118')}${glove(-100, -132, -18, .82)}
+  ${hose('M56 -16 C90 -40 108 -76 104 -110')}${glove(104, -126, 16, .82)}
+  <rect x="-62" y="-92" width="124" height="166" rx="10" fill="${RED}" stroke="${K}" stroke-width="6"/>
+  <path d="M-62 -60 L0 -26 L62 -60" fill="none" stroke="${K}" stroke-width="5"/>
+  <circle cx="0" cy="-26" r="17" fill="#E9B949" stroke="${K}" stroke-width="4"/><rect x="-6" y="-32" width="12" height="12" fill="${RED}"/>
+  ${pieEye(-20, 12, 9, 15)}${pieEye(20, 12, 9, 15)}
+  <path d="M-26 40 C-14 64 14 64 26 40 C10 48 -10 48 -26 40 Z" fill="${K}"/>
+</g>`;
+document.getElementById('cast').innerHTML = c;
+
+// notes and confetti outside the frame
+let n = '';
+const note = (x, y, s, col) => `<g transform="translate(${x} ${y}) scale(${s})"><ellipse cx="0" cy="0" rx="16" ry="12" transform="rotate(-24)" fill="${col}" stroke="${K}" stroke-width="3"/><path d="M14 -4 V-70 C30 -60 44 -52 40 -30" fill="none" stroke="${K}" stroke-width="6" stroke-linecap="round"/></g>`;
+n += note(1092, 330, 1.1, TEAL) + note(1858, 250, 1, RED) + note(1866, 840, .9, TEAL);
+[[1040, 240, RED, 20], [1124, 900, TEAL, -30], [1832, 136, '#E9B949', 40], [1890, 520, RED, -15], [1068, 760, '#E9B949', 60], [1712, 990, RED, 10]].forEach(([x, y, col, r]) => n += `<rect x="${x}" y="${y}" width="22" height="12" fill="${col}" stroke="${K}" stroke-width="2.5" transform="rotate(${r} ${x} ${y})"/>`);
+document.getElementById('notes').innerHTML = n;
+
+// list badges: film countdown leaders
+document.querySelectorAll('svg.badge').forEach(el => {
+  const k = +el.dataset.n, a = -Math.PI / 2 + k * Math.PI / 2;
+  el.innerHTML = `<circle cx="43" cy="43" r="40" fill="#F6D7A7" stroke="${K}" stroke-width="4"/>
+    <path d="M43 43 L43 7 A36 36 0 ${k > 2 ? 1 : 0} 1 ${43 + Math.cos(a) * 36} ${43 + Math.sin(a) * 36} Z" fill="#E3A866"/>
+    <circle cx="43" cy="43" r="31" fill="none" stroke="${K}" stroke-width="2"/><path d="M3 43 H83 M43 3 V83" stroke="${K}" stroke-width="2"/>
+    <circle cx="43" cy="43" r="21" fill="#F6D7A7" stroke="${K}" stroke-width="2"/><text class="cd" x="43" y="58" text-anchor="middle">${k}</text>`;
+});
+</script>
+</body>
+</html>
