@@ -2,11 +2,11 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<title>梵谷筆觸融合版（B）｜創意工作坊：字寫在畫上的一層薄釉</title>
+<title>梵谷筆觸深色版（B）｜創意工作坊：深鈷藍的白天天空，字寫在一層薄釉上</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
 <link rel="stylesheet" href="../../illustration-renderings/src/base.css">
 <style>
-  :root{--bg:#1F3B73;--ink:#F6EBC8;--ink2:#EFE3BD;--sub:#CFC6A6;--accent:#F4C542}
+  :root{--bg:#1F4288;--ink:#F6EBC8;--ink2:#EFE3BD;--sub:#CFC6A6;--accent:#F4C542}
   .bn{font:900 30px/1 "Chiron GoRound TC";fill:#1A2F5E}
 </style>
 </head>
@@ -47,7 +47,6 @@ function flow(x, y) {
   for (const [cx, cy, s, r] of vort) { const dx = x - cx, dy = y - cy, d = Math.sqrt(dx * dx + dy * dy) + 1, f = k * s * r * r * 2.4 / (d * d + r * r); vx += -dy / d * f; vy += dx / d * f; }
   return Math.atan2(vy, vx);
 }
-const stars = [[1190, 150, 46], [1430, 96, 40], [1580, 330, 36], [1250, 430, 30], [1880, 260, 34], [1720, 70, 30], [300, 200, 40], [760, 120, 34], [560, 560, 30]];
 layer();
 for (let y = 6; y < 1080; y += 15) for (let x = 6; x < 1920; x += 15) {
   const px = x + (rand() - .5) * 10, py = y + (rand() - .5) * 10, calm = false;
@@ -55,16 +54,19 @@ for (let y = 6; y < 1080; y += 15) for (let x = 6; x < 1920; x += 15) {
   if (calm) col = pick(['#1C3870', '#1F3D78', '#22417C', '#1A3366', '#24467F']);
   else {
     const near = vort.some(([cx, cy, , r]) => Math.hypot(px - cx, py - cy) < r * 1.1);
-    col = near ? pick(['#3A6BB0', '#5C8FD1', '#9CC3E8', '#2F5DA0', '#7FB0DD']) : pick(['#1F3D78', '#27508F', '#2F5DA0', '#1C3870', '#3A6BB0', '#4A7DC2']);
+    col = near ? pick(['#3E70BC', '#5C8FD6', '#9CC3E8', '#3264B0', '#7FB0DD']) : pick(['#1F4590', '#2752A0', '#2E5DAE', '#1D3F86', '#3A6BBA', '#4677C4']);
   }
   st(px, py, flow(px, py) + (rand() - .5) * .25, 18 + rand() * 14, col, calm ? 7 : 8 + Math.round(rand() * 2));
 }
-// stars and the moon: rings of strokes
+// daytime, as the workshop is: no stars or moon; white clouds turn in two of the vortices and one sun burns where the moon was
 layer();
 const ring = (cx, cy, R, pal) => { for (let r = 6; r <= R; r += 8) { const n = Math.max(5, Math.round(2 * Math.PI * r / 13)); for (let k = 0; k < n; k++) { const t = k / n * Math.PI * 2 + rand() * .2; st(cx + Math.cos(t) * r, cy + Math.sin(t) * r, t + Math.PI / 2, 14, pal(r / R), 7); } } };
-stars.forEach(([x, y, R]) => ring(x, y, R, f => f < .3 ? '#FFF6C8' : f < .6 ? pick(['#F8E08A', '#F4C542']) : f < .85 ? pick(['#F4C542', '#E8C860']) : pick(['#9CC3E8', '#BFD8EC'])));
-ring(1800, 150, 70, f => f < .75 ? pick(['#F4C542', '#F8E08A']) : pick(['#E8C860', '#9CC3E8']));
-for (let y = 100; y < 202; y += 9) for (let x = 1748; x < 1856; x += 9) { if (Math.hypot(x - 1800, y - 150) < 50 && Math.hypot(x - 1822, y - 136) > 44) st(x, y, flow(x, y), 12, pick(['#FFF0A8', '#F8E08A']), 7); }
+const CLOUD = typeof CLOUD_PAL !== 'undefined' ? CLOUD_PAL : [['#E9EEF2', '#F4F6F8'], ['#BFD3E6', '#D5E2EE', '#9CC3E8']];
+// clouds are long, as in his daytime fields: strokes laid along flattened ellipses, not round like a moon
+const cloud = (cx, cy, Rx, Ry) => { for (let f = .12; f <= 1; f += .14) { const n = Math.max(6, Math.round(2 * Math.PI * Rx * f / 15)); for (let k = 0; k < n; k++) { const t = k / n * Math.PI * 2 + rand() * .15, x = cx + Math.cos(t) * Rx * f, y = cy + Math.sin(t) * Ry * f; st(x, y, Math.atan2(Math.cos(t) * Ry, -Math.sin(t) * Rx), 15, f < .6 ? pick(CLOUD[0]) : pick(CLOUD[1]), 7); } } };
+cloud(1320, 300, 170, 48); cloud(1150, 160, 120, 36);
+ring(1770, 170, 92, f => f < .35 ? '#FFF6C8' : f < .7 ? pick(['#F8E08A', '#F4C542']) : pick(['#F4C542', '#E8A33A']));
+for (let k = 0; k < 28; k++) { const t = k / 28 * Math.PI * 2; st(1770 + Math.cos(t) * 122, 170 + Math.sin(t) * 122, t, 28, pick(['#F4C542', '#E8C860', '#F8E08A']), 7); }
 // cypress, like a dark flame
 layer();
 for (let y = 330; y < 1090; y += 9) {
@@ -107,7 +109,7 @@ const draw = Ly => {
 };
 let out = '<defs><filter id="frost" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080"><feGaussianBlur stdDeviation="7"/></filter>'
   + '<clipPath id="glaze"><rect x="96" y="34" width="896" height="918" rx="36"/></clipPath></defs>';
-out += '<rect width="1920" height="1080" fill="#1F3B73"/><g id="paint">' + draw(layers[0]) + draw(layers[1]) + '</g>';
+out += '<rect width="1920" height="1080" fill="#1F4288"/><g id="paint">' + draw(layers[0]) + draw(layers[1]) + '</g>';
 // the glaze: the same sky, softened and darkened, with painted edges
 out += '<g clip-path="url(#glaze)"><use href="#paint" filter="url(#frost)"/><rect x="96" y="34" width="896" height="918" fill="#13254F" opacity=".58"/></g>';
 let edge = '';
@@ -121,7 +123,7 @@ out += `<path d="${div}" stroke="#E8C860" stroke-opacity=".75" stroke-width="5" 
 layers.slice(2).forEach(Ly => out += draw(Ly));
 document.getElementById('scene').innerHTML = out;
 
-// list badges: a small star, painted
+// list badges: a small sun, painted
 document.querySelectorAll('svg.badge').forEach(el => {
   let s = '';
   for (let r = 30; r <= 48; r += 8) { const n = Math.round(2 * Math.PI * r / 12); for (let k = 0; k < n; k++) { const t = k / n * Math.PI * 2, x = 52 + Math.cos(t) * r, y = 52 + Math.sin(t) * r, a = t + Math.PI / 2; s += `<path d="M${(x - Math.cos(a) * 6).toFixed(1)} ${(y - Math.sin(a) * 6).toFixed(1)}L${(x + Math.cos(a) * 6).toFixed(1)} ${(y + Math.sin(a) * 6).toFixed(1)}" stroke="${r < 40 ? '#F4C542' : '#9CC3E8'}" stroke-width="6" stroke-linecap="round"/>`; } }
