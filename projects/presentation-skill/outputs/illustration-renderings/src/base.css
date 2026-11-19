@@ -1,0 +1,25 @@
+/* Shared text layer for every illustration rendering. Per the spec, switching rendering keeps the
+   text and layout; only the picture, texture, palette and signature frame change.
+   Each page sets --bg, --ink, --ink2, --sub and --accent. */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+.slide{position:relative;width:1920px;height:1080px;overflow:hidden;color:var(--ink);font-family:"Noto Sans TC",sans-serif;background:var(--bg)}
+svg.scene,svg.over{position:absolute;left:0;top:0;width:1920px;height:1080px}
+nav{position:absolute;left:140px;top:66px;display:flex;gap:44px;font:500 24px/1 "Noto Sans TC";color:var(--sub);letter-spacing:.04em}
+nav b{display:flex;align-items:center;gap:12px;color:var(--ink);font-weight:700}
+nav b::before{content:"";width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.copy{position:absolute;left:140px;top:190px;width:900px}
+.copy h2{font:900 76px/1.2 "Chiron GoRound TC";letter-spacing:.03em}
+.copy p.key{margin-top:30px;font:700 34px/1.5 "Noto Sans TC";color:var(--ink2);letter-spacing:.03em}
+.copy p.key em{font-style:normal;color:var(--accent)}
+ul.items{position:absolute;left:140px;top:470px;list-style:none;display:grid;gap:34px}
+ul.items li{display:grid;grid-template-columns:104px 1fr;align-items:center;column-gap:30px}
+ul.items .badge{width:104px;height:104px;overflow:visible}
+ul.items strong{display:block;font:700 34px/1.25 "Noto Sans TC";letter-spacing:.03em}
+ul.items span{display:block;margin-top:6px;font:400 26px/1.4 "Noto Sans TC";color:var(--sub);letter-spacing:.02em}
+ul.items.four{top:452px;gap:24px}
+ul.items.four li{grid-template-columns:86px 1fr}
+ul.items.four .badge{width:86px;height:86px}
+ul.items.five{top:440px;gap:14px}
+ul.items.five li{grid-template-columns:72px 1fr}
+ul.items.five .badge{width:72px;height:72px}
