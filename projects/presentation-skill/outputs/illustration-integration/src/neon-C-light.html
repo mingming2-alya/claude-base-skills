@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>霓虹淺色版（C）｜第一週會遇到的人：店裡燈全開的白漆磚牆，燈管照樣亮著</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#ECEAEE;--ink:#23263A;--ink2:#383C52;--sub:#596075;--accent:#D41E73}
+  ul.items.people{top:438px;width:1660px;grid-template-columns:repeat(3,1fr);gap:0 40px}
+  ul.items.people li{grid-template-columns:34px 1fr;column-gap:14px;align-items:start}
+  ul.items.people .badge{width:34px;height:34px;margin-top:6px;overflow:visible}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="glow" filterUnits="userSpaceOnUse" x="-100" y="-100" width="2120" height="1280"><feGaussianBlur stdDeviation="9"/></filter>
+      <filter id="cast" filterUnits="userSpaceOnUse" x="-100" y="-100" width="2120" height="1280"><feGaussianBlur stdDeviation="2.6"/></filter>
+      <filter id="paint" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .38  0 0 0 0 .38  0 0 0 0 .44  0 0 0 -1 .52"/>
+      </filter>
+      <!-- whitewashed brick: the paint fills the bricks, the recessed joints stay a shade darker -->
+      <pattern id="brick" width="120" height="60" patternUnits="userSpaceOnUse"><rect width="120" height="60" fill="#EEECF0"/><path d="M0 1.5 H120 M0 31.5 H120 M30 0 V30 M90 30 V60" stroke="#D6D3DC" stroke-width="3"/><path d="M0 4 H120 M0 34 H120" stroke="#F8F7FA" stroke-width="1.2"/></pattern>
+      <radialGradient id="roomLight" cx="300" cy="120" r="2000" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/><stop offset=".7" stop-color="#C9C6D2" stop-opacity=".18"/><stop offset="1" stop-color="#A9A5B6" stop-opacity=".32"/></radialGradient>
+      <linearGradient id="floorG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D8D6DD"/><stop offset="1" stop-color="#C4C1CB"/></linearGradient>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#brick)"/>
+    <rect width="1920" height="1080" filter="url(#paint)" opacity=".16" style="mix-blend-mode:multiply"/>
+    <rect width="1920" height="1080" fill="url(#roomLight)"/>
+    <g id="room"></g>
+  </svg>
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，先認識<em>這三個人</em>就好。</p>
+  </div>
+  <ul class="items people">
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#EC3A8C" aria-hidden="true"></svg><div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div></li>
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#13B26B" aria-hidden="true"></svg><div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div></li>
+    <li><svg class="badge" viewBox="0 0 34 34" data-c="#E8A400" aria-hidden="true"></svg><div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div></li>
+  </ul>
+</div>
+<script src="office.js"></script>
+<script>
+// Neon with the room lights on: the same tubes, still lit. In a bright room the glow shrinks to a faint halo,
+// the colour sits in the glass, the hot core shows as a pale line, and you can see what daylight shows:
+// each tube stands off the wall on clips and throws a thin shadow down-right (light from the upper left).
+const P = { frame: '#5B7BB4', glass: '#00A3C2', wood: '#EE7A22', cream: '#8C95AE', screen: '#00A3C2', peach: '#EC3A8C', sage: '#13B26B', butter: '#E8A400', terra: '#EF5A3C', skin: '#EA9468', hair: '#EE7A22', dark: '#59608E', cal: '#8794BA', accent: '#E33585', white: '#8C95AE', floor: '#5B7BB4' };
+// the hot core: the tube colour mixed most of the way to white
+const core = (c) => { const n = parseInt(c.slice(1), 16), m = (v) => Math.round(v + (255 - v) * .72); return `rgb(${m(n >> 16)},${m((n >> 8) & 255)},${m(n & 255)})`; };
+const tube = (frag, c, w = 4) => `<g fill="none" stroke="#262838" stroke-width="${w + 2}" opacity=".2" filter="url(#cast)" transform="translate(5 8)" stroke-linecap="round" stroke-linejoin="round">${frag}</g>`
+  + `<g fill="none" stroke="${c}" stroke-width="${w + 12}" opacity=".2" filter="url(#glow)" stroke-linecap="round" stroke-linejoin="round">${frag}</g>`
+  + `<g class="tb" fill="none" stroke="${c}" stroke-width="${w + 2}" stroke-linecap="round" stroke-linejoin="round">${frag}</g>`
+  + `<g fill="none" stroke="${core(c)}" stroke-width="${Math.max(1.3, w * .42)}" stroke-linecap="round" stroke-linejoin="round">${frag}</g>`;
+const S = {
+  fill: (frag, c) => `<g fill="${P[c]}" opacity=".06">${frag}</g>` + tube(frag, P[c]),
+  line: (d, c, w) => tube(`<path d="${d}"/>`, P[c], w > 12 ? 5 : Math.min(w, 4)),
+  dot: (x, y, r, c) => `<circle cx="${x + 2}" cy="${y + 3}" r="${r}" fill="#262838" opacity=".16"/><circle cx="${x}" cy="${y}" r="${r}" fill="${P[c]}"/>`,
+  floor: (y) => `<rect x="-10" y="${y}" width="1940" height="190" fill="url(#floorG)"/>`,
+};
+let r = officeScene(S);
+// signature: the sign frame of tubes around the title, with its electrode housings and the cable up to the ceiling
+r += tube('<rect x="104" y="160" width="880" height="232" rx="34"/>', '#EC3A8C', 4) + tube('<rect x="122" y="178" width="844" height="196" rx="24"/>', '#00A3C2', 2);
+r += `<path d="M952 160 C952 110 968 60 990 0" fill="none" stroke="#3A3D4C" stroke-width="3"/><g transform="translate(5 7)" opacity=".18"><rect x="940" y="146" width="24" height="16" rx="5" fill="#262838" filter="url(#cast)"/></g><rect x="940" y="146" width="24" height="16" rx="5" fill="#4A4E60"/><rect x="944" y="149" width="16" height="4" rx="2" fill="#6E7388"/>`;
+document.getElementById('room').innerHTML = r;
+// clips: every long tube is held off the wall at regular intervals
+let clips = '';
+document.querySelectorAll('#room g.tb > *').forEach(el => {
+  if (!el.getTotalLength) return;
+  const len = el.getTotalLength();
+  if (len < 200) return;
+  for (let d = 90; d < len - 60; d += 210) {
+    const p = el.getPointAtLength(d);
+    clips += `<circle cx="${p.x + 3}" cy="${p.y + 4}" r="4" fill="#262838" opacity=".14"/><circle cx="${p.x}" cy="${p.y}" r="3.4" fill="#E3E5EC" stroke="#8A8FA2" stroke-width="1.2"/>`;
+  }
+});
+document.getElementById('room').insertAdjacentHTML('beforeend', clips);
+document.querySelectorAll('svg.badge').forEach(el => el.innerHTML = `<circle cx="20" cy="22" r="11" fill="none" stroke="#262838" stroke-width="5" opacity=".18" filter="url(#cast)"/><circle cx="17" cy="17" r="11" fill="none" stroke="${el.dataset.c}" stroke-width="10" opacity=".16" filter="url(#glow)"/><circle cx="17" cy="17" r="11" fill="none" stroke="${el.dataset.c}" stroke-width="5"/><circle cx="17" cy="17" r="11" fill="none" stroke="${core(el.dataset.c)}" stroke-width="1.8"/>`);
+</script>
+</body>
+</html>

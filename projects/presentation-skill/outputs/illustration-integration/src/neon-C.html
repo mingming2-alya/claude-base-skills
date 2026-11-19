@@ -48,8 +48,6 @@ const S = {
 let r = officeScene(S);
 // signature: a sign frame of tubes around the title
 r += tube('<rect x="104" y="160" width="880" height="232" rx="34"/>', '#FF6FB5', 4) + tube('<rect x="122" y="178" width="844" height="196" rx="24"/>', '#33E6F0', 2);
-// the window shows the night: a moon in tube
-r += tube('<path d="M1700 170 a40 40 0 1 0 30 70 a32 32 0 1 1 -30 -70 z"/>', '#FFD84A', 3);
 document.getElementById('room').innerHTML = r;
 document.querySelectorAll('svg.badge').forEach(el => el.innerHTML = `<circle cx="17" cy="17" r="11" fill="none" stroke="${el.dataset.c}" stroke-width="9" opacity=".5" filter="url(#glow)"/><circle cx="17" cy="17" r="11" fill="none" stroke="${el.dataset.c}" stroke-width="4"/><circle cx="17" cy="17" r="11" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity=".8"/>`);
 </script>
