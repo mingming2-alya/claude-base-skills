@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-Hant" data-light="dark">
+<head>
+<meta charset="utf-8">
+<title>紙黏土深色版（C）｜第一週會遇到的人：拉上百葉窗、關掉大燈的同一個房間</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="../../illustration-renderings/src/base.css">
+<style>
+  :root{--bg:#3A2721;--ink:#F9ECE1;--ink2:#EBDCCE;--sub:#CDBAAB;--accent:#F2A27F}
+  ul.items.people{top:438px;width:1660px;grid-template-columns:repeat(3,1fr);gap:0 40px}
+  ul.items.people li{grid-template-columns:30px 1fr;column-gap:16px;align-items:start}
+  ul.items.people .badge{width:30px;height:30px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs id="defs">
+      <!-- the main light is off: the wall keeps only a faint warm wash from the upper left -->
+      <radialGradient id="wall" cx="420" cy="160" r="1700" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#4A3129"/><stop offset=".55" stop-color="#3A2620"/><stop offset="1" stop-color="#2A1B17"/>
+      </radialGradient>
+      <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5C4433"/><stop offset="1" stop-color="#3E2C21"/></linearGradient>
+      <linearGradient id="slat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#B6AA97"/><stop offset="1" stop-color="#857A69"/></linearGradient>
+      <radialGradient id="lampPool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFC982" stop-opacity=".55"/><stop offset=".45" stop-color="#FFB46A" stop-opacity=".2"/><stop offset="1" stop-color="#FFB46A" stop-opacity="0"/></radialGradient>
+      <radialGradient id="screenPool" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#CFF3E2" stop-opacity=".42"/><stop offset="1" stop-color="#CFF3E2" stop-opacity="0"/></radialGradient>
+      <radialGradient id="led" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFD07A" stop-opacity=".8"/><stop offset="1" stop-color="#FFD07A" stop-opacity="0"/></radialGradient>
+      <radialGradient id="falloff" cx="250" cy="640" r="1750" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".3" stop-color="#F1E9E4"/><stop offset=".75" stop-color="#C4B6AD"/><stop offset="1" stop-color="#A8988E"/></radialGradient>
+      <linearGradient id="cone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD9A0" stop-opacity=".34"/><stop offset="1" stop-color="#FFD9A0" stop-opacity="0"/></linearGradient>
+    </defs>
+    <rect width="1920" height="1080" fill="url(#wall)"/>
+    <rect width="1920" height="1080" filter="url(#grain)" opacity=".22" style="mix-blend-mode:multiply"/>
+    <g id="objs"></g>
+    <!-- the lamp is the only real light: everything falls off away from it -->
+    <rect width="1920" height="1080" fill="url(#falloff)" style="mix-blend-mode:multiply"/>
+  </svg>
+  <nav aria-label="章節"><span>報到前</span><b>第一週</b><span>第一個月</span><span>找誰幫忙</span></nav>
+  <div class="copy">
+    <h2>第一週會遇到的人</h2>
+    <p class="key">不用急著學會一切，先認識<em>這三個人</em>就好。</p>
+  </div>
+  <ul class="items people">
+    <li><svg class="badge" viewBox="0 0 30 30" data-c="gPeach" aria-hidden="true"></svg><div><strong>你的導師</strong><span>有問題先問他，再小的事都可以</span></div></li>
+    <li><svg class="badge" viewBox="0 0 30 30" data-c="gSage" aria-hidden="true"></svg><div><strong>你的主管</strong><span>週五一起看你的第一個小任務</span></div></li>
+    <li><svg class="badge" viewBox="0 0 30 30" data-c="gButter" aria-hidden="true"></svg><div><strong>隔壁的夥伴</strong><span>午餐、會議室、印表機，都問他</span></div></li>
+  </ul>
+</div>
+<script src="clay.js"></script>
+<script>
+// The light version's room with the blinds down and the main light off. Nothing says what time it is:
+// the light comes from the desk lamp, the laptop screen and the machines, and still falls from the upper left.
+const FLOOR = 905;
+const D = { leg: '#AB854A', trouser: '#5A493A', shoe: '#453528', hair: '#5C3B27', cellOn: '#B87E60', cell: '#A9987C', ring: '#E07A55',
+            seam: '#6E5B49', panel: '#3A2114', slot: '#2A1A12', paper: '#B6AC9B', eye: '#2E1D14', mouth: '#8D2A00', blush: '#C76A4A', handle: '#A34825' };
+let s = '';
+// window high on the right wall, blinds down: only thin warm lines between the slats
+s += `<g filter="url(#clay)"><rect x="1250" y="92" width="560" height="296" rx="26" fill="url(#gCream)"/></g>`;
+s += `<rect x="1276" y="118" width="508" height="244" rx="14" fill="#2C211C"/>`;
+for (let y = 124; y < 356; y += 26) s += `<rect x="1280" y="${y}" width="500" height="20" rx="6" fill="url(#slat)"/><rect x="1280" y="${y + 20}" width="500" height="2" fill="#E9D7B8" opacity=".35"/>`;
+s += `<path d="M1766 118 V316" stroke="#CBB89A" stroke-width="3"/><g filter="url(#claySm)"><rect x="1758" y="312" width="16" height="30" rx="8" fill="url(#gCream)"/></g>`;
+// floor and skirting
+s += `<rect x="0" y="${FLOOR}" width="1920" height="${1080 - FLOOR}" fill="url(#floor)"/>`;
+for (let x = 0; x < 1920; x += 160) s += `<path d="M${x} ${FLOOR + 6} L${x - 90} 1080" stroke="#2E2018" stroke-width="3" opacity=".7"/>`;
+s += `<g filter="url(#claySm)"><rect x="-20" y="${FLOOR - 14}" width="1960" height="20" rx="6" fill="url(#gCream)"/></g>`;
+// pools of light on the floor and wall from the lamp and the screens
+s += `<ellipse cx="330" cy="${FLOOR + 40}" rx="420" ry="90" fill="url(#lampPool)"/>`;
+s += `<ellipse cx="290" cy="700" rx="300" ry="190" fill="url(#lampPool)" opacity=".75"/>`;
+
+function person(cx, shirt, pose) {
+  const arm = (d) => `<path d="${d}" fill="none" stroke="url(#${shirt})" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const hand = (x, y) => `<circle cx="${x}" cy="${y}" r="17" fill="url(#gSkin)"/>`;
+  let a = '', front = '';
+  if (pose === 'wave') { a += arm(`M${cx - 54} 690 L${cx - 78} 790`) + hand(cx - 80, 798); front += arm(`M${cx + 54} 690 L${cx + 96} 640 L${cx + 106} 582`) + hand(cx + 108, 572); }
+  if (pose === 'point') { a += arm(`M${cx + 54} 690 L${cx + 78} 790`) + hand(cx + 80, 798); front += arm(`M${cx - 54} 690 L${cx - 120} 668 L${cx - 168} 650`) + hand(cx - 176, 646); }
+  if (pose === 'mug') { a += arm(`M${cx - 54} 690 L${cx - 78} 790`) + hand(cx - 80, 798); front += arm(`M${cx + 54} 690 L${cx + 84} 760 L${cx + 52} 772`) + `<g><rect x="${cx + 24}" y="${742}" width="46" height="54" rx="10" fill="url(#gTerra)"/><path d="M${cx + 70} 756 c18 0 18 26 0 26" stroke="${D.handle}" stroke-width="8" fill="none"/></g>` + hand(cx + 46, 772); }
+  return `<g filter="url(#clay)">
+    <rect x="${cx - 32}" y="808" width="30" height="${FLOOR - 812}" rx="15" fill="${D.trouser}"/><rect x="${cx + 2}" y="808" width="30" height="${FLOOR - 812}" rx="15" fill="${D.trouser}"/>
+    <ellipse cx="${cx - 22}" cy="${FLOOR - 4}" rx="26" ry="12" fill="${D.shoe}"/><ellipse cx="${cx + 22}" cy="${FLOOR - 4}" rx="26" ry="12" fill="${D.shoe}"/>
+    ${a}
+    <rect x="${cx - 64}" y="664" width="128" height="170" rx="54" fill="url(#${shirt})"/>
+    <circle cx="${cx}" cy="606" r="52" fill="url(#gSkin)"/>
+    <path d="M${cx - 52} 600 C${cx - 52} 548 ${cx + 52} 540 ${cx + 52} 592 C${cx + 30} 574 ${cx - 20} 572 ${cx - 52} 600 Z" fill="${D.hair}"/>
+    ${front}
+  </g>
+  <circle cx="${cx - 17}" cy="612" r="5.5" fill="${D.eye}"/><circle cx="${cx + 17}" cy="612" r="5.5" fill="${D.eye}"/>
+  <path d="M${cx - 14} 632 q14 12 28 0" stroke="${D.mouth}" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  <circle cx="${cx - 30}" cy="628" r="9" fill="${D.blush}" opacity=".45"/><circle cx="${cx + 30}" cy="628" r="9" fill="${D.blush}" opacity=".45"/>`;
+}
+const X1 = 140, X2 = 700, X3 = 1260;
+// station 1: the mentor at the desk; a clay desk lamp at the left end of the desk is the room's key light
+s += `<g filter="url(#clay)"><rect x="${X1 + 20}" y="716" width="290" height="24" rx="10" fill="url(#gButter)"/><rect x="${X1 + 40}" y="736" width="22" height="${FLOOR - 736}" rx="8" fill="${D.leg}"/><rect x="${X1 + 268}" y="736" width="22" height="${FLOOR - 736}" rx="8" fill="${D.leg}"/></g>`;
+s += `<path d="M${X1 + 92} 576 L${X1 + 24} 716 H${X1 + 300} Z" fill="url(#cone)"/>`;
+s += `<g filter="url(#claySm)"><ellipse cx="${X1 + 40}" cy="710" rx="30" ry="9" fill="url(#gTerra)"/><path d="M${X1 + 40} 706 L${X1 + 30} 618 L${X1 + 78} 572" fill="none" stroke="url(#gTerra)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M${X1 + 60} 556 L${X1 + 108} 552 L${X1 + 122} 600 L${X1 + 64} 606 Z" fill="url(#gTerra)"/></g>`;
+s += `<ellipse cx="${X1 + 94}" cy="604" rx="24" ry="7" fill="#FFF1D2"/><ellipse cx="${X1 + 94}" cy="604" rx="60" ry="26" fill="url(#led)" opacity=".7"/>`;
+s += `<g filter="url(#clay)"><rect x="${X1 + 86}" y="594" width="168" height="114" rx="12" fill="url(#gCream)"/><rect x="${X1 + 70}" y="704" width="200" height="14" rx="7" fill="url(#gBase)"/></g>`;
+s += `<ellipse cx="${X1 + 170}" cy="651" rx="190" ry="120" fill="url(#screenPool)"/><rect x="${X1 + 98}" y="606" width="144" height="90" rx="8" fill="url(#gScreen)"/>`;
+s += person(X1 + 400, 'gPeach', 'wave');
+// station 2: the manager at the board, pointing at Friday
+s += `<g filter="url(#clay)"><path d="M${X2 + 80} 772 L${X2 + 56} ${FLOOR}" stroke="${D.leg}" stroke-width="16" stroke-linecap="round"/><path d="M${X2 + 250} 772 L${X2 + 274} ${FLOOR}" stroke="${D.leg}" stroke-width="16" stroke-linecap="round"/><rect x="${X2 + 30}" y="586" width="270" height="190" rx="16" fill="url(#gCream)"/></g>`;
+let cal = '';
+for (let r = 0; r < 3; r++) for (let c = 0; c < 5; c++) cal += `<rect x="${X2 + 54 + c * 46}" y="${616 + r * 46}" width="36" height="34" rx="6" fill="${r === 1 && c === 4 ? D.cellOn : D.cell}"/>`;
+s += cal + `<circle cx="${X2 + 256}" cy="${679}" r="27" fill="none" stroke="${D.ring}" stroke-width="5"/>`;
+s += person(X2 + 470, 'gSage', 'point');
+// station 3: the buddy by the coffee machine and printer; their small lights glow in the dark
+s += `<g filter="url(#clay)"><rect x="${X3 + 10}" y="740" width="300" height="${FLOOR - 740}" rx="14" fill="url(#gCream)"/><rect x="${X3}" y="728" width="320" height="22" rx="10" fill="url(#gButter)"/></g>`;
+s += `<path d="M${X3 + 160} 760 V${FLOOR - 20}" stroke="${D.seam}" stroke-width="4"/>`;
+s += `<g filter="url(#clay)"><rect x="${X3 + 40}" y="590" width="120" height="140" rx="16" fill="url(#gTerra)"/><rect x="${X3 + 60}" y="610" width="80" height="34" rx="8" fill="${D.panel}"/><rect x="${X3 + 80}" y="660" width="40" height="14" rx="4" fill="${D.slot}"/><rect x="${X3 + 76}" y="694" width="48" height="36" rx="8" fill="url(#gCream)"/></g>`;
+s += `<circle cx="${X3 + 124}" cy="627" r="22" fill="url(#led)"/><circle cx="${X3 + 124}" cy="627" r="5" fill="#FFE2A6"/><rect x="${X3 + 72}" y="621" width="34" height="12" rx="4" fill="#CFF3E2" opacity=".85"/>`;
+s += `<g filter="url(#clay)"><rect x="${X3 + 186}" y="640" width="120" height="90" rx="14" fill="url(#gBase)"/><rect x="${X3 + 200}" y="626" width="92" height="22" rx="6" fill="${D.paper}"/></g>`;
+s += `<rect x="${X3 + 206}" y="664" width="40" height="16" rx="4" fill="#CFF3E2" opacity=".8"/><circle cx="${X3 + 280}" cy="672" r="16" fill="url(#led)" opacity=".8"/><circle cx="${X3 + 280}" cy="672" r="4" fill="#FFE2A6"/>`;
+s += person(X3 + 420, 'gButter', 'mug');
+document.getElementById('objs').innerHTML = s;
+document.querySelectorAll('svg.badge').forEach(el => { el.innerHTML = `<g filter="url(#claySm)"><circle cx="15" cy="15" r="13" fill="url(#${el.dataset.c})"/></g>`; });
+</script>
+</body>
+</html>
