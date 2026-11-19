@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>插畫場景（埃及壁畫）｜金字塔怎麼蓋</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=block">
+<link rel="stylesheet" href="base.css">
+<style>
+  :root{--bg:#E9D8B4;--ink:#2A2118;--ink2:#36291D;--sub:#594634;--accent:#24508A}
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="scene" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="stone" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".008" numOctaves="4" seed="17" result="m"/>
+        <feColorMatrix in="m" type="matrix" values="0 0 0 0 .62  0 0 0 0 .48  0 0 0 0 .3  1.3 0 0 0 -.55"/>
+      </filter>
+      <filter id="grit" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="2" seed="6"/>
+        <feColorMatrix type="matrix" values="0 0 0 0 .4  0 0 0 0 .3  0 0 0 0 .2  0 0 0 -1.2 .6"/>
+      </filter>
+      <!-- old paint: flaked here and there -->
+      <filter id="aged" filterUnits="userSpaceOnUse" x="0" y="0" width="1920" height="1080">
+        <feTurbulence type="fractalNoise" baseFrequency=".11" numOctaves="2" seed="23" result="g"/>
+        <feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -6 0 0 0 4.9" result="ga"/>
+        <feComposite in="SourceGraphic" in2="ga" operator="in"/>
+      </filter>
+    </defs>
+    <rect width="1920" height="1080" fill="#E9D8B4"/>
+    <rect width="1920" height="1080" filter="url(#stone)" opacity=".5"/>
+    <rect width="1920" height="1080" filter="url(#grit)" opacity=".45"/>
+    <g id="mural" filter="url(#aged)"></g>
+    <g fill="none" stroke="#8A6A44" stroke-linecap="round" opacity=".5"><path d="M1912 600 C1880 640 1890 690 1860 720 C1846 740 1850 770 1830 790" stroke-width="2.4"/><path d="M1240 1080 C1250 1050 1236 1030 1250 1004" stroke-width="2"/></g>
+  </svg>
+
+  <nav aria-label="章節"><span>背景</span><b>四個階段</b><span>人力與時程</span><span>今天的啟示</span></nav>
+  <div class="copy">
+    <h2>金字塔怎麼蓋</h2>
+    <p class="key">四千五百年前的大工程，靠的是<em>先算清楚再動工</em>。</p>
+  </div>
+  <ul class="items four">
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="1" aria-hidden="true"></svg><div><strong>規劃：書記官先算</strong><span>石材、人力、口糧都記在莎草紙上</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="2" aria-hidden="true"></svg><div><strong>採石：就近開採</strong><span>大部分石塊來自工地旁的採石場</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="3" aria-hidden="true"></svg><div><strong>運輸：雪橇加濕沙</strong><span>在沙上潑水，拉起來省一半力</span></div></li>
+    <li><svg class="badge" viewBox="0 0 86 86" data-n="4" aria-hidden="true"></svg><div><strong>堆砌：沿坡道往上</strong><span>一層一層推上去</span></div></li>
+  </ul>
+</div>
+<script>
+const K = '#3A2418', SKIN = '#B5603A', LIN = '#F2EBDC', BLK = '#1E1A18', BLUE = '#2E5E9E', GRN = '#3E8E7E', RED = '#B5452E', YEL = '#D9A441';
+const lim = (d, w = 10) => `<path d="${d}" fill="none" stroke="${K}" stroke-width="${w + 3}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${SKIN}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+// the canon: head in profile with a frontal eye, shoulders square to us, legs in profile
+function man(x, y, s, pose, opt = {}) {
+  const arms = {
+    pull: ['M-22 -136 L-42 -118 L-58 -108', 'M20 -136 L-6 -116 L-36 -104'],
+    point: ['M-22 -136 L-30 -100 L-30 -74', 'M20 -136 L46 -140 L72 -142'],
+    pour: ['M-22 -136 L4 -118 L30 -122', 'M20 -136 L38 -124 L52 -130'],
+    carry: ['M-22 -136 L-34 -170 L-20 -206', 'M20 -136 L34 -172 L24 -208'],
+    work: ['M-22 -136 L0 -112 L30 -112', 'M20 -136 L44 -118 L62 -132'],
+  }[pose];
+  let o = `<g transform="translate(${x} ${y}) scale(${s})">`;
+  o += lim(arms[0]);
+  o += `<path d="M-6 -52 L-16 -6 L-22 -2 L-24 0 L4 0 L0 -6 L8 -52 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/><path d="M8 -52 L22 -8 L18 -2 L44 0 L44 -4 L30 -10 L22 -52 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>`;
+  o += `<path d="M-28 -140 C-28 -118 -16 -100 -14 -92 L16 -92 C18 -100 30 -118 30 -140 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>`;
+  o += `<path d="M-18 -94 L22 -94 L34 -48 L-12 -48 Z" fill="${LIN}" stroke="${K}" stroke-width="2"/><path d="M10 -94 L34 -48 L22 -48 Z" fill="#E2D8C2" stroke="${K}" stroke-width="1.5"/><path d="M-18 -94 L22 -94 L22 -88 L-18 -88 Z" fill="${RED}"/>`;
+  o += `<path d="M-30 -142 C-24 -126 26 -126 32 -142 C20 -134 -18 -134 -30 -142 Z" fill="${BLUE}" stroke="${K}" stroke-width="1.5"/><path d="M-26 -134 C-14 -126 16 -126 28 -134" fill="none" stroke="${GRN}" stroke-width="4"/>`;
+  o += `<path d="M2 -150 L14 -150 L14 -140 L2 -140 Z" fill="${SKIN}"/>`;
+  o += `<path d="M6 -196 C14 -194 22 -188 24 -178 L30 -172 L24 -168 C25 -162 23 -156 18 -152 L4 -150 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>`;
+  o += `<path d="M-14 -206 C2 -212 18 -206 20 -196 L8 -192 L6 -150 C-4 -148 -14 -150 -22 -154 L-22 -186 C-22 -198 -20 -204 -14 -206 Z" fill="${BLK}"/><path d="M-20 -170 H6 M-20 -160 H6" stroke="${BLUE}" stroke-width="2" opacity=".6"/>`;
+  o += `<path d="M10 -182 C14 -186 20 -186 22 -182 C20 -178 14 -178 10 -182 Z" fill="${LIN}" stroke="${BLK}" stroke-width="2"/><circle cx="17" cy="-182" r="2.2" fill="${BLK}"/><path d="M10 -182 L2 -180 M12 -188 C16 -190 20 -190 23 -188" stroke="${BLK}" stroke-width="2" fill="none"/>`;
+  o += lim(arms[1]);
+  if (pose === 'point') o += `<path d="M74 -200 L74 -20" stroke="${K}" stroke-width="5" stroke-linecap="round"/>`;
+  if (pose === 'pour') o += `<path d="M44 -146 C60 -150 72 -136 66 -120 C60 -108 44 -110 40 -122 Z" fill="${RED}" stroke="${K}" stroke-width="2"/><path d="M66 -118 C72 -100 74 -80 78 -40 M84 -110 C88 -90 90 -70 92 -40" stroke="${BLUE}" stroke-width="4" stroke-dasharray="8 8" fill="none" stroke-linecap="round"/>`;
+  if (pose === 'carry') o += `<rect x="-34" y="-246" width="72" height="40" fill="#D8C9A2" stroke="${K}" stroke-width="2.5"/>`;
+  if (pose === 'work') o += `<path d="M62 -132 L80 -150" stroke="${K}" stroke-width="6" stroke-linecap="round"/><path d="M74 -160 L92 -142" stroke="${K}" stroke-width="10"/>`;
+  return o + '</g>';
+}
+function scribe(x, y, s) {
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <path d="M-44 0 C-48 -30 -30 -44 0 -44 C34 -44 52 -30 50 0 Z" fill="${LIN}" stroke="${K}" stroke-width="2"/>
+    <path d="M-24 -120 C-24 -98 -16 -60 -16 -44 L18 -44 C18 -60 26 -98 26 -120 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>
+    <path d="M-26 -122 C-20 -106 22 -106 28 -122 C18 -114 -16 -114 -26 -122 Z" fill="${BLUE}" stroke="${K}" stroke-width="1.5"/>
+    <path d="M4 -176 C12 -174 20 -168 22 -158 L28 -152 L22 -148 C23 -142 21 -136 16 -132 L2 -130 Z" fill="${SKIN}" stroke="${K}" stroke-width="2"/>
+    <path d="M-16 -186 C0 -192 16 -186 18 -176 L6 -172 L4 -130 C-6 -128 -16 -130 -24 -134 L-24 -166 C-24 -178 -22 -184 -16 -186 Z" fill="${BLK}"/>
+    <path d="M8 -162 C12 -166 18 -166 20 -162 C18 -158 12 -158 8 -162 Z" fill="${LIN}" stroke="${BLK}" stroke-width="2"/><circle cx="15" cy="-162" r="2" fill="${BLK}"/>
+    <rect x="-8" y="-62" width="64" height="18" fill="#F4ECD4" stroke="${K}" stroke-width="2"/><path d="M0 -55 H44 M0 -49 H36" stroke="${K}" stroke-width="1.5"/>
+    ${lim('M24 -112 L40 -84 L40 -64', 9)}${lim('M-20 -112 L-10 -80 L16 -66', 9)}<path d="M40 -64 L54 -90" stroke="${K}" stroke-width="3"/>
+  </g>`;
+}
+// borders: bands of colour, and a frieze along the top
+let m = '';
+const band = (x, y, w, h, cols) => cols.map((c, i) => `<rect x="${x}" y="${y + i * h / cols.length}" width="${w}" height="${h / cols.length + .5}" fill="${c}"/>`).join('');
+m += band(1000, 400, 860, 20, [BLUE, RED, BLUE]) + band(1000, 680, 860, 20, [GRN, RED, GRN]) + band(1000, 960, 860, 20, [BLUE, YEL, BLUE]);
+m += `<rect x="1000" y="112" width="16" height="868" fill="${RED}"/><rect x="1844" y="112" width="16" height="868" fill="${RED}"/>`;
+for (let x = 1000, k = 0; x < 1860; x += 26, k++) m += `<path d="M${x + 2} 140 V122 C${x + 2} 108 ${x + 22} 108 ${x + 22} 122 V140 Z" fill="${[BLUE, GRN, RED][k % 3]}" stroke="${K}" stroke-width="1.5"/><circle cx="${x + 12}" cy="122" r="4" fill="${YEL}"/>`;
+m += `<rect x="1000" y="138" width="860" height="4" fill="${K}"/>`;
+// register 1: the plan is made before a single block moves
+m += scribe(1120, 398, 1) + scribe(1250, 398, 1);
+m += man(1410, 398, 1.05, 'point');
+m += `<g transform="translate(1520 210)"><rect width="190" height="150" fill="#F4ECD4" stroke="${K}" stroke-width="3"/><path d="M20 130 L95 30 L170 130 Z" fill="none" stroke="${RED}" stroke-width="4"/><path d="M40 104 H150 M58 78 H132 M76 54 H114" stroke="${RED}" stroke-width="2.5" stroke-dasharray="6 5"/><path d="M14 18 H70 M14 30 H56" stroke="${K}" stroke-width="3"/></g>`;
+// cartouche with made-up signs
+m += `<g transform="translate(1764 160)"><rect x="0" y="0" width="64" height="210" rx="32" fill="${LIN}" stroke="${K}" stroke-width="4"/><rect x="-6" y="214" width="76" height="10" fill="${K}"/>
+  <circle cx="32" cy="38" r="14" fill="${RED}" stroke="${K}" stroke-width="2"/>
+  <path d="M14 74 L22 66 L30 74 L38 66 L46 74 L54 66" fill="none" stroke="${BLUE}" stroke-width="4"/>
+  <path d="M32 92 C44 104 44 124 32 138 C20 124 20 104 32 92 Z" fill="${GRN}" stroke="${K}" stroke-width="2"/>
+  <path d="M32 150 V196 M20 162 H44 M32 150 C22 146 22 136 32 134 C42 136 42 146 32 150" fill="none" stroke="${YEL}" stroke-width="5" stroke-linecap="round"/></g>`;
+// register 2: a block on a sledge, water poured ahead, a team on the rope
+m += `<g><path d="M1050 664 H1250 L1270 676 H1046 Z" fill="#8A5A30" stroke="${K}" stroke-width="2.5"/><rect x="1062" y="520" width="170" height="144" fill="#D8C9A2" stroke="${K}" stroke-width="3"/><path d="M1062 568 H1232 M1062 616 H1232 M1120 520 V568 M1180 568 V616 M1110 616 V664" stroke="#A8966C" stroke-width="2"/></g>`;
+m += `<path d="M1250 588 L1820 566" stroke="#6E4A28" stroke-width="5"/>`;
+m += man(1296, 678, .98, 'pour') + man(1470, 678, .98, 'pull') + man(1590, 678, .98, 'pull') + man(1710, 678, .98, 'pull');
+m += `<path d="M1340 676 C1380 670 1420 676 1460 670" stroke="${BLUE}" stroke-width="4" fill="none" opacity=".7"/>`;
+// register 3: up the ramp, and boats bringing more stone
+m += `<path d="M1520 958 L1700 720 L1880 958 Z" fill="#E8D49A" stroke="${K}" stroke-width="3"/>`;
+for (let k = 1; k < 9; k++) { const y = 958 - k * 28, half = (958 - y) * 180 / 238; m += `<path d="M${1700 - (180 - half) + 0} ${y} H${1700 + (180 - half)}" stroke="#B89E62" stroke-width="2"/>`; }
+m += `<path d="M1240 958 L1620 828 L1640 840 L1290 958 Z" fill="#C9AE78" stroke="${K}" stroke-width="2.5"/>`;
+m += man(1310, 934, .78, 'carry') + man(1410, 900, .78, 'carry');
+m += `<circle cx="1772" cy="760" r="34" fill="${RED}" stroke="${K}" stroke-width="2.5"/>`;
+for (let k = 0; k < 7; k++) { const a = Math.PI * (.55 + k * .15); m += `<path d="M${1772 + Math.cos(a) * 44} ${760 + Math.sin(a) * 44} L${1772 + Math.cos(a) * 64} ${760 + Math.sin(a) * 64}" stroke="${YEL}" stroke-width="4" stroke-linecap="round"/>`; }
+m += `<g transform="translate(1040 900)"><path d="M0 30 C30 52 150 52 186 30 L176 46 C140 64 40 64 10 46 Z" fill="#8A5A30" stroke="${K}" stroke-width="2.5"/><path d="M90 30 V-70" stroke="${K}" stroke-width="4"/><path d="M92 -66 C120 -50 124 0 92 18 Z" fill="${LIN}" stroke="${K}" stroke-width="2"/><rect x="24" y="8" width="44" height="24" fill="#D8C9A2" stroke="${K}" stroke-width="2"/><rect x="118" y="10" width="44" height="22" fill="#D8C9A2" stroke="${K}" stroke-width="2"/></g>`;
+for (let x = 1020; x < 1240; x += 34) m += `<path d="M${x} 948 L${x + 8} 940 L${x + 16} 948 L${x + 24} 940 L${x + 32} 948" fill="none" stroke="${BLUE}" stroke-width="3"/>`;
+document.getElementById('mural').innerHTML = m;
+
+// list badges: Egyptian strokes for 1 to 4, inside a cartouche
+document.querySelectorAll('svg.badge').forEach(el => {
+  const n = +el.dataset.n;
+  let s = `<rect x="15" y="4" width="56" height="74" rx="28" fill="${LIN}" stroke="${K}" stroke-width="3.5"/><rect x="11" y="78" width="64" height="6" fill="${K}"/>`;
+  const gap = 10, x0 = 43 - (n - 1) * gap / 2;
+  for (let i = 0; i < n; i++) s += `<rect x="${x0 + i * gap - 2.5}" y="24" width="5" height="34" rx="2" fill="${BLUE}"/>`;
+  el.innerHTML = s;
+});
+</script>
+</body>
+</html>
