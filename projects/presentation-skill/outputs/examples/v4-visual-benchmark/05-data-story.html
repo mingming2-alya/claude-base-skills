@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>關鍵頁突破 2｜有張力的數據故事頁（24 盤 → 9 盤單位視覺矩陣）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;800;900&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #13161B;
+    --panel: #1A1E26;
+    --panel-2: #202530;
+    --fg: #F1EFEA;
+    --fg-2: #C2C7D0;
+    --muted: #8C93A0;
+    --line: rgba(241, 239, 234, 0.12);
+    --mint: #4AD49A;
+    --mint-bg: rgba(74, 212, 154, 0.14);
+    --coral: #FF7657;
+    --coral-bg: rgba(255, 118, 87, 0.16);
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    --num: "Archivo", "Noto Sans TC", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+  .slide {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 880px 540px at 78% 24%, rgba(255, 118, 87, 0.10), transparent 66%),
+      radial-gradient(ellipse 760px 520px at 20% 90%, rgba(74, 212, 154, 0.08), transparent 66%),
+      var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-synthesis: none;
+  }
+
+  /* Subtle static noise grain via data URI */
+  .grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.04;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  nav {
+    position: absolute;
+    left: 104px;
+    top: 48px;
+    display: flex;
+    gap: 34px;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  nav b { color: var(--fg); font-weight: 800; }
+
+  /* Left editorial narrative column */
+  .left {
+    position: absolute;
+    left: 100px;
+    top: 120px;
+    width: 716px;
+  }
+  h1 {
+    font-size: 82px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+  }
+  p.lead {
+    margin-top: 24px;
+    font-size: 31px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--fg-2);
+  }
+  p.lead em {
+    font-style: normal;
+    font-weight: 900;
+    color: var(--coral);
+  }
+
+  .evidence {
+    margin-top: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .ev-card {
+    display: grid;
+    grid-template-columns: 164px 1fr;
+    align-items: center;
+    gap: 18px;
+    padding: 24px 28px;
+    border-radius: 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+  }
+  .ev-card b {
+    font-family: var(--num);
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+  .ev-card.hot b { color: var(--coral); }
+  .ev-card b small {
+    font-size: 24px;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+  .ev-card strong {
+    display: block;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--fg);
+  }
+  .ev-card span {
+    display: block;
+    margin-top: 6px;
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.48;
+    color: var(--fg-2);
+  }
+
+  /* Right visual centerpiece: 24-tray unit waffle matrix + comparative cost bar */
+  .right {
+    position: absolute;
+    right: 100px;
+    top: 120px;
+    width: 960px;
+    height: 860px;
+    border-radius: 32px;
+    background: var(--panel);
+    border: 1px solid rgba(241, 239, 234, 0.14);
+    padding: 38px 42px;
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+    display: flex;
+    flex-direction: column;
+  }
+  .r-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .r-kicker {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+  .r-headline {
+    margin-top: 8px;
+    font-size: 36px;
+    font-weight: 900;
+    color: var(--fg);
+  }
+  .r-headline em {
+    font-style: normal;
+    color: var(--mint);
+  }
+  .r-big {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: var(--num);
+    font-variant-numeric: tabular-nums;
+  }
+  .r-big .old {
+    font-size: 46px;
+    font-weight: 800;
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+  .r-big .arrow {
+    font-size: 30px;
+    color: var(--muted);
+  }
+  .r-big .now {
+    font-size: 76px;
+    font-weight: 900;
+    line-height: 0.9;
+    color: var(--mint);
+  }
+  .r-big small {
+    font-family: var(--sans);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--fg-2);
+  }
+
+  /* 6x4 visual tray waffle grid (24 real trays) */
+  .tray-grid {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 14px;
+  }
+  .tray {
+    height: 92px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px 14px;
+    font-family: var(--num);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .tray.kept {
+    background: linear-gradient(155deg, rgba(74, 212, 154, 0.24), rgba(14, 107, 79, 0.34));
+    border: 1.5px solid rgba(74, 212, 154, 0.56);
+    color: #93F2C8;
+  }
+  .tray.saved {
+    background: repeating-linear-gradient(-45deg, rgba(255, 118, 87, 0.16) 0 8px, rgba(255, 118, 87, 0.06) 8px 16px);
+    border: 1.5px dashed rgba(255, 118, 87, 0.52);
+    color: #FFA08A;
+  }
+  .tray .dot-row {
+    display: flex;
+    gap: 6px;
+  }
+  .tray .dot-row i {
+    width: 14px;
+    height: 8px;
+    border-radius: 4px;
+    display: block;
+  }
+  .tray.kept .dot-row i { background: #64E6AF; }
+  .tray.saved .dot-row i { background: rgba(255, 130, 102, 0.55); }
+
+  .legend {
+    margin-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-radius: 16px;
+    background: var(--panel-2);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .leg-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 5px;
+    display: block;
+  }
+  .swatch.mint { background: var(--mint); }
+  .swatch.coral { background: var(--coral); }
+
+  /* Bottom comparison strip inside right card */
+  .comp {
+    margin-top: auto;
+    padding-top: 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  .comp-box {
+    padding: 18px 22px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--line);
+  }
+  .comp-box small {
+    display: block;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .comp-box strong {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--num);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--fg);
+  }
+  .comp-box.win strong { color: var(--mint); }
+  .comp-box.loss strong { color: var(--coral); }
+
+  .src {
+    position: absolute;
+    left: 100px;
+    bottom: 24px;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="grain" aria-hidden="true"></div>
+
+  <nav aria-label="章節">
+    <b>現況痛點</b>
+    <span>試點成果</span>
+    <span>導入節奏</span>
+  </nav>
+
+  <div class="left">
+    <h1>報廢的代價</h1>
+    <p class="lead">人工憑印象估量烤盤，讓未導入門市每天打烊白白倒掉<em>超過一成新鮮麵包</em>。</p>
+
+    <div class="evidence">
+      <div class="ev-card hot">
+        <b>+42<small>%</small></b>
+        <div>
+          <strong>雨天估量誤差最大</strong>
+          <span>氣溫驟降或午後陣雨，店長仍沿用前週晴天銷量。</span>
+        </div>
+      </div>
+      <div class="ev-card">
+        <b>35<small>分</small></b>
+        <div>
+          <strong>每日盤點耗費工時</strong>
+          <span>早班師傅與店長靠紙本回推補貨，耗時且難累積準度。</span>
+        </div>
+      </div>
+      <div class="ev-card">
+        <b>2.1<small>×</small></b>
+        <div>
+          <strong>熱門斷貨、冷門剩滿架</strong>
+          <span>下班尖峰招牌可頌缺貨，歐包與甜麵包打烊被迫報廢。</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="right">
+    <div class="r-top">
+      <div>
+        <div class="r-kicker">單店每日打烊報廢視覺拆解（1 格 ＝ 1 烤盤）</div>
+        <div class="r-headline">每天救回 <em>15 盤新鮮麵包</em></div>
+      </div>
+      <div class="r-big">
+        <span class="old">24</span>
+        <span class="arrow">→</span>
+        <span class="now">9</span>
+        <small>盤／日</small>
+      </div>
+    </div>
+
+    <div class="tray-grid" aria-label="24 盤報廢對比矩陣：9 盤為導入後剩餘，15 盤為系統省下">
+      <!-- 9 remaining trays (mint) -->
+      <div class="tray kept"><span>01</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>02</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>03</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>04</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>05</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>06</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>07</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>08</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>09</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <!-- 15 saved trays (coral hatched) -->
+      <div class="tray saved"><span>10</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>11</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>12</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>13</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>14</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>15</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>16</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>17</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>18</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>19</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>20</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>21</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>22</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>23</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>24</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+    </div>
+
+    <div class="legend">
+      <span class="leg-item"><i class="swatch mint"></i>導入後合理餘量：9 盤（報廢率 4.2%）</span>
+      <span class="leg-item"><i class="swatch coral"></i>預報省下報廢：15 盤（−63%）</span>
+    </div>
+
+    <div class="comp">
+      <div class="comp-box loss">
+        <small>板橋店現況（人工經驗估量）</small>
+        <strong>報廢 11.4%・月損 2.9 萬</strong>
+      </div>
+      <div class="comp-box win">
+        <small>信義店試點（系統預報 8 週）</small>
+        <strong>報廢 4.2%・年省 34 萬</strong>
+      </div>
+    </div>
+  </section>
+
+  <p class="src">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（常態營運日 8 週試點，不含中秋節慶檔期）</p>
+</div>
+</body>
+</html>

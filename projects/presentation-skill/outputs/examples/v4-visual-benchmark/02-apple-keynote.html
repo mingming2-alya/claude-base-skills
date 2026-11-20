@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>B｜大膽・Apple 發表（精雕深色舞台＋實景預報介面）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Geist:wght@500;600;700;800&display=block" rel="stylesheet">
+<style>
+  :root {
+    --stage-bg: #0A0C10;
+    --fg: #F5F6F8;
+    --sub: #A2A6B0;
+    --muted: #7C828E;
+    --grad: linear-gradient(92deg, #7CEEF9 0%, #4AC3FA 48%, #4BE2A5 100%);
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    --num: "Geist", "Noto Sans TC", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--stage-bg); }
+  .slide {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background: var(--stage-bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-synthesis: none;
+  }
+  svg.backdrop { position: absolute; inset: 0; pointer-events: none; }
+
+  nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 46px;
+    display: flex;
+    justify-content: center;
+    gap: 44px;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--muted);
+  }
+  nav b { color: var(--fg); font-weight: 700; }
+
+  header {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 112px;
+    text-align: center;
+  }
+  h1 {
+    font-size: 120px;
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+  h1 span.ver {
+    font-family: var(--num);
+    font-weight: 800;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    margin-left: 12px;
+  }
+  p.tag {
+    margin-top: 22px;
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 1.38;
+    color: #D2D5DC;
+  }
+  p.tag em {
+    font-style: normal;
+    font-weight: 700;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Central precision glass tablet UI */
+  .device {
+    position: absolute;
+    left: 560px;
+    top: 432px;
+    width: 800px;
+    height: 678px;
+    border-radius: 48px 48px 0 0;
+    background: linear-gradient(180deg, #171B24 0%, #0E1118 62%, #090B10 100%);
+    padding: 34px 40px 0;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 28px 90px rgba(0, 0, 0, 0.65);
+  }
+  .dev-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  }
+  .dev-store {
+    font-size: 21px;
+    font-weight: 700;
+    color: #D9DDE5;
+  }
+  .dev-weather {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 16px;
+    border-radius: 999px;
+    background: rgba(74, 195, 250, 0.14);
+    border: 1px solid rgba(74, 195, 250, 0.34);
+    font-size: 18px;
+    font-weight: 700;
+    color: #7CEEF9;
+  }
+
+  .dev-body {
+    display: grid;
+    grid-template-columns: 1.06fr 0.94fr;
+    gap: 28px;
+    margin-top: 24px;
+  }
+  .metric-k {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--sub);
+  }
+  .metric-v {
+    margin-top: 8px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .metric-v b {
+    font-family: var(--num);
+    font-size: 78px;
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+  .metric-v b small {
+    font-size: 36px;
+    font-weight: 700;
+    color: #4BE2A5;
+  }
+  .badge-ok {
+    padding: 6px 13px;
+    border-radius: 999px;
+    background: rgba(75, 226, 165, 0.16);
+    border: 1px solid rgba(75, 226, 165, 0.35);
+    font-size: 18px;
+    font-weight: 700;
+    color: #6CEFB9;
+  }
+
+  .chart-box {
+    margin-top: 20px;
+    padding: 18px 20px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .chart-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--sub);
+    margin-bottom: 10px;
+  }
+  .chart-head em { font-style: normal; color: #6CEFB9; }
+
+  .batch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
+  .batch-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sub);
+    margin-bottom: 2px;
+  }
+  .batch-row {
+    padding: 14px 18px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .batch-row.hl {
+    background: rgba(74, 195, 250, 0.08);
+    border-color: rgba(74, 195, 250, 0.28);
+  }
+  .b-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .b-top strong {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--fg);
+  }
+  .b-top b {
+    font-family: var(--num);
+    font-size: 22px;
+    font-weight: 700;
+    color: #7CEEF9;
+    font-variant-numeric: tabular-nums;
+  }
+  .b-sub {
+    margin-top: 5px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--sub);
+  }
+  .b-track {
+    margin-top: 10px;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.09);
+    overflow: hidden;
+  }
+  .b-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--grad);
+  }
+
+  /* Precision side callouts */
+  .side {
+    position: absolute;
+    width: 380px;
+  }
+  .side.left { left: 86px; text-align: right; }
+  .side.right { left: 1454px; text-align: left; }
+  .side .eyebrow {
+    font-family: var(--num);
+    font-size: 20px;
+    font-weight: 700;
+    color: #6CEFB9;
+    letter-spacing: 0.02em;
+  }
+  .side h3 {
+    margin-top: 6px;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.25;
+    color: var(--fg);
+  }
+  .side p {
+    margin-top: 10px;
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--sub);
+    text-wrap: balance;
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <svg class="backdrop" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="blur48" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480">
+        <feGaussianBlur stdDeviation="48"/>
+      </filter>
+      <filter id="blur14" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480">
+        <feGaussianBlur stdDeviation="14"/>
+      </filter>
+      <linearGradient id="rimGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#67E8F9"/>
+        <stop offset="42%" stop-color="#38BDF8"/>
+        <stop offset="76%" stop-color="#34D399"/>
+        <stop offset="100%" stop-color="#FBBF24"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Floor & rim ambient light strictly around lower device (never behind headline) -->
+    <ellipse cx="960" cy="1080" rx="720" ry="200" fill="#2DD4BF" opacity="0.16" filter="url(#blur48)"/>
+    <ellipse cx="740" cy="940" rx="340" ry="180" fill="#38BDF8" opacity="0.14" filter="url(#blur48)"/>
+    <rect x="558" y="430" width="804" height="690" rx="50" fill="none" stroke="url(#rimGrad)" stroke-width="34" opacity="0.34" filter="url(#blur48)"/>
+    <rect x="558" y="430" width="804" height="690" rx="50" fill="none" stroke="url(#rimGrad)" stroke-width="6" opacity="0.82" filter="url(#blur14)"/>
+    <rect x="559" y="431" width="802" height="690" rx="49" fill="none" stroke="url(#rimGrad)" stroke-width="2.5"/>
+
+    <!-- Precision hairlines linking callouts to glass device -->
+    <g stroke="rgba(255,255,255,0.24)" stroke-width="1.5">
+      <line x1="486" y1="590" x2="556" y2="590"/>
+      <line x1="486" y1="846" x2="556" y2="846"/>
+      <line x1="1364" y1="590" x2="1434" y2="590"/>
+      <line x1="1364" y1="846" x2="1434" y2="846"/>
+    </g>
+    <g fill="#7CEEF9">
+      <circle cx="556" cy="590" r="4"/>
+      <circle cx="556" cy="846" r="4"/>
+      <circle cx="1364" cy="590" r="4"/>
+      <circle cx="1364" cy="846" r="4"/>
+    </g>
+  </svg>
+
+  <nav aria-label="章節">
+    <span>現況痛點</span>
+    <b>試點成果</b>
+    <span>導入節奏</span>
+  </nav>
+
+  <header>
+    <h1>星塵預報<span class="ver">2.0</span></h1>
+    <p class="tag">凌晨四點前，替每家店算好<em>剛剛好的出爐量</em>。</p>
+  </header>
+
+  <div class="device">
+    <div class="dev-top">
+      <span class="dev-store">信義旗艦店・今日清晨排程</span>
+      <span class="dev-weather">降雨機率 80%・18°C</span>
+    </div>
+
+    <div class="dev-body">
+      <div>
+        <div class="metric-k">試點 8 週平均報廢率</div>
+        <div class="metric-v">
+          <b>4.2<small>%</small></b>
+          <span class="badge-ok">低於紅線 1.8%</span>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-head">
+            <span>8 週走勢</span>
+            <em>4.2% vs 人工 11.4%</em>
+          </div>
+          <svg width="330" height="148" viewBox="0 0 330 148" aria-hidden="true">
+            <defs>
+              <linearGradient id="areaG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#34D399" stop-opacity="0.34"/>
+                <stop offset="100%" stop-color="#34D399" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Target 6% dashed line -->
+            <line x1="0" y1="74" x2="330" y2="74" stroke="rgba(255,255,255,0.22)" stroke-width="1.2" stroke-dasharray="5 5"/>
+            <!-- Manual erratic dashed curve -->
+            <path d="M 8 34 C 52 24, 80 52, 120 38 C 160 24, 198 48, 242 30 C 274 18, 302 42, 322 28"
+                  fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="2" stroke-dasharray="6 5"/>
+            <!-- Forecast smooth drop curve -->
+            <path d="M 8 54 C 54 66, 94 84, 146 94 C 202 105, 260 112, 322 116 L 322 144 L 8 144 Z" fill="url(#areaG)"/>
+            <path d="M 8 54 C 54 66, 94 84, 146 94 C 202 105, 260 112, 322 116"
+                  fill="none" stroke="#4BE2A5" stroke-width="3.2" stroke-linecap="round"/>
+            <circle cx="322" cy="116" r="6" fill="#7CEEF9"/>
+            <circle cx="322" cy="116" r="12" fill="#7CEEF9" opacity="0.22"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="batch-list">
+        <div class="batch-title">系統自動建議盤數</div>
+        <div class="batch-row hl">
+          <div class="b-top"><strong>招牌鹽可頌</strong><b>18 盤</b></div>
+          <div class="b-sub">高周轉主力・維持全量</div>
+          <div class="b-track"><div class="b-fill" style="width:86%"></div></div>
+        </div>
+        <div class="batch-row">
+          <div class="b-top"><strong>酸種歐包</strong><b>6 盤</b></div>
+          <div class="b-sub">雨天客流降・減烤 4 盤</div>
+          <div class="b-track"><div class="b-fill" style="width:42%"></div></div>
+        </div>
+        <div class="batch-row">
+          <div class="b-top"><strong>職人生吐司</strong><b>10 盤</b></div>
+          <div class="b-sub">15:30 視銷速補烤 2 盤</div>
+          <div class="b-track"><div class="b-fill" style="width:62%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Left callouts -->
+  <div class="side left" style="top:548px">
+    <div class="eyebrow">−63% 報廢盤數</div>
+    <h3>壓進 6% 紅線內</h3>
+    <p>信義店試點 8 週，打烊剩餘從 24 盤降到 9 盤，穩定不再暴衝。</p>
+  </div>
+  <div class="side left" style="top:804px">
+    <div class="eyebrow">氣象 × 連假</div>
+    <h3>雨天自動調降冷門品</h3>
+    <p>串接鄉鎮級降雨機率與商圈活動，告別看天吃飯的經驗估量。</p>
+  </div>
+
+  <!-- Right callouts -->
+  <div class="side right" style="top:548px">
+    <div class="eyebrow">12 分鐘確認</div>
+    <h3>清晨直接照單備料</h3>
+    <p>凌晨自動產出各品項建議盤數，店長只需微調特賣品項。</p>
+  </div>
+  <div class="side right" style="top:804px">
+    <div class="eyebrow">單店年省 34 萬</div>
+    <h3>不換既有收銀硬體</h3>
+    <p>直接串接門市日結資料即可上線，零額外設備採購成本。</p>
+  </div>
+</div>
+</body>
+</html>

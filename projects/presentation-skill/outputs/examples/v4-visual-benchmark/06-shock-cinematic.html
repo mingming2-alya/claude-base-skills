@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>關鍵頁突破 3｜電影級震撼轉折頁（景深光影＋空間層次）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;900&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0A0D12;
+    --fg: #F4F2EC;
+    --sub: #B7BDC8;
+    --muted: #7F8794;
+    --grad: linear-gradient(96deg, #74F2BE 0%, #3AD99B 55%, #F2C96B 100%);
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    --num: "Archivo", "Noto Sans TC", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+  .slide {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 920px 620px at 78% 48%, rgba(58, 217, 155, 0.14), rgba(58, 217, 155, 0) 68%),
+      radial-gradient(ellipse 680px 460px at 24% 88%, rgba(242, 201, 107, 0.08), rgba(242, 201, 107, 0) 68%),
+      var(--bg);
+    color: var(--fg);
+    font-family: var(--sans);
+    font-synthesis: none;
+  }
+
+  /* Delicate architectural dot grid */
+  .dots {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(244, 242, 236, 0.11) 1.2px, transparent 1.2px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 75% 70% at 62% 50%, #000 0%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 75% 70% at 62% 50%, #000 0%, transparent 78%);
+  }
+
+  /* Huge architectural watermark numeral for depth */
+  .watermark {
+    position: absolute;
+    right: -30px;
+    top: 120px;
+    font-family: var(--num);
+    font-size: 460px;
+    font-weight: 900;
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    color: rgba(116, 242, 190, 0.048);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .eyebrow {
+    position: absolute;
+    left: 140px;
+    top: 236px;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--num);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #74F2BE;
+  }
+  .eyebrow i {
+    width: 36px;
+    height: 2px;
+    background: #74F2BE;
+    display: block;
+  }
+
+  h1 {
+    position: absolute;
+    left: 140px;
+    top: 298px;
+    font-size: 112px;
+    font-weight: 900;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+  h1 .hl {
+    font-family: var(--num);
+    font-weight: 900;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    margin-left: 16px;
+  }
+
+  p.sub {
+    position: absolute;
+    left: 140px;
+    top: 604px;
+    font-size: 34px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--sub);
+  }
+
+  /* Grounded three-pillar proof footer */
+  .proof-row {
+    position: absolute;
+    left: 140px;
+    right: 140px;
+    bottom: 120px;
+    padding-top: 34px;
+    border-top: 1px solid rgba(244, 242, 236, 0.16);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+  }
+  .p-item b {
+    display: block;
+    font-family: var(--num);
+    font-size: 52px;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+  .p-item b.mint { color: #74F2BE; }
+  .p-item b small {
+    font-family: var(--sans);
+    font-size: 24px;
+    font-weight: 700;
+    margin-left: 6px;
+    color: var(--sub);
+  }
+  .p-item span {
+    display: block;
+    margin-top: 10px;
+    font-size: 21px;
+    font-weight: 500;
+    color: var(--sub);
+  }
+
+  .src {
+    position: absolute;
+    left: 140px;
+    bottom: 30px;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="dots" aria-hidden="true"></div>
+  <div class="watermark" aria-hidden="true">1.8%</div>
+
+  <div class="eyebrow"><i></i><span>PROFIT LEVERAGE・財務部單店損益試算</span></div>
+
+  <h1>
+    少丟 1 盤麵包，<br>
+    門市淨利多<span class="hl">+1.8%</span>
+  </h1>
+
+  <p class="sub">報廢不是零星耗損，而是烘焙業最直接的現金槓桿。</p>
+
+  <div class="proof-row">
+    <div class="p-item">
+      <b class="mint">170<small>萬／年</small></b>
+      <span>五家主力門市同步導入預估省下原料費</span>
+    </div>
+    <div class="p-item">
+      <b>4.2<small>個月</small></b>
+      <span>系統導入與串接成本完整回本週期</span>
+    </div>
+    <div class="p-item">
+      <b>0<small>台新硬體</small></b>
+      <span>沿用既有收銀機，零門市資本支出</span>
+    </div>
+  </div>
+
+  <p class="src">資料來源：財務部 2026 單店損益模型試算（常態營運週期推估，未含節慶檔期）</p>
+</div>
+</body>
+</html>

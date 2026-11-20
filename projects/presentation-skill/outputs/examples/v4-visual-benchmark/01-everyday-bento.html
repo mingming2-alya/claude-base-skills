@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>A｜穩健・日常工作款（現代 Bento 進度儀表板）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@600;700;800;900&display=block" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E5EAEF;
+    --card: #FCFBF9;
+    --ink: #15181E;
+    --ink-2: #3D434D;
+    --muted: #555C68;
+    --line: #D8DEE7;
+    --ok: #136B49;
+    --ok-bg: #E1F2EA;
+    --warn: #A45308;
+    --warn-bg: #FEF1DC;
+    --risk: #C03C1E;
+    --risk-text: #A83217;
+    --risk-bg: #FFF3EB;
+    --risk-line: #F0C6B2;
+    --accent: #0E6B4F;
+    --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    --num: "Archivo", "Noto Sans TC", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+  .slide {
+    position: relative;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 900px 560px at 14% 0%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0) 70%),
+      radial-gradient(ellipse 840px 520px at 90% 100%, rgba(14, 107, 79, 0.08), rgba(14, 107, 79, 0) 68%),
+      var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-synthesis: none;
+  }
+
+  /* Segmented pill navigation */
+  nav {
+    position: absolute;
+    left: 96px;
+    top: 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    border-radius: 14px;
+    background: #D6DDE6;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--muted);
+  }
+  nav span, nav b {
+    padding: 10px 22px;
+    border-radius: 10px;
+  }
+  nav b {
+    background: var(--card);
+    color: var(--ink);
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(18, 28, 45, 0.10);
+  }
+
+  .meta-pill {
+    position: absolute;
+    right: 96px;
+    top: 52px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    background: rgba(252, 251, 249, 0.85);
+    border: 1px solid var(--line);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .meta-pill i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: block;
+  }
+
+  h1 {
+    position: absolute;
+    left: 96px;
+    top: 120px;
+    font-size: 62px;
+    font-weight: 900;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  h1 .wk {
+    font-family: var(--num);
+    font-weight: 900;
+    color: var(--accent);
+    margin-right: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+  p.lead {
+    position: absolute;
+    left: 96px;
+    top: 204px;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  p.lead em {
+    font-style: normal;
+    font-weight: 900;
+    color: var(--risk-text);
+  }
+
+  /* Bento cards */
+  .card {
+    position: absolute;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    padding: 30px 34px;
+    box-shadow:
+      0 1px 2px rgba(16, 24, 40, 0.04),
+      0 14px 34px rgba(16, 24, 40, 0.06);
+  }
+  .card.focus-risk {
+    border-color: var(--risk-line);
+    box-shadow:
+      0 1px 2px rgba(192, 60, 30, 0.06),
+      0 16px 36px rgba(192, 60, 30, 0.08);
+  }
+  .card.decision {
+    background: var(--risk-bg);
+    border-color: var(--risk-line);
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .head strong {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .head small {
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .avatar {
+    margin-left: auto;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #E7ECF2;
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .pill {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .pill.risk { background: var(--risk); color: #FAF7F5; }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); }
+
+  /* Gantt block inside focus card */
+  .gantt {
+    position: relative;
+    margin-top: 34px;
+    height: 185px;
+  }
+  .g-row-label {
+    position: absolute;
+    left: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .g-bar {
+    position: absolute;
+    height: 26px;
+    border-radius: 13px;
+  }
+  .g-date {
+    position: absolute;
+    font-family: var(--num);
+    font-size: 19px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .g-note {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    border-top: 1px solid #EAE5DF;
+    font-size: 21px;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .g-note b {
+    font-family: var(--num);
+    font-weight: 800;
+    color: var(--risk-text);
+  }
+
+  /* Ring cards */
+  .ring-wrap {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 28px;
+  }
+  .ring {
+    position: relative;
+    width: 176px;
+    height: 176px;
+    flex: none;
+  }
+  .ring b {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--num);
+    font-size: 46px;
+    font-weight: 900;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .ring b span {
+    font-size: 22px;
+    margin-left: 2px;
+    font-weight: 700;
+  }
+  .ring-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .ring-copy .date {
+    font-family: var(--num);
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .ring-copy .desc {
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .ring-copy .sub {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ok);
+  }
+
+  /* Bottom KPI card */
+  .kpi-num {
+    margin-top: 18px;
+    font-family: var(--num);
+    font-size: 118px;
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-num span {
+    font-size: 48px;
+    font-weight: 800;
+    margin-left: 4px;
+  }
+  .kpi-cap {
+    margin-top: 8px;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  /* Decision options */
+  .opt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 20px;
+  }
+  .opt {
+    background: var(--card);
+    border: 1.5px solid #F0CEBC;
+    border-radius: 18px;
+    padding: 20px 22px;
+  }
+  .opt.rec {
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px rgba(14, 107, 79, 0.12);
+  }
+  .opt-tag {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .opt.rec .opt-tag { background: var(--ok-bg); color: var(--ok); }
+  .opt:not(.rec) .opt-tag { background: #EFECE8; color: var(--ink-2); }
+  .opt b {
+    display: block;
+    font-size: 23px;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .opt span {
+    display: block;
+    margin-top: 6px;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--ink-2);
+  }
+  .dec-foot {
+    margin-top: 18px;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .dec-foot b {
+    font-family: var(--num);
+    font-weight: 800;
+    color: var(--risk-text);
+  }
+
+  /* Rollout queue card */
+  .queue {
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .q-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .q-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .q-top small {
+    font-family: var(--num);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .q-track {
+    height: 12px;
+    border-radius: 999px;
+    background: #E6EBF1;
+    overflow: hidden;
+  }
+  .q-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--accent);
+  }
+  .q-meta {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .src {
+    position: absolute;
+    left: 96px;
+    bottom: 22px;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <nav aria-label="章節">
+    <span>現況痛點</span>
+    <span>試點成果</span>
+    <b>導入節奏</b>
+  </nav>
+
+  <div class="meta-pill"><i></i><span>2026 Q4・五店同步追蹤</span></div>
+
+  <h1><span class="wk">W47</span>五店導入進度與風險</h1>
+  <p class="lead">四家門市按進度推進，<em>板橋車站店卡在收銀回傳排程</em>，需本週拍板支援。</p>
+
+  <!-- Row 1 Left: Biggest card for the store that needs action -->
+  <section class="card focus-risk" style="left:96px;top:284px;width:790px;height:362px">
+    <div class="head">
+      <span class="pill risk">延遲 1 週</span>
+      <strong>板橋車站店</strong>
+      <small>北區主力</small>
+      <span class="avatar">林</span>
+    </div>
+    <div class="gantt">
+      <div class="g-row-label" style="top:16px">原訂</div>
+      <div class="g-bar" style="left:76px;top:14px;width:450px;background:#D6DCE4"></div>
+      <div class="g-date" style="left:450px;top:-16px;color:var(--ink)">原訂 12/01</div>
+
+      <div class="g-row-label" style="top:76px">實際</div>
+      <div class="g-bar" style="left:76px;top:74px;width:270px;background:var(--ink)"></div>
+      <div class="g-bar" style="left:352px;top:74px;width:240px;background:repeating-linear-gradient(-45deg,#F3B8A4 0 8px,#FCE3D9 8px 16px);border:2px dashed var(--risk)"></div>
+      <div class="g-date" style="left:505px;top:108px;color:var(--risk-text)">預估 12/08</div>
+
+      <div class="g-note">
+        <span>卡點：夜間日結收銀機斷線重傳尚未自動排程</span>
+        <b>完成度 45%</b>
+      </div>
+    </div>
+  </section>
+
+  <!-- Row 1 Center: Ring progress 75% -->
+  <section class="card" style="left:910px;top:284px;width:445px;height:362px">
+    <div class="head">
+      <strong>東區概念店</strong>
+      <span class="pill warn" style="margin-left:auto">待確認</span>
+    </div>
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
+          <circle cx="88" cy="88" r="72" fill="none" stroke="#E5EAF0" stroke-width="16"/>
+          <circle cx="88" cy="88" r="72" fill="none" stroke="#C87518" stroke-width="16" stroke-linecap="round"
+                  stroke-dasharray="339.3 452.4" transform="rotate(-90 88 88)"/>
+        </svg>
+        <b>75<span>%</span></b>
+      </div>
+      <div class="ring-copy">
+        <span class="date">11/26 上線</span>
+        <span class="desc">本週完成店長培訓，待確認假日限定款納入預報。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Row 1 Right: Ring progress 100% benchmark -->
+  <section class="card" style="left:1379px;top:284px;width:445px;height:362px">
+    <div class="head">
+      <strong>信義旗艦店</strong>
+      <span class="pill ok" style="margin-left:auto">試點標竿</span>
+    </div>
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
+          <circle cx="88" cy="88" r="72" fill="none" stroke="#E1F2EA" stroke-width="16"/>
+          <circle cx="88" cy="88" r="72" fill="none" stroke="#0E6B4F" stroke-width="16" stroke-linecap="round"
+                  stroke-dasharray="452.4 452.4" transform="rotate(-90 88 88)"/>
+        </svg>
+        <b>100<span>%</span></b>
+      </div>
+      <div class="ring-copy">
+        <span class="date">報廢 4.2%</span>
+        <span class="desc">連續 8 週低於 6% 紅線，由王店長協助培訓新店。</span>
+        <span class="sub">單店年省 34 萬</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Row 2 Left: Big KPI + 6-week descending waste sparkline -->
+  <section class="card" style="left:96px;top:670px;width:416px;height:352px">
+    <div class="head"><strong>信義店報廢降幅</strong></div>
+    <p class="kpi-num">-63<span>%</span></p>
+    <p class="kpi-cap">打烊剩餘自 24 盤逐週降至 9 盤</p>
+    <svg width="348" height="72" viewBox="0 0 348 72" style="margin-top:20px" aria-hidden="true">
+      <rect x="0"   y="8"  width="44" height="64" rx="8" fill="#CED6E0"/>
+      <rect x="60"  y="16" width="44" height="56" rx="8" fill="#CED6E0"/>
+      <rect x="120" y="26" width="44" height="46" rx="8" fill="#CED6E0"/>
+      <rect x="180" y="34" width="44" height="38" rx="8" fill="#B9C5D3"/>
+      <rect x="240" y="42" width="44" height="30" rx="8" fill="#9BB5AA"/>
+      <rect x="300" y="48" width="44" height="24" rx="8" fill="#0E6B4F"/>
+    </svg>
+  </section>
+
+  <!-- Row 2 Center: Actionable Decision Card -->
+  <section class="card decision" style="left:536px;top:670px;width:819px;height:352px">
+    <div class="head">
+      <strong>需要今天拍板：板橋店收銀回傳怎麼解？</strong>
+    </div>
+    <div class="opt-grid">
+      <div class="opt rec">
+        <span class="opt-tag">建議方案 A</span>
+        <b>資訊組週五前補寫排程</b>
+        <span>一次到位自動回傳，不增加早班店長手動工時，延後 7 天上線。</span>
+      </div>
+      <div class="opt">
+        <span class="opt-tag">過渡方案 B</span>
+        <b>先由店長手動匯出日結</b>
+        <span>可守住 12/01 原訂上線，但每日多花 15 分鐘且有漏傳風險。</span>
+      </div>
+    </div>
+    <p class="dec-foot">請營運長與資訊主管於 <b>11/22（五）</b> 前確認方案，以利鎖定 12 月上線檔期。</p>
+  </section>
+
+  <!-- Row 2 Right: Southern/Central wave queue -->
+  <section class="card" style="left:1379px;top:670px;width:445px;height:352px">
+    <div class="head">
+      <strong>中南二店接棒</strong>
+      <span class="pill ok" style="margin-left:auto">進度正常</span>
+    </div>
+    <div class="queue">
+      <div class="q-item">
+        <div class="q-top"><span>台中公益店・吳店長</span><small>25%</small></div>
+        <div class="q-track"><div class="q-fill" style="width:25%"></div></div>
+        <div class="q-meta">11/25 網路健檢完成，目標 12/12 上線</div>
+      </div>
+      <div class="q-item">
+        <div class="q-top"><span>高雄巨蛋店・鄭店長</span><small>10%</small></div>
+        <div class="q-track"><div class="q-fill" style="width:14%"></div></div>
+        <div class="q-meta">12/01 啟動收銀串接，目標 12/15 壓軸上線</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="src">資料來源：星塵烘焙營運企劃組 2026/11/19 週進度彙整（虛構範例）</p>
+</div>
+</body>
+</html>
