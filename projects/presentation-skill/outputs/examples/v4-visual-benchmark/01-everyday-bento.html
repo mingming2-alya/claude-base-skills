@@ -8,21 +8,19 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@600;700;800;900&display=block" rel="stylesheet">
 <style>
   :root {
-    --bg: #E5EAEF;
+    --bg: #E7ECF1;
     --card: #FCFBF9;
-    --ink: #15181E;
-    --ink-2: #3D434D;
-    --muted: #555C68;
-    --line: #D8DEE7;
-    --ok: #136B49;
-    --ok-bg: #E1F2EA;
-    --warn: #A45308;
-    --warn-bg: #FEF1DC;
+    --ink: #161A21;
+    --ink-2: #3F4652;
+    --muted: #58606E;
+    --line: #D9DFE8;
+    --ok: #0E6B4F;
+    --ok-soft: #2E7D63;
+    --ok-bg: #E2F2EB;
     --risk: #C03C1E;
-    --risk-text: #A83217;
-    --risk-bg: #FFF3EB;
-    --risk-line: #F0C6B2;
-    --accent: #0E6B4F;
+    --risk-text: #A63016;
+    --risk-bg: #FFF5EE;
+    --risk-line: #EFC7B4;
     --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     --num: "Archivo", "Noto Sans TC", sans-serif;
   }
@@ -34,117 +32,146 @@
     height: 1080px;
     overflow: hidden;
     background:
-      radial-gradient(ellipse 900px 560px at 14% 0%, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0) 70%),
-      radial-gradient(ellipse 840px 520px at 90% 100%, rgba(14, 107, 79, 0.08), rgba(14, 107, 79, 0) 68%),
+      radial-gradient(ellipse 920px 540px at 14% 0%, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0) 70%),
+      radial-gradient(ellipse 840px 500px at 88% 100%, rgba(14, 107, 79, 0.06), rgba(14, 107, 79, 0) 68%),
       var(--bg);
     color: var(--ink);
     font-family: var(--sans);
     font-synthesis: none;
   }
 
-  /* Segmented pill navigation */
+  /* Unified top bar: segmented nav on left, calm week pill on right */
   nav {
     position: absolute;
     left: 96px;
-    top: 48px;
+    top: 44px;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 6px;
-    border-radius: 14px;
-    background: #D6DDE6;
-    font-size: 20px;
+    padding: 5px;
+    border-radius: 13px;
+    background: #D8DFE8;
+    font-size: 19px;
     font-weight: 500;
     line-height: 1;
     color: var(--muted);
   }
   nav span, nav b {
-    padding: 10px 22px;
-    border-radius: 10px;
+    padding: 10px 20px;
+    border-radius: 9px;
   }
   nav b {
     background: var(--card);
     color: var(--ink);
     font-weight: 700;
-    box-shadow: 0 2px 6px rgba(18, 28, 45, 0.10);
+    box-shadow: 0 2px 5px rgba(18, 28, 45, 0.09);
   }
 
   .meta-pill {
     position: absolute;
     right: 96px;
-    top: 52px;
+    top: 46px;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     padding: 10px 20px;
     border-radius: 999px;
-    background: rgba(252, 251, 249, 0.85);
+    background: rgba(252, 251, 249, 0.9);
     border: 1px solid var(--line);
     font-size: 19px;
     font-weight: 700;
     color: var(--ink-2);
     font-variant-numeric: tabular-nums;
   }
+  .meta-pill b {
+    font-family: var(--num);
+    font-weight: 900;
+    color: var(--ink);
+  }
   .meta-pill i {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
-    background: var(--accent);
+    background: var(--ok);
     display: block;
   }
 
-  h1 {
+  /* Calm, cohesive header block with generous breathing room above bento grid */
+  header {
     position: absolute;
     left: 96px;
-    top: 120px;
-    font-size: 62px;
+    right: 96px;
+    top: 114px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(22, 26, 33, 0.09);
+  }
+  h1 {
+    font-size: 56px;
     font-weight: 900;
-    line-height: 1.15;
-    letter-spacing: -0.01em;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
     color: var(--ink);
   }
-  h1 .wk {
-    font-family: var(--num);
-    font-weight: 900;
-    color: var(--accent);
-    margin-right: 16px;
-    font-variant-numeric: tabular-nums;
-  }
   p.lead {
-    position: absolute;
-    left: 96px;
-    top: 204px;
-    font-size: 28px;
+    margin-top: 12px;
+    font-size: 25px;
     font-weight: 500;
     line-height: 1.4;
     color: var(--ink-2);
   }
   p.lead em {
     font-style: normal;
-    font-weight: 900;
+    font-weight: 800;
     color: var(--risk-text);
   }
+
+  /* Compact summary legend on header right to unify header & cards */
+  .header-legend {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-bottom: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .hl-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .hl-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    display: block;
+  }
+  .hl-dot.ok { background: var(--ok); }
+  .hl-dot.risk { background: var(--risk); }
 
   /* Bento cards */
   .card {
     position: absolute;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 28px;
-    padding: 30px 34px;
+    border-radius: 26px;
+    padding: 28px 32px;
     box-shadow:
       0 1px 2px rgba(16, 24, 40, 0.04),
-      0 14px 34px rgba(16, 24, 40, 0.06);
+      0 12px 30px rgba(16, 24, 40, 0.055);
   }
   .card.focus-risk {
-    border-color: var(--risk-line);
+    border: 1.5px solid var(--risk-line);
     box-shadow:
-      0 1px 2px rgba(192, 60, 30, 0.06),
-      0 16px 36px rgba(192, 60, 30, 0.08);
+      0 1px 2px rgba(192, 60, 30, 0.05),
+      0 14px 34px rgba(192, 60, 30, 0.075);
   }
   .card.decision {
     background: var(--risk-bg);
-    border-color: var(--risk-line);
+    border: 1.5px solid var(--risk-line);
   }
 
   .head {
@@ -153,7 +180,7 @@
     gap: 14px;
   }
   .head strong {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 800;
     line-height: 1.2;
     color: var(--ink);
@@ -165,20 +192,20 @@
   }
   .avatar {
     margin-left: auto;
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: #E7ECF2;
+    background: #EAEFF4;
     border: 1px solid var(--line);
     display: grid;
     place-items: center;
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--ink-2);
   }
   .pill {
     display: inline-block;
-    padding: 8px 16px;
+    padding: 7px 15px;
     border-radius: 999px;
     font-size: 18px;
     font-weight: 700;
@@ -186,13 +213,12 @@
   }
   .pill.risk { background: var(--risk); color: #FAF7F5; }
   .pill.ok { background: var(--ok-bg); color: var(--ok); }
-  .pill.warn { background: var(--warn-bg); color: var(--warn); }
 
   /* Gantt block inside focus card */
   .gantt {
     position: relative;
     margin-top: 34px;
-    height: 185px;
+    height: 184px;
   }
   .g-row-label {
     position: absolute;
@@ -203,7 +229,7 @@
   }
   .g-bar {
     position: absolute;
-    height: 26px;
+    height: 25px;
     border-radius: 13px;
   }
   .g-date {
@@ -222,8 +248,8 @@
     align-items: center;
     justify-content: space-between;
     padding-top: 16px;
-    border-top: 1px solid #EAE5DF;
-    font-size: 21px;
+    border-top: 1px solid #ECE7E1;
+    font-size: 20px;
     font-weight: 500;
     color: var(--ink-2);
   }
@@ -242,8 +268,8 @@
   }
   .ring {
     position: relative;
-    width: 176px;
-    height: 176px;
+    width: 170px;
+    height: 170px;
     flex: none;
   }
   .ring b {
@@ -253,7 +279,7 @@
     align-items: center;
     justify-content: center;
     font-family: var(--num);
-    font-size: 46px;
+    font-size: 44px;
     font-weight: 900;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
@@ -270,15 +296,15 @@
   }
   .ring-copy .date {
     font-family: var(--num);
-    font-size: 26px;
+    font-size: 25px;
     font-weight: 800;
     color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
   .ring-copy .desc {
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 500;
-    line-height: 1.45;
+    line-height: 1.48;
     color: var(--ink-2);
   }
   .ring-copy .sub {
@@ -287,59 +313,104 @@
     color: var(--ok);
   }
 
-  /* Bottom KPI card */
-  .kpi-num {
-    margin-top: 18px;
+  /* Row 2 Left: Overall 5-store progress card (100% aligned with title) */
+  .overall-top {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .overall-num {
     font-family: var(--num);
-    font-size: 118px;
+    font-size: 92px;
     font-weight: 900;
     line-height: 0.92;
     letter-spacing: -0.04em;
-    color: var(--accent);
+    color: var(--ink);
     font-variant-numeric: tabular-nums;
   }
-  .kpi-num span {
-    font-size: 48px;
+  .overall-num span {
+    font-size: 38px;
     font-weight: 800;
-    margin-left: 4px;
+    color: var(--ok);
+    margin-left: 2px;
   }
-  .kpi-cap {
-    margin-top: 8px;
-    font-size: 20px;
-    font-weight: 500;
+  .overall-cap {
+    font-size: 19px;
+    font-weight: 600;
     color: var(--muted);
+    line-height: 1.35;
   }
+  .mini-bars {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    align-items: end;
+    height: 118px;
+  }
+  .mb-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+  .mb-track {
+    width: 100%;
+    height: 86px;
+    border-radius: 10px;
+    background: #EAEEF4;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+  }
+  .mb-fill {
+    width: 100%;
+    border-radius: 10px;
+    background: var(--ok);
+  }
+  .mb-fill.soft { background: #5B9E85; }
+  .mb-fill.risk { background: var(--risk); }
+  .mb-fill.muted { background: #8FA3B8; }
+  .mb-col span {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+  .mb-col span.risk { color: var(--risk-text); }
 
-  /* Decision options */
+  /* Decision options (directly beneath blocked Banqiao store for vertical flow) */
   .opt-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px;
-    margin-top: 20px;
+    margin-top: 18px;
   }
   .opt {
     background: var(--card);
-    border: 1.5px solid #F0CEBC;
+    border: 1.5px solid #EDD0C1;
     border-radius: 18px;
-    padding: 20px 22px;
+    padding: 18px 22px;
   }
   .opt.rec {
-    border-color: var(--accent);
+    border-color: var(--ok);
     box-shadow: inset 0 0 0 1px rgba(14, 107, 79, 0.12);
   }
   .opt-tag {
     display: inline-block;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 6px;
+    padding: 4px 11px;
+    border-radius: 7px;
     margin-bottom: 10px;
   }
   .opt.rec .opt-tag { background: var(--ok-bg); color: var(--ok); }
   .opt:not(.rec) .opt-tag { background: #EFECE8; color: var(--ink-2); }
   .opt b {
     display: block;
-    font-size: 23px;
+    font-size: 22px;
     font-weight: 800;
     line-height: 1.3;
     color: var(--ink);
@@ -354,7 +425,7 @@
   }
   .dec-foot {
     margin-top: 18px;
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 500;
     color: var(--ink-2);
   }
@@ -369,7 +440,7 @@
     margin-top: 22px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 22px;
   }
   .q-item {
     display: flex;
@@ -380,7 +451,7 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -400,7 +471,7 @@
   .q-fill {
     height: 100%;
     border-radius: 999px;
-    background: var(--accent);
+    background: var(--ok-soft);
   }
   .q-meta {
     font-size: 18px;
@@ -411,7 +482,7 @@
   .src {
     position: absolute;
     left: 96px;
-    bottom: 22px;
+    bottom: 20px;
     font-size: 18px;
     font-weight: 500;
     color: var(--muted);
@@ -426,13 +497,21 @@
     <b>導入節奏</b>
   </nav>
 
-  <div class="meta-pill"><i></i><span>2026 Q4・五店同步追蹤</span></div>
+  <div class="meta-pill"><i></i><b>W47</b><span>2026 Q4 五店同步追蹤</span></div>
 
-  <h1><span class="wk">W47</span>五店導入進度與風險</h1>
-  <p class="lead">四家門市按進度推進，<em>板橋車站店卡在收銀回傳排程</em>，需本週拍板支援。</p>
+  <header>
+    <div>
+      <h1>五店導入進度與風險</h1>
+      <p class="lead">四家門市按進度推進，僅<em>板橋車站店卡在收銀回傳排程</em>，需今天拍板支援。</p>
+    </div>
+    <div class="header-legend">
+      <span class="hl-item"><i class="hl-dot ok"></i>4 店按進度</span>
+      <span class="hl-item"><i class="hl-dot risk"></i>1 店需介入</span>
+    </div>
+  </header>
 
-  <!-- Row 1 Left: Biggest card for the store that needs action -->
-  <section class="card focus-risk" style="left:96px;top:284px;width:790px;height:362px">
+  <!-- Row 1 Left: Biggest card for the single blocked store -->
+  <section class="card focus-risk" style="left:96px;top:276px;width:790px;height:356px">
     <div class="head">
       <span class="pill risk">延遲 1 週</span>
       <strong>板橋車站店</strong>
@@ -456,91 +535,92 @@
     </div>
   </section>
 
-  <!-- Row 1 Center: Ring progress 75% -->
-  <section class="card" style="left:910px;top:284px;width:445px;height:362px">
+  <!-- Row 1 Center: East District on-track (unified calm green palette) -->
+  <section class="card" style="left:910px;top:276px;width:445px;height:356px">
     <div class="head">
       <strong>東區概念店</strong>
-      <span class="pill warn" style="margin-left:auto">待確認</span>
+      <span class="pill ok" style="margin-left:auto">按進度</span>
     </div>
     <div class="ring-wrap">
       <div class="ring">
-        <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
-          <circle cx="88" cy="88" r="72" fill="none" stroke="#E5EAF0" stroke-width="16"/>
-          <circle cx="88" cy="88" r="72" fill="none" stroke="#C87518" stroke-width="16" stroke-linecap="round"
-                  stroke-dasharray="339.3 452.4" transform="rotate(-90 88 88)"/>
+        <svg width="170" height="170" viewBox="0 0 170 170" aria-hidden="true">
+          <circle cx="85" cy="85" r="70" fill="none" stroke="#E5EAF0" stroke-width="15"/>
+          <circle cx="85" cy="85" r="70" fill="none" stroke="#2E7D63" stroke-width="15" stroke-linecap="round"
+                  stroke-dasharray="329.9 439.8" transform="rotate(-90 85 85)"/>
         </svg>
         <b>75<span>%</span></b>
       </div>
       <div class="ring-copy">
         <span class="date">11/26 上線</span>
-        <span class="desc">本週完成店長培訓，待確認假日限定款納入預報。</span>
+        <span class="desc">已完成店長培訓，下週串接測試假日限定品項。</span>
       </div>
     </div>
   </section>
 
-  <!-- Row 1 Right: Ring progress 100% benchmark -->
-  <section class="card" style="left:1379px;top:284px;width:445px;height:362px">
+  <!-- Row 1 Right: Xinyi flagship completed benchmark -->
+  <section class="card" style="left:1379px;top:276px;width:445px;height:356px">
     <div class="head">
       <strong>信義旗艦店</strong>
-      <span class="pill ok" style="margin-left:auto">試點標竿</span>
+      <span class="pill ok" style="margin-left:auto">已上線</span>
     </div>
     <div class="ring-wrap">
       <div class="ring">
-        <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
-          <circle cx="88" cy="88" r="72" fill="none" stroke="#E1F2EA" stroke-width="16"/>
-          <circle cx="88" cy="88" r="72" fill="none" stroke="#0E6B4F" stroke-width="16" stroke-linecap="round"
-                  stroke-dasharray="452.4 452.4" transform="rotate(-90 88 88)"/>
+        <svg width="170" height="170" viewBox="0 0 170 170" aria-hidden="true">
+          <circle cx="85" cy="85" r="70" fill="none" stroke="#E2F2EB" stroke-width="15"/>
+          <circle cx="85" cy="85" r="70" fill="none" stroke="#0E6B4F" stroke-width="15" stroke-linecap="round"
+                  stroke-dasharray="439.8 439.8" transform="rotate(-90 85 85)"/>
         </svg>
         <b>100<span>%</span></b>
       </div>
       <div class="ring-copy">
         <span class="date">報廢 4.2%</span>
         <span class="desc">連續 8 週低於 6% 紅線，由王店長協助培訓新店。</span>
-        <span class="sub">單店年省 34 萬</span>
+        <span class="sub">試點標竿・年省 34 萬</span>
       </div>
     </div>
   </section>
 
-  <!-- Row 2 Left: Big KPI + 6-week descending waste sparkline -->
-  <section class="card" style="left:96px;top:670px;width:416px;height:352px">
-    <div class="head"><strong>信義店報廢降幅</strong></div>
-    <p class="kpi-num">-63<span>%</span></p>
-    <p class="kpi-cap">打烊剩餘自 24 盤逐週降至 9 盤</p>
-    <svg width="348" height="72" viewBox="0 0 348 72" style="margin-top:20px" aria-hidden="true">
-      <rect x="0"   y="8"  width="44" height="64" rx="8" fill="#CED6E0"/>
-      <rect x="60"  y="16" width="44" height="56" rx="8" fill="#CED6E0"/>
-      <rect x="120" y="26" width="44" height="46" rx="8" fill="#CED6E0"/>
-      <rect x="180" y="34" width="44" height="38" rx="8" fill="#B9C5D3"/>
-      <rect x="240" y="42" width="44" height="30" rx="8" fill="#9BB5AA"/>
-      <rect x="300" y="48" width="44" height="24" rx="8" fill="#0E6B4F"/>
-    </svg>
+  <!-- Row 2 Left: Overall 5-store rollout progress (100% aligned with slide title) -->
+  <section class="card" style="left:96px;top:656px;width:416px;height:358px">
+    <div class="head"><strong>五店整體完成度</strong></div>
+    <div class="overall-top">
+      <div class="overall-num">51<span>%</span></div>
+      <div class="overall-cap">平均導入進度<br>1 店上線・4 店推進</div>
+    </div>
+    <div class="mini-bars" aria-label="五家門市進度條對照">
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill" style="height:100%"></div></div><span>信義</span></div>
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill soft" style="height:75%"></div></div><span>東區</span></div>
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill risk" style="height:45%"></div></div><span class="risk">板橋</span></div>
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill muted" style="height:25%"></div></div><span>台中</span></div>
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill muted" style="height:12%"></div></div><span>高雄</span></div>
+    </div>
   </section>
 
-  <!-- Row 2 Center: Actionable Decision Card -->
-  <section class="card decision" style="left:536px;top:670px;width:819px;height:352px">
+  <!-- Row 2 Center: Actionable Decision Card aligned directly beneath Banqiao risk card -->
+  <section class="card decision" style="left:536px;top:656px;width:819px;height:358px">
     <div class="head">
-      <strong>需要今天拍板：板橋店收銀回傳怎麼解？</strong>
+      <strong>需要今天拍板：板橋店收銀回傳解法</strong>
     </div>
     <div class="opt-grid">
       <div class="opt rec">
         <span class="opt-tag">建議方案 A</span>
         <b>資訊組週五前補寫排程</b>
-        <span>一次到位自動回傳，不增加早班店長手動工時，延後 7 天上線。</span>
+        <span>一次到位自動回傳，不增加店長手動工時，順延 7 天上線。</span>
       </div>
       <div class="opt">
         <span class="opt-tag">過渡方案 B</span>
         <b>先由店長手動匯出日結</b>
-        <span>可守住 12/01 原訂上線，但每日多花 15 分鐘且有漏傳風險。</span>
+        <span>可守住 12/01 原訂日期，但每日多花 15 分鐘且有漏傳風險。</span>
       </div>
     </div>
     <p class="dec-foot">請營運長與資訊主管於 <b>11/22（五）</b> 前確認方案，以利鎖定 12 月上線檔期。</p>
   </section>
 
   <!-- Row 2 Right: Southern/Central wave queue -->
-  <section class="card" style="left:1379px;top:670px;width:445px;height:352px">
+  <section class="card" style="left:1379px;top:656px;width:445px;height:358px">
     <div class="head">
       <strong>中南二店接棒</strong>
-      <span class="pill ok" style="margin-left:auto">進度正常</span>
+      <span class="pill ok" style="margin-left:auto">按進度</span>
     </div>
     <div class="queue">
       <div class="q-item">

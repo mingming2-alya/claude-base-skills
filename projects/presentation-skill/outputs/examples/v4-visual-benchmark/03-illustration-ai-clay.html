@@ -129,12 +129,13 @@
     color: var(--terra);
   }
 
-  /* C-layout stations anchored directly over the 3 clay objects */
+  /* C-layout stations centered cleanly over each of the 3 clay objects */
   .station {
     position: absolute;
     top: 306px;
-    width: 470px;
+    width: 440px;
     z-index: 3;
+    text-align: center;
   }
   .time-pill {
     display: inline-flex;
@@ -154,7 +155,7 @@
   .time-pill.ochre { background: var(--ochre); }
 
   .station h3 {
-    margin-top: 16px;
+    margin-top: 15px;
     font-family: var(--round);
     font-size: 32px;
     font-weight: 900;
@@ -165,8 +166,9 @@
     margin-top: 10px;
     font-size: 22px;
     font-weight: 500;
-    line-height: 1.55;
+    line-height: 1.52;
     color: var(--ink-2);
+    text-wrap: balance;
   }
 
   /* Live editable HTML overlay sitting INSIDE the blank clay tablet screen (center object) */
@@ -216,7 +218,7 @@
   </div>
   <div class="wash" aria-hidden="true"></div>
 
-  <!-- Soft leader lines connecting each callout directly to its clay station below -->
+  <!-- Soft leader lines connecting each centered station callout straight down to its clay object -->
   <svg class="guides" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
     <g stroke-width="2" stroke-dasharray="5 6" fill="none">
       <line x1="298" y1="504" x2="298" y2="564" stroke="#AD4A2D" stroke-opacity="0.55"/>
@@ -237,19 +239,19 @@
   <h1>清晨到打烊的三個站</h1>
   <p class="lead">預報系統接住每個時段，讓店裡<em>隨時有熱麵包、打烊不再剩滿架</em>。</p>
 
-  <div class="station" style="left:112px">
+  <div class="station" style="left:78px">
     <span class="time-pill terra">04:00 烤爐站</span>
     <h3>依天氣自動減量</h3>
     <p>凌晨產出首波備料盤數，雨天自動少烤冷門品，守住原料成本。</p>
   </div>
 
-  <div class="station" style="left:725px">
+  <div class="station" style="left:738px">
     <span class="time-pill sage">12:00 櫃檯站</span>
     <h3>午間即時看銷速</h3>
     <p>收銀回傳前四小時賣出比例，熱門品賣超預期立刻亮起補烤提示。</p>
   </div>
 
-  <div class="station" style="left:1338px">
+  <div class="station" style="left:1328px">
     <span class="time-pill ochre">15:30 補貨站</span>
     <h3>精準小批補烤</h3>
     <p>下班尖峰前只補高周轉 3 款招牌品，把打烊報廢穩控在 4.2% 以內。</p>
