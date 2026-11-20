@@ -1201,4 +1201,22 @@
 - **同步的檔案**：`outputs/deck-architect/`（v4 完整 26 檔）、`outputs/deck-architect.skill`、`outputs/examples/v4-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
 - **下一步**：進入 **Phase B｜注入 HTML 獨有的「活」**。
 
+## 2026-11-19｜Phase B 預研：實查 14 個 GitHub 簡報／動態 Skill 的技術路線（GSAP 之外）
+
+- **使用者的指示（互動表單）**：
+  - 使用者決定先自行檢視 Phase A 的 `outputs/examples/v4-demo/` 成品與截圖，稍後再決定是否啟動 Phase B（本輪不動 `outputs/deck-architect/` 程式碼）。
+  - 同時要求在決定 Phase B 技術棧前，除了 GSAP 之外，實地回頭查本 repo 紀錄的相關 GitHub 技能，看看各自採取什麼動態技術路線。
+- **做了什麼**：透過 `gh api` 實際檢查本 repo 紀錄的全部 **14 個 GitHub 專案**的檔案結構、`package.json`、`SKILL.md`、動效引擎原始碼與授權檔案（含補查 `borjaperfra/beatdeck` 確認為 MIT、`chuspeeism/dashi-ppt-skill` 與 `op7418/guizang-ppt-skill` 為 AGPL-3.0 僅盤點架構不抄碼），並核對 `motion.dev`（MIT）與 GSAP 3.15（Webflow Standard "No Charge" License，商用免費但非 MIT）的最新授權與體積，彙整為 `inputs/motion-research.md`。
+- **關鍵發現（六大技術路線）**：
+  1. **零依賴原生 Web 平台（CSS + WAAPI + 手寫 FLIP + SVG 原生）**：`open-slide`（MIT）完全不用 GSAP／Framer Motion，僅用原生 WAAPI + FLIP 覆蓋層就做出 Keynote 級 Magic Move（含反縮放圓角與文字／背景／SVG 顏色同步內插，並鎖定離場 `opacity: 1` 防閃底色）；`visual-explainer`（MIT）用原生 SVG `pathLength="1"` ＋ CSS `offset-path` 取代 DrawSVG／MotionPath 並做可調參數的 Live Figure；`paper-collage-ppt`（MIT，2D）用純 CSS `steps()` 定格動畫。
+  2. **零依賴原生 ＋ 模組化 Canvas 2D 生命週期**：`lewislulu/html-ppt-skill`（MIT）把 20 種輕量 Canvas 2D 特效（1–3 KB/檔）綁在 `MutationObserver` 上，進頁啟動、離頁 `stop()` 銷毀，零背景耗能。
+  3. **Motion（`motion.dev`，純 MIT）**：`emilkowalski/skills`（MIT）在「最低成本工具階梯」把 Motion 定位在 CSS/WAAPI 之上的彈簧與手勢解（`spring({ duration, bounce: 0 })`）；`guizang`（AGPL 概念）內嵌 64 KB Motion One 搭配原生 GLSL Shader；`bolt-slides`（MIT）以 React + Framer Motion 做點擊建置 `<Build>`。
+  4. **GSAP 3.15 確定性時間軸與進階外掛**：`scrolline-deck`（MIT，GSAP + Lenis）、`bang-motion`（MIT，GSAP CDN）用於連續捲動敘事或 60fps MP4 影片輸出；`beatdeck`（MIT）只把 GSAP 用在自動連續拍，頁面換拍仍用純 CSS「禁止疊化（快離 320ms → 停頓 → 慢進 900ms）」。
+  5. **方法層與引擎層解耦的雙後端**：`huashu-design`（MIT）的簡報模組完全不用 GSAP，動態片才分「零依賴 `Stage+Sprite`（10 KB）」與「GSAP + HyperFrames」，並以 40 行閉式解析彈簧實現 seek-safe 物理手感。
+  6. **WebGL / Three.js 3D 舞台**：`paper-collage-ppt` 的 `haoqi-3d`／`playful-lab-3d`（MIT）用本地 Three.js + 真 HTML `#txt` 文字層 + `registerPptx3D()` 匯出透明 3D 物件到可編輯 PPTX；`visual-explainer` 僅在深度代表資料時透過 `importmap` 按需載入。
+- **產出建議**：在 `inputs/motion-research.md` 整理 8 條跨引擎必裝工程共識，並提出 4 條 Phase B 候選路線，首推**方案 1｜分層混合架構（日常 100% 離線 ~8 KB 零依賴原生核心 ＋ 旗艦簡報按需外掛契約）**。
+- **同步的檔案**：`inputs/motion-research.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：透過互動表單與使用者對齊 `v4-demo` 檢視進度與 Phase B 動態技術路線，確認後才啟動 Phase B 實作。
+
+
 
