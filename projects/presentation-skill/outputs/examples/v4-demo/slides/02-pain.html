@@ -1,0 +1,48 @@
+<style>
+.slide .slide-nav { position: absolute; left: 88px; top: 44px; }
+.slide .head { position: absolute; left: 88px; right: 88px; top: 118px; }
+.slide h2.title { font-weight: 900; font-size: 86px; line-height: 1.1; letter-spacing: -.02em; }
+.slide p.lead { margin-top: 20px; font-weight: 500; font-size: 32px; line-height: 1.48; color: var(--fg); max-width: 1360px; }
+.slide p.lead em { font-style: normal; font-weight: 900; color: var(--late); }
+.slide .grid { position: absolute; left: 88px; right: 88px; top: 368px; bottom: 110px; display: grid; grid-template-columns: 760px 1fr; gap: 72px; align-items: end; }
+.slide .hero-box { border-top: 4px solid var(--late); padding-top: 30px; }
+.slide .hero-num { font: 900 228px/.86 var(--font-number); letter-spacing: -.045em; color: var(--late); font-variant-numeric: tabular-nums; }
+.slide .hero-num small { font-size: 84px; font-weight: 700; margin-left: 6px; }
+.slide .hero-lbl { margin-top: 24px; font-weight: 700; font-size: 32px; color: var(--fg); }
+.slide .hero-sub { margin-top: 10px; font-weight: 400; font-size: 24px; line-height: 1.5; color: var(--fg-2); }
+.slide .causes { border-top: 2px solid var(--fg); }
+.slide .cause { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding: 30px 0; border-bottom: 1px solid var(--line-2); align-items: baseline; }
+.slide .cause .cn { font: 900 54px/1 var(--font-number); color: var(--fg); font-variant-numeric: tabular-nums; }
+.slide .cause strong { display: block; font-weight: 700; font-size: 28px; color: var(--fg); }
+.slide .cause span { display: block; margin-top: 8px; font-weight: 400; font-size: 22px; line-height: 1.48; color: var(--fg-2); }
+.slide .src { position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+</style>
+<section class="slide canvas" data-nav="inline">
+  <nav class="slide-nav" data-auto-nav></nav>
+  <header class="head">
+    <h2 class="title" data-role="title">報廢的代價</h2>
+    <p class="lead" data-role="summary">靠經驗估量烤盤數，讓未導入門市平均每天丟掉<em>超過一成新鮮麵包</em>。</p>
+  </header>
+  <div class="grid">
+    <div class="hero-box" data-fit-group="figure">
+      <div class="hero-num" data-fit="figure">11.4<small>%</small></div>
+      <div class="hero-lbl">板橋門市單月平均報廢率</div>
+      <div class="hero-sub">幾乎是總部 6% 管控紅線的兩倍，單月原料直接蒸發 2.9 萬元。</div>
+    </div>
+    <div class="causes">
+      <div class="cause">
+        <div class="cn">+42%</div>
+        <div><strong>雨天估量誤差最大</strong><span>氣溫驟降或午後雷陣雨時，店長仍依前週晴天銷量備料。</span></div>
+      </div>
+      <div class="cause">
+        <div class="cn">35分</div>
+        <div><strong>每日盤點耗費工時</strong><span>早班師傅與店長靠紙本回推補貨量，既耗時又難累積準度。</span></div>
+      </div>
+      <div class="cause">
+        <div class="cn">2.1×</div>
+        <div><strong>熱門斷貨、冷門剩滿架</strong><span>下班尖峰招牌可頌缺貨，但歐包與甜麵包打烊前被迫報廢。</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="src">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（板橋、東區兩店常態營運日）</p>
+</section>

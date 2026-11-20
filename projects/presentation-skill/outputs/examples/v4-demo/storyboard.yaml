@@ -1,0 +1,135 @@
+meta:
+  title: 星塵烘焙・智慧補貨系統導入
+  kicker: 2026 Q4 營運提案
+  subtitle: 從經驗估量到預報驅動，把每日報廢率壓進 6% 以內
+  presenter: 營運企劃組
+  date: 2026.11
+  delivery: talk
+  style: counsel
+  mode: light
+  palette: 貼題松綠
+  minutes: 8
+  pages: 8
+  lang: zh-Hant
+
+structure:
+  start: 區域經理知道雨天與假日報廢高，但不確定系統預報值不值得跨店導入
+  destination: 核准 Q4 於五家主力門市分批上線智慧補貨系統
+  axis: causal
+  direction: 痛點 → 試點證據 → 導入節奏
+  sensitivity: false
+
+constraints:
+  limitations:
+    - 試點數據僅涵蓋常態 8 週，尚未計入中秋禮盒等大型節慶檔期
+    - 門市須保留既有收銀機網路連線以利凌晨回傳日結
+  forbidden:
+    - 保證零報廢
+  must_include:
+    - 6%
+
+chapters:
+  - id: pain
+    label: 現況痛點
+    minutes: 2
+  - id: proof
+    label: 試點成果
+    minutes: 3
+  - id: rollout
+    label: 導入節奏
+    minutes: 2
+
+slides:
+  - type: cover
+    file: slides/01-cover.html
+
+  - chapter: pain
+    title: 報廢的代價
+    layout: number
+    file: slides/02-pain.html
+    value: "11.4%"
+    label: 板橋門市單月平均報廢率
+    source: 星塵烘焙 2026 Q3 門市日結紀錄
+    notes: 先用單店真實損耗把問題具象化，說明人工估量在雨天與假日誤差最大。
+
+  - chapter: proof
+    title: 三門市報廢率
+    signature: true
+    layout: chart-bar
+    file: slides/03-chart.html
+    link: model-detail
+    source: 星塵烘焙 2026 Q3 門市日結紀錄（試點 8 週，不含中秋檔期）
+    notes: 試點數據僅涵蓋常態 8 週，尚未計入中秋禮盒檔期；若被問及演算法細節可點右下角進入附件。
+
+  - chapter: proof
+    title: 門市三段節奏
+    layout: scene
+    file: slides/04-scene.html
+    notes: 這頁同時示範零等待程式插畫與可替換 AI 升級插槽（bakery-flow）；提醒門市須維持收銀機網路連線。
+
+  - type: shock
+    file: slides/05-shock.html
+    text: 少丟 1 盤麵包，門市淨利多 1.8%
+    sub: 五店同步導入，預估年省 170 萬原料成本
+    source: 財務部 2026 單店損益模型試算
+    notes: 停頓兩秒再切到進度與風險總覽。
+
+  - chapter: rollout
+    title: 五店導入進度與風險
+    layout: status-table
+    summary:
+      - 北區三店：信義店已上線且報廢降至 ==4.2%==；板橋店卡在收銀回傳排程，需資訊組協助
+      - 中南二店：台中店本週啟動網路健檢；高雄店排定 12/15 接棒，目前無風險
+    stages: [網路健檢, 日結串接, 店長培訓, 正式上線]
+    groups:
+      - name: 北區主力門市
+        chapter: rollout
+        rows:
+          - name: 板橋車站店
+            owner: 林組長
+            cells: [{state: done, date: 11/02}, {state: doing, date: 11/24}, {state: target, date: 11/28}, {state: target, date: 12/01}]
+            progress: 45
+            risk: red
+            support: 資訊組本週五前修正收銀機夜間自動回傳
+          - name: 東區概念店
+            owner: 陳店長
+            cells: [{state: done, date: 11/05}, {state: done, date: 11/14}, {state: doing, date: 11/22}, {state: target, date: 11/26}]
+            progress: 75
+            risk: yellow
+            support: 需區經理確認假日限定款是否納入預報
+          - name: 信義旗艦店
+            owner: 王店長
+            cells: [{state: done, date: 09/01}, {state: done, date: 09/08}, {state: done, date: 09/15}, {state: done, date: 09/20}]
+            progress: 100
+            risk: green
+            support: 試點標竿，協助培訓新店
+      - name: 中南主力門市
+        chapter: rollout
+        rows:
+          - name: 台中公益店
+            owner: 吳店長
+            cells: [{state: doing, date: 11/25}, {state: target, date: 12/02}, {state: target, date: 12/08}, {state: target, date: 12/12}]
+            progress: 25
+            risk: green
+            support: 進度正常
+          - name: 高雄巨蛋店
+            owner: 鄭店長
+            cells: [{state: target, date: 12/01}, {state: target, date: 12/08}, {state: target, date: 12/12}, {state: target, date: 12/15}]
+            progress: 10
+            risk: green
+            support: 進度正常
+    source: 營運企劃組 2026/11/19 週進度彙整
+    notes: 此頁由底盤商務元件 status-table 直接生成，展示自由畫布與高紀律工作頁無縫混搭。
+
+  - type: closing
+    file: slides/07-closing.html
+    text: 核准五店導入，今年底前把報廢壓回 6% 以下
+    sub: 請營運長與資訊主管確認板橋店排程與 Q4 預算
+
+  - appendix: true
+    id: model-detail
+    chapter: proof
+    title: 預報模型輸入與限制
+    layout: free
+    file: slides/app-model.html
+    notes: 現場被追問演算法與節慶限制時點入，按 Esc 或右上返回鍵回到第 3 頁。

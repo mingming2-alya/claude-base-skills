@@ -1,0 +1,38 @@
+/* @fonts family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;900 */
+/* v4-demo deck.css — Counsel Light Paper + OKLCH 松綠貼題配色 */
+:root {
+  --bg: #F1EFEA;
+  --bg-2: #E6E2DA;
+  --fg: #141619;
+  --fg-2: #3F444B;
+  --fg-3: #5A5E66;
+  --line: #141619;
+  --line-2: #D3CFC6;
+  --gray: #CFCAC1;
+  --gray2: #BDB7AC;
+  --accent: #0D6B4F;
+  --accent-text: #0B5E45;
+  --accent-ink: #F4F2EC;
+  --accent-sub: #CFE5DB;
+  --late: #B5381F;
+  --late-tint: #E8C2B6;
+  --shock-bg: #15181D;
+  --shock-fg: #ECEAE4;
+  --shock-em: #5CCB94;
+
+  --font-display: "Noto Sans TC", var(--font-sans-fallback);
+  --font-body: "Noto Sans TC", var(--font-sans-fallback);
+  --font-number: "Archivo", "Noto Sans TC", var(--font-sans-fallback);
+  --font-label: "Noto Sans TC", var(--font-sans-fallback);
+
+  --nav-top: 42px;
+  --nav-left: 88px;
+  --nav-right: 88px;
+  --nav-justify: flex-start;
+  --nav-gap: 34px;
+  --nav-size: 21px;
+  --nav-color: #585D66;
+  --nav-active: #141619;
+  --nav-accent: #0D6B4F;
+  --nav-border: transparent;
+}

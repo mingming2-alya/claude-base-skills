@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-19｜第一性原理路線重構）**：已完成全專案覆盤，放棄原 2c「19 種內容結構 × 3–5 種靜態排法 × 12 風格」的組合窮舉，改採**「輕底盤、強自由混合架構 ＋ 生成式風格憲法（Style DNA）＋ 零等待全自動產出與可選 AI 升級插槽」**，重構為 **Phase A → E**。下一步進入 **Phase A｜地基對齊與輕底盤 v4**。
+> **最新接手點（2026-11-19｜Phase A 完成）**：`deck-architect` 已解凍並全面升級為 **v4 輕底盤、強自由混合架構**（`assemble.py`＋統一像素 WCAG `check.mjs`＋`oklch.py --palette`＋首批 3 款 Style DNA），並以虛構範例 `outputs/examples/v4-demo/` 跑通 Gate 2 三風格樣張、8 頁自由畫布＋商務元件混搭簡報與圖像插槽替換測試（全數通過）。下一步進入 **Phase B｜注入 HTML 獨有的「活」**。
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。
@@ -20,27 +20,27 @@
 - [x] Grill：目的、對象、時長、場合 → 起點與終點；互動表單；既有框架與模板先讀
 - [x] 架構：一條軸、單一方向；最上層不可並列；序幕、轉折點、尾聲
 - [x] 呈現：標題是路標（總結永遠不當主標題）、重點放大加突出色（不畫底線）、不寫過場、目錄與頁籤導航、震撼頁
-- [x] 內容可信度：證據、限制、數字查核與出處
+- [x] 內容可信度：證據、限制、數字查核與出處（v4 已將 `constraints` 納入 `lint.py` 自動檢查）
 - [x] 類型：一頁總覽、可點入附件、進度回報狀態表、多人填寫檢查
 
 ### ② 設計美感與「活」（皮肉）：生成式風格憲法 ＋ HTML 主場優勢
 研究見 `inputs/research-html-slide-skills.md`、`inputs/design-research.md`、`inputs/style-research.md`、`inputs/reference-styles.md`。**借用前先確認授權**：MIT 等寬鬆授權可以借程式碼並標註來源；限制商用或未標授權的（如 guizang AGPL-3.0）只學做法與數值、自己實作。
 
 - [x] **風格方向與首批定調（原 2a–2b）**：12 款風格清單定案（`inputs/style-list-v5.md`）；OKLCH「鎖規則、不鎖色碼、全淺深雙底」用色系統（`outputs/style-specs/color-system.md`）；首批三款（Apple 發表、顧問報告、插畫場景 15 種畫風與融合規則 A／B／C、淺深雙底）規格完成並實測對比通過
-- [x] **內容結構與容量基礎（原 v3.0 資產沿用）**：14 種結構＋5 種圖表結構（長條、圓環比例、折線趨勢、人形圖示、地圖）、容量規則、`series`、`lint.py`；不再當成固定靜態模板庫，改作「內容形狀參考與防錯規則」
-- [ ] **輕底盤、強自由混合架構（Phase A）**：Thin Shell 共用底盤（舞台縮放、單一資料來源導航／目錄／頁籤契約且允許風格客製、附件返回、講者與編輯掛鉤）＋ 90%+ 頁面由 Agent 依 Style DNA 自由編排 HTML/CSS/SVG ＋ 高紀律商務頁（週報 `status-table`、多單位檢核、`pillars`）保留穩定元件
-- [ ] **多元風格憲法庫 Style DNA（Phase A 接首批 3 款 → Phase D 補齊其餘 9 款＋15 種插畫配方）**：精煉的生成式設計配方、主題→風格智能配對（穩健／大膽／驚喜）、外觀帳本
-- [ ] **圖像層零等待＋可選升級（Phase B）**：預設由程式一次產出完整可看版本，同時每頁圖像層預留可替換插槽並輸出可選的 `IMAGE_UPGRADE.md`，使用者想更精緻時無縫換進 AI 無字底圖或真實照片
+- [x] **內容結構與容量基礎（原 v3.0 資產沿用）**：14 種結構＋5 種圖表結構（長條、圓環比例、折線趨勢、人形圖示、地圖）、容量規則、`series`、`lint.py`；已轉為 `references/content-shapes.md` 內容形狀指南
+- [x] **輕底盤、強自由混合架構（Phase A）**：Thin Shell 共用底盤（`shell.css`、`runtime.js`、`fit.js`、`assemble.py`）＋ 90%+ 頁面由 Agent 依 Style DNA 自由編排 HTML/CSS/SVG ＋ 高紀律商務頁（週報 `status-table`、`pillars`、`toc`）保留穩定元件（`components.css`）
+- [~] **多元風格憲法庫 Style DNA**：首批 3 款（`styles/apple.md`、`counsel.md`、`illustration.md`＋`color-system.md`、`index.json`）已接進 Skill（Phase A ✅）；其餘 9 款＋主題智能配對與外觀帳本於 Phase D 補齊
+- [~] **圖像層零等待＋可選升級**：底盤已實作 `.asset-slot[data-slot]` 自動換圖與 `IMAGE_UPGRADE.md` 清單（Phase A ✅）；進階接圖動態與微動背景於 Phase B 補齊
 - [ ] **HTML 核心動態（Phase B）**：可打斷的 spring 物理動態（`emilkowalski/skills` apple-design，MIT）、依軸運鏡、元素跨頁延續（Magic Move／交棒）、微動態背景（含效能降級與 `prefers-reduced-motion`）、動態圖表與滾動數字（引入 GSAP 前先問使用者）
-- [x] **排版細節與像素級品管**：中文不用斜體、字距 0、標點擠壓、balance 斷行、等寬數字；`render.cjs` 真實背景像素 WCAG 對比檢查（待 Phase A 併入統一的 `check.mjs`）
+- [x] **排版細節與像素級品管**：中文不用斜體、字距 0、標點擠壓、balance 斷行、等寬數字、離線字體退路；統一 `check.mjs`（支援 Playwright＋零依賴 Chromium CDP、真實背景像素 WCAG 對比、漸層字逐段對比、主標題≥總結檢查、SVG 重複 ID 檢查）
 
 ### ③ 全流程（從頭到尾）
 
-- [x] Grill → brief
-- [x] 架構展開 → storyboard → lint（待 Phase A 補上 11-14 實測待辦）
-- [ ] 一次視覺關卡 Gate 2（Phase A）：依主題端出 3 個截然不同的風格樣張（穩健／大膽／驚喜）＋明暗與三組主題配色，令人「哇就是這些！」
-- [ ] 製作 → `deck.html`（Phase A–B）：輕底盤掛載自由編排頁與商務元件，內建動態與可選 `IMAGE_UPGRADE.md`
-- [ ] 品管：統一強化版 `check.mjs`（Phase A）＋ 獨立評審（Phase E）
+- [x] Grill → brief（含頁數算術、播放密度 `delivery`、簡體在地化指引）
+- [x] 架構展開 → storyboard → lint（含 `constraints` 地雷／限制檢查、動態字數、頁數拆解、簡體偵測、附件防濫用）
+- [x] 一次視覺關卡 Gate 2（Phase A）：`assemble.py --sheet`＋`check.mjs --sheet` 產出 3 款多元風格樣張並排＋`oklch.py --palette` 驗證三組 OKLCH 主題配色
+- [x] 製作 → `deck.html`（Phase A 靜態＋基礎過場完成；Phase B 補齊高階動態）
+- [~] 品管：統一強化版 `check.mjs` 已完成（Phase A ✅）；獨立評審留待 Phase E
 - [ ] 交付（Phase E）：文字可編輯 PPTX、雙螢幕講者模式（備註、計時、下一頁預覽）、乾淨列印 PDF
 - [ ] 修改（Phase E）：在成品上按 `E` 直接改字回寫、畫面上點選留言讓 Agent 一次改完
 - [ ] 記憶（Phase D–E）：外觀帳本、品味記憶、常用風格與模板
@@ -59,8 +59,8 @@
 
 | 階段 | 名稱 | 核心交付 | 完成條件 | 狀態 |
 |---|---|---|---|---|
-| **A** | **地基對齊與輕底盤 v4** | 解凍 `deck-architect`：套用原則 #12–#25、清掉 11-14 實測待辦；建立「輕底盤、強自由」的 `deck-shell`（舞台、可客製導航契約、附件返回、商務元件掛鉤）；把 `render.cjs` 真實像素 WCAG 檢查併入 `check.mjs`；把首批 3 款 Style DNA 與「明暗＋依主題三組配色」接進單一視覺關卡 Gate 2 | 新架構可在虛構範例上由輕底盤＋自由編排跑通 Gate 2 到成品，並通過統一 `check.mjs` | ⏭ 下一步 |
-| **B** | **注入 HTML 獨有的「活」** | 在底盤實作可打斷 spring 動態（MIT `apple-design`）、依軸運鏡、Magic Move 跨頁延續、微動態背景與效能降級、動態圖表／滾動數字；建立每頁圖像層「零等待程式版＋可替換插槽＋`IMAGE_UPGRADE.md` 無縫換圖」機制 | 樣本簡報具備明顯超越靜態圖片的動態與互動質感，且替換 AI 底圖後對比與排版零破版 | |
+| **A** | **地基對齊與輕底盤 v4** | 解凍 `deck-architect`：套用原則 #12–#25、清掉 11-14 實測待辦；建立「輕底盤、強自由」的 `deck-shell`（舞台、可客製導航契約、附件返回、商務元件掛鉤）；把 `render.cjs` 真實像素 WCAG 檢查併入 `check.mjs`；把首批 3 款 Style DNA 與「明暗＋依主題三組配色」接進單一視覺關卡 Gate 2 | 新架構可在虛構範例上由輕底盤＋自由編排跑通 Gate 2 到成品，並通過統一 `check.mjs`（`outputs/examples/v4-demo/` 全部通過） | ✅ |
+| **B** | **注入 HTML 獨有的「活」** | 在底盤實作可打斷 spring 動態（MIT `apple-design`）、依軸運鏡、Magic Move 跨頁延續、微動態背景與效能降級、動態圖表／滾動數字；強化圖像層零等待程式版與 `IMAGE_UPGRADE.md` 換圖進場體驗 | 樣本簡報具備明顯超越靜態圖片的動態與互動質感，且替換 AI 底圖後對比與排版零破版 | ⏭ 下一步 |
 | **C** | **第一份真實簡報端到端 PK 🎯** | 讓**全新 Agent 只靠 `SKILL.md`**，以真實簡報（如「內部工具推廣與部署說明」）從頭走到尾產出會動的多頁成品，直接跟原本的 `codex-ppt-skill` 版本 PK，並將摩擦點回修到 Skill | 使用者實測後確認「Gate 2 候選令人驚豔」且「成品比原本的做法更好」 | |
 | **D** | **多元風格庫全面成形** | 依驗證過的 Style DNA 格式補齊其餘 9 款風格（積木構成、水彩水墨、書卷刻本、孔版小誌、摩登金、日常工作款、攝影雜誌、年輕潮流、在地懷舊，各含淺深規則與動效個性）；整理插畫 15 種畫風配方與生圖公式；建立「主題→風格智能配對（穩健／大膽／驚喜）」與外觀帳本 | 面對不同主題（商務／發表／活動／文化／科普）的簡報，Gate 2 都能端出截然不同、貼題驚豔的三個候選且不撞款 | |
 | **E** | **交付、修改閉環與越用越省事** | 成品上按 `E` 直接改字並回寫、畫面上點選留言修改；雙螢幕講者模式（備註、計時、下一頁預覽）；文字可編輯 PPTX 匯出；品味記憶與獨立評審；評估搬進 `skills/` 由 `install.sh` 全域安裝 | 完整覆蓋日常製作→修改→上台→交付閉環，重複使用明顯更省事 | |
@@ -85,26 +85,26 @@
 
 ---
 
-## 待辦清單（來自 2026-11-14 新 agent 實測，納入 Phase A 處理）
+## 待辦清單（來自 2026-11-14 新 agent 實測，已於 Phase A 清完）
 
-第一輪（未處理項併入 Phase A）：
+第一輪：
 
-- [~] 品管抓不到「斷行很醜」：大字已改只在標點後換行、放不下自動縮字；大數字與一般內文待補（→ Phase A）
-- [ ] 選風格之前看不到完整頁面：隨 Phase A 改為「一次視覺關卡（完整風格樣張）＋製作後逐頁 `check.mjs` 截圖」一併檢視（→ Phase A）
-- [ ] 每頁字數上限是固定的：需依播放方式（上台講或自己讀）、每頁分鐘數調整（→ Phase A）
-- [ ] 頁數算術沒有在 brief 階段檢查：章節數加上封面、目錄後，震撼頁和結尾頁可能放不下（→ Phase A）
-- [ ] 附件頁不計入頁數上限，成了規避上限的漏洞，需要給出指引（→ Phase A）
-- [ ] brief 的「限制」與「地雷」沒有辦法寫進 storyboard，lint 也無法檢查（→ Phase A）
-- [ ] 來源是簡體中文時，沒有轉換與用詞的指引（→ Phase A）
-- [ ] 離線或內網環境載不到 Google Fonts，主題會失去特色（→ Phase A，補完整系統字體退路）
-- [~] 內容頁的文字集中在中段，上方三分之一是空的：隨自由編排畫布與風格版面語法解決，待 Phase C 真實簡報確認
+- [x] 品管抓不到「斷行很醜」：升級 `fit.js` 支援 `[data-fit="phrase"]` 與 `[data-fit="figure"]`，搭配 `shell.css` 的 `text-wrap: balance/pretty` 與 `line-break: strict`（Phase A）
+- [x] 選風格之前看不到完整頁面：改為單一視覺關卡 Gate 2 直接呈現完整風格樣張（Phase A）
+- [x] 每頁字數上限是固定的：`meta.delivery`（`talk`/`discuss`/`read`/`auto`）＋每頁分鐘數動態調整字數上限（Phase A）
+- [x] 頁數算術沒有在 brief 階段檢查：`brief.md`/`grill.md` 加預算拆解，`lint.py` 輸出「封面+目錄+內容+震撼+結尾=合計/上限」（Phase A）
+- [x] 附件頁不計入頁數上限成了漏洞：`presentation-rules.md` 明定附件防濫用指引，`lint.py` 對附件過多發出警告（Phase A）
+- [x] brief 的「限制」與「地雷」無法寫進 storyboard 與檢查：新增 `constraints`（`forbidden` ERROR、`limitations`/`must_include` WARN）（Phase A）
+- [x] 來源是簡體中文時缺轉換與用詞指引：`presentation-rules.md` 補台灣習慣用語指引，`lint.py` 自動偵測純簡體字（Phase A）
+- [x] 離線環境載不到 Google Fonts：`shell.css` 與 Style DNA 內建五種語音的系統字體退路，`check.mjs` 離線不崩潰（Phase A）
+- [~] 內容頁文字集中在中段、上方三分之一空：隨自由編排畫布與風格版面語法解決，待 Phase C 真實簡報確認
 
-第二輪（剩餘未處理項併入 Phase A）：
+第二輪：
 
-- [ ] 有好幾個數字頁時，樣張預設挑的招牌頁不一定是最重要的那一頁（→ Phase A）
-- [ ] 樣張放 4 頁時每格太小（→ Phase A，明確限定 3 頁或改善檢視版面）
+- [x] 有好幾個數字頁時樣張預設招牌頁挑不準：支援 `signature: true` 明確標記招牌頁（Phase A）
+- [x] 樣張放 4 頁時每格太小：`references/samples.md` 與 `assemble.py --sheet` 強制 2–3 頁並排（Phase A）
 - [x] 步驟 `detail` 裡的 `==重點==` 字太小（v3.0 已修）
-- [ ] 步驟 `detail` 無法指定斷行（→ Phase A）
+- [x] 步驟 `detail` 無法指定斷行：`storyboard.yaml` 明確支援並示範 `\n` 換行，由 `rich()` 轉 `<br>`（Phase A）
 - [x] `presentation-rules.md` 補 `stats`、`note`、`{label, detail}`（v3.0 已修）
 - [x] `stats` 的 `value` 支援 `==…==`（v3.0 已修）
 - [x] 關卡二前看不到沒被選進樣張的頁面（已轉由新 Gate 2 流程處理）

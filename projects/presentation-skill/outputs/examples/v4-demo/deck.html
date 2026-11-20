@@ -1,0 +1,1370 @@
+<!doctype html>
+<html lang="zh-Hant" data-shape="row" data-motion="horizontal" data-format="deck" data-style="counsel" data-mode="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>星塵烘焙・智慧補貨系統導入</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;900&display=swap" rel="stylesheet">
+<style>
+/* deck-architect v4 Thin Shell CSS
+ *
+ * Only locks invariants that must never break across slides:
+ *  - 1920x1080 auto-scaled stage & active-slide visibility
+ *  - Offline CJK + Latin system font fallback stacks
+ *  - Single-source navigation/tab hooks (fully styleable or replaceable via data-nav="inline")
+ *  - Replaceable image-layer slot (.asset-slot) for zero-wait SVG + optional AI/photo upgrade
+ *  - Shock curtain, appendix back button, speaker notes, and exact 16:9 print/PDF output
+ *
+ * Free-canvas slides (<section class="slide canvas">) keep 100% layout freedom.
+ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Curated offline CJK + Latin fallback voices */
+  --font-sans-fallback: "PingFang TC", "Microsoft JhengHei", "Heiti TC", "Noto Sans CJK TC", system-ui, -apple-system, sans-serif;
+  --font-serif-fallback: "Songti TC", "PMingLiU", "Noto Serif CJK TC", Georgia, serif;
+  --font-round-fallback: "PingFang TC", "Hiragino Maru Gothic ProN", "Microsoft JhengHei", sans-serif;
+  --font-kai-fallback: "BiauKai", "DFKai-SB", "Kaiti TC", serif;
+  --font-mono-fallback: "SFMono-Regular", ui-monospace, "Cascadia Mono", Consolas, monospace;
+
+  /* Default surface & type tokens (overridden by deck style CSS) */
+  --bg: #F1EFEA;
+  --bg-2: #E6E2DA;
+  --fg: #141619;
+  --fg-2: #3F444B;
+  --fg-3: #5D6168;
+  --line: rgba(20, 22, 25, .24);
+  --line-2: rgba(20, 22, 25, .14);
+  --accent: #0D6B4F;
+  --accent-text: #0B5E45;
+  --accent-ink: #F4F2EC;
+  --em-on-accent: #FFE082;
+  --em-on-ink: #5CCB94;
+  --shock-bg: #111318;
+  --shock-fg: #F4F2EC;
+  --shock-em: #FFB340;
+  --radius: 0px;
+
+  --font-display: "Noto Sans TC", var(--font-sans-fallback);
+  --font-body: "Noto Sans TC", var(--font-sans-fallback);
+  --font-number: "Archivo", "Geist", "Noto Sans TC", var(--font-sans-fallback);
+  --font-label: "Noto Sans TC", var(--font-sans-fallback);
+  --font-quote: "Noto Serif TC", var(--font-serif-fallback);
+
+  --display-weight: 900;
+  --title-weight: 800;
+  --quote-weight: 600;
+  --number-weight: 900;
+  --numeral-weight: 700;
+  --display-tracking: -0.02em;
+  --title-tracking: -0.01em;
+  --label-tracking: 0.02em;
+
+  /* Flexible navigation placement tokens (styles may override) */
+  --nav-top: 44px;
+  --nav-left: 96px;
+  --nav-right: 96px;
+  --nav-justify: flex-start;
+  --nav-gap: 36px;
+  --nav-size: 21px;
+  --nav-color: var(--fg-3);
+  --nav-active: var(--fg);
+  --nav-accent: var(--accent);
+  --nav-border: var(--line-2);
+  --enter-easing: cubic-bezier(.16, 1, .3, 1);
+}
+
+html, body {
+  height: 100%;
+  background: #0D0E11;
+  overflow: hidden;
+}
+
+#viewport {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0D0E11;
+}
+
+#stage {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  flex: none;
+  transform-origin: center center;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* ---------------------------------------------------------------- slide container */
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-synthesis: none;
+  line-break: strict;
+  -webkit-font-smoothing: antialiased;
+  font-kerning: normal;
+  visibility: hidden;
+  overflow: hidden;
+}
+.slide.active { visibility: visible; }
+.slide h1, .slide h2, .slide h3 { text-wrap: balance; font-feature-settings: "halt" 1; }
+.slide p { text-wrap: pretty; }
+
+/* Emphasis: colour only, never underline, never faux italic */
+mark.em {
+  background: none;
+  color: var(--accent-text);
+  font-weight: inherit;
+  font-style: normal;
+  text-decoration: none;
+}
+.num { font-variant-numeric: tabular-nums lining-nums; }
+.unit { font-size: .42em; font-weight: 500; letter-spacing: 0; opacity: .75; margin-left: .08em; font-family: var(--font-body); }
+.ph { display: inline-block; max-width: 100%; }
+
+/* ---------------------------------------------------------------- replaceable image/scene slot */
+.asset-slot {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.asset-slot > svg,
+.asset-slot > img.slot-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Ensure slide content sits above background scene layer with zero specificity so slide CSS / .back always win */
+:where(.slide.canvas > :not(.asset-slot):not(.scene):not([data-layer="bg"]):not(.back):not(.more-btn)) {
+  position: relative;
+  z-index: 2;
+}
+:where(.slide.canvas > svg.scene, .slide.canvas > [data-layer="bg"]) {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- persistent navigation (customizable) */
+#nav {
+  position: absolute;
+  left: var(--nav-left);
+  right: var(--nav-right);
+  top: var(--nav-top);
+  z-index: 12;
+  display: flex;
+  justify-content: var(--nav-justify);
+  gap: var(--nav-gap);
+  align-items: center;
+  font: 500 var(--nav-size)/1 var(--font-label);
+  letter-spacing: var(--label-tracking);
+  color: var(--nav-color);
+  transition: opacity .28s ease;
+  pointer-events: none;
+}
+#nav span {
+  position: relative;
+  padding-bottom: 10px;
+  transition: color .35s ease;
+}
+#nav span.on {
+  color: var(--nav-active);
+  font-weight: 700;
+}
+#nav .ind {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: var(--nav-accent);
+  transition: left .5s cubic-bezier(.65, 0, .35, 1), width .5s cubic-bezier(.65, 0, .35, 1);
+}
+#nav.with-rule::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--nav-border);
+}
+
+#tabs {
+  position: absolute;
+  left: var(--nav-left);
+  top: calc(var(--nav-top) + 46px);
+  z-index: 12;
+  display: flex;
+  gap: 24px;
+  font: 500 19px/1 var(--font-label);
+  letter-spacing: var(--label-tracking);
+  color: var(--nav-color);
+  transition: opacity .28s ease;
+  pointer-events: none;
+}
+#tabs span {
+  padding: 5px 0;
+  border-bottom: 2px solid transparent;
+  transition: color .3s ease, border-color .3s ease;
+}
+#tabs span.on {
+  color: var(--nav-active);
+  border-bottom-color: var(--nav-accent);
+}
+
+#stage.hide-nav #nav,
+#stage.hide-nav #tabs { opacity: 0; }
+#stage.no-trans *, #stage.no-trans { transition: none !important; }
+
+/* Inline chapter nav (for free-canvas slides & print fallback) */
+.snav { display: none; }
+.slide-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font: 500 20px/1 var(--font-label);
+  color: var(--nav-color);
+}
+.slide-nav .on,
+.slide-nav b {
+  color: var(--nav-active);
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------------- interactive chrome */
+.back {
+  position: absolute;
+  right: 64px;
+  top: 36px;
+  z-index: 15;
+  font: 600 20px/1 var(--font-label);
+  color: var(--fg);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 12px 22px;
+  cursor: pointer;
+}
+.more-btn {
+  position: absolute;
+  right: 96px;
+  bottom: 40px;
+  z-index: 12;
+  font: 600 20px/1 var(--font-label);
+  color: var(--fg);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+[data-link] { cursor: pointer; }
+[data-format="section"] .pageno,
+[data-format="section"] .foot .pg { display: none; }
+
+#curtain {
+  position: absolute;
+  inset: 0;
+  background: #08090C;
+  z-index: 25;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#notes {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  background: rgba(12, 14, 18, .9);
+  color: #ECEAE4;
+  font: 400 20px/1.6 var(--font-sans-fallback);
+  padding: 18px 28px;
+  display: none;
+  max-height: 32vh;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+#notes.show { display: block; }
+
+#hint {
+  position: fixed;
+  right: 16px;
+  bottom: 12px;
+  z-index: 41;
+  color: #9A9EA6;
+  font: 12px/1.4 var(--font-sans-fallback);
+  opacity: 0;
+  transition: opacity .35s ease;
+  pointer-events: none;
+}
+body:hover #hint { opacity: .75; }
+
+/* ---------------------------------------------------------------- static & print */
+.static .slide {
+  position: relative;
+  visibility: visible;
+  width: 1920px;
+  height: 1080px;
+}
+.static .snav {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  left: var(--nav-left);
+  right: var(--nav-right);
+  top: var(--nav-top);
+  z-index: 12;
+}
+.static .slabels {
+  display: flex;
+  justify-content: var(--nav-justify);
+  gap: var(--nav-gap);
+  font: 500 var(--nav-size)/1 var(--font-label);
+  color: var(--nav-color);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--nav-border);
+}
+.static .slabels span.on {
+  color: var(--nav-active);
+  font-weight: 700;
+}
+.static .stabs {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  font: 500 19px/1 var(--font-label);
+  color: var(--nav-color);
+}
+.static .stabs span.on {
+  color: var(--nav-active);
+  font-weight: 700;
+}
+
+@media print {
+  @page { size: 1920px 1080px; margin: 0; }
+  html, body { height: auto; overflow: visible; background: none; }
+  #viewport { position: static; display: block; background: none; }
+  #stage { transform: none !important; width: 1920px; height: auto; overflow: visible; }
+  #nav, #tabs, #curtain, #notes, #hint, .back, .more-btn { display: none !important; }
+  .slide {
+    position: relative;
+    visibility: visible !important;
+    width: 1920px;
+    height: 1080px;
+    break-after: page;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .slide * { opacity: 1; transform: none !important; }
+  .toc li.off { opacity: .28 !important; }
+  .snav {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    left: var(--nav-left);
+    right: var(--nav-right);
+    top: var(--nav-top);
+  }
+  .slabels {
+    display: flex;
+    gap: var(--nav-gap);
+    font: 500 var(--nav-size)/1 var(--font-label);
+    color: var(--nav-color);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--nav-border);
+  }
+  .slabels span.on { color: var(--nav-active); font-weight: 700; }
+  .stabs { display: flex; gap: 24px; margin-top: 16px; font: 500 19px/1 var(--font-label); color: var(--nav-color); }
+  .stabs span.on { color: var(--nav-active); font-weight: 700; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #nav .ind, #tabs span, #nav span { transition: none !important; }
+}
+
+/* deck-architect v4 Business Components & Quick-Mode Fallback CSS
+ *
+ * Scoped strictly to deterministic component slides (.cmp, .status, .overview, .toc)
+ * so free-canvas slides (.slide.canvas) NEVER suffer CSS specificity conflicts.
+ */
+
+/* ---------------------------------------------------------------- shared component chrome */
+.slide.cmp,
+.slide.status,
+.slide.overview,
+.slide.toc {
+  font-size: 28px;
+  line-height: 1.65;
+}
+
+.slide.cmp .source,
+.slide.status .source,
+.slide.overview .source {
+  position: absolute;
+  left: 96px;
+  bottom: 36px;
+  font: 400 19px/1.3 var(--font-label);
+  color: var(--fg-3);
+  z-index: 5;
+}
+
+.slide.cmp .foot,
+.slide.status .pageno {
+  position: absolute;
+  right: 96px;
+  bottom: 36px;
+  font: 500 19px/1 var(--font-label);
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+  z-index: 5;
+}
+
+/* ---------------------------------------------------------------- status-table (weekly progress overview) */
+.slide.status .st-head {
+  position: absolute;
+  left: 80px;
+  right: 80px;
+  top: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 36px;
+}
+.slide.status .st-head .title {
+  font: var(--title-weight) 54px/1.15 var(--font-display);
+  letter-spacing: var(--title-tracking);
+}
+.slide.status .legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font: 500 20px/1 var(--font-label);
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+.slide.status .legend span { display: inline-flex; align-items: center; gap: 8px; }
+.slide.status .st-body {
+  position: absolute;
+  left: 80px;
+  right: 80px;
+  top: 136px;
+  bottom: 84px;
+  overflow: hidden;
+}
+.slide.status .st-summary {
+  list-style: none;
+  margin-bottom: 18px;
+  padding: 4px 0 4px 22px;
+  border-left: 3px solid var(--accent);
+  display: grid;
+  gap: 6px;
+}
+.slide.status .st-summary li { font: 500 23px/1.45 var(--font-body); }
+.slide.status .status-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 21px/1.25 var(--font-body);
+}
+.slide.status .status-table th {
+  font: 600 20px/1.2 var(--font-label);
+  color: var(--fg-3);
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--line);
+}
+.slide.status .status-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line-2);
+  vertical-align: middle;
+}
+.slide.status .status-table tr.grp td {
+  font: 700 22px/1.2 var(--font-display);
+  padding-top: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.slide.status .g-note { margin-left: 14px; font: 400 20px/1 var(--font-label); color: var(--fg-3); }
+.slide.status .c-name { font-weight: 600; min-width: 260px; }
+.slide.status .c-owner { color: var(--fg-3); white-space: nowrap; }
+.slide.status .st { white-space: nowrap; color: var(--fg-3); }
+.slide.status .st i, .slide.status .legend i {
+  width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: middle;
+}
+.slide.status .st-done i, .slide.status .legend .st-done { background: var(--fg); }
+.slide.status .st-done { color: var(--fg); }
+.slide.status .st-doing i, .slide.status .legend .st-doing { background: var(--accent); }
+.slide.status .st-doing { color: var(--fg); font-weight: 600; }
+.slide.status .st-target i, .slide.status .legend .st-target { background: transparent; border: 2px solid var(--fg-3); }
+.slide.status .st-na i { display: none; }
+.slide.status .c-prog { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
+.slide.status .bar {
+  display: inline-block; width: 88px; height: 8px; background: var(--line-2);
+  margin-right: 10px; vertical-align: middle; overflow: hidden;
+}
+.slide.status .bar span { display: block; height: 100%; background: var(--fg); }
+.slide.status .c-risk { white-space: nowrap; }
+.slide.status .dot {
+  display: inline-block; width: 15px; height: 15px; border-radius: 50%; margin-right: 8px; vertical-align: middle;
+}
+.slide.status .dot-red { background: #C82828; }
+.slide.status .dot-yellow { background: #C9820B; }
+.slide.status .dot-green { background: #1E874B; }
+.slide.status tr.rk-red td.c-name { box-shadow: inset 5px 0 0 #C82828; padding-left: 16px; }
+.slide.status .c-sup { color: var(--fg); max-width: 420px; }
+.slide.status .source { left: 80px; }
+
+/* ---------------------------------------------------------------- overview: pillars (annual section) */
+.slide.overview .ov-head { position: absolute; left: 96px; right: 96px; top: 72px; }
+.slide.overview .ov-kicker {
+  font: 600 22px/1.2 var(--font-label);
+  color: var(--fg-3);
+  margin-bottom: 18px;
+}
+.slide.overview .ov-headline {
+  font: var(--display-weight) 92px/1.1 var(--font-display);
+  letter-spacing: var(--display-tracking);
+}
+.slide.overview .pillars {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  top: 296px;
+  bottom: 100px;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+  gap: 44px;
+  align-items: start;
+}
+.slide.overview .pillar {
+  margin-top: calc(var(--k) * 56px);
+  padding-top: 24px;
+  border-top: 2px solid var(--line);
+  position: relative;
+}
+.slide.overview .pillar[data-link]:hover h3 { color: var(--accent-text); }
+.slide.overview .pk { font: 600 20px/1.2 var(--font-label); color: var(--fg-3); margin-bottom: 12px; }
+.slide.overview .pillar h3 { font: var(--title-weight) 44px/1.2 var(--font-display); transition: color .25s; }
+.slide.overview .psub { margin-top: 12px; font: 400 25px/1.5 var(--font-body); color: var(--fg-2); }
+.slide.overview .pillar ul { list-style: none; margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+.slide.overview .pillar li { font: 500 24px/1.45 var(--font-body); padding-left: 24px; position: relative; }
+.slide.overview .pillar li::before { content: ""; position: absolute; left: 0; top: .72em; width: 12px; height: 2px; background: var(--accent); }
+.slide.overview .stats { display: flex; flex-wrap: wrap; gap: 18px 40px; margin-top: 24px; }
+.slide.overview .sv { font: var(--number-weight) 78px/1 var(--font-number); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.slide.overview .sl { margin-top: 8px; font: 400 21px/1.3 var(--font-body); color: var(--fg-3); }
+.slide.overview .more { display: inline-block; margin-top: 20px; font: 600 20px/1 var(--font-label); color: var(--accent-text); }
+
+/* ---------------------------------------------------------------- automatic TOC highlight page */
+.slide.toc .toc-list { list-style: none; position: absolute; inset: 0; display: flex; padding: 0 120px; }
+.slide.toc li { transition: opacity .5s; }
+.slide.toc li.off { opacity: .28; }
+.slide.toc .i { font: var(--numeral-weight) 84px/1 var(--font-number); letter-spacing: -.03em; color: var(--fg-3); display: block; margin-bottom: 24px; }
+.slide.toc li.on .i { color: var(--accent-text); }
+.slide.toc .l { font: var(--display-weight) 68px/1.15 var(--font-display); }
+[data-shape="row"] .slide.toc .toc-list { align-items: center; }
+[data-shape="row"] .slide.toc li { flex: 1; border-top: 2px solid var(--line-2); padding-top: 36px; margin-right: 44px; }
+[data-shape="row"] .slide.toc li.on { border-top-color: var(--accent); }
+[data-shape="column"] .slide.toc .toc-list { flex-direction: column; justify-content: center; gap: 32px; }
+[data-shape="column"] .slide.toc li { display: flex; align-items: baseline; gap: 44px; border-left: 3px solid transparent; padding-left: 36px; }
+[data-shape="column"] .slide.toc li.on { border-left-color: var(--accent); }
+[data-shape="column"] .slide.toc .i { margin: 0; font-size: 58px; }
+[data-shape="rings"] .slide.toc .toc-list { align-items: center; justify-content: center; }
+[data-shape="rings"] .slide.toc li {
+  position: absolute; left: 50%; top: 50%; border: 1px solid var(--line-2); border-radius: 50%;
+  transform: translate(-50%, -50%); width: calc(var(--r) * 1px); height: calc(var(--r) * 1px);
+  display: flex; align-items: flex-start; justify-content: center; padding-top: 32px;
+}
+[data-shape="rings"] .slide.toc li.on { border-color: var(--accent); border-width: 2px; }
+[data-shape="rings"] .slide.toc .i { display: none; }
+[data-shape="rings"] .slide.toc .l { font-size: 44px; }
+
+/* ---------------------------------------------------------------- quick-mode / fallback components (.slide.cmp) */
+.slide.cmp.cover { background: var(--cover-bg, var(--bg)); color: var(--cover-fg, var(--fg)); }
+.slide.cmp.cover .kicker { position: absolute; left: 120px; top: 108px; font: 600 22px/1 var(--font-label); color: var(--cover-fg-3, var(--fg-3)); }
+.slide.cmp.cover .cover-inner { position: absolute; left: 120px; right: 120px; bottom: 290px; }
+.slide.cmp.cover .cover-title { font: var(--display-weight) 144px/1.05 var(--font-display); letter-spacing: var(--display-tracking); max-width: 1640px; }
+.slide.cmp.cover .cover-sub { margin-top: 32px; font: 400 38px/1.45 var(--font-body); color: var(--cover-fg-2, var(--fg-2)); max-width: 1280px; }
+.slide.cmp.cover .route {
+  position: absolute; left: 120px; right: 120px; bottom: 88px; display: grid;
+  grid-template-columns: 1.4fr repeat(var(--n), 1fr); gap: 36px; font: 500 22px/1.4 var(--font-label);
+  color: var(--cover-fg-2, var(--fg-2));
+}
+.slide.cmp.cover .route.no-who { grid-template-columns: repeat(var(--n), 1fr); }
+.slide.cmp.cover .route > div { border-top: 1px solid var(--cover-line, var(--line)); padding-top: 16px; }
+.slide.cmp.cover .route i { display: block; font-style: normal; color: var(--cover-fg-3, var(--fg-3)); margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+
+.slide.cmp.closing { background: var(--cover-bg, var(--bg)); color: var(--cover-fg, var(--fg)); }
+.slide.cmp.closing .closing-inner { position: absolute; left: 120px; right: 120px; bottom: 200px; }
+.slide.cmp.closing .closing-text { font: var(--display-weight) 168px/1.08 var(--font-display); }
+.slide.cmp.closing .closing-sub { margin-top: 28px; font: 400 38px/1.45 var(--font-body); color: var(--cover-fg-2, var(--fg-2)); }
+
+.slide.cmp.shock { background: var(--shock-bg); color: var(--shock-fg); }
+.slide.cmp.shock .shock-inner { position: absolute; left: 120px; right: 120px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+.slide.cmp.shock .shock-text { font: var(--display-weight) 144px/1.1 var(--font-display); max-width: 1640px; }
+.slide.cmp.shock .shock-text mark.em { color: var(--shock-em); }
+.slide.cmp.shock .shock-sub { margin-top: 40px; font: 400 38px/1.45 var(--font-body); opacity: .78; }
+.slide.cmp.shock .source { color: inherit; opacity: .6; }
+
+/* Standard content component: title is ALWAYS largest heading on the slide */
+.slide.cmp.content .slide-head { position: absolute; left: 96px; right: 96px; top: 124px; }
+.slide.cmp.content.tabbed .slide-head { top: 156px; }
+.slide.cmp.content .title { font: var(--display-weight) 78px/1.12 var(--font-display); letter-spacing: var(--title-tracking); }
+.slide.cmp.content .body {
+  position: absolute; left: 96px; right: 96px; top: 244px; bottom: 108px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.slide.cmp.content.tabbed .body { top: 274px; }
+
+.slide.cmp .point .key { font: 700 54px/1.3 var(--font-display); max-width: 1460px; }
+.slide.cmp .point .key.whole { color: var(--accent-text); }
+.slide.cmp .point .support { margin-top: 36px; max-width: 1120px; font: 400 30px/1.6 var(--font-body); color: var(--fg-2); padding-left: 24px; border-left: 3px solid var(--accent); }
+
+.slide.cmp .number { display: grid; grid-template-columns: auto minmax(0, 660px); column-gap: 72px; align-items: end; justify-content: start; }
+.slide.cmp .number .value { grid-row: 1 / 3; font: var(--number-weight) 240px/.88 var(--font-number); letter-spacing: -.04em; }
+.slide.cmp .number .label { font: 700 44px/1.25 var(--font-display); align-self: end; }
+.slide.cmp .number .note { font: 400 28px/1.55 var(--font-body); color: var(--fg-2); margin-top: 16px; align-self: start; }
+.slide.cmp .pair { display: inline-flex; align-items: baseline; gap: .12em; white-space: nowrap; }
+.slide.cmp .pair .was { color: var(--fg-3); }
+.slide.cmp .pair .arrow { font-size: .5em; font-weight: 400; color: var(--fg-3); margin: 0 .12em; }
+
+.slide.cmp .stats-lead { font: 600 34px/1.4 var(--font-body); color: var(--fg-2); margin-bottom: 40px; max-width: 1320px; }
+.slide.cmp .stats-row { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 44px; }
+.slide.cmp .stats-row .stat { padding-top: 22px; border-top: 2px solid var(--line); }
+.slide.cmp .stats-row .sh { margin-bottom: 12px; font: 700 30px/1.3 var(--font-display); }
+.slide.cmp .stats-row .sv { font: var(--number-weight) 120px/1 var(--font-number); letter-spacing: -.04em; white-space: nowrap; }
+.slide.cmp .stats-row .sl { margin-top: 14px; font: 500 28px/1.35 var(--font-body); }
+.slide.cmp .stats-row .sn { margin-top: 8px; font: 400 22px/1.45 var(--font-body); color: var(--fg-3); }
+.slide.cmp .lnote { margin-top: 28px; padding-left: 20px; border-left: 3px solid var(--accent); font: 400 26px/1.5 var(--font-body); color: var(--fg-2); }
+
+.slide.cmp .bullets { list-style: none; display: flex; flex-direction: column; max-width: 1420px; }
+.slide.cmp .bullets li { font: 500 36px/1.45 var(--font-body); padding: 20px 0 20px 64px; position: relative; border-top: 1px solid var(--line-2); }
+.slide.cmp .bullets li:last-child { border-bottom: 1px solid var(--line-2); }
+.slide.cmp .bullets li::before { content: ""; position: absolute; left: 0; top: calc(20px + .72em); width: 32px; height: 3px; background: var(--accent); }
+
+.slide.cmp .steps { list-style: none; display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 44px; }
+.slide.cmp .steps li { padding-top: 22px; border-top: 2px solid var(--line); }
+.slide.cmp .steps .n { display: block; font: var(--numeral-weight) 88px/1 var(--font-number); color: var(--fg-3); margin-bottom: 18px; }
+.slide.cmp .steps li:has(mark.em) .n { color: var(--accent-text); }
+.slide.cmp .steps .t { display: block; font: 700 32px/1.4 var(--font-body); }
+.slide.cmp .steps .d { display: block; margin-top: 10px; font: 400 25px/1.5 var(--font-body); color: var(--fg-2); }
+
+.slide.cmp .compare { display: grid; grid-template-columns: .95fr 1.05fr; align-items: stretch; min-height: 440px; }
+.slide.cmp .compare .col { padding: 44px 52px; }
+.slide.cmp .compare .col:first-child { color: var(--fg-2); border-top: 2px solid var(--line-2); }
+.slide.cmp .compare .col:last-child { background: var(--accent); color: var(--accent-ink); border-radius: var(--radius); }
+.slide.cmp .compare .col:last-child mark.em { color: var(--em-on-accent, inherit); }
+.slide.cmp .compare h3 { font: 600 22px/1 var(--font-label); margin-bottom: 28px; opacity: .82; }
+.slide.cmp .compare ul { list-style: none; display: flex; flex-direction: column; gap: 22px; }
+.slide.cmp .compare li { font: 700 40px/1.35 var(--font-display); }
+
+.slide.cmp .lanes { display: grid; grid-template-columns: 120px repeat(var(--n), minmax(0, 1fr)); gap: 16px 20px; align-items: stretch; }
+.slide.cmp .lanes .ll { font: 700 22px/1.3 var(--font-label); color: var(--fg-3); display: flex; align-items: center; }
+.slide.cmp .lanes .lane { display: grid; grid-template-rows: 1fr auto 1fr; gap: 12px; border-left: 1px solid var(--line-2); padding-left: 16px; }
+.slide.cmp .lanes .lo { list-style: none; font: 400 21px/1.45 var(--font-body); color: var(--fg-2); display: flex; flex-direction: column; gap: 6px; }
+.slide.cmp .lanes .lc { font: 600 20px/1.35 var(--font-label); color: var(--accent-text); padding: 6px 0; border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); }
+.slide.cmp .lanes .ln { display: flex; flex-direction: column; gap: 6px; }
+.slide.cmp .lanes .ln .n { font: 800 22px/1 var(--font-number); color: var(--accent-text); }
+.slide.cmp .lanes .ln .t { font: 700 24px/1.35 var(--font-body); }
+.slide.cmp .lanes .ln .d { font: 400 20px/1.4 var(--font-body); color: var(--fg-2); }
+
+.slide.cmp .tl { list-style: none; display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 32px; border-top: 2px solid var(--line); padding-top: 28px; }
+.slide.cmp .tl .w { display: block; font: 700 22px/1.2 var(--font-number); color: var(--accent-text); margin-bottom: 10px; }
+.slide.cmp .tl .t { display: block; font: 700 28px/1.35 var(--font-body); }
+.slide.cmp .tl .d { display: block; margin-top: 8px; font: 400 22px/1.45 var(--font-body); color: var(--fg-2); }
+
+.slide.cmp .tbl { width: 100%; border-collapse: collapse; font: 400 24px/1.4 var(--font-body); }
+.slide.cmp .tbl th { font: 700 21px/1.2 var(--font-label); color: var(--fg-3); text-align: left; padding: 12px 14px; border-bottom: 2px solid var(--line); }
+.slide.cmp .tbl td { padding: 14px; border-bottom: 1px solid var(--line-2); }
+.slide.cmp .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.slide.cmp .quote { max-width: 1440px; }
+.slide.cmp .quote::before { content: "\201C"; display: block; font: 700 200px/.8 var(--font-quote); color: var(--accent); margin-bottom: 8px; }
+.slide.cmp .quote p { font: var(--quote-weight) 58px/1.4 var(--font-quote); }
+.slide.cmp .quote cite { display: flex; align-items: center; gap: 18px; margin-top: 40px; font: 500 24px/1.4 var(--font-label); color: var(--fg-3); font-style: normal; }
+.slide.cmp .quote cite::before { content: ""; width: 40px; height: 2px; background: var(--fg-3); }
+
+.slide.cmp .image { display: grid; grid-template-columns: 1.35fr 1fr; gap: 64px; align-items: end; height: 100%; }
+.slide.cmp .image .img { height: 100%; overflow: hidden; background: var(--bg-2); border-radius: var(--radius); }
+.slide.cmp .image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.slide.cmp .image .caption { font: 700 38px/1.4 var(--font-display); }
+
+/* @fonts family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;900 */
+/* v4-demo deck.css — Counsel Light Paper + OKLCH 松綠貼題配色 */
+:root {
+  --bg: #F1EFEA;
+  --bg-2: #E6E2DA;
+  --fg: #141619;
+  --fg-2: #3F444B;
+  --fg-3: #5A5E66;
+  --line: #141619;
+  --line-2: #D3CFC6;
+  --gray: #CFCAC1;
+  --gray2: #BDB7AC;
+  --accent: #0D6B4F;
+  --accent-text: #0B5E45;
+  --accent-ink: #F4F2EC;
+  --accent-sub: #CFE5DB;
+  --late: #B5381F;
+  --late-tint: #E8C2B6;
+  --shock-bg: #15181D;
+  --shock-fg: #ECEAE4;
+  --shock-em: #5CCB94;
+
+  --font-display: "Noto Sans TC", var(--font-sans-fallback);
+  --font-body: "Noto Sans TC", var(--font-sans-fallback);
+  --font-number: "Archivo", "Noto Sans TC", var(--font-sans-fallback);
+  --font-label: "Noto Sans TC", var(--font-sans-fallback);
+
+  --nav-top: 42px;
+  --nav-left: 88px;
+  --nav-right: 88px;
+  --nav-justify: flex-start;
+  --nav-gap: 34px;
+  --nav-size: 21px;
+  --nav-color: #585D66;
+  --nav-active: #141619;
+  --nav-accent: #0D6B4F;
+  --nav-border: transparent;
+}
+
+/* 01-cover.html */
+#s-1 { background: var(--bg); color: var(--fg); }
+#s-1 .band { position: absolute; right: 0; top: 0; bottom: 0; width: 420px; background: var(--accent); color: var(--accent-ink); padding: 72px 52px; display: flex; flex-direction: column; justify-content: space-between; }
+#s-1 .band-kicker { font-weight: 700; font-size: 20px; letter-spacing: .06em; color: var(--accent-sub); }
+#s-1 .band-stat .big { font: 900 124px/.9 var(--font-number); letter-spacing: -.04em; }
+#s-1 .band-stat .big small { font-size: 44px; font-weight: 700; }
+#s-1 .band-stat p { margin-top: 14px; font-weight: 500; font-size: 24px; line-height: 1.45; color: var(--accent-sub); }
+#s-1 .main { position: absolute; left: 96px; top: 96px; right: 492px; bottom: 92px; display: flex; flex-direction: column; justify-content: space-between; }
+#s-1 .kicker { font-weight: 700; font-size: 22px; color: var(--accent-text); letter-spacing: .04em; }
+#s-1 h1 { font-weight: 900; font-size: 112px; line-height: 1.08; letter-spacing: -.025em; margin-top: 28px; }
+#s-1 .sub { margin-top: 28px; font-weight: 500; font-size: 36px; line-height: 1.48; color: var(--fg-2); max-width: 1080px; }
+#s-1 .route { display: grid; grid-template-columns: 1.2fr repeat(3, 1fr); gap: 32px; padding-top: 24px; border-top: 2px solid var(--fg); }
+#s-1 .route i { display: block; font-style: normal; font-weight: 700; font-size: 20px; color: var(--fg-3); margin-bottom: 6px; font-family: var(--font-number); }
+#s-1 .route span { font-weight: 700; font-size: 24px; color: var(--fg); }
+/* 02-pain.html */
+#s-2 .slide-nav { position: absolute; left: 88px; top: 44px; }
+#s-2 .head { position: absolute; left: 88px; right: 88px; top: 118px; }
+#s-2 h2.title { font-weight: 900; font-size: 86px; line-height: 1.1; letter-spacing: -.02em; }
+#s-2 p.lead { margin-top: 20px; font-weight: 500; font-size: 32px; line-height: 1.48; color: var(--fg); max-width: 1360px; }
+#s-2 p.lead em { font-style: normal; font-weight: 900; color: var(--late); }
+#s-2 .grid { position: absolute; left: 88px; right: 88px; top: 368px; bottom: 110px; display: grid; grid-template-columns: 760px 1fr; gap: 72px; align-items: end; }
+#s-2 .hero-box { border-top: 4px solid var(--late); padding-top: 30px; }
+#s-2 .hero-num { font: 900 228px/.86 var(--font-number); letter-spacing: -.045em; color: var(--late); font-variant-numeric: tabular-nums; }
+#s-2 .hero-num small { font-size: 84px; font-weight: 700; margin-left: 6px; }
+#s-2 .hero-lbl { margin-top: 24px; font-weight: 700; font-size: 32px; color: var(--fg); }
+#s-2 .hero-sub { margin-top: 10px; font-weight: 400; font-size: 24px; line-height: 1.5; color: var(--fg-2); }
+#s-2 .causes { border-top: 2px solid var(--fg); }
+#s-2 .cause { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding: 30px 0; border-bottom: 1px solid var(--line-2); align-items: baseline; }
+#s-2 .cause .cn { font: 900 54px/1 var(--font-number); color: var(--fg); font-variant-numeric: tabular-nums; }
+#s-2 .cause strong { display: block; font-weight: 700; font-size: 28px; color: var(--fg); }
+#s-2 .cause span { display: block; margin-top: 8px; font-weight: 400; font-size: 22px; line-height: 1.48; color: var(--fg-2); }
+#s-2 .src { position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+/* 03-chart.html */
+#s-3 .slide-nav { position: absolute; left: 88px; top: 44px; }
+#s-3 .left { position: absolute; left: 88px; top: 122px; width: 680px; bottom: 84px; display: flex; flex-direction: column; }
+#s-3 h2.title { font-weight: 900; font-size: 84px; line-height: 1.1; letter-spacing: -.02em; }
+#s-3 p.lead { margin-top: 24px; font-weight: 500; font-size: 32px; line-height: 1.5; color: var(--fg); }
+#s-3 p.lead em { font-style: normal; font-weight: 900; color: var(--accent-text); white-space: nowrap; }
+#s-3 .ev { margin-top: 46px; border-top: 2px solid var(--fg); }
+#s-3 .ev-row { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--line-2); }
+#s-3 .ev-num { font: 900 64px/1 var(--font-number); font-variant-numeric: tabular-nums; color: var(--fg); letter-spacing: -.03em; }
+#s-3 .ev-num .u { font-weight: 700; font-size: 24px; margin-left: 4px; color: var(--fg-2); font-family: var(--font-body); }
+#s-3 .ev-num.hi { color: var(--accent-text); }
+#s-3 .ev-txt strong { display: block; font-weight: 700; font-size: 25px; color: var(--fg); }
+#s-3 .ev-txt span { display: block; margin-top: 6px; font-weight: 400; font-size: 21px; line-height: 1.45; color: var(--fg-2); }
+#s-3 .src { position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+#s-3 .detail-btn { position: absolute; left: 88px; bottom: 94px; padding: 11px 22px; border: 1.5px solid var(--fg); background: var(--bg); color: var(--fg); font-weight: 700; font-size: 20px; cursor: pointer; }
+#s-3 .detail-btn:hover { background: var(--fg); color: var(--bg); }
+
+#s-3 .chart { position: absolute; left: 836px; right: 84px; top: 116px; bottom: 0; }
+#s-3 .target-line { position: absolute; left: 0; right: 0; bottom: 480px; border-top: 2.5px dashed var(--fg); z-index: 6; }
+#s-3 .target-tag { position: absolute; left: 0; top: -38px; font-weight: 700; font-size: 21px; color: var(--fg); background: var(--bg); padding: 4px 10px 4px 0; }
+#s-3 .bars { position: absolute; left: 0; right: 0; bottom: 0; top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: end; }
+#s-3 .bar-col { position: relative; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+#s-3 .block { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 26px 32px; }
+#s-3 .block.best { height: 336px; background: var(--accent); color: var(--accent-ink); }
+#s-3 .block.mid { height: 784px; background: var(--gray); color: var(--fg); }
+#s-3 .block.high { height: 880px; background: var(--gray2); color: var(--fg); }
+#s-3 .over { position: absolute; left: 0; right: 0; top: 0;
+  background: repeating-linear-gradient(-45deg, rgba(181,56,31,.24) 0 10px, rgba(232,194,182,.55) 10px 20px);
+  border-bottom: 2px solid var(--late); }
+#s-3 .block.mid .over { height: 304px; }
+#s-3 .block.high .over { height: 400px; }
+#s-3 .gap-pill { position: absolute; left: 24px; top: 24px; background: var(--late); color: #FAF6F2; padding: 10px 16px; z-index: 7; }
+#s-3 .gap-pill strong { display: block; font: 900 38px/1 var(--font-number); font-variant-numeric: tabular-nums; }
+#s-3 .gap-pill span { display: block; margin-top: 4px; font-weight: 500; font-size: 18px; }
+#s-3 .val { font: 900 128px/.9 var(--font-number); font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+#s-3 .val small { font: 700 44px/1 var(--font-number); margin-left: 4px; }
+#s-3 .meta { margin-top: 14px; font-weight: 700; font-size: 26px; }
+#s-3 .sub { margin-top: 4px; font-weight: 500; font-size: 20px; opacity: .88; }
+#s-3 .block.best .sub { color: var(--accent-sub); opacity: 1; }
+/* 04-scene.html */
+#s-4 .slide-nav { position: absolute; left: 88px; top: 44px; }
+#s-4 .head { position: absolute; left: 88px; top: 118px; max-width: 1200px; }
+#s-4 h2.title { font-weight: 900; font-size: 82px; line-height: 1.1; letter-spacing: -.02em; }
+#s-4 p.lead { margin-top: 18px; font-weight: 500; font-size: 32px; line-height: 1.48; color: var(--fg); }
+#s-4 p.lead em { font-style: normal; font-weight: 900; color: var(--accent-text); }
+#s-4 .cards { position: absolute; left: 88px; right: 88px; top: 368px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+#s-4 .step { background: rgba(241, 239, 234, .92); border-top: 3px solid var(--fg); padding: 26px 28px; }
+#s-4 .step.active { border-top-color: var(--accent); }
+#s-4 .step .t0 { font: 900 22px/1 var(--font-number); color: var(--accent-text); letter-spacing: .02em; }
+#s-4 .step h3 { margin-top: 12px; font-weight: 800; font-size: 32px; color: var(--fg); }
+#s-4 .step p { margin-top: 10px; font-weight: 400; font-size: 23px; line-height: 1.5; color: var(--fg-2); }
+#s-4 .foot-note { position: absolute; left: 88px; bottom: 42px; font-weight: 500; font-size: 20px; color: var(--fg-3); }
+/* 05-shock.html */
+#s-5 { background: var(--shock-bg); color: var(--shock-fg); }
+#s-5 .wrap { position: absolute; left: 120px; right: 120px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+#s-5 .shock-text { font-weight: 900; font-size: 108px; line-height: 1.15; letter-spacing: -.02em; max-width: 1640px; }
+#s-5 .shock-text em { font-style: normal; color: var(--shock-em); }
+#s-5 .shock-sub { margin-top: 38px; font-weight: 500; font-size: 38px; line-height: 1.45; color: #B8BDC6; }
+#s-5 .src { position: absolute; left: 120px; bottom: 44px; font-size: 19px; color: #8E949E; }
+/* 07-closing.html */
+#s-7 { background: var(--accent); color: var(--accent-ink); }
+#s-7 .wrap { position: absolute; left: 120px; right: 120px; top: 140px; bottom: 120px; display: flex; flex-direction: column; justify-content: space-between; }
+#s-7 .kicker { font-weight: 700; font-size: 22px; color: var(--accent-sub); letter-spacing: .06em; }
+#s-7 h2 { font-weight: 900; font-size: 98px; line-height: 1.14; letter-spacing: -.02em; max-width: 1520px; }
+#s-7 .sub { margin-top: 28px; font-weight: 500; font-size: 34px; line-height: 1.5; color: var(--accent-sub); max-width: 1460px; }
+#s-7 .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; border-top: 1.5px solid rgba(244,242,236,.35); padding-top: 28px; }
+#s-7 .actions strong { display: block; font-weight: 700; font-size: 24px; color: var(--accent-ink); }
+#s-7 .actions span { display: block; margin-top: 8px; font-weight: 400; font-size: 21px; line-height: 1.45; color: var(--accent-sub); }
+/* app-model.html */
+#s-8 .head { position: absolute; left: 88px; right: 240px; top: 72px; }
+#s-8 .kicker { font-weight: 700; font-size: 20px; color: var(--accent-text); letter-spacing: .04em; margin-bottom: 10px; }
+#s-8 h2.title { font-weight: 900; font-size: 72px; line-height: 1.12; }
+#s-8 .cols { position: absolute; left: 88px; right: 88px; top: 258px; bottom: 96px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+#s-8 .box { border-top: 2.5px solid var(--fg); padding-top: 26px; }
+#s-8 .box.warn { border-top-color: var(--late); }
+#s-8 .box h3 { font-weight: 800; font-size: 32px; margin-bottom: 24px; }
+#s-8 .box.warn h3 { color: var(--late); }
+#s-8 ul { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+#s-8 li { font-weight: 500; font-size: 25px; line-height: 1.5; padding-left: 26px; position: relative; color: var(--fg); }
+#s-8 li::before { content: ""; position: absolute; left: 0; top: .68em; width: 12px; height: 3px; background: var(--accent); }
+#s-8 .box.warn li::before { background: var(--late); }
+#s-8 .src { position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+</style>
+</head>
+<body>
+<div id="viewport"><div id="stage">
+<div id="nav"></div><div id="tabs"></div>
+<section class="slide canvas" id="s-1" data-kind="cover" data-chi="-1" data-tab="0" data-tabs="1" data-notes="">
+  <div class="band">
+    <div class="band-kicker">PILOT RESULT</div>
+    <div class="band-stat">
+      <div class="big">4.2<small>%</small></div>
+      <p>信義旗艦店試點 8 週平均報廢率，較未導入門市減少 63%。</p>
+    </div>
+    <div class="band-kicker">2026.11 · 營運企劃組</div>
+  </div>
+  <div class="main">
+    <div>
+      <div class="kicker">2026 Q4 營運提案</div>
+      <h1 data-fit="phrase">星塵烘焙・智慧補貨系統導入</h1>
+      <p class="sub">從經驗估量到預報驅動，把每日報廢率壓進 6% 以內。</p>
+    </div>
+    <div class="route">
+      <div><i>DATE</i><span>2026.11</span></div>
+      <div><i>01</i><span>現況痛點</span></div>
+      <div><i>02</i><span>試點成果</span></div>
+      <div><i>03</i><span>導入節奏</span></div>
+    </div>
+  </div>
+</section>
+<section class="slide canvas" data-nav="inline" id="s-2" data-kind="content" data-chi="0" data-tab="0" data-tabs="1" data-notes="先用單店真實損耗把問題具象化，說明人工估量在雨天與假日誤差最大。">
+  <nav class="slide-nav" data-auto-nav><b class="on">現況痛點</b><span>試點成果</span><span>導入節奏</span></nav>
+  <header class="head">
+    <h2 class="title" data-role="title">報廢的代價</h2>
+    <p class="lead" data-role="summary">靠經驗估量烤盤數，讓未導入門市平均每天丟掉<em>超過一成新鮮麵包</em>。</p>
+  </header>
+  <div class="grid">
+    <div class="hero-box" data-fit-group="figure">
+      <div class="hero-num" data-fit="figure">11.4<small>%</small></div>
+      <div class="hero-lbl">板橋門市單月平均報廢率</div>
+      <div class="hero-sub">幾乎是總部 6% 管控紅線的兩倍，單月原料直接蒸發 2.9 萬元。</div>
+    </div>
+    <div class="causes">
+      <div class="cause">
+        <div class="cn">+42%</div>
+        <div><strong>雨天估量誤差最大</strong><span>氣溫驟降或午後雷陣雨時，店長仍依前週晴天銷量備料。</span></div>
+      </div>
+      <div class="cause">
+        <div class="cn">35分</div>
+        <div><strong>每日盤點耗費工時</strong><span>早班師傅與店長靠紙本回推補貨量，既耗時又難累積準度。</span></div>
+      </div>
+      <div class="cause">
+        <div class="cn">2.1×</div>
+        <div><strong>熱門斷貨、冷門剩滿架</strong><span>下班尖峰招牌可頌缺貨，但歐包與甜麵包打烊前被迫報廢。</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="src">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（板橋、東區兩店常態營運日）</p>
+</section>
+<section class="slide canvas" data-nav="inline" id="s-3" data-kind="content" data-chi="1" data-tab="0" data-tabs="2" data-notes="試點數據僅涵蓋常態 8 週，尚未計入中秋禮盒檔期；若被問及演算法細節可點右下角進入附件。">
+  <nav class="slide-nav" data-auto-nav><span>現況痛點</span><b class="on">試點成果</b><span>導入節奏</span></nav>
+  <div class="left">
+    <h2 class="title" data-role="title">三門市報廢率</h2>
+    <p class="lead" data-role="summary">只有導入預報系統的信義店，把每日報廢壓在<em>目標線 6% 以下</em>。</p>
+    <div class="ev">
+      <div class="ev-row">
+        <div class="ev-num hi">-63<span class="u">%</span></div>
+        <div class="ev-txt"><strong>報廢盤數降幅</strong><span>導入 8 週後，打烊剩餘從 24 盤降至 9 盤</span></div>
+      </div>
+      <div class="ev-row">
+        <div class="ev-num">12<span class="u">分鐘</span></div>
+        <div class="ev-txt"><strong>店長備料決策</strong><span>系統凌晨自動產單，免去人工比對前週</span></div>
+      </div>
+      <div class="ev-row">
+        <div class="ev-num">34<span class="u">萬</span></div>
+        <div class="ev-txt"><strong>單店年省原料費</strong><span>依信義店常態 8 週損耗率推估（不含中秋）</span></div>
+      </div>
+    </div>
+  </div>
+  <button class="detail-btn" type="button" data-link="model-detail">查看預報模型細節與限制 →</button>
+  <div class="chart">
+    <div class="target-line"><span class="target-tag">總部報廢上限 6.0%</span></div>
+    <div class="bars">
+      <div class="bar-col">
+        <div class="block best">
+          <div class="val">4.2<small>%</small></div>
+          <div class="meta">信義旗艦店</div>
+          <div class="sub">已導入｜低於上限 1.8%</div>
+        </div>
+      </div>
+      <div class="bar-col">
+        <div class="block mid">
+          <div class="over"><div class="gap-pill"><strong>+3.8%</strong><span>超出上限</span></div></div>
+          <div class="val">9.8<small>%</small></div>
+          <div class="meta">東區門市</div>
+          <div class="sub">人工經驗｜雨天波動最大</div>
+        </div>
+      </div>
+      <div class="bar-col">
+        <div class="block high">
+          <div class="over"><div class="gap-pill"><strong>+5.4%</strong><span>超出上限</span></div></div>
+          <div class="val">11.4<small>%</small></div>
+          <div class="meta">板橋門市</div>
+          <div class="sub">人工經驗｜假日熱銷缺貨</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="src">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（試點 8 週，不含中秋禮盒檔期）</p>
+</section>
+<section class="slide canvas" data-nav="inline" id="s-4" data-kind="content" data-chi="1" data-tab="1" data-tabs="2" data-notes="這頁同時示範零等待程式插畫與可替換 AI 升級插槽（bakery-flow）；提醒門市須維持收銀機網路連線。">
+  <div class="asset-slot" data-slot="bakery-flow" data-mode="light">
+    <svg viewBox="0 0 1920 1080" aria-hidden="true">
+      <defs>
+        <linearGradient id="s4_bgPaper" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#F1EFEA"/>
+          <stop offset="100%" stop-color="#E7E2D8"/>
+        </linearGradient>
+      </defs>
+      <rect width="1920" height="1080" fill="url(#s4_bgPaper)"/>
+      <!-- Minimalist geometric architectural floor & timeline rail -->
+      <rect x="0" y="700" width="1920" height="380" fill="#E3DDD2"/>
+      <line x1="88" y1="700" x2="1832" y2="700" stroke="#C8C1B4" stroke-width="2"/>
+      <path d="M240 850 H1680" stroke="#0D6B4F" stroke-width="6" stroke-dasharray="16 14" opacity=".45"/>
+      <!-- Three rhythmic bakery-flow station silhouettes -->
+      <g transform="translate(220 752)">
+        <rect x="0" y="0" width="220" height="168" fill="#D5CFC4"/>
+        <rect x="24" y="28" width="172" height="84" fill="#3F444B"/>
+        <circle cx="72" cy="70" r="18" fill="#D98A4E"/>
+        <circle cx="148" cy="70" r="18" fill="#D98A4E"/>
+        <rect x="24" y="130" width="76" height="14" fill="#0D6B4F"/>
+      </g>
+      <g transform="translate(850 752)">
+        <rect x="0" y="34" width="220" height="134" fill="#0D6B4F"/>
+        <rect x="26" y="0" width="168" height="72" fill="#F1EFEA" stroke="#141619" stroke-width="3"/>
+        <rect x="48" y="20" width="84" height="12" fill="#0D6B4F"/>
+        <rect x="48" y="42" width="120" height="10" fill="#BDB7AC"/>
+      </g>
+      <g transform="translate(1480 752)">
+        <polygon points="16,44 204,44 186,168 34,168" fill="#C4BCAE"/>
+        <ellipse cx="78" cy="36" rx="40" ry="22" fill="#C88142"/>
+        <ellipse cx="142" cy="36" rx="40" ry="22" fill="#D9985A"/>
+        <rect x="6" y="38" width="208" height="18" fill="#141619"/>
+      </g>
+    </svg>
+  </div><!-- /slot -->
+
+  <nav class="slide-nav" data-auto-nav><span>現況痛點</span><b class="on">試點成果</b><span>導入節奏</span></nav>
+  <header class="head">
+    <h2 class="title" data-role="title">門市三段節奏</h2>
+    <p class="lead" data-role="summary">預報系統串起早班、午間與尖峰前補烤，讓店長<em>12 分鐘就能定案排程</em>。</p>
+  </header>
+  <div class="cards">
+    <div class="step">
+      <div class="t0">04:00 · 備料產單</div>
+      <h3>依天氣自動調降</h3>
+      <p>凌晨自動讀取昨日日結與降雨機率，先減量冷門品項。</p>
+    </div>
+    <div class="step active">
+      <div class="t0">12:00 · 午間檢核</div>
+      <h3>收銀即時回報銷速</h3>
+      <p>前四小時賣超預期立刻標亮，避免下班尖峰熱門品斷貨。</p>
+    </div>
+    <div class="step">
+      <div class="t0">15:30 · 小批補烤</div>
+      <h3>精準鎖定前三名</h3>
+      <p>只補高周轉 3 款招牌品，將打烊報廢穩控在 4.2% 左右。</p>
+    </div>
+  </div>
+  <p class="foot-note">前提條件：門市須維持既有收銀機網路連線以利凌晨自動回傳日結資料。</p>
+</section>
+<section class="slide canvas" data-nav="none" id="s-5" data-kind="shock" data-chi="-1" data-tab="0" data-tabs="1" data-notes="停頓兩秒再切到進度與風險總覽。">
+  <div class="wrap">
+    <p class="shock-text" data-role="shock" data-fit="phrase">少丟 1 盤麵包，<br>門市淨利多 <em>1.8%</em></p>
+    <p class="shock-sub">五家主力門市同步導入，預估年省 170 萬原料成本。</p>
+  </div>
+  <p class="src">資料來源：財務部 2026 單店損益模型試算（常態營運週期推估）</p>
+</section>
+<section class="slide status" id="s-6" data-kind="status" data-chi="-1" data-notes="此頁由底盤商務元件 status-table 直接生成，展示自由畫布與高紀律工作頁無縫混搭。"><header class="st-head"><h2 class="title" data-role="title">五店導入進度與風險</h2><div class="legend"><span><i class="st-done"></i>已完成</span><span><i class="st-doing"></i>進行中</span><span><i class="st-target"></i>目標</span><span class="dot dot-red"></span>需介入<span class="dot dot-yellow"></span>注意<span class="dot dot-green"></span>正常</div></header><div class="st-body"><ul class='st-summary'><li>北區三店：信義店已上線且報廢降至 <mark class="em">4.2%</mark>；板橋店卡在收銀回傳排程，需資訊組協助</li><li>中南二店：台中店本週啟動網路健檢；高雄店排定 12/15 接棒，目前無風險</li></ul><table class='status-table'><thead><tr><th class='c-name'>項目</th><th class='c-owner'>負責</th><th>網路健檢</th><th>日結串接</th><th>店長培訓</th><th>正式上線</th><th class='c-prog'>進度</th><th class='c-risk'>風險</th><th class='c-sup'>需要的支援</th></tr></thead><tbody><tr class='grp'><td colspan='9'>北區主力門市</td></tr><tr class='rk-red'><td class='c-name'>板橋車站店</td><td class='c-owner'>林組長</td><td class='st st-done'><i></i><b>11/02</b> 已完成</td><td class='st st-doing'><i></i><b>11/24</b> 進行中</td><td class='st st-target'><i></i><b>11/28</b> 目標</td><td class='st st-target'><i></i><b>12/01</b> 目標</td><td class='c-prog'><span class='bar'><span style='width:45%'></span></span>45%</td><td class='c-risk'><span class='dot dot-red'></span>需介入</td><td class='c-sup'>資訊組本週五前修正收銀機夜間自動回傳</td></tr><tr class='rk-yellow'><td class='c-name'>東區概念店</td><td class='c-owner'>陳店長</td><td class='st st-done'><i></i><b>11/05</b> 已完成</td><td class='st st-done'><i></i><b>11/14</b> 已完成</td><td class='st st-doing'><i></i><b>11/22</b> 進行中</td><td class='st st-target'><i></i><b>11/26</b> 目標</td><td class='c-prog'><span class='bar'><span style='width:75%'></span></span>75%</td><td class='c-risk'><span class='dot dot-yellow'></span>注意</td><td class='c-sup'>需區經理確認假日限定款是否納入預報</td></tr><tr class='rk-green'><td class='c-name'>信義旗艦店</td><td class='c-owner'>王店長</td><td class='st st-done'><i></i><b>09/01</b> 已完成</td><td class='st st-done'><i></i><b>09/08</b> 已完成</td><td class='st st-done'><i></i><b>09/15</b> 已完成</td><td class='st st-done'><i></i><b>09/20</b> 已完成</td><td class='c-prog'><span class='bar'><span style='width:100%'></span></span>100%</td><td class='c-risk'><span class='dot dot-green'></span>正常</td><td class='c-sup'>試點標竿，協助培訓新店</td></tr><tr class='grp'><td colspan='9'>中南主力門市</td></tr><tr class='rk-green'><td class='c-name'>台中公益店</td><td class='c-owner'>吳店長</td><td class='st st-doing'><i></i><b>11/25</b> 進行中</td><td class='st st-target'><i></i><b>12/02</b> 目標</td><td class='st st-target'><i></i><b>12/08</b> 目標</td><td class='st st-target'><i></i><b>12/12</b> 目標</td><td class='c-prog'><span class='bar'><span style='width:25%'></span></span>25%</td><td class='c-risk'><span class='dot dot-green'></span>正常</td><td class='c-sup'>進度正常</td></tr><tr class='rk-green'><td class='c-name'>高雄巨蛋店</td><td class='c-owner'>鄭店長</td><td class='st st-target'><i></i><b>12/01</b> 目標</td><td class='st st-target'><i></i><b>12/08</b> 目標</td><td class='st st-target'><i></i><b>12/12</b> 目標</td><td class='st st-target'><i></i><b>12/15</b> 目標</td><td class='c-prog'><span class='bar'><span style='width:10%'></span></span>10%</td><td class='c-risk'><span class='dot dot-green'></span>正常</td><td class='c-sup'>進度正常</td></tr></tbody></table></div><p class="source">資料來源：營運企劃組 2026/11/19 週進度彙整</p><div class="pageno">06</div></section>
+<section class="slide canvas" data-nav="none" id="s-7" data-kind="closing" data-chi="-1" data-tab="0" data-tabs="1" data-notes="">
+  <div class="wrap">
+    <div class="kicker">DECISION NEEDED · 2026 Q4</div>
+    <div>
+      <h2 data-fit="phrase">核准五店導入，<br>今年底前壓回 6% 以下</h2>
+      <p class="sub">請營運長與資訊主管確認板橋店排程與 Q4 導入預算，11/24 正式啟動第二波串接。</p>
+    </div>
+    <div class="actions">
+      <div><strong>① 資訊組（11/24 前）</strong><span>完成板橋店收銀機夜間回傳排程修正</span></div>
+      <div><strong>② 區域經理（本週內）</strong><span>確認東區店假日限定款是否納入預報</span></div>
+      <div><strong>③ 營運企劃組（12/15）</strong><span>五店全數上線並每週追蹤報廢紅線</span></div>
+    </div>
+  </div>
+</section>
+<section class="slide canvas" data-nav="none" id="s-8" data-kind="content" data-chi="1" data-tab="0" data-tabs="1" data-notes="現場被追問演算法與節慶限制時點入，按 Esc 或右上返回鍵回到第 3 頁。" data-appendix="1" data-id="model-detail"><button class="back" type="button">← 返回</button>
+  <header class="head">
+    <div class="kicker">附件｜點擊右上返回或按 Esc 回到「三門市報廢率」</div>
+    <h2 class="title" data-role="title">預報模型輸入與限制</h2>
+  </header>
+  <div class="cols">
+    <div class="box">
+      <h3>系統使用的四項輸入資料</h3>
+      <ul>
+        <li>各品項過去 8 週分時段銷售量（既有收銀日結自動匯出）</li>
+        <li>中央氣象署鄉鎮級逐日降雨機率與最高／最低溫</li>
+        <li>平日、週末、國定連假與商圈周邊大型活動標記</li>
+        <li>各品項麵團發酵提前期與最小整盤烘烤單位</li>
+      </ul>
+    </div>
+    <div class="box warn">
+      <h3>目前限制與不承諾事項</h3>
+      <ul>
+        <li>試點僅涵蓋常態 8 週，中秋禮盒等大型節慶檔期仍須由店長人工鎖量</li>
+        <li>門市須維持收銀機夜間網路連線，斷網時自動退回前週同日基準</li>
+        <li>新上市未滿兩週的限定品項缺乏歷史銷量，系統只給同類參考區間</li>
+      </ul>
+    </div>
+  </div>
+  <p class="src">資料來源：數據與營運企劃組 2026 Q3 系統規格書（v1.2）</p>
+</section>
+<div id="curtain"></div>
+</div></div>
+<div id="notes"></div>
+<div id="hint">← → 翻頁 · F 全螢幕 · N 備註 · P 列印</div>
+<script>window.DECK={"title": "星塵烘焙・智慧補貨系統導入", "style": "counsel", "mode": "light", "chapters": ["現況痛點", "試點成果", "導入節奏"], "tabs": [["報廢的代價"], ["三門市報廢率", "門市三段節奏"], []], "motion": "horizontal"};</script>
+<script></script>
+<script>/* deck-architect v4 Thin Shell Runtime
+ *
+ * Provides deterministic playback infrastructure across all styles & free-canvas slides:
+ *  - 1920x1080 responsive stage fit
+ *  - Single-source chapter nav & tabs (auto-suppressed on slides with data-nav="inline" or "none")
+ *  - Axis-derived chapter transitions & shock curtain pause (Phase B spring/Magic Move hook ready)
+ *  - Appendix click-in ([data-link]) and return (.back / Esc / arrow)
+ *  - Speaker notes (N), fullscreen (F), print (P), hash navigation (#3), reduced-motion respect
+ */
+(function () {
+  const stage = document.getElementById('stage');
+  const slides = [...document.querySelectorAll('.slide')];
+  const nav = document.getElementById('nav');
+  const tabsEl = document.getElementById('tabs');
+  const curtain = document.getElementById('curtain');
+  const notesEl = document.getElementById('notes');
+  if (!stage || !slides.length) return;
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const M = (window.DECK && window.DECK.motion) || 'horizontal';
+  let cur = -1;
+  let busy = false;
+  const returnTo = [];
+
+  const isApp = i => slides[i] && slides[i].dataset.appendix === '1';
+
+  function step(d) {
+    if (isApp(cur)) { back(); return; }
+    let n = cur + d;
+    while (n >= 0 && n < slides.length && isApp(n)) n += d;
+    if (n >= 0 && n < slides.length) go(n);
+  }
+
+  function openLink(id) {
+    const n = slides.findIndex(s => s.dataset.appendix === '1' && s.dataset.id === id);
+    if (n < 0) return;
+    if (!isApp(cur)) returnTo.push(cur);
+    go(n);
+  }
+
+  function back() {
+    const n = returnTo.length ? returnTo.pop() : 0;
+    go(n);
+  }
+
+  // Rings TOC radii
+  document.querySelectorAll('[data-shape="rings"] .toc-list').forEach(ol => {
+    const lis = [...ol.children], n = lis.length;
+    const big = M === 'zoom-in';
+    lis.forEach((li, i) => {
+      const k = big ? i : n - 1 - i;
+      li.style.setProperty('--r', 940 - k * (700 / Math.max(1, n - 1)));
+    });
+  });
+
+  function fit() {
+    const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  addEventListener('resize', fit);
+  fit();
+
+  // Persistent single-source navigation (automatically yields to slides with data-nav="inline" or "none")
+  const chapters = (window.DECK && window.DECK.chapters) || [];
+  let labels = [], ind = null;
+  if (nav && chapters.length) {
+    nav.innerHTML = chapters.map(l => '<span>' + String(l).replace(/</g, '&lt;') + '</span>').join('') + '<i class="ind"></i>';
+    labels = [...nav.querySelectorAll('span')];
+    ind = nav.querySelector('.ind');
+  }
+
+  function setNav(sl) {
+    if (!nav || !tabsEl) return;
+    const kind = sl.dataset.kind || 'content';
+    const chi = Number(sl.dataset.chi ?? -1);
+    const navMode = sl.dataset.nav || (sl.querySelector('nav.slide-nav, [data-auto-nav]') ? 'inline' : 'shell');
+    const hide = kind !== 'content' || navMode === 'inline' || navMode === 'none' || chi < 0 || !labels[chi];
+    stage.classList.toggle('hide-nav', hide);
+    if (hide) { tabsEl.style.opacity = 0; return; }
+
+    labels.forEach((l, i) => l.classList.toggle('on', i === chi));
+    const on = labels[chi];
+    if (ind && on) {
+      ind.style.left = on.offsetLeft + 'px';
+      ind.style.width = on.offsetWidth + 'px';
+    }
+    const tabs = Number(sl.dataset.tabs || 0);
+    const tab = Number(sl.dataset.tab || 0);
+    const tabList = (window.DECK && window.DECK.tabs && window.DECK.tabs[chi]) || [];
+    if (tabs > 2 && tabList.length > 2) {
+      if (tabsEl.dataset.chi != String(chi)) {
+        tabsEl.innerHTML = tabList.map(t => '<span>' + String(t).replace(/</g, '&lt;') + '</span>').join('');
+        tabsEl.dataset.chi = String(chi);
+      }
+      [...tabsEl.children].forEach((t, i) => t.classList.toggle('on', i === tab));
+      tabsEl.style.opacity = 1;
+    } else {
+      tabsEl.style.opacity = 0;
+    }
+  }
+
+  function vec(dir) {
+    const s = dir;
+    if (M === 'vertical') return ['translateY(' + (8 * s) + '%)', 'translateY(' + (-8 * s) + '%)'];
+    if (M === 'zoom-in') return s > 0 ? ['scale(.9)', 'scale(1.12)'] : ['scale(1.12)', 'scale(.9)'];
+    if (M === 'zoom-out') return s > 0 ? ['scale(1.12)', 'scale(.9)'] : ['scale(.9)', 'scale(1.12)'];
+    return ['translateX(' + (8 * s) + '%)', 'translateX(' + (-8 * s) + '%)'];
+  }
+
+  function getEnterEasing(sl) {
+    return (getComputedStyle(sl).getPropertyValue('--enter-easing') || '').trim() || 'cubic-bezier(.16,1,.3,1)';
+  }
+
+  function reveal(sl, delay) {
+    if (reduce) return;
+    const ease = getEnterEasing(sl);
+    const stepped = ease.startsWith('steps');
+    sl.querySelectorAll('.rv').forEach((el, i) => {
+      el.animate(
+        [{ opacity: 0, transform: stepped ? 'translateY(-30px) scale(1.02)' : 'translateY(24px)' }, { opacity: 1, transform: 'none' }],
+        { duration: stepped ? 480 : 760, delay: delay + i * (stepped ? 150 : 70), easing: ease, fill: 'backwards' }
+      );
+    });
+  }
+
+  function showNotes(sl) {
+    if (notesEl) notesEl.textContent = sl.dataset.notes || '（這頁沒有講者備註）';
+  }
+
+  async function go(n, instant) {
+    n = Math.max(0, Math.min(slides.length - 1, n));
+    if (n === cur || busy) return;
+    const prev = slides[cur];
+    const next = slides[n];
+    const dir = n > cur ? 1 : -1;
+    busy = true;
+
+    const instantly = Boolean(instant || reduce || !prev);
+    const chapterChange = prev && (
+      next.dataset.kind === 'toc' || prev.dataset.kind === 'toc' ||
+      (next.dataset.chi !== prev.dataset.chi && Number(next.dataset.chi) >= 0 && Number(prev.dataset.chi) >= 0)
+    );
+
+    if (instantly) {
+      stage.classList.add('no-trans');
+      if (prev) prev.classList.remove('active');
+      next.classList.add('active');
+      setNav(next);
+      stage.offsetWidth;
+      requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
+    } else if (next.dataset.kind === 'shock' && dir > 0 && curtain) {
+      stage.classList.add('hide-nav');
+      await curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, fill: 'forwards' }).finished;
+      prev.classList.remove('active');
+      next.classList.add('active');
+      await new Promise(r => setTimeout(r, 480));
+      curtain.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 360, fill: 'forwards' });
+      const st = next.querySelector('.shock-text, [data-role="shock"]');
+      if (st) {
+        st.animate(
+          [{ opacity: 0, transform: 'translateY(24px)', filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'none' }],
+          { duration: 1000, delay: 180, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' }
+        );
+      }
+      const sub = next.querySelector('.shock-sub');
+      if (sub) sub.animate([{ opacity: 0 }, { opacity: .78 }], { duration: 650, delay: 1100, fill: 'backwards' });
+      setNav(next);
+    } else if (chapterChange) {
+      const [inT, outT] = vec(dir);
+      await prev.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: outT }], { duration: 340, easing: 'cubic-bezier(.55,.055,.675,.19)' }).finished;
+      prev.classList.remove('active');
+      next.classList.add('active');
+      setNav(next);
+      next.animate([{ opacity: 0, transform: inT }, { opacity: 1, transform: 'none' }], { duration: 720, easing: getEnterEasing(next) });
+      reveal(next, 140);
+    } else {
+      await prev.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 170, easing: 'cubic-bezier(.55,.055,.675,.19)' }).finished;
+      prev.classList.remove('active');
+      next.classList.add('active');
+      setNav(next);
+      next.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: getEnterEasing(next) });
+      reveal(next, 50);
+    }
+
+    cur = n;
+    showNotes(next);
+    if (typeof window.__deckFit === 'function') window.__deckFit();
+    try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
+    stage.dispatchEvent(new CustomEvent('deck:slidechange', { detail: { index: cur, slide: next, prev } }));
+    busy = false;
+  }
+
+  addEventListener('keydown', e => {
+    const k = e.key;
+    if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); step(1); }
+    else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); step(-1); }
+    else if (k === 'Escape' && isApp(cur)) { e.preventDefault(); back(); }
+    else if (k === 'Home') go(0);
+    else if (k === 'End') go(slides.length - 1);
+    else if (k === 'f' || k === 'F') {
+      document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
+    }
+    else if ((k === 'n' || k === 'N') && notesEl) notesEl.classList.toggle('show');
+    else if (k === 'p' || k === 'P') print();
+  });
+
+  addEventListener('click', e => {
+    if (e.target.closest('#notes, a, button:not(.back):not([data-link])')) return;
+    const b = e.target.closest('.back');
+    if (b) { back(); return; }
+    const l = e.target.closest('[data-link]');
+    if (l) { openLink(l.dataset.link); return; }
+    step(e.clientX > innerWidth / 3 ? 1 : -1);
+  });
+
+  const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
+  go(start - 1, true);
+
+  window.__deck = {
+    go: (n, instant = true) => go(n, instant),
+    step,
+    openLink,
+    back,
+    count: slides.length,
+    get index() { return cur; },
+    get slides() { return slides; },
+  };
+})();
+</script>
+<script>/* deck-architect v4 typography auto-fit
+ *
+ * Works on both v4 free-canvas slides ([data-fit="phrase"], [data-fit="figure"])
+ * and business components (.key, .shock-text, .closing-text, .cover-title, .number .value, .stats-row .sv).
+ */
+(function () {
+  function fitPhrases() {
+    document.querySelectorAll('[data-fit="phrase"], .key, .shock-text, .closing-text, .cover-title').forEach(function (el) {
+      var phs = [].slice.call(el.querySelectorAll('.ph'));
+      if (!phs.length) return;
+      el.style.fontSize = '';
+      var base = parseFloat(getComputedStyle(el).fontSize);
+      if (!base) return;
+      var size = base;
+      function wraps() {
+        var lh = parseFloat(getComputedStyle(el).lineHeight) || size * 1.2;
+        return phs.some(function (p) { return p.offsetHeight > lh * 1.5; });
+      }
+      while (wraps() && size > base * 0.72) {
+        size -= base * 0.04;
+        el.style.fontSize = size + 'px';
+      }
+      if (wraps()) el.style.fontSize = '';
+    });
+  }
+
+  function fitFigures() {
+    document.querySelectorAll('.slide').forEach(function (sl) {
+      var groups = sl.querySelectorAll('[data-fit-group="figure"], .body');
+      var list = groups.length ? [].slice.call(groups) : [sl];
+      list.forEach(function (box) {
+        var els = [].slice.call(box.querySelectorAll('[data-fit="figure"], .number .value, .stats-row .sv'));
+        if (!els.length) return;
+        els.forEach(function (e) { e.style.fontSize = ''; });
+        var base = els.map(function (e) { return parseFloat(getComputedStyle(e).fontSize) || 64; });
+        var k = 1;
+        function over() {
+          return box.scrollWidth > box.clientWidth + 2 ||
+            els.some(function (e) { return e.scrollWidth > e.clientWidth + 2; });
+        }
+        while (over() && k > 0.5) {
+          k -= 0.05;
+          els.forEach(function (e, i) { e.style.fontSize = (base[i] * k) + 'px'; });
+        }
+      });
+    });
+  }
+
+  function run() {
+    fitPhrases();
+    fitFigures();
+  }
+
+  window.__deckFit = run;
+  run();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(run);
+  }
+})();
+</script>
+</body>
+</html>

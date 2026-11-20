@@ -1,0 +1,75 @@
+<style>
+.slide .slide-nav { position: absolute; left: 88px; top: 44px; }
+.slide .head { position: absolute; left: 88px; top: 118px; max-width: 1200px; }
+.slide h2.title { font-weight: 900; font-size: 82px; line-height: 1.1; letter-spacing: -.02em; }
+.slide p.lead { margin-top: 18px; font-weight: 500; font-size: 32px; line-height: 1.48; color: var(--fg); }
+.slide p.lead em { font-style: normal; font-weight: 900; color: var(--accent-text); }
+.slide .cards { position: absolute; left: 88px; right: 88px; top: 368px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+.slide .step { background: rgba(241, 239, 234, .92); border-top: 3px solid var(--fg); padding: 26px 28px; }
+.slide .step.active { border-top-color: var(--accent); }
+.slide .step .t0 { font: 900 22px/1 var(--font-number); color: var(--accent-text); letter-spacing: .02em; }
+.slide .step h3 { margin-top: 12px; font-weight: 800; font-size: 32px; color: var(--fg); }
+.slide .step p { margin-top: 10px; font-weight: 400; font-size: 23px; line-height: 1.5; color: var(--fg-2); }
+.slide .foot-note { position: absolute; left: 88px; bottom: 42px; font-weight: 500; font-size: 20px; color: var(--fg-3); }
+</style>
+<section class="slide canvas" data-nav="inline">
+  <div class="asset-slot" data-slot="bakery-flow" data-mode="light">
+    <svg viewBox="0 0 1920 1080" aria-hidden="true">
+      <defs>
+        <linearGradient id="bgPaper" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#F1EFEA"/>
+          <stop offset="100%" stop-color="#E7E2D8"/>
+        </linearGradient>
+      </defs>
+      <rect width="1920" height="1080" fill="url(#bgPaper)"/>
+      <!-- Minimalist geometric architectural floor & timeline rail -->
+      <rect x="0" y="700" width="1920" height="380" fill="#E3DDD2"/>
+      <line x1="88" y1="700" x2="1832" y2="700" stroke="#C8C1B4" stroke-width="2"/>
+      <path d="M240 850 H1680" stroke="#0D6B4F" stroke-width="6" stroke-dasharray="16 14" opacity=".45"/>
+      <!-- Three rhythmic bakery-flow station silhouettes -->
+      <g transform="translate(220 752)">
+        <rect x="0" y="0" width="220" height="168" fill="#D5CFC4"/>
+        <rect x="24" y="28" width="172" height="84" fill="#3F444B"/>
+        <circle cx="72" cy="70" r="18" fill="#D98A4E"/>
+        <circle cx="148" cy="70" r="18" fill="#D98A4E"/>
+        <rect x="24" y="130" width="76" height="14" fill="#0D6B4F"/>
+      </g>
+      <g transform="translate(850 752)">
+        <rect x="0" y="34" width="220" height="134" fill="#0D6B4F"/>
+        <rect x="26" y="0" width="168" height="72" fill="#F1EFEA" stroke="#141619" stroke-width="3"/>
+        <rect x="48" y="20" width="84" height="12" fill="#0D6B4F"/>
+        <rect x="48" y="42" width="120" height="10" fill="#BDB7AC"/>
+      </g>
+      <g transform="translate(1480 752)">
+        <polygon points="16,44 204,44 186,168 34,168" fill="#C4BCAE"/>
+        <ellipse cx="78" cy="36" rx="40" ry="22" fill="#C88142"/>
+        <ellipse cx="142" cy="36" rx="40" ry="22" fill="#D9985A"/>
+        <rect x="6" y="38" width="208" height="18" fill="#141619"/>
+      </g>
+    </svg>
+  </div><!-- /slot -->
+
+  <nav class="slide-nav" data-auto-nav></nav>
+  <header class="head">
+    <h2 class="title" data-role="title">門市三段節奏</h2>
+    <p class="lead" data-role="summary">預報系統串起早班、午間與尖峰前補烤，讓店長<em>12 分鐘就能定案排程</em>。</p>
+  </header>
+  <div class="cards">
+    <div class="step">
+      <div class="t0">04:00 · 備料產單</div>
+      <h3>依天氣自動調降</h3>
+      <p>凌晨自動讀取昨日日結與降雨機率，先減量冷門品項。</p>
+    </div>
+    <div class="step active">
+      <div class="t0">12:00 · 午間檢核</div>
+      <h3>收銀即時回報銷速</h3>
+      <p>前四小時賣超預期立刻標亮，避免下班尖峰熱門品斷貨。</p>
+    </div>
+    <div class="step">
+      <div class="t0">15:30 · 小批補烤</div>
+      <h3>精準鎖定前三名</h3>
+      <p>只補高周轉 3 款招牌品，將打烊報廢穩控在 4.2% 左右。</p>
+    </div>
+  </div>
+  <p class="foot-note">前提條件：門市須維持既有收銀機網路連線以利凌晨自動回傳日結資料。</p>
+</section>

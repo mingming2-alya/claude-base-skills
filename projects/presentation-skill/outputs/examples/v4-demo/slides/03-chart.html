@@ -1,0 +1,91 @@
+<style>
+.slide .slide-nav { position: absolute; left: 88px; top: 44px; }
+.slide .left { position: absolute; left: 88px; top: 122px; width: 680px; bottom: 84px; display: flex; flex-direction: column; }
+.slide h2.title { font-weight: 900; font-size: 84px; line-height: 1.1; letter-spacing: -.02em; }
+.slide p.lead { margin-top: 24px; font-weight: 500; font-size: 32px; line-height: 1.5; color: var(--fg); }
+.slide p.lead em { font-style: normal; font-weight: 900; color: var(--accent-text); white-space: nowrap; }
+.slide .ev { margin-top: 46px; border-top: 2px solid var(--fg); }
+.slide .ev-row { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--line-2); }
+.slide .ev-num { font: 900 64px/1 var(--font-number); font-variant-numeric: tabular-nums; color: var(--fg); letter-spacing: -.03em; }
+.slide .ev-num .u { font-weight: 700; font-size: 24px; margin-left: 4px; color: var(--fg-2); font-family: var(--font-body); }
+.slide .ev-num.hi { color: var(--accent-text); }
+.slide .ev-txt strong { display: block; font-weight: 700; font-size: 25px; color: var(--fg); }
+.slide .ev-txt span { display: block; margin-top: 6px; font-weight: 400; font-size: 21px; line-height: 1.45; color: var(--fg-2); }
+.slide .src { position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+.slide .detail-btn { position: absolute; left: 88px; bottom: 94px; padding: 11px 22px; border: 1.5px solid var(--fg); background: var(--bg); color: var(--fg); font-weight: 700; font-size: 20px; cursor: pointer; }
+.slide .detail-btn:hover { background: var(--fg); color: var(--bg); }
+
+.slide .chart { position: absolute; left: 836px; right: 84px; top: 116px; bottom: 0; }
+.slide .target-line { position: absolute; left: 0; right: 0; bottom: 480px; border-top: 2.5px dashed var(--fg); z-index: 6; }
+.slide .target-tag { position: absolute; left: 0; top: -38px; font-weight: 700; font-size: 21px; color: var(--fg); background: var(--bg); padding: 4px 10px 4px 0; }
+.slide .bars { position: absolute; left: 0; right: 0; bottom: 0; top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: end; }
+.slide .bar-col { position: relative; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.slide .block { position: relative; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 26px 32px; }
+.slide .block.best { height: 336px; background: var(--accent); color: var(--accent-ink); }
+.slide .block.mid { height: 784px; background: var(--gray); color: var(--fg); }
+.slide .block.high { height: 880px; background: var(--gray2); color: var(--fg); }
+.slide .over { position: absolute; left: 0; right: 0; top: 0;
+  background: repeating-linear-gradient(-45deg, rgba(181,56,31,.24) 0 10px, rgba(232,194,182,.55) 10px 20px);
+  border-bottom: 2px solid var(--late); }
+.slide .block.mid .over { height: 304px; }
+.slide .block.high .over { height: 400px; }
+.slide .gap-pill { position: absolute; left: 24px; top: 24px; background: var(--late); color: #FAF6F2; padding: 10px 16px; z-index: 7; }
+.slide .gap-pill strong { display: block; font: 900 38px/1 var(--font-number); font-variant-numeric: tabular-nums; }
+.slide .gap-pill span { display: block; margin-top: 4px; font-weight: 500; font-size: 18px; }
+.slide .val { font: 900 128px/.9 var(--font-number); font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.slide .val small { font: 700 44px/1 var(--font-number); margin-left: 4px; }
+.slide .meta { margin-top: 14px; font-weight: 700; font-size: 26px; }
+.slide .sub { margin-top: 4px; font-weight: 500; font-size: 20px; opacity: .88; }
+.slide .block.best .sub { color: var(--accent-sub); opacity: 1; }
+</style>
+<section class="slide canvas" data-nav="inline">
+  <nav class="slide-nav" data-auto-nav></nav>
+  <div class="left">
+    <h2 class="title" data-role="title">三門市報廢率</h2>
+    <p class="lead" data-role="summary">只有導入預報系統的信義店，把每日報廢壓在<em>目標線 6% 以下</em>。</p>
+    <div class="ev">
+      <div class="ev-row">
+        <div class="ev-num hi">-63<span class="u">%</span></div>
+        <div class="ev-txt"><strong>報廢盤數降幅</strong><span>導入 8 週後，打烊剩餘從 24 盤降至 9 盤</span></div>
+      </div>
+      <div class="ev-row">
+        <div class="ev-num">12<span class="u">分鐘</span></div>
+        <div class="ev-txt"><strong>店長備料決策</strong><span>系統凌晨自動產單，免去人工比對前週</span></div>
+      </div>
+      <div class="ev-row">
+        <div class="ev-num">34<span class="u">萬</span></div>
+        <div class="ev-txt"><strong>單店年省原料費</strong><span>依信義店常態 8 週損耗率推估（不含中秋）</span></div>
+      </div>
+    </div>
+  </div>
+  <button class="detail-btn" type="button" data-link="model-detail">查看預報模型細節與限制 →</button>
+  <div class="chart">
+    <div class="target-line"><span class="target-tag">總部報廢上限 6.0%</span></div>
+    <div class="bars">
+      <div class="bar-col">
+        <div class="block best">
+          <div class="val">4.2<small>%</small></div>
+          <div class="meta">信義旗艦店</div>
+          <div class="sub">已導入｜低於上限 1.8%</div>
+        </div>
+      </div>
+      <div class="bar-col">
+        <div class="block mid">
+          <div class="over"><div class="gap-pill"><strong>+3.8%</strong><span>超出上限</span></div></div>
+          <div class="val">9.8<small>%</small></div>
+          <div class="meta">東區門市</div>
+          <div class="sub">人工經驗｜雨天波動最大</div>
+        </div>
+      </div>
+      <div class="bar-col">
+        <div class="block high">
+          <div class="over"><div class="gap-pill"><strong>+5.4%</strong><span>超出上限</span></div></div>
+          <div class="val">11.4<small>%</small></div>
+          <div class="meta">板橋門市</div>
+          <div class="sub">人工經驗｜假日熱銷缺貨</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="src">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（試點 8 週，不含中秋禮盒檔期）</p>
+</section>

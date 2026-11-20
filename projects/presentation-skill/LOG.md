@@ -1169,3 +1169,36 @@
 - **同步的檔案**：`inputs/presentation-principles.md`（新增第 23–25 條）、`ROADMAP.md`（重構為 Phase A–E）、`STATUS.md`（更新接手點與 Phase A 計畫）、`LOG.md`（本段）。
 - **下一步**：進入 **Phase A｜地基對齊與輕底盤 v4**。
 
+## 2026-11-19｜Phase A 完成：deck-architect v4 輕底盤、統一像素品管、首批 3 款 Style DNA 與虛構範例驗收
+
+- **做了什麼**：解凍自 11-14 停留在 v3.0 的 `outputs/deck-architect/`，全面升級為 v4「輕底盤、強自由」混合架構（26 檔，並清除所有舊 v3 衝突檔：`themes/`、`assets/base.css`、`assets/layouts.css`、`references/layouts.md`、`scripts/build.py`、`scripts/catalogue.py`，重新打包 `outputs/deck-architect.skill`）。
+  1. **輕底盤與自由畫布組裝器**：
+     - `assets/shell.css`：1920×1080 舞台縮放、五種繁體中文／拉丁離線系統字體退路、可客製導航變數與 `data-nav="inline"` 契約、`.asset-slot` 可替換圖像插槽、`:where()` 零權重畫布層級、16:9 精準列印。
+     - `assets/components.css`：將確定性商務元件（`status-table`、`pillars`、`toc`）與快速模式退路嚴格隔離在 `.cmp/.status/.overview/.toc`，不與自由畫布衝突。
+     - `assets/runtime.js`、`assets/fit.js`：單一資料來源導航自動禮讓客製 `data-auto-nav`、附件點入與返回、震撼頁黑幕停頓、`[data-fit="phrase"]`／`[data-fit="figure"]` 自動斷行與縮放、預留 Phase B 事件掛鉤。
+     - `scripts/assemble.py`：讀取 `storyboard.yaml`＋`deck.css`＋自由畫布 `slides/*.html`，自動以 `s{idx}_` 隔離每頁 SVG `<defs>` ID、以 IIFE 包裹各頁腳本避免全域汙染、自動填入 `data-auto-nav`、自動偵測 `assets/` 替換 `.asset-slot[data-slot]`、未提供客製檔的頁面自動以底盤元件渲染、支援 `--sheet` 建立 Gate 2 並排審閱頁與 `--write-upgrade-list` 產出 `IMAGE_UPGRADE.md`。
+  2. **規則檢查與統一像素級品管**：
+     - `scripts/oklch.py`：整合進 Skill，新增 CIELAB ΔE 計算與 `--palette` 自動檢查（禁純白純黑、禁紫色帶 H 280–335、對比門檻、ΔE ≥ 15、與警示色差 ≥ 60°）。
+     - `scripts/deck_model.py`、`scripts/lint.py`：一次清完 2026-11-14 新 agent 實測待辦——`meta.delivery` 動態字數上限、頁數算術拆解、附件過多警告、`constraints`（`forbidden` ERROR、`limitations`／`must_include` 中文 3-gram 檢查）、純簡體字自動偵測（已驗證對全專案繁中文件零誤報）、`signature: true` 招牌頁提示、自由畫布 `file:` 支援。
+     - `scripts/check.mjs`：合併 `render.cjs` 真實背景像素 WCAG 對比檢查與 `make.py` 漸層字逐段對比檢查；新增主標題≥總結字級檢查、SVG 重複 ID 檢查、`--sheet` 批次樣張檢查；支援 Playwright 並內建**零依賴系統 Chromium CDP 自動退路**（帶 `HTTPS_PROXY`）。
+  3. **首批 3 款 Style DNA 與文件全線對齊**：
+     - 新增 `styles/index.json`（全 12 款調性索引）、`styles/color-system.md`、`styles/apple.md`、`styles/counsel.md`、`styles/illustration.md`（12 條融合規則、A／B／C、變暗不等於夜晚、15 種畫風表、零等待＋`IMAGE_UPGRADE.md` 插槽規格）。
+     - 重寫 `SKILL.md`、`references/samples.md`、`references/presentation-rules.md`、新增 `references/content-shapes.md`（14 結構＋5 圖表結構），更新 `grill.md`、`contexts.md`、`templates/brief.md`、`templates/storyboard.yaml`、新增 `templates/image-upgrade.md`。
+- **實測過程中抓到並修掉的 bug**：
+  1. `SIMPLIFIED_CHARS` 初版混入繁簡同字（如 `表/影/文/件/全/物/核`）造成誤報 → 逐字篩成純簡體字集合，全專案繁中文件驗證 0 誤報。
+  2. `check.mjs` CLI 參數解析在未傳 `--out` 時 `outIdx === -1` 誤跳過第一個參數 → 已修。
+  3. `check.mjs` 測漸層字背景時，因 `-webkit-text-fill-color: transparent` 原本就透明，漸層字未隱藏導致把自己當成背景（誤判 1.38:1）→ 改以暫時類別 `.__check_hide_grad`（`opacity: 0`）隱藏後再截底圖，Apple 漸層字實測恢復正確（4.37:1）。
+  4. `shell.css` 的 `.slide.canvas > *` 權重高於 `.back`，把附件頁右上返回鈕改回 `position: relative` 造成左邊界溢出 → 改用 `:where(...)` 零權重並排除 `.back/.more-btn`，驗證通過。
+  5. `lint.py` 的中文 limitation 關鍵字比對原本把無空白中文字串當單一長詞 → 改為中文 3-gram 重疊比對。
+- **端到端驗證結果**（全數實跑並逐張視覺檢查截圖）：
+  - `oklch.py --palette`：合法配色通過，紫色／純白／近色（ΔE 2.9）／撞警示色全部正確擋下。
+  - `lint.py`：範本與既有商務範例（`annual-section`、`progress-overview`）0 錯 0 警；蓄意寫壞測試檔正確抓出禁用詞、頁數超標、簡體字、自動播放超字、附件濫用與漏限制。
+  - 既有商業範例 `annual-section`（4 頁）與 `progress-overview`（2 頁）經 `assemble.py`＋`check.mjs` 全部通過（最低對比 5.41:1）。
+  - **全新虛構範例 `outputs/examples/v4-demo/`（星塵烘焙・智慧補貨系統導入）**：
+    - Gate 2 三風格樣張（`samples/sheet.jpg`）：顧問淺色紙（4.91:1）、Apple 深色舞台含漸層字（4.37:1）、插畫紙黏土 C 融合版（5.13:1）全部 OK。
+    - 8 頁混合簡報（`deck.html`：7 頁自由畫布＋1 頁自動生成 `status-table` 元件＋可點入附件，附 `IMAGE_UPGRADE.md`）：`lint.py` 0 錯 0 警，`check.mjs` 全 8 頁通過（最低對比 4.81:1），並修正視覺檢視發現的 3 處斷行細節。
+    - 圖像插槽自動替換測試（於 `/tmp` 放入 `assets/bakery-flow-light.png`）：`assemble.py` 成功換入 `slot-img` 並通過 `check.mjs`（最低對比 4.91:1）。
+- **同步的檔案**：`outputs/deck-architect/`（v4 完整 26 檔）、`outputs/deck-architect.skill`、`outputs/examples/v4-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：進入 **Phase B｜注入 HTML 獨有的「活」**。
+
+

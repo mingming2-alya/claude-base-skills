@@ -1,0 +1,160 @@
+{
+  "version": "4.0",
+  "note": "全部 12 款風格皆支援淺、深兩種底（明暗依場合選，用色鎖規則不鎖色碼）。Phase A 完成首批 3 款完整 Style DNA；其餘 9 款已列調性與適用場景，將於 Phase D 補齊完整憲法。",
+  "styles": [
+    {
+      "id": "counsel",
+      "name": "顧問報告",
+      "status": "ready",
+      "spec": "styles/counsel.md",
+      "mood": ["大膽", "理性", "有說服力", "數據主導"],
+      "formality": "high",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "best_for": ["策略提案", "決策會議", "高階報告", "專案評估", "商業比較", "前後成效對照"],
+      "avoid_for": ["慶典活動", "感性故事分享", "兒童或家庭日"],
+      "signature": "色塊就是圖表、巨大數字、單一焦點色＋中性灰、虛線目標線與斜線差距標註"
+    },
+    {
+      "id": "apple",
+      "name": "Apple 發表",
+      "status": "ready",
+      "spec": "styles/apple.md",
+      "mood": ["俐落", "高級", "科技感", "期待"],
+      "formality": "medium-high",
+      "default_mode": "dark",
+      "modes": ["dark", "light"],
+      "best_for": ["產品與工具發表", "大會開場", "主題演講", "功能總覽", "成果揭曉"],
+      "avoid_for": ["密集多欄報表", "長篇細項表格", "多專案週進度表"],
+      "signature": "暗／亮舞台大留白、一頁一發光主視覺、漸層關鍵字、細線標註與便當格功能卡"
+    },
+    {
+      "id": "illustration",
+      "name": "插畫場景",
+      "status": "ready",
+      "spec": "styles/illustration.md",
+      "mood": ["溫暖", "親切", "說故事", "高記憶點"],
+      "formality": "low-medium",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "substyles": [
+        "紙黏土", "手繪", "霓虹", "復古卡通", "兒童手繪", "素描",
+        "山洞岩畫", "埃及壁畫", "漢畫像石拓片", "瑪雅抄本",
+        "皮影戲", "浮世繪", "梵谷筆觸", "吶喊", "8bit 像素"
+      ],
+      "best_for": ["知識分享", "新人引導", "內部宣導", "科普", "活動流程", "故事型演講"],
+      "avoid_for": ["密集財務報表", "嚴肅合規稽核"],
+      "signature": "全頁同源底材、物件說故事、A 全景環繞／B 內生題箋／C 內容住進場景，預設程式版＋可選 AI 升級插槽"
+    },
+    {
+      "id": "blocks",
+      "name": "積木構成",
+      "status": "planned",
+      "mood": ["結構感", "模組化", "明快"],
+      "formality": "medium",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "variants": ["2D 幾何", "3D 霧面木", "3D 亮面塑膠"],
+      "best_for": ["系統架構", "平台分工", "設計思考工作坊", "模組拆解"],
+      "avoid_for": ["感性致詞", "古典文化"],
+      "signature": "包浩斯色格咬合＋積木立體層次"
+    },
+    {
+      "id": "watercolor",
+      "name": "水彩水墨",
+      "status": "planned",
+      "mood": ["詩意", "有機", "從容"],
+      "formality": "low-medium",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "variants": ["彩色水彩", "黑白水墨", "厚油彩"],
+      "best_for": ["文化旅遊", "品牌故事", "年度心境回顧", "永續與自然"],
+      "avoid_for": ["密集 KPI 報表", "技術部署 SOP"],
+      "signature": "紙面水性暈染或厚塗筆觸＋留白呼吸"
+    },
+    {
+      "id": "scroll",
+      "name": "書卷刻本",
+      "status": "planned",
+      "mood": ["典雅", "書卷氣", "文化底蘊"],
+      "formality": "high",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "best_for": ["文化講座", "讀書會", "經典導讀", "繁體中文專屬人文主題"],
+      "avoid_for": ["新創科技產品發表", "潮流社群招募"],
+      "signature": "古籍版框界欄、直排題名、朱印點睛"
+    },
+    {
+      "id": "riso",
+      "name": "孔版小誌",
+      "status": "planned",
+      "mood": ["獨立出版", "手作印刷", "活潑"],
+      "formality": "low",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "best_for": ["社群活動", "市集策展", "創意分享", "內部社團"],
+      "avoid_for": ["董事會財報", "正式客戶標書"],
+      "signature": "兩色疊印、半色調網點與刻意錯位套印"
+    },
+    {
+      "id": "deco-gold",
+      "name": "摩登金",
+      "status": "planned",
+      "mood": ["隆重", "榮耀", "儀式感"],
+      "formality": "high",
+      "default_mode": "dark",
+      "modes": ["dark", "light"],
+      "best_for": ["頒獎典禮", "尾牙表揚", "週年慶典", "年會開場"],
+      "avoid_for": ["日常週報", "技術除錯複盤"],
+      "signature": "Art Deco 對稱幾何金線、莊重典禮構圖"
+    },
+    {
+      "id": "workday",
+      "name": "日常工作款",
+      "status": "planned",
+      "mood": ["清晰", "省心", "高效率"],
+      "formality": "medium",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "best_for": ["週進度回報", "專案群總覽", "例會同步", "待決事項追蹤"],
+      "avoid_for": ["大型活動開場", "品牌形象影片"],
+      "signature": "現代便當格狀態卡＋清晰風險紅黃綠燈＋一秒讀懂待決事項"
+    },
+    {
+      "id": "cinema",
+      "name": "攝影雜誌",
+      "status": "planned",
+      "mood": ["震撼", "電影感", "真實現場"],
+      "formality": "medium-high",
+      "default_mode": "dark",
+      "modes": ["dark", "light"],
+      "best_for": ["年度回顧", "紀實分享", "人物故事", "場域與實景展示"],
+      "avoid_for": ["沒有真實照片素材的純流程報告"],
+      "signature": "寬銀幕電影劇照構圖、片名卡與字幕式重點（實戰由使用者提供照片或升級插槽）"
+    },
+    {
+      "id": "pop-youth",
+      "name": "年輕潮流",
+      "status": "planned",
+      "mood": ["張揚", "高能量", "直球"],
+      "formality": "low",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "best_for": ["校園招募", "實習計畫", "行銷企劃", "社群宣傳"],
+      "avoid_for": ["高管財報", "嚴肅政策宣導"],
+      "signature": "螢幕高彩平塗、多色撞色、粗黑框與硬邊陰影"
+    },
+    {
+      "id": "heritage",
+      "name": "在地懷舊",
+      "status": "planned",
+      "mood": ["人情味", "歷史感", "在地認同"],
+      "formality": "medium",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "best_for": ["企業週年回顧", "品牌歷史", "在地文化與地方創生"],
+      "avoid_for": ["前沿 AI 模型技術發表"],
+      "signature": "鐵窗花／花磚圖騰、日曆牌與老招牌排版語言"
+    }
+  ]
+}

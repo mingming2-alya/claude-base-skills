@@ -1,0 +1,38 @@
+<style>
+.slide { background: var(--bg); color: var(--fg); }
+.slide .band { position: absolute; right: 0; top: 0; bottom: 0; width: 420px; background: var(--accent); color: var(--accent-ink); padding: 72px 52px; display: flex; flex-direction: column; justify-content: space-between; }
+.slide .band-kicker { font-weight: 700; font-size: 20px; letter-spacing: .06em; color: var(--accent-sub); }
+.slide .band-stat .big { font: 900 124px/.9 var(--font-number); letter-spacing: -.04em; }
+.slide .band-stat .big small { font-size: 44px; font-weight: 700; }
+.slide .band-stat p { margin-top: 14px; font-weight: 500; font-size: 24px; line-height: 1.45; color: var(--accent-sub); }
+.slide .main { position: absolute; left: 96px; top: 96px; right: 492px; bottom: 92px; display: flex; flex-direction: column; justify-content: space-between; }
+.slide .kicker { font-weight: 700; font-size: 22px; color: var(--accent-text); letter-spacing: .04em; }
+.slide h1 { font-weight: 900; font-size: 112px; line-height: 1.08; letter-spacing: -.025em; margin-top: 28px; }
+.slide .sub { margin-top: 28px; font-weight: 500; font-size: 36px; line-height: 1.48; color: var(--fg-2); max-width: 1080px; }
+.slide .route { display: grid; grid-template-columns: 1.2fr repeat(3, 1fr); gap: 32px; padding-top: 24px; border-top: 2px solid var(--fg); }
+.slide .route i { display: block; font-style: normal; font-weight: 700; font-size: 20px; color: var(--fg-3); margin-bottom: 6px; font-family: var(--font-number); }
+.slide .route span { font-weight: 700; font-size: 24px; color: var(--fg); }
+</style>
+<section class="slide canvas">
+  <div class="band">
+    <div class="band-kicker">PILOT RESULT</div>
+    <div class="band-stat">
+      <div class="big">4.2<small>%</small></div>
+      <p>信義旗艦店試點 8 週平均報廢率，較未導入門市減少 63%。</p>
+    </div>
+    <div class="band-kicker">2026.11 · 營運企劃組</div>
+  </div>
+  <div class="main">
+    <div>
+      <div class="kicker">2026 Q4 營運提案</div>
+      <h1 data-fit="phrase">星塵烘焙・智慧補貨系統導入</h1>
+      <p class="sub">從經驗估量到預報驅動，把每日報廢率壓進 6% 以內。</p>
+    </div>
+    <div class="route">
+      <div><i>DATE</i><span>2026.11</span></div>
+      <div><i>01</i><span>現況痛點</span></div>
+      <div><i>02</i><span>試點成果</span></div>
+      <div><i>03</i><span>導入節奏</span></div>
+    </div>
+  </div>
+</section>

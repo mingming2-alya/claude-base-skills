@@ -1,102 +1,91 @@
 ---
 name: deck-architect
-description: 架構先行的簡報製作技能：先用 Grill 問清楚目的、對象、時長、場合，找出「聽眾的起點與終點」並設計一條單一方向的架構，再提供三種風格樣張讓使用者選，最後產出導航清楚、重點突出、可直接播放的 HTML 簡報（可列印成 PDF）。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能，即使沒有明說「簡報」二字。Use for any presentation / slides / pitch deck / talk request.
+description: 架構先行的簡報製作技能（v4）：先用互動表單 Grill 問清楚目的、對象、時長、場合與既有框架，找出「聽眾的起點與終點」並設計單軸單向架構，再以單一視覺關卡提供三款多元風格憲法（Style DNA）與 OKLCH 主題配色樣張，最後以「輕底盤、強自由」混合架構產出圖文融合、真文字可編輯、通過真實像素 WCAG 品管的 HTML 簡報（可列印 PDF）。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
 ---
 
-# Deck Architect：架構決定一切
+# Deck Architect v4：架構決定一切，畫布自由表達
 
-這個技能的信念是：**簡報的成敗在架構，不在裝飾**。好架構讓聽眾不需要任何過場文字，也知道自己在哪裡、接下來會聽到什麼。所以你要先當「簡報架構師」把路徑想清楚，最後才當設計師。
+信念：**簡報的成敗在架構，驚豔來自風格憲法與自由畫布**。先當「簡報架構師」把路徑與證據想清楚，再依主題端出令人「哇就是這些！」的多元風格樣張，最後用「輕底盤、強自由」架構產出高品質 HTML 簡報。
 
-使用者只在三個時刻做決定，其餘由你自動完成：
+使用者只在**三個時刻**做決定，其餘自動完成：
 
-1. **Grill 結束時**：確認 brief（說什麼、怎麼走）
-2. **看完三種風格樣張時**：選一種（長什麼樣）
-3. **看完成品時**：留言修改（哪裡要改）
+1. **Grill 結束時（⛔ 關卡一）**：確認 `brief.md`（說什麼、怎麼走、頁數算術、限制與地雷）
+2. **看完風格與配色樣張時（⛔ 關卡二）**：從三款多元風格（＋明暗與三組 OKLCH 主題配色）中定調方向
+3. **看完成品時（⛔ 關卡三）**：檢視成品與截圖並留言修改
 
-在這三個時刻，**一定要停下來、結束回合、等使用者回覆**，不要替使用者決定後繼續往下做。這是因為使用者最在意的就是「內容由我掌舵」，跳過關卡等於把簡報變成你的作品。
+在這三個時刻，**一定要停下來、用互動表單（若有表單工具）確認、等使用者回覆**，不可替使用者決定後逕行往下做。
 
 ## 工作目錄
 
-每份簡報建立一個資料夾（預設 `./decks/<簡短英文名>/`），所有產出都放這裡：
+每份簡報建立獨立資料夾（預設 `./decks/<簡短英文名>/`）：
 
 ```
 decks/<name>/
-├── brief.md          # Step 1 產出：Grill 結論
-├── storyboard.yaml   # Step 2 產出：唯一的內容來源（之後改字都改這裡）
-├── layouts.html      # Step 3 產出：排版選單（灰階，每頁幾種排法）
-├── samples.html      # Step 3 產出：三種風格樣張
-├── deck.html         # Step 4 產出：成品
-└── check/            # Step 5 產出：截圖與檢查報告
+├── brief.md                 # Step 1：Grill 結論（含頁數算術、限制與地雷）
+├── storyboard.yaml          # Step 2：唯一內容來源（敘事、章節、每頁形狀、constraints）
+├── deck.css                 # Step 4：這份簡報的風格與 OKLCH 配色變數／共性樣式
+├── samples/                 # Step 3：Gate 2 樣張（2–3 頁 × 3 方向）＋ sheet.html / sheet.jpg
+├── slides/                  # Step 4：逐頁自由編排 HTML 片段（01-cover.html 等）
+├── assets/                  # 可選：使用者提供或生成的升級底圖／真實照片
+├── IMAGE_UPGRADE.md         # 可選：AI 升級生圖清單（零等待程式版同步附上）
+├── deck.html                # Step 4：assemble.py 掛載輕底盤產出的單檔成品
+└── check/                   # Step 5：check.mjs 逐頁截圖與真實像素 WCAG 品管報告
 ```
 
-`storyboard.yaml` 是唯一的內容來源。HTML 是從它產生的，所以修改永遠改 yaml 再重建，不要直接改 HTML。
+## 架構模式：輕底盤、強自由（Thin Shell + Free Canvas）
+
+- **輕底盤（`assemble.py` 自動掛載）**：1920×1080 舞台縮放、單一資料來源章節導航／頁籤（支援 `data-auto-nav` 風格客製外觀）、依軸運鏡、震撼頁黑幕停頓、附件點入與返回、SVG `<defs>` ID 自動隔離、可替換圖像插槽 `.asset-slot[data-slot]`、講者備註（`N`）、全螢幕（`F`）、列印 PDF（`P`）。
+- **自由編排畫布（預設 90%+ 頁面）**：你依選定的 **Style DNA**（`styles/*.md`）與該頁內容形狀，在 `slides/XX-*.html` 直接編寫最貼題的 HTML／CSS／SVG，不受僵化模板束縛。
+- **高紀律商務元件（按需自動生成）**：`status-table`（週進度總覽）、`pillars`（年度一頁總覽）、自動 `toc` 目錄頁，以及快速模式未寫客製片段的頁面，由 `assemble.py` 從 `storyboard.yaml` 直接穩定生成。
 
 ## 流程
 
 ### Step 1｜Grill → `brief.md`　⛔ 關卡一
 
-先讀 `references/grill.md`。有互動表單工具（例如 AskUserQuestion）時**一律用表單問**，每次 2–4 題，建議答案放第一個；沒有表單工具時一次問一題。必須問出：
+讀 `references/grill.md`。有互動表單工具時**一律用表單問**（每張 2–4 題、題目互不依賴、建議答案放第一標「（推薦）」）：
 
-- 目的、對象、時長、場合 → 推出**聽眾的起點**與**你要帶他去的終點**
-- 有沒有需要顧慮的人或部門（決定能不能用「價值軸」，以及要不要把批評改成「我們」提問）
-- 有沒有既有的框架、大綱或前一版報告：有的話先讀，它**一定要是架構候選之一**；若它的最上層是並列的，要提醒並提出路徑版本；若是計畫改成果，照 contexts.md「計畫轉成果」處理
-- 每章的時間分配；頁數含不含封面與目錄
-- 說服或推廣型：有沒有**證據**（數據、案例），以及有沒有**還做不到、不能承諾**的事
-- 關鍵數字要先跟原始資料**查核**（見 grill.md「查核關鍵數字」）
-- 每章的內容與重點
-- 有沒有想讓聽眾震撼的一刻（沒有就不要硬做）
-
-「既有框架」要**單獨先問**，拿到答案後再讀 `references/structure.md`，推導出 2–3 個架構候選（軸 + 方向 + 停靠點）讓使用者選。選定後用 `templates/brief.md` 寫出 brief，給使用者看，**停下來等確認**。
-
-如果使用者只給了很少資訊又趕時間，讀 `references/contexts.md` 的「快速模式」，把 Grill 壓到 5 題以內，但起點、終點、架構這三件事不能省。
+1. 先問情境：目的（終點）、對象（起點）、場合與播放方式（`delivery`：上台講／討論／自己讀／自動播放）、時長與**頁數算術**（含不含封面與目錄）、人際顧慮。
+2. **單獨先問既有框架／前一版／空白模板**，讀完後再依 `references/structure.md` 提 2–3 個架構候選（原框架必列候選之一；若最上層並列則提醒並提路徑版；計畫改成果照 `contexts.md`）。
+3. 補齊各章重點與分鐘數、序幕／轉折／尾聲、證據（**關鍵數字必查核出處**）、限制與不承諾、地雷與偏好、震撼的一刻。
+4. 寫出 `brief.md`（`templates/brief.md`），**停下來等使用者確認**。
 
 ### Step 2｜架構展開 → `storyboard.yaml`
 
-讀 `references/presentation-rules.md`（標題、重點、導航、震撼頁的規則），用 `templates/storyboard.yaml` 的格式把 brief 展開成逐頁內容。然後跑：
+讀 `references/presentation-rules.md` 與 `references/content-shapes.md`，把 brief 展開成逐頁內容（格式見 `templates/storyboard.yaml`）。務必把 brief 的限制與地雷寫進 `constraints`、標出最重要的一頁 `signature: true`、設定 `meta.delivery`。然後跑：
 
 ```bash
 python3 <skill>/scripts/lint.py decks/<name>/storyboard.yaml
 ```
 
-lint 會檢查架構與呈現規則（訊息裡的 `slides[n]` 從 1 起算，也會提醒版型不認得的欄位）。有 ERROR 必須修到通過；WARNING 要嘛修正、要嘛在給使用者的摘要裡說明為什麼保留。不要為了讓 lint 通過而扭曲內容，lint 抓的問題通常代表架構真的有洞。
+有 ERROR 必須修到通過；WARNING 要修正或在架構摘要說明原因。完成後給使用者一頁**架構摘要**（章節、每頁題目、內容形狀、頁數算術與震撼頁位置）。
 
-完成後給使用者一頁**架構摘要**（章節、每頁標題、重點、震撼頁位置）。使用者沒意見可以直接進 Step 3，不用另外等。
+### Step 3｜單一視覺關卡（風格 × 明暗 × 主題配色）→ `samples/sheet.jpg`　⛔ 關卡二
 
-### Step 3｜先選排版，再選風格 → `layouts.html`、`samples.html`　⛔ 關卡二
+**不再分灰階排版與風格兩步選。** 讀 `references/samples.md`、`styles/index.json` 與 `styles/color-system.md`：
 
-**排版和風格是兩件獨立的事**：排版（東西放哪裡）逐頁跟著內容走；風格（顏色、字體、質感）整份固定。風格不決定排版，所以分兩步選。
-
-**3a 排版**。讀 `references/layouts.md`。依每一頁內容的形狀，替它挑 2–3 種候選排法，寫成 `variant: [建議的, 候選, 候選]`，然後：
-
-```bash
-python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --layouts
-```
-
-產生的 `layouts.html` 是灰階的排版選單：每頁一列，每個候選有編號（例如 3A、3B）。先自己截圖看一次，確認沒有壞掉，再給使用者，**停下來等使用者逐頁選**（可以只回「3B、5A，其他照你的建議」）。選定後把每頁的 `variant` 改成單一名稱，目錄頁的排法寫進 `meta.toc`，再跑一次 lint：相鄰兩頁不可以是同一種排法；同一類內容的頁面（例如不同案例的進度）寫上同一個 `series`，就會要求它們長得一樣。
-
-**3b 風格**。讀 `references/samples.md`。依調性挑三個方向（穩健 / 大膽 / 驚喜），用使用者真實的內容與**剛選定的排版**產生樣張：
+1. 依 brief 主題與場合，決定建議明暗（`light`／`dark`）並挑出 **3 個外觀截然不同的風格方向**（穩健／大膽／驚喜）。
+2. 讀入對應的 Style DNA（`styles/<id>.md`），替這份簡報用真實內容自由編排樣張（每方向 **2–3 頁**：封面＋`signature: true` 招牌頁＋另一種版型或震撼頁，絕不超過 3 頁免得太小）；同時依主題產生三組 OKLCH 配色並跑 `scripts/oklch.py --palette` 驗證（禁純白純黑、禁紫色帶 H 280–335、三組 ΔE ≥ 15）。
+3. 產生並排總覽並自動像素品管：
 
 ```bash
-python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml --samples swiss:穩健,broadsheet:大膽,washi:驚喜
+python3 <skill>/scripts/assemble.py --sheet decks/<name>/samples
+node <skill>/scripts/check.mjs --sheet decks/<name>/samples
 ```
 
-樣張預設包含封面、這份簡報的招牌頁（大重點或大數字）、再一頁不同版型的內容頁（有震撼頁就用震撼頁），三種風格並排。想指定頁面就加 `--sample-pages 1,3,5`（成品的頁碼）。冒號後面的角色會顯示在樣張上。產生後先自己截圖看一次，確認沒有壞掉再給使用者，**停下來等使用者選**。使用者可以混搭（例如「A 的配色 + B 的字體」），這時照 `references/samples.md` 的方式寫一個自訂主題。
+4. **自己先看過 `samples/sheet.jpg`**（確認「真的不同」而不只是換字體顏色、主標題最大、對比通過），再交給使用者選風格、明暗與配色，**停下來等回覆**。
 
-快速模式可以把兩步合成一次：排版由你依內容決定，只給風格樣張；使用者指出不滿意的頁面時再換排法。
+### Step 4｜製作 → `deck.html`（＋可選 `IMAGE_UPGRADE.md`）
 
-### Step 4｜製作 → `deck.html`
-
-把選定的主題寫進 storyboard 的 `meta.theme`，然後：
+1. 將選定的 `style`、`mode` 與配色寫入 `storyboard.yaml` 與 `deck.css`。
+2. 依選定的 Style DNA，逐頁在 `slides/` 撰寫自由編排 HTML 片段（商務 `status-table`／`pillars` 可直接交給底盤元件渲染）。
+   - 插畫／攝影類頁面預設先由程式一次畫出完整可看版本（**零等待**），同時把場景層包進 `<div class="asset-slot" data-slot="..." data-mode="...">...</div><!-- /slot -->`。
+3. 組裝單檔簡報：
 
 ```bash
-python3 <skill>/scripts/build.py decks/<name>/storyboard.yaml
+python3 <skill>/scripts/assemble.py decks/<name>/storyboard.yaml --write-upgrade-list
 ```
 
-只要一頁、或是大簡報裡的一章時，用 `meta.format: section` 與 `layout: pillars`（一頁總覽）；需要現場點進細節時，用附件頁（`appendix: true`＋`link`）。見 presentation-rules.md「一頁總覽與附件」。
-
-定期進度回報要先拿到模板，總覽用 `layout: status-table`；多個單位交上來的 PPTX 用 `scripts/check_reports.py` 檢查內容。見 progress-report.md。
-
-build 會根據架構自動產生導航（章節列、目錄點亮、頁籤）、依「軸」決定換章的運鏡方向、處理震撼頁。你不需要手寫 HTML。
+若產出了可替換插槽，補齊 `IMAGE_UPGRADE.md`（參考 `templates/image-upgrade.md`）作為可選升級清單；當使用者後續把圖放到 `assets/` 後，重跑 `assemble.py` 即可無縫替換底圖、保留真文字層與動態。
 
 ### Step 5｜品管 → `check/`
 
@@ -104,43 +93,33 @@ build 會根據架構自動產生導航（章節列、目錄點亮、頁籤）�
 node <skill>/scripts/check.mjs decks/<name>/deck.html
 ```
 
-它會逐頁截圖並檢查文字溢出、字太小、文字對比不足、圖片載入失敗、主控台錯誤。它抓不到「斷行很醜」這類問題，所以截圖一定要自己看。有問題就回到 storyboard 修正後重建，**最多修 2 輪**；兩輪後仍有問題，如實告訴使用者還剩什麼問題，不要假裝通過。
-
-接著**自己看截圖**，用 `references/presentation-rules.md` 最後的「品管清單」逐條檢查。這一步你是評審，不是作者：用挑剔的眼光看。
+`check.mjs` 會逐頁截圖並自動檢查：**真實背景像素 WCAG 對比**（含漸層字每段色標）、主標題≥總結字級、文字溢出與邊界、最小字級、SVG 重複 ID、圖片載入、腳本錯誤。接著**親自檢視截圖**（含斷行美感與風格一致性），有問題就修對應 `slides/` 或 `storyboard.yaml` 後重建，**最多修 2 輪**；未解項目如實回報。
 
 ### Step 6｜交付　⛔ 關卡三
 
-告訴使用者：
+告知使用者：檔案位置與播放快捷鍵（`← →`／空白鍵翻頁、`F` 全螢幕、`N` 備註、`P` 列印 PDF）、一句話架構總結、品管最低對比與未解項，以及可選的 `IMAGE_UPGRADE.md`（若有）。等使用者回饋修改。
 
-- 檔案位置，以及怎麼播放（方向鍵 / 空白鍵翻頁，`F` 全螢幕，`N` 講者備註，`P` 列印成 PDF）
-- 架構一句話總結（從哪裡帶到哪裡、沿著什麼軸）
-- 品管結果，包含沒解決的問題
+## 八條鐵律（加上設計共識）
 
-然後等使用者留言修改。修改一律改 `storyboard.yaml` → 重建 → 重新 check。
-
-## 八條鐵律
-
-這些規則來自使用者多年做簡報的心法，每條都有理由：
-
-1. **先有架構，再寫內容。** 最上層章節必須沿著同一條軸、單一方向排列。聽眾能預測下一步，就不需要過場。
-2. **章節名稱只在一處定義**（storyboard 的 `chapters`）。目錄、章節列、頁籤都由它自動產生，才不會前後不一致。
-3. **標題只說「這頁在講什麼」**：簡短、中性，像路標。結論不要寫在標題裡。
-4. **重點放在內容裡，放大並用突出色**（`==重點==` 語法），一頁最多一處。到處都強調就等於沒有強調。
-5. **不寫過場文字。** 位置感交給導航：超過 3 章時自動出現目錄點亮頁，單章超過 2 頁時自動出現頁籤。
-6. **震撼頁只留給情緒轉折或刻意的衝擊**（像 One more thing）。必須有鋪陳、全場 0–2 次、不可連續。唯一例外是開場提問（`role: opener`），它的鋪陳是聽眾自己的經驗。
-7. **震撼頁打破所有規則**：導航隱藏、畫面淨空、停頓後才進場。前面的秩序越穩，這一刻越有力。
-8. **把圖拿掉，文字依然讀得懂。** 圖片是氣氛，文字才是內容。
+1. **先有架構，再寫內容**：最上層章節沿單一軸、單一方向前進，不可並列。
+2. **章節名稱只在一處定義**（`storyboard.yaml` 的 `chapters`），由輕底盤或 `data-auto-nav` 自動同步。
+3. **總結永遠不當主標題**：主標題只寫題目（路標、≤12 字），且是頁面上最大、最先被看到的字；總結放在內文。
+4. **重點只用顏色標示**（不畫底線、不用斜體），每頁最多一處 `==重點==`。
+5. **不寫過場文字**：位置感交給導航（>3 章自動目錄、單章 >2 頁顯示頁籤）。
+6. **震撼頁稀少且有鋪陳**：全場 0–2 次、間隔 ≥3 頁、打破導航與規則（唯開場提問 `role: opener` 例外）。
+7. **裝飾可與文字交錯，可讀性由像素 WCAG 把關**：底色禁純白純黑、禁紫漸層、變暗不等於夜晚。
+8. **把圖拿掉，文字依然讀得懂**：背景與圖像強化故事，真文字承載核心資訊且隨時可編輯。
 
 ## 參考檔索引（用到才讀）
 
 | 檔案 | 什麼時候讀 |
 |---|---|
-| `references/grill.md` | Step 1 開始時 |
-| `references/structure.md` | Step 1 推導架構時 |
-| `references/contexts.md` | 判斷情境、選擇快速 / 標準模式時 |
-| `references/presentation-rules.md` | Step 2 寫 storyboard 前、Step 5 品管時 |
-| `references/layouts.md` | Step 2 寫 storyboard、Step 3a 挑每頁的排法時（版型庫：每種內容有哪些排法、什麼時候用） |
-| `references/samples.md` | Step 3b 做風格樣張、或使用者要自訂風格時 |
-| `references/progress-report.md` | 定期進度回報、專案群總覽、多人填寫的回報時 |
-| `templates/brief.md` | 寫 brief 時 |
-| `templates/storyboard.yaml` | 寫 storyboard 時（含所有欄位與版型說明） |
+| `references/grill.md` | Step 1 開始時（互動表單、頁數算術、數字查核） |
+| `references/structure.md` | Step 1 推導架構與處理既有框架時 |
+| `references/contexts.md` | 判斷情境、播放密度、計畫轉成果、快速模式時 |
+| `references/presentation-rules.md` | Step 2 展開內容、繁體在地化、Step 5 品管時 |
+| `references/content-shapes.md` | Step 2–4 判斷內容形狀（14 結構＋5 圖表）與容量上限時 |
+| `references/samples.md` | Step 3 挑選三款多元風格與製作 Gate 2 樣張時 |
+| `references/progress-report.md` | 定期進度回報、多單位 PPTX 檢核（`check_reports.py`）時 |
+| `styles/index.json`、`styles/color-system.md`、`styles/<id>.md` | Step 3–4 撰寫樣張、推薦三組 OKLCH 配色與編排每一頁時 |
+| `templates/brief.md`、`templates/storyboard.yaml`、`templates/image-upgrade.md` | 建立對應產出物時 |

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lint a deck-architect storyboard against the structure and presentation rules.
+"""Lint a deck-architect v4 storyboard against narrative, structure, constraint, and pacing rules.
 
 Usage: python3 lint.py path/to/storyboard.yaml [--json]
 
@@ -10,19 +10,51 @@ import sys
 sys.dont_write_bytecode = True
 import json
 import re
-import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from deck_model import (AXES, CELL_STATES, COMMON_FIELDS, EMPH_RE, LAYOUT_FIELDS, LAYOUTS,  # noqa: E402
-                        RISK_LEVELS, SLIDE_TYPES,
-                        TRANSITION_PHRASES,
-                        StoryboardError, emphasis_count, load, page_count, slide_texts, toc_mode,
-                        visible_len, VARIANTS, VARIANT_ZH, layout_key, main_slides, variant_of, variant_options,
-                        variant_problems)
+from deck_model import (  # noqa: E402
+    AXES, CELL_STATES, COMMON_FIELDS, DELIVERY_MODES, DENSE_LAYOUTS, EMPH_RE,
+    LAYOUT_FIELDS, LAYOUTS, RISK_LEVELS, SIMPLIFIED_CHARS, SLIDE_TYPES,
+    TRANSITION_PHRASES, StoryboardError, all_slide_texts_with_notes,
+    appendix_slides, capacity_problems, char_limit_for, emphasis_count, load,
+    main_slides, page_breakdown, slide_texts, toc_mode, visible_len,
+)
 
-CJK = re.compile(r"[㐀-鿿]")
-LATIN = re.compile(r"[A-Za-z]")
+CJK = re.compile(r"[\u3400-\u9fff]")
+TOKEN_RE = re.compile(r"[\u4e00-\u9fff]{2,}|[A-Za-z0-9]{2,}")
+
+
+def _find_simplified(texts):
+    found = []
+    seen = set()
+    for t in texts:
+        for ch in t:
+            if ch in SIMPLIFIED_CHARS and ch not in seen:
+                seen.add(ch)
+                found.append(ch)
+    return found
+
+
+def _matches_any(needle, haystack):
+    needle = str(needle or "").strip()
+    if not needle:
+        return True
+    low_n, low_h = needle.lower(), haystack.lower()
+    if low_n in low_h:
+        return True
+    cjk_runs = re.findall(r"[\u4e00-\u9fff]+", needle)
+    latin_toks = re.findall(r"[A-Za-z0-9%]{2,}", low_n)
+    grams = list(latin_toks)
+    for run in cjk_runs:
+        if len(run) <= 3:
+            grams.append(run)
+        else:
+            grams.extend(run[i:i + 3] for i in range(0, len(run) - 2, 2))
+    if not grams:
+        return True
+    hits = sum(1 for g in grams if g in low_h)
+    return hits >= max(1, int(len(grams) * 0.35))
 
 
 def lint(data):
@@ -31,11 +63,21 @@ def lint(data):
     W = lambda where, msg: warnings.append(f"[WARN]  {where}: {msg}")  # noqa: E731
     I = lambda where, msg: infos.append(f"[INFO]  {where}: {msg}")  # noqa: E731
 
-    meta, st, chapters, slides = data["meta"], data["structure"], data["chapters"], data["slides"]
+    meta = data["meta"]
+    st = data["structure"]
+    constraints = data.get("constraints") or {}
+    chapters = data["chapters"]
+    slides = data["slides"]
 
     # ---- meta
     if not meta.get("title"):
         E("meta.title", "缺少簡報標題。")
+    delivery = str(meta.get("delivery") or "talk").lower()
+    if delivery not in DELIVERY_MODES:
+        E("meta.delivery", f"必須是 {', '.join(DELIVERY_MODES)} 之一（目前：{delivery!r}）。")
+        delivery = "talk"
+    lang = str(meta.get("lang") or "zh-Hant")
+    check_trad = lang.lower().startswith("zh-hant") or lang.lower() == "zh-tw"
 
     # ---- structure: the core of this skill
     for k, hint in (("start", "聽眾現在知道什麼、在意什麼"), ("destination", "聽完要相信或做什麼")):
@@ -73,7 +115,6 @@ def lint(data):
         lens = [visible_len(x) for x in labels]
         if max(lens) > 2 * min(lens) and max(lens) - min(lens) > 3:
             W("chapters", f"章節名稱長度差很多（{', '.join(labels)}）。停靠點命名要平行：結構、長度、詞性一致。")
-        # a label counts as Chinese if it has any CJK (縮寫如「導入 AI」仍算中文)；只有中英兩類並存才算不平行
         scripts = {"cjk" if CJK.search(x) else "latin" for x in labels}
         if len(scripts) > 1:
             W("chapters", f"章節名稱混用中英文（{', '.join(labels)}）。命名要平行。")
@@ -89,14 +130,21 @@ def lint(data):
     appendix_ids, links = set(), []
     for s in slides:
         if isinstance(s, dict):
-            if s.get("appendix"):
-                if s.get("id"):
-                    appendix_ids.add(s["id"])
+            if s.get("appendix") and s.get("id"):
+                appendix_ids.add(s["id"])
             if s.get("link"):
                 links.append(s["link"])
             for p in s.get("pillars") or []:
                 if isinstance(p, dict) and p.get("link"):
                     links.append(p["link"])
+
+    forbidden = [str(x).strip() for x in (constraints.get("forbidden") or []) if str(x).strip()]
+    char_limit = char_limit_for(data)
+    delivery_label, _, delivery_note = DELIVERY_MODES[delivery]
+
+    all_visible_joined = []
+    all_with_notes_joined = []
+    signatures = 0
 
     for n, s in enumerate(slides, 1):
         where = f"slides[{n}]"
@@ -108,10 +156,21 @@ def lint(data):
             E(where, f"type 必須是 {', '.join(sorted(SLIDE_TYPES))} 之一（目前：{t!r}）。")
             continue
         texts = slide_texts(s)
+        all_visible_joined.extend(texts)
+        all_with_notes_joined.extend(all_slide_texts_with_notes(s))
         is_appendix = bool(s.get("appendix"))
+        is_free_file = bool(s.get("file"))
+        if s.get("signature"):
+            signatures += 1
         if is_appendix and not s.get("id"):
             E(where, "附件頁（appendix: true）需要 id，才能被 link 指到。")
 
+        # ---- constraints: forbidden phrases (ERROR)
+        for bad in forbidden:
+            if any(bad.lower() in x.lower() for x in texts):
+                E(where, f"出現地雷／禁用說法「{bad}」（定義於 constraints.forbidden）。請移除或改寫。")
+
+        # ---- sensitivity & transition phrases
         if st.get("sensitivity") and any("你們" in x for x in texts):
             W(where, "有人際顧慮（sensitivity: true）卻出現「你們」。把批評改成以「我們」開頭的反思提問，聽眾才不會覺得被指責。")
         for txt in texts:
@@ -121,31 +180,31 @@ def lint(data):
                     W(where, f"出現過場語「{p}」。位置感交給導航，不要寫過場文字；覺得需要就代表架構要調整。")
                     break
 
-        if t == "content" and s.get("layout") in LAYOUT_FIELDS:
+        # ---- Traditional Chinese check
+        if check_trad:
+            sc = _find_simplified(texts)
+            if sc:
+                W(where, f"偵測到簡體字（{''.join(sc[:10])}）。meta.lang 為 {lang}，請轉成繁體中文並確認台灣習慣用語。")
+
+        # ---- unknown fields (only warn for non-free built-in layouts)
+        if t == "content" and not is_free_file and s.get("layout") in LAYOUT_FIELDS:
             unknown = set(s) - COMMON_FIELDS - LAYOUT_FIELDS[s["layout"]]
             if unknown:
-                W(where, f"layout「{s['layout']}」不認得欄位 {', '.join(sorted(unknown))}，建置時會被忽略。"
-                         f"這個版型可用：{', '.join(sorted(LAYOUT_FIELDS[s['layout']]))}。")
-        # layout variant: must exist for this layout, and the content must fit it
-        key = layout_key(s)
-        if key in VARIANTS:
-            names = VARIANTS[key]
-            listing = "、".join(f"{v}（{VARIANT_ZH[key][v]}）" for v in names)
-            opts = variant_options(s)
-            bad = [v for v in opts if v not in names]
-            if bad:
-                E(where, f"「{key}」沒有 {', '.join(bad)} 這種排法。可用：{listing}。")
-            elif len(opts) > 1:
-                I(where, f"variant 寫了 {len(opts)} 個候選，成品會用第一個（{opts[0]}）。使用者選定後改成單一名稱。")
-            if not bad:
-                for msg in variant_problems(s):
-                    W(where, msg + "。換一種排法，或調整內容。")
-        elif s.get("variant"):
-            W(where, f"「{key}」沒有可選的排法，variant 會被忽略。")
-        has_digit = any(re.search(r"\d", x) for x in texts)
-        if has_digit and not s.get("source") and (t == "shock" or (t == "content" and s.get("layout") in ("number", "stats"))):
-            W(where, "關鍵數字沒有 source（出處）。先跟原始資料核對，再寫上出處與適用範圍。")
+                W(where, f"layout「{s['layout']}」不認得欄位 {', '.join(sorted(unknown))}。"
+                         f"可用欄位：{', '.join(sorted(LAYOUT_FIELDS[s['layout']]))}。")
 
+        # ---- capacity rules
+        for msg in capacity_problems(s):
+            W(where, msg + "。")
+
+        # ---- numeric source check
+        has_digit = any(re.search(r"\d", x) for x in texts)
+        if has_digit and not s.get("source") and (
+            t == "shock" or (t == "content" and s.get("layout") in ("number", "stats", "chart-bar", "chart-donut", "chart-trend"))
+        ):
+            W(where, "關鍵數字或圖表沒有 source（出處）。先跟原始資料核對，再寫上出處與適用範圍。")
+
+        # ---- status-table (deterministic business component)
         if t == "content" and s.get("layout") == "status-table":
             seen_content = True
             stages = s.get("stages") or []
@@ -153,7 +212,6 @@ def lint(data):
                 E(where, "status-table 的 stages 需要 2–6 個共用階段（例如 啟動、需求、建置、適配）。")
                 stages = stages if isinstance(stages, list) else []
             n_rows = 0
-            # groups are the chapters of a progress overview: match by chapter id or label
             label_to_id = {str(c.get("label")): c.get("id") for c in chapters if isinstance(c, dict)}
             matched = False
             for g in s.get("groups") or []:
@@ -170,7 +228,7 @@ def lint(data):
                 if not isinstance(g, dict) or not g.get("name"):
                     E(gw, "每個 group 需要 name（專案大類）。")
                     continue
-                prev = None
+                prev_rank = None
                 for r_i, r in enumerate(g.get("rows") or []):
                     n_rows += 1
                     rw = f"{gw}.rows[{r_i}]「{r.get('name', '?') if isinstance(r, dict) else '?'}」"
@@ -194,10 +252,10 @@ def lint(data):
                     if pr is not None and not (isinstance(pr, (int, float)) and 0 <= pr <= 100):
                         E(rw, "progress 必須是 0–100 的數字。")
                     if g.get("order", "risk") == "risk" and risk in RISK_LEVELS:
-                        key = (-RISK_LEVELS[risk], -(pr or 0))
-                        if prev is not None and key < prev:
+                        rank = (-RISK_LEVELS[risk], -(pr or 0))
+                        if prev_rank is not None and rank < prev_rank:
                             W(rw, "同一類之內要先排風險高的，同風險再依進度。這列的順序比上一列前面。")
-                        prev = key
+                        prev_rank = rank
             if n_rows > 13:
                 E(where, f"一頁 {n_rows} 列，超過 13 列放不下。拆成兩頁（第二頁加上 continued: true）。")
             for k, line in enumerate(s.get("summary") or []):
@@ -207,6 +265,7 @@ def lint(data):
                 W(where, "總覽的第一頁建議加上 summary：依大類各一行本期重點，每行帶數字或明確狀態。")
             continue
 
+        # ---- pillars (deterministic overview component)
         if t == "content" and s.get("layout") == "pillars":
             seen_content = True
             pillars = s.get("pillars") or []
@@ -227,19 +286,18 @@ def lint(data):
                 E(where, "pillars 的欄位順序要跟 chapters 一致（架構的方向）。")
             if len(order) != len(ids):
                 W(where, "pillars 沒有涵蓋所有章節。一頁總覽通常每章一欄。")
-            if EMPH_RE.findall(str(s.get("headline", ""))).__len__() > 1:
+            if len(EMPH_RE.findall(str(s.get("headline", "")))) > 1:
                 E(where, "headline 最多一處重點。")
             continue
 
+        # ---- general content slide (free canvas OR built-in)
         if t == "content":
             seen_content = True
             title = str(s.get("title") or "")
             ch = s.get("chapter")
             if ch not in chapter_index:
                 E(where, f"chapter「{ch}」不在 chapters 的 id 裡。")
-            elif is_appendix:
-                pass  # appendix pages are reached by links, not by the chapter flow
-            else:
+            elif not is_appendix:
                 content_per_ch[ch] += 1
                 if chapter_index[ch] < last_ch:
                     E(where, f"章節順序倒退（回到「{ch}」）。架構必須單一方向前進，不要來回跳。把這頁移到該章，或重新思考軸。")
@@ -249,43 +307,40 @@ def lint(data):
             else:
                 L = visible_len(title)
                 if EMPH_RE.search(title):
-                    E(where, "title 裡不要放 ==重點==。標題是路標，重點放在內容裡。")
+                    E(where, "title 裡不要放 ==重點==。標題是路標，重點與總結放在內文裡。")
                 if L > 20:
-                    E(where, f"title「{title}」太長（{L} 字）。標題只說這頁在講什麼，不寫結論。")
+                    E(where, f"title「{title}」太長（{L} 字）。主標題只寫這頁在講什麼，總結永遠不當主標題。")
                 elif L > 12:
                     W(where, f"title「{title}」偏長（{L} 字），建議 12 字以內。")
                 if re.search(r"[，。！？,!?]", title):
-                    W(where, f"title「{title}」像一句話或結論。改成主題詞，結論放到內容的重點裡。")
-            layout = s.get("layout")
+                    W(where, f"title「{title}」像一句話或總結。總結永遠不當主標題，請改為主題詞並把總結移到內文。")
+
+            layout = s.get("layout") or ("free" if is_free_file else None)
             if layout not in LAYOUTS:
                 E(where, f"layout 必須是 {', '.join(LAYOUTS)} 之一（目前：{layout!r}）。")
-            else:
+            elif not is_free_file:
                 for f in LAYOUTS[layout]:
                     if not s.get(f):
-                        E(where, f"layout「{layout}」需要欄位 {f}。")
-                if layout in ("bullets", "steps") and isinstance(s.get("items"), list) and len(s["items"]) > 5:
-                    E(where, f"{layout} 有 {len(s['items'])} 條，超過 5 條。拆成兩頁或合併。")
+                        E(where, f"layout「{layout}」需要欄位 {f}（或改用 file: 指定自由編排頁）。")
                 if layout == "compare":
                     for side in ("left", "right"):
                         v = s.get(side)
                         if v is not None and (not isinstance(v, dict) or "items" not in v):
                             E(where, f"compare 的 {side} 需要 heading 與 items。")
+
             em = emphasis_count(s)
             if em > 1:
                 E(where, f"有 {em} 處重點。每頁最多一處，到處強調等於沒強調。保留最重要的一個，或拆頁。")
+
             chars = sum(visible_len(x) for x in texts) - visible_len(title)
-            if s.get("layout") == "stats":
-                n_st = len(s.get("stats") or [])
-                if not 2 <= n_st <= 4:
-                    E(where, "stats 需要 2–4 個數字，每個有 value 與 label。")
-            if chars > 110 and not is_appendix:
-                W(where, f"內容約 {chars} 字，偏多。上台講的頁面，講者 30 秒內要講得完。")
+            if chars > char_limit and not is_appendix and layout not in DENSE_LAYOUTS:
+                W(where, f"內容約 {chars} 字，超過「{delivery_label}」建議上限 {char_limit} 字（{delivery_note}）。")
 
         elif t == "shock":
             text = str(s.get("text") or "")
-            if not text:
+            if not text and not is_free_file:
                 E(where, "震撼頁需要 text。")
-            elif visible_len(text) > 20:
+            elif text and visible_len(text) > 20:
                 W(where, f"震撼頁文字 {visible_len(text)} 字，偏長。震撼頁只放一句話，盡量 20 字以內。")
             is_opener = s.get("role") == "opener"
             first_after_cover = all(isinstance(x, dict) and x.get("type") == "cover" for x in slides[:n - 1])
@@ -300,31 +355,60 @@ def lint(data):
         elif t == "cover" and n != 1:
             W(where, "封面通常是第一頁。")
 
+    # ---- links & appendix guardrails
     for target in links:
         if target not in appendix_ids:
             E("link", f"link 指向「{target}」，但沒有 id 為「{target}」的附件頁（appendix: true）。")
     for aid in appendix_ids - set(links):
         W(f"appendix[{aid}]", "這個附件頁沒有任何 link 指向它，現場點不到。")
+    n_main = len(main_slides(data))
+    n_app = len(appendix_slides(data))
+    if n_app > max(3, n_main // 2) and n_main > 0:
+        W("appendix", f"附件頁有 {n_app} 頁，相對主線 {n_main} 頁過多。附件只放「現場被追問才點入的補充」，不可用來規避主線頁數上限。")
 
+    # ---- chapters coverage
     for cid, count in content_per_ch.items():
         if count == 0:
             E(f"chapters[{cid}]", "這章沒有任何內容頁。")
         elif count > 2:
             I(f"chapters[{cid}]", f"這章有 {count} 頁，會自動顯示頁籤標示位置。")
 
+    # ---- shocks spacing
     if len(shock_positions) > 2:
         E("slides", f"有 {len(shock_positions)} 個震撼頁，超過 2 個。用多了就不震撼了，只留最關鍵的時刻。")
     for a, b in zip(shock_positions, shock_positions[1:]):
         if b - a < 4:
             E(f"slides[{b}]", f"與上一個震撼頁（第 {a} 頁）距離太近。兩個震撼頁之間至少隔 3 頁。")
 
-    budget = data["meta"].get("pages")
-    if isinstance(budget, int) and budget > 0:
-        total_pages = page_count(data)
-        if total_pages > budget:
-            E("meta.pages", f"建置後共 {total_pages} 頁（含封面與自動目錄頁），超過上限 {budget} 頁。")
+    # ---- constraints: limitations & must_include
+    joined_notes = "\n".join(all_with_notes_joined)
+    joined_vis = "\n".join(all_visible_joined)
+    for lim in constraints.get("limitations") or []:
+        if not _matches_any(lim, joined_notes):
+            W("constraints.limitations", f"限制／不承諾「{lim}」尚未出現在任何頁的內容或講者備註（notes）裡，小心過度宣稱。")
+    for req in constraints.get("must_include") or []:
+        if not _matches_any(req, joined_vis):
+            W("constraints.must_include", f"必放項目「{req}」尚未出現在任何投影片的可見內容裡。")
 
-    minutes = data["meta"].get("minutes")
+    # ---- page arithmetic breakdown
+    bd = page_breakdown(data)
+    formula = f"封面 {bd['cover']} + 目錄 {bd['toc']} + 內容 {bd['content']} + 震撼 {bd['shock']} + 結尾 {bd['closing']} = {bd['total']} 頁"
+    if bd["appendix"]:
+        formula += f"（另含附件 {bd['appendix']} 頁）"
+    budget = meta.get("pages")
+    if isinstance(budget, int) and budget > 0:
+        if bd["total"] > budget:
+            E("meta.pages", f"頁數算術超過上限：{formula} > 上限 {budget} 頁。請精簡內容或調整章節／頁數預算。")
+        else:
+            I("meta.pages", f"頁數算術：{formula}（上限 {budget} 頁）。")
+        min_needed = bd["cover"] + bd["toc"] + len(chapters)
+        if min_needed > budget:
+            W("meta.pages", f"頁數上限 {budget} 頁連「封面 + 目錄 + 每章 1 頁」（至少 {min_needed} 頁）都放不下，請在 brief 階段重新對齊頁數定義。")
+    else:
+        I("meta.pages", f"頁數算術：{formula}。")
+
+    # ---- time budget
+    minutes = meta.get("minutes")
     ch_minutes = [c.get("minutes") for c in chapters if isinstance(c, dict)]
     if chapters and all(isinstance(m, (int, float)) for m in ch_minutes):
         total = sum(ch_minutes)
@@ -339,49 +423,44 @@ def lint(data):
                 W(f"chapters[{c.get('id')}]", f"{m:g} 分鐘配 {pages} 頁，每分鐘超過 1.5 頁，講者會趕。")
     elif isinstance(minutes, (int, float)) and minutes > 0:
         I("chapters.minutes", "沒有寫每章分鐘數。加上 chapters[].minutes 可以檢查時間分配。")
-    if isinstance(minutes, (int, float)) and minutes > 0:
-        n_content = sum(1 for s in slides if isinstance(s, dict) and not s.get("appendix")
-                        and s.get("type", "content") in ("content", "shock"))
+
+    if isinstance(minutes, (int, float)) and minutes > 0 and delivery in ("talk", "discuss"):
+        n_content = sum(
+            1 for s in slides if isinstance(s, dict) and not s.get("appendix")
+            and s.get("type", "content") in ("content", "shock")
+        )
         lo, hi = max(1, int(minutes * 0.3)), round(minutes * 1.2) + 1
         if not lo <= n_content <= hi:
-            W("meta.minutes", f"{minutes} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.4–1 頁；圖解密集的頁面可以更少）。")
+            W("meta.minutes", f"{minutes:g} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.4–1 頁；圖解密集的頁面可以更少）。")
 
-    # ---- layout variety: style never decides layout, so variety has to be checked here
-    if meta.get("toc") and str(meta["toc"]) not in VARIANTS["toc"]:
-        E("meta.toc", f"目錄頁沒有「{meta['toc']}」這種排法。可用：{', '.join(VARIANTS['toc'])}。")
+    # ---- signature page hint for Gate 2 samples
+    if n_main >= 4 and signatures == 0:
+        I("slides", "尚未標註招牌頁（signature: true）。在最重要的一頁加上 signature: true，Gate 2 樣張才會優先挑中它。")
+
+    # ---- visual rhythm: adjacent slides should vary unless in same series
     flow = [(n, s) for n, s in enumerate(slides, 1) if isinstance(s, dict) and not s.get("appendix")]
-    combo = lambda s: (s.get("layout"), variant_of(s))  # noqa: E731
-    label = lambda c: f"{c[0]}／{c[1]}（{VARIANT_ZH.get(c[0], {}).get(c[1], c[1])}）"  # noqa: E731
+    shape_of = lambda s: (s.get("layout") or "free", s.get("visual") or s.get("variant") or "")  # noqa: E731
     prev = None
     for n, s in flow:
-        if s.get("type", "content") != "content" or s.get("layout") not in VARIANTS:
-            prev = None  # a cover, shock or overview page breaks the run
+        if s.get("type", "content") != "content" or s.get("layout") in ("pillars", "status-table", "free", "scene"):
+            prev = None
             continue
-        if prev and combo(prev) == combo(s) and not (s.get("series") and s.get("series") == prev.get("series")):
-            W(f"slides[{n}]", f"和上一頁用同一種排法 {label(combo(s))}。相鄰兩頁換一種排法，聽眾才分得出這是兩件事。"
-                              "如果這幾頁是同一類內容（例如不同案例的進度），在這幾頁寫上同一個 series，就會要求它們長得一樣。")
+        if prev and shape_of(prev) == shape_of(s) and not (s.get("series") and s.get("series") == prev.get("series")):
+            W(f"slides[{n}]", f"和上一頁同為 {shape_of(s)[0]}（{shape_of(s)[1] or '預設'}）。相鄰兩頁應變化視覺呈現；"
+                              "若這幾頁本來就是同類內容，請寫上同一個 series。")
         prev = s
-    series = {}
+
+    series_map = {}
     for n, s in flow:
         if s.get("series") and s.get("type", "content") == "content":
-            series.setdefault(str(s["series"]), []).append((n, s))
-    for name, pages in series.items():
-        kinds = {combo(s) for _, s in pages}
+            series_map.setdefault(str(s["series"]), []).append((n, s))
+    for name, pages in series_map.items():
         if len(pages) == 1:
             I(f"slides[{pages[0][0]}]", f"series「{name}」只有這一頁。series 是給「同一類、要長得一樣」的多頁用的。")
-        elif len(kinds) > 1:
-            W(f"series「{name}」", "同一個系列的頁面用了不同排法：" + "、".join(label(k) for k in sorted(kinds, key=str))
-              + "。同一系列要長得一樣，聽眾才看得出它們是同一類。")
-    units, seen_series = [], set()
-    for n, s in flow:
-        if s.get("type", "content") == "content" and s.get("layout") in VARIANTS:
-            if s.get("series"):
-                if s["series"] in seen_series:
-                    continue
-                seen_series.add(s["series"])
-            units.append(combo(s))
-    if len(units) >= 6 and len(set(units)) < 4:
-        W("slides", f"{len(units)} 頁內容只用了 {len(set(units))} 種排法，畫面會單調。依內容換排法（見 references/layouts.md）。")
+        else:
+            kinds = {shape_of(s) for _, s in pages}
+            if len(kinds) > 1:
+                W(f"series「{name}」", "同一個系列的頁面用了不同結構，同一系列建議維持一致視覺語言。")
 
     return errors, warnings, infos
 

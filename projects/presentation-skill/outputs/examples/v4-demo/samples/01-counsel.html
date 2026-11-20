@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>顧問報告｜三門市報廢率</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#F1EFEA;--ink:#141619;--nav:#585D66;--desc:#3F444B;--src:#5A5E66;--rule:#D3CFC6;
+    --gray:#CFCAC1;--gray2:#BDB7AC;--focus:#0D6B4F;--focusText:#0B5E45;--onFocus:#F4F2EC;--onFocusSub:#CFE5DB;
+    --late:#B5381F;--lateTint:#E8C2B6;
+  }
+  body{background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh}
+  .slide{position:relative;width:1920px;height:1080px;background:var(--bg);color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;overflow:hidden;font-synthesis:none}
+  nav.slide-nav{position:absolute;left:88px;top:44px;display:flex;gap:34px;font-weight:500;font-size:21px;line-height:1;color:var(--nav)}
+  nav.slide-nav b{color:var(--ink);font-weight:700}
+  .left{position:absolute;left:88px;top:126px;width:680px;bottom:84px;display:flex;flex-direction:column}
+  h2.title{font-weight:900;font-size:84px;line-height:1.1;letter-spacing:-.02em}
+  p.lead{margin-top:26px;font-weight:500;font-size:32px;line-height:1.5;color:var(--ink)}
+  p.lead em{font-style:normal;font-weight:900;color:var(--focusText)}
+  .ev{margin-top:52px;border-top:2px solid var(--ink)}
+  .ev-row{display:grid;grid-template-columns:220px 1fr;gap:24px;align-items:baseline;padding:24px 0;border-bottom:1px solid var(--rule)}
+  .ev-num{font:900 66px/1 "Archivo","Noto Sans TC",sans-serif;font-variant-numeric:tabular-nums;color:var(--ink);letter-spacing:-.03em}
+  .ev-num .u{font:700 26px/1 "Noto Sans TC",sans-serif;margin-left:4px;color:var(--desc)}
+  .ev-num.hi{color:var(--focusText)}
+  .ev-txt strong{display:block;font-weight:700;font-size:25px;line-height:1.3;color:var(--ink)}
+  .ev-txt span{display:block;margin-top:6px;font-weight:400;font-size:21px;line-height:1.45;color:var(--desc)}
+  .source{position:absolute;left:88px;bottom:38px;font-weight:400;font-size:19px;line-height:1.3;color:var(--src)}
+
+  .chart{position:absolute;left:836px;right:84px;top:116px;bottom:0}
+  .target-line{position:absolute;left:0;right:0;bottom:480px;border-top:2.5px dashed var(--ink);z-index:6}
+  .target-tag{position:absolute;left:0;top:-38px;font-weight:700;font-size:21px;line-height:1;color:var(--ink);background:var(--bg);padding:4px 10px 4px 0}
+  .bars{position:absolute;left:0;right:0;bottom:0;top:40px;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;align-items:end}
+  .bar-col{position:relative;display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+  .block{position:relative;width:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:30px 28px 34px}
+  .block.best{height:336px;background:var(--focus);color:var(--onFocus)}
+  .block.mid{height:784px;background:var(--gray);color:var(--ink)}
+  .block.high{height:880px;background:var(--gray2);color:var(--ink)}
+  .over{position:absolute;left:0;right:0;top:0;
+    background:repeating-linear-gradient(-45deg,rgba(181,56,31,.24) 0 10px,rgba(232,194,182,.55) 10px 20px);
+    border-bottom:2px solid var(--late)}
+  .block.mid .over{height:304px}
+  .block.high .over{height:400px}
+  .gap-pill{position:absolute;left:24px;top:24px;background:var(--late);color:#FAF6F2;padding:10px 16px;z-index:7}
+  .gap-pill strong{display:block;font:900 38px/1 "Archivo",sans-serif;font-variant-numeric:tabular-nums}
+  .gap-pill span{display:block;margin-top:4px;font-weight:500;font-size:18px;line-height:1.2}
+  .val{font:900 132px/.9 "Archivo",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+  .val small{font:700 44px/1 "Archivo",sans-serif;margin-left:4px}
+  .meta{margin-top:14px;font-weight:700;font-size:26px;line-height:1.3}
+  .sub{margin-top:4px;font-weight:500;font-size:20px;line-height:1.3;opacity:.85}
+  .block.best .sub{color:var(--onFocusSub);opacity:1}
+</style>
+</head>
+<body>
+<section class="slide" data-kind="content" data-nav="inline">
+  <nav class="slide-nav"><span>現況痛點</span><b>試點成果</b><span>導入節奏</span></nav>
+  <div class="left">
+    <h2 class="title" data-role="title">三門市報廢率</h2>
+    <p class="lead" data-role="summary">只有導入預報系統的信義店，把每日報廢壓在<em>目標線 6% 以下</em>。</p>
+    <div class="ev">
+      <div class="ev-row">
+        <div class="ev-num hi">-63<span class="u">%</span></div>
+        <div class="ev-txt"><strong>報廢盤數降幅</strong><span>導入 8 週後，打烊剩餘盤數從 24 盤降至 9 盤</span></div>
+      </div>
+      <div class="ev-row">
+        <div class="ev-num">12<span class="u">分鐘</span></div>
+        <div class="ev-txt"><strong>店長備料決策</strong><span>系統凌晨自動產單，免去人工對照前週銷量</span></div>
+      </div>
+      <div class="ev-row">
+        <div class="ev-num">34<span class="u">萬</span></div>
+        <div class="ev-txt"><strong>單店年省原料費</strong><span>以信義店近兩個月平均客單與損耗率推估</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="chart">
+    <div class="target-line"><span class="target-tag">總部報廢上限 6.0%</span></div>
+    <div class="bars">
+      <div class="bar-col">
+        <div class="block best">
+          <div class="val">4.2<small>%</small></div>
+          <div class="meta">信義旗艦店</div>
+          <div class="sub">已導入｜低於上限 1.8%</div>
+        </div>
+      </div>
+      <div class="bar-col">
+        <div class="block mid">
+          <div class="over">
+            <div class="gap-pill"><strong>+3.8%</strong><span>超出上限</span></div>
+          </div>
+          <div class="val">9.8<small>%</small></div>
+          <div class="meta">東區門市</div>
+          <div class="sub">人工經驗｜雨天波動最大</div>
+        </div>
+      </div>
+      <div class="bar-col">
+        <div class="block high">
+          <div class="over">
+            <div class="gap-pill"><strong>+5.4%</strong><span>超出上限</span></div>
+          </div>
+          <div class="val">11.4<small>%</small></div>
+          <div class="meta">板橋門市</div>
+          <div class="sub">人工經驗｜假日熱銷缺貨</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="source">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（試點期間 8 週，不含中秋禮盒檔期）</p>
+</section>
+</body>
+</html>

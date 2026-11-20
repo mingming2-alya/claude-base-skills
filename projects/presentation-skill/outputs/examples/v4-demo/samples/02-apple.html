@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>Apple 發表｜星塵預報 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --stage:#0B0B0D;--fg:#F5F5F7;--sub:#9A9AA0;--nav:#8E8E93;--hair:rgba(255,255,255,.22);
+    --g1:#8BE6FF;--g2:#2E9BFF;--g3:#2F6BFF;
+  }
+  body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh}
+  .slide{position:relative;width:1920px;height:1080px;background:var(--stage);color:var(--fg);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;overflow:hidden;font-synthesis:none}
+  .floor-glow{position:absolute;left:50%;bottom:-140px;width:1180px;height:380px;transform:translateX(-50%);
+    background:radial-gradient(ellipse at center,rgba(46,155,255,.26) 0%,rgba(46,155,255,0) 70%);pointer-events:none;z-index:0}
+  nav.slide-nav{position:absolute;left:0;right:0;top:42px;display:flex;justify-content:center;gap:40px;font-weight:500;font-size:21px;line-height:1;color:var(--nav);z-index:4}
+  nav.slide-nav b{color:var(--fg);font-weight:700}
+  .hero{position:absolute;left:0;right:0;top:116px;text-align:center;z-index:4}
+  h2.title{font:900 120px/1.05 "Geist","Noto Sans TC","PingFang TC",sans-serif;letter-spacing:-.02em}
+  .grad{background:linear-gradient(90deg,var(--g1),var(--g2),var(--g3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+  p.lead{margin-top:22px;font-weight:500;font-size:42px;line-height:1.35;color:#D9D9DE}
+  p.lead em{font-style:normal;font-weight:700}
+
+  .device-wrap{position:absolute;left:50%;bottom:-36px;width:620px;height:620px;transform:translateX(-50%);z-index:3}
+  .rim{position:absolute;inset:-4px;border-radius:46px 46px 0 0;
+    background:linear-gradient(135deg,#A5F3FF,#5AC8FA,#2E9BFF,#33D1B0);filter:blur(14px);opacity:.55}
+  .device{position:relative;width:100%;height:100%;border-radius:42px 42px 0 0;background:#121318;
+    border:2px solid rgba(165,243,255,.55);padding:42px 44px;display:flex;flex-direction:column;gap:24px}
+  .dev-top{display:flex;justify-content:space-between;align-items:center;font-weight:500;font-size:20px;line-height:1;color:var(--sub)}
+  .dev-tag{color:#8BE6FF;font-weight:700}
+  .dev-kpi{display:flex;align-items:baseline;gap:18px;padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.12)}
+  .dev-num{font:700 84px/1 "Geist",sans-serif;color:var(--fg);font-variant-numeric:tabular-nums}
+  .dev-lbl{font-weight:500;font-size:24px;line-height:1.3;color:#C4C4CA}
+  .dev-list{list-style:none;display:flex;flex-direction:column;gap:18px}
+  .dev-list li{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-radius:18px;background:#1A1C24;font-weight:500;font-size:24px;line-height:1.2}
+  .dev-list li b{font:700 26px/1 "Geist",sans-serif;color:#8BE6FF;font-variant-numeric:tabular-nums}
+
+  .callout{position:absolute;width:430px;z-index:4}
+  .callout h3{font-weight:700;font-size:32px;line-height:1.25;color:var(--fg)}
+  .callout p{margin-top:10px;font-weight:400;font-size:23px;line-height:1.5;color:var(--sub)}
+  .c-l1{left:120px;top:520px;text-align:right}
+  .c-l2{left:120px;top:740px;text-align:right}
+  .c-r1{right:120px;top:520px;text-align:left}
+  .c-r2{right:120px;top:740px;text-align:left}
+  svg.lines{position:absolute;inset:0;width:1920px;height:1080px;pointer-events:none;z-index:2}
+</style>
+</head>
+<body>
+<section class="slide" data-kind="content" data-nav="inline">
+  <div class="floor-glow" data-layer="bg"></div>
+  <svg class="lines" viewBox="0 0 1920 1080" aria-hidden="true">
+    <path d="M568 538 H650 M568 758 H650 M1270 538 H1352 M1270 758 H1352" stroke="rgba(255,255,255,0.28)" stroke-width="1.5"/>
+    <circle cx="650" cy="538" r="4" fill="#8BE6FF"/><circle cx="650" cy="758" r="4" fill="#8BE6FF"/>
+    <circle cx="1270" cy="538" r="4" fill="#8BE6FF"/><circle cx="1270" cy="758" r="4" fill="#8BE6FF"/>
+  </svg>
+  <nav class="slide-nav"><span>現況痛點</span><b>試點成果</b><span>導入節奏</span></nav>
+  <header class="hero">
+    <h2 class="title" data-role="title">星塵預報 <span class="grad">2.0</span></h2>
+    <p class="lead" data-role="summary">凌晨四點前，替每家店算好<em class="grad">剛剛好的出爐量</em>。</p>
+  </header>
+  <div class="callout c-l1">
+    <h3>報廢率降至 4.2%</h3>
+    <p>信義店試點 8 週，打烊剩餘盤數減少 63%，守住 6% 紅線。</p>
+  </div>
+  <div class="callout c-l2">
+    <h3>納入天氣與連假</h3>
+    <p>結合區域降雨機率與周邊商圈人流，雨天不再多烤。</p>
+  </div>
+  <div class="callout c-r1">
+    <h3>12 分鐘確認排程</h3>
+    <p>系統自動產出建議盤數，店長只需微調特賣品項。</p>
+  </div>
+  <div class="callout c-r2">
+    <h3>單店年省 34 萬</h3>
+    <p>不改門市收銀設備，直接串接既有日結資料即可上線。</p>
+  </div>
+  <div class="device-wrap">
+    <div class="rim"></div>
+    <div class="device">
+      <div class="dev-top"><span>明晨備料建議 · 信義店</span><span class="dev-tag">降雨機率 70%</span></div>
+      <div class="dev-kpi"><span class="dev-num">4.2%</span><span class="dev-lbl">預估本週報廢（上限 6%）</span></div>
+      <ul class="dev-list">
+        <li><span>鹽可頌（招牌）</span><b>18 盤</b></li>
+        <li><span>酸種歐包（雨天降量）</span><b>6 盤</b></li>
+        <li><span>生吐司（午間補烤）</span><b>10 盤</b></li>
+      </ul>
+    </div>
+  </div>
+</section>
+</body>
+</html>

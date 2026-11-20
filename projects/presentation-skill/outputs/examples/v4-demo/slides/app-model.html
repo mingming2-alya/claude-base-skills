@@ -1,0 +1,41 @@
+<style>
+.slide .head { position: absolute; left: 88px; right: 240px; top: 72px; }
+.slide .kicker { font-weight: 700; font-size: 20px; color: var(--accent-text); letter-spacing: .04em; margin-bottom: 10px; }
+.slide h2.title { font-weight: 900; font-size: 72px; line-height: 1.12; }
+.slide .cols { position: absolute; left: 88px; right: 88px; top: 258px; bottom: 96px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+.slide .box { border-top: 2.5px solid var(--fg); padding-top: 26px; }
+.slide .box.warn { border-top-color: var(--late); }
+.slide .box h3 { font-weight: 800; font-size: 32px; margin-bottom: 24px; }
+.slide .box.warn h3 { color: var(--late); }
+.slide ul { list-style: none; display: flex; flex-direction: column; gap: 20px; }
+.slide li { font-weight: 500; font-size: 25px; line-height: 1.5; padding-left: 26px; position: relative; color: var(--fg); }
+.slide li::before { content: ""; position: absolute; left: 0; top: .68em; width: 12px; height: 3px; background: var(--accent); }
+.slide .box.warn li::before { background: var(--late); }
+.slide .src { position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+</style>
+<section class="slide canvas" data-nav="none">
+  <header class="head">
+    <div class="kicker">附件｜點擊右上返回或按 Esc 回到「三門市報廢率」</div>
+    <h2 class="title" data-role="title">預報模型輸入與限制</h2>
+  </header>
+  <div class="cols">
+    <div class="box">
+      <h3>系統使用的四項輸入資料</h3>
+      <ul>
+        <li>各品項過去 8 週分時段銷售量（既有收銀日結自動匯出）</li>
+        <li>中央氣象署鄉鎮級逐日降雨機率與最高／最低溫</li>
+        <li>平日、週末、國定連假與商圈周邊大型活動標記</li>
+        <li>各品項麵團發酵提前期與最小整盤烘烤單位</li>
+      </ul>
+    </div>
+    <div class="box warn">
+      <h3>目前限制與不承諾事項</h3>
+      <ul>
+        <li>試點僅涵蓋常態 8 週，中秋禮盒等大型節慶檔期仍須由店長人工鎖量</li>
+        <li>門市須維持收銀機夜間網路連線，斷網時自動退回前週同日基準</li>
+        <li>新上市未滿兩週的限定品項缺乏歷史銷量，系統只給同類參考區間</li>
+      </ul>
+    </div>
+  </div>
+  <p class="src">資料來源：數據與營運企劃組 2026 Q3 系統規格書（v1.2）</p>
+</section>
