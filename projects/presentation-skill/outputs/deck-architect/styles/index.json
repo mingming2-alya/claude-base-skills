@@ -1,6 +1,6 @@
 {
-  "version": "4.0",
-  "note": "全部 12 款風格皆支援淺、深兩種底（明暗依場合選，用色鎖規則不鎖色碼）。Phase A 完成首批 3 款完整 Style DNA；其餘 9 款已列調性與適用場景，將於 Phase D 補齊完整憲法。",
+  "version": "4.1",
+  "note": "全部 12 款風格皆支援淺、深兩種底（明暗依場合選，用色鎖規則不鎖色碼）。目前已就緒 4 款完整 Style DNA（counsel／apple／illustration／workday）；其餘 8 款已列調性與適用場景，將於 Phase D 補齊完整憲法。",
   "styles": [
     {
       "id": "counsel",
@@ -111,14 +111,15 @@
     {
       "id": "workday",
       "name": "日常工作款",
-      "status": "planned",
+      "status": "ready",
+      "spec": "styles/workday.md",
       "mood": ["清晰", "省心", "高效率"],
       "formality": "medium",
       "default_mode": "light",
       "modes": ["light", "dark"],
       "best_for": ["週進度回報", "專案群總覽", "例會同步", "待決事項追蹤"],
       "avoid_for": ["大型活動開場", "品牌形象影片"],
-      "signature": "現代便當格狀態卡＋清晰風險紅黃綠燈＋一秒讀懂待決事項"
+      "signature": "現代便當格狀態卡＋雙語意色甘特與圓環進度＋掃讀式 A/B 拍板卡"
     },
     {
       "id": "cinema",

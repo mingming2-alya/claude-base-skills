@@ -1,0 +1,154 @@
+<style>
+.slide {
+  --bg: #0A0D12;
+  --fg: #F4F2EC;
+  --sub: #B7BDC8;
+  --muted: #7F8794;
+  --grad: linear-gradient(96deg, #74F2BE 0%, #3AD99B 55%, #F2C96B 100%);
+  --sans: "Noto Sans TC", var(--font-sans-fallback);
+  --num: "Archivo", "Noto Sans TC", var(--font-sans-fallback);
+  --motion-mode: spring;
+  --spring-response: 0.62;
+  background:
+    radial-gradient(ellipse 920px 620px at 78% 48%, rgba(58, 217, 155, 0.14), rgba(58, 217, 155, 0) 68%),
+    radial-gradient(ellipse 680px 460px at 24% 88%, rgba(242, 201, 107, 0.08), rgba(242, 201, 107, 0) 68%),
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+}
+.slide .dots {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(244, 242, 236, 0.11) 1.2px, transparent 1.2px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 75% 70% at 62% 50%, #000 0%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 75% 70% at 62% 50%, #000 0%, transparent 78%);
+}
+.slide .watermark {
+  position: absolute;
+  left: auto;
+  right: -16px;
+  top: 110px;
+  z-index: 1;
+  font-family: var(--num);
+  font-size: 460px;
+  font-weight: 900;
+  line-height: 0.85;
+  letter-spacing: -0.06em;
+  color: rgba(116, 242, 190, 0.052);
+  pointer-events: none;
+  user-select: none;
+}
+.slide .eyebrow {
+  position: absolute;
+  left: 140px;
+  top: 256px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #74F2BE;
+}
+.slide .eyebrow i { width: 36px; height: 2px; background: #74F2BE; display: block; }
+
+.slide h1 {
+  position: absolute;
+  left: 140px;
+  top: 320px;
+  z-index: 3;
+  font-size: 120px;
+  font-weight: 900;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.slide h1 .hl {
+  font-family: var(--num);
+  font-weight: 900;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-left: 16px;
+}
+
+.slide .proof-row {
+  position: absolute;
+  left: 140px;
+  right: 140px;
+  bottom: 132px;
+  z-index: 3;
+  padding-top: 36px;
+  border-top: 1px solid rgba(244, 242, 236, 0.16);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+}
+.slide .p-item b {
+  display: block;
+  font-family: var(--num);
+  font-size: 58px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.slide .p-item b.mint { color: #74F2BE; }
+.slide .p-item b small {
+  font-family: var(--sans);
+  font-size: 26px;
+  font-weight: 700;
+  margin-left: 6px;
+  color: var(--sub);
+}
+.slide .p-item span {
+  display: block;
+  margin-top: 12px;
+  font-size: 23px;
+  font-weight: 500;
+  color: var(--sub);
+}
+.slide .src {
+  position: absolute;
+  left: 140px;
+  bottom: 30px;
+  z-index: 3;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--muted);
+}
+</style>
+<section class="slide canvas" data-nav="none" data-fx="soft-aurora">
+  <div class="dots" data-layer="bg" aria-hidden="true"></div>
+  <div class="watermark" aria-hidden="true">1.8%</div>
+
+  <div class="eyebrow rv" data-delay="80"><i></i><span>單店損益試算</span></div>
+
+  <h1 data-role="shock">
+    少丟 1 盤麵包，<br>
+    門市淨利多<span class="hl">+1.8%</span>
+  </h1>
+
+  <div class="proof-row" data-stagger="90" data-delay="220">
+    <div class="p-item">
+      <b class="mint" data-count data-delay="260">170<small>萬／年</small></b>
+      <span>五店年省原料費</span>
+    </div>
+    <div class="p-item">
+      <b data-count data-delay="340">4.2<small>個月</small></b>
+      <span>導入回本週期</span>
+    </div>
+    <div class="p-item">
+      <b>0<small>台新硬體</small></b>
+      <span>沿用既有收銀機</span>
+    </div>
+  </div>
+
+  <p class="src" data-role="source">資料來源：財務部 2026 單店損益模型</p>
+</section>

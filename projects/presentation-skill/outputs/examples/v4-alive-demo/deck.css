@@ -1,0 +1,12 @@
+/* @fonts family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@600;700;800;900&family=Geist:wght@500;600;700;800&family=Chiron+GoRound+TC:wght@700;900&family=Nunito:wght@800;900 */
+
+:root {
+  --bg: #0D1015;
+  --fg: #F4F2EC;
+  --accent: #0E6B4F;
+  --accent-text: #4AD49A;
+  --motion-mode: spring;
+  --spring-response: 0.54;
+  --spring-bounce: 0;
+  --morph-ms: 780;
+}

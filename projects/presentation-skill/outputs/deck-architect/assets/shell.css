@@ -1,11 +1,14 @@
-/* deck-architect v4 Thin Shell CSS
+/* deck-architect v4.1 Thin Shell CSS (Phase B Layered Hybrid Motion Core)
  *
- * Only locks invariants that must never break across slides:
- *  - 1920x1080 auto-scaled stage & active-slide visibility
+ * Locks only invariants that must never break across slides:
+ *  - 1920x1080 auto-scaled stage & hold-outgoing slide visibility layering
  *  - Offline CJK + Latin system font fallback stacks
  *  - Single-source navigation/tab hooks (fully styleable or replaceable via data-nav="inline")
- *  - Replaceable image-layer slot (.asset-slot) for zero-wait SVG + optional AI/photo upgrade
- *  - Shock curtain, appendix back button, speaker notes, and exact 16:9 print/PDF output
+ *  - Style-driven motion personality tokens (--motion-mode: spring | crisp | stepped)
+ *  - Magic Move overlay (#morph-layer), Canvas 2D FX layer (.fx-canvas), and toast (#toast)
+ *  - Interactive live-figure controls (.live-ctrl / .live-only) with print/static isolation
+ *  - Replaceable image-layer slot (.asset-slot) for zero-wait SVG + AI/photo fusion
+ *  - Dual static freeze (?still=1, B low-power mode, prefers-reduced-motion) & exact 16:9 print/PDF
  *
  * Free-canvas slides (<section class="slide canvas">) keep 100% layout freedom.
  */
@@ -63,6 +66,14 @@
   --nav-active: var(--fg);
   --nav-accent: var(--accent);
   --nav-border: var(--line-2);
+
+  /* Phase B motion personality tokens (spring | crisp | stepped) */
+  --motion-mode: spring;
+  --spring-response: 0.54;
+  --spring-bounce: 0;
+  --step-frames: 5;
+  --stagger-base: 48;
+  --morph-ms: 780;
   --enter-easing: cubic-bezier(.16, 1, .3, 1);
 }
 
@@ -105,9 +116,19 @@ html, body {
   -webkit-font-smoothing: antialiased;
   font-kerning: normal;
   visibility: hidden;
+  z-index: 1;
   overflow: hidden;
 }
-.slide.active { visibility: visible; }
+/* Hold outgoing slide at opacity 1 underneath incoming slide to prevent dark flashes (open-slide MIT) */
+.slide.leaving {
+  visibility: visible;
+  z-index: 2;
+  pointer-events: none;
+}
+.slide.active {
+  visibility: visible;
+  z-index: 4;
+}
 .slide h1, .slide h2, .slide h3 { text-wrap: balance; font-feature-settings: "halt" 1; }
 .slide p { text-wrap: pretty; }
 
@@ -123,7 +144,7 @@ mark.em {
 .unit { font-size: .42em; font-weight: 500; letter-spacing: 0; opacity: .75; margin-left: .08em; font-family: var(--font-body); }
 .ph { display: inline-block; max-width: 100%; }
 
-/* ---------------------------------------------------------------- replaceable image/scene slot */
+/* ---------------------------------------------------------------- replaceable image/scene slot & FX canvas */
 .asset-slot {
   position: absolute;
   inset: 0;
@@ -132,14 +153,23 @@ mark.em {
   overflow: hidden;
 }
 .asset-slot > svg,
+.asset-slot > img,
 .asset-slot > img.slot-img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-/* Ensure slide content sits above background scene layer with zero specificity so slide CSS / .back always win */
-:where(.slide.canvas > :not(.asset-slot):not(.scene):not([data-layer="bg"]):not(.back):not(.more-btn)) {
+.fx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 1;
+  pointer-events: none;
+}
+/* Ensure slide content sits above background scene & FX layers with zero specificity */
+:where(.slide.canvas > :not(.asset-slot):not(.scene):not(.fx-canvas):not([data-layer="bg"]):not(.back):not(.more-btn)) {
   position: relative;
   z-index: 2;
 }
@@ -148,6 +178,61 @@ mark.em {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- Phase B overlays & motion helpers */
+#morph-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Flowing SVG offset-path token helper (visual-explainer MIT) */
+@keyframes deck-token-flow {
+  0% { offset-distance: 0%; opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+.flow-token {
+  pointer-events: none;
+  animation: deck-token-flow var(--token-dur, 3.2s) cubic-bezier(.4, 0, .2, 1) infinite;
+}
+
+/* Interactive live controls (isolated from slide click-to-advance) */
+.live-ctrl {
+  user-select: none;
+}
+.live-ctrl input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+  cursor: pointer;
+}
+.live-ctrl input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--slider-thumb, #4BE2A5);
+  border: 3px solid var(--slider-ring, #0D1117);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  transition: transform .15s ease;
+}
+.live-ctrl input[type="range"]::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.14);
+}
+.live-ctrl input[type="range"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(75, 226, 165, 0.45);
 }
 
 /* ---------------------------------------------------------------- persistent navigation (customizable) */
@@ -281,16 +366,38 @@ mark.em {
   right: 0;
   bottom: 0;
   z-index: 40;
-  background: rgba(12, 14, 18, .9);
+  background: rgba(12, 14, 18, .92);
   color: #ECEAE4;
-  font: 400 20px/1.6 var(--font-sans-fallback);
-  padding: 18px 28px;
+  font: 400 20px/1.65 var(--font-sans-fallback);
+  padding: 20px 32px;
   display: none;
-  max-height: 32vh;
+  max-height: 34vh;
   overflow: auto;
   white-space: pre-wrap;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
 }
 #notes.show { display: block; }
+
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%) translateY(10px);
+  z-index: 45;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: rgba(14, 17, 22, 0.9);
+  border: 1px solid rgba(244, 242, 236, 0.18);
+  color: #F4F2EC;
+  font: 600 16px/1.3 var(--font-sans-fallback);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .22s ease, transform .22s ease;
+}
+#toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 
 #hint {
   position: fixed;
@@ -303,9 +410,31 @@ mark.em {
   transition: opacity .35s ease;
   pointer-events: none;
 }
-body:hover #hint { opacity: .75; }
+body:hover #hint { opacity: .78; }
 
-/* ---------------------------------------------------------------- static & print */
+/* ---------------------------------------------------------------- static freeze & low-power */
+html.still *,
+html.still *::before,
+html.still *::after,
+body.low-power *,
+body.low-power *::before,
+body.low-power *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+html.still .fx-canvas,
+body.low-power .fx-canvas {
+  display: none !important;
+}
+html.still .flow-token,
+body.low-power .flow-token {
+  display: none !important;
+}
+html.hide-ctrl .live-only,
+body.hide-ctrl .live-only {
+  display: none !important;
+}
+
 .static .slide {
   position: relative;
   visibility: visible;
@@ -351,7 +480,7 @@ body:hover #hint { opacity: .75; }
   html, body { height: auto; overflow: visible; background: none; }
   #viewport { position: static; display: block; background: none; }
   #stage { transform: none !important; width: 1920px; height: auto; overflow: visible; }
-  #nav, #tabs, #curtain, #notes, #hint, .back, .more-btn { display: none !important; }
+  #nav, #tabs, #curtain, #morph-layer, #notes, #hint, #toast, .back, .more-btn, .live-only, .fx-canvas, .flow-token { display: none !important; }
   .slide {
     position: relative;
     visibility: visible !important;
@@ -361,7 +490,7 @@ body:hover #hint { opacity: .75; }
     opacity: 1 !important;
     transform: none !important;
   }
-  .slide * { opacity: 1; transform: none !important; }
+  .slide * { opacity: 1; transform: none !important; animation: none !important; }
   .toc li.off { opacity: .28 !important; }
   .snav {
     display: flex;
@@ -386,5 +515,7 @@ body:hover #hint { opacity: .75; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #nav .ind, #tabs span, #nav span { transition: none !important; }
+  #nav .ind, #tabs span, #nav span, #toast { transition: none !important; }
+  .fx-canvas, .flow-token { display: none !important; }
+  .slide * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }

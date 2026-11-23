@@ -538,14 +538,168 @@ async function runSheetMode(driver, samplesDir) {
   return failed > 0 ? 1 : 0;
 }
 
+async function runMotionAudit(driver, filePath) {
+  const results = [];
+  const failures = [];
+  driver.clearErrors();
+  await driver.setViewport(1920, 1080);
+  await driver.goto(pathToFileURL(filePath).href);
+  await driver.wait(280);
+
+  const count = await driver.evaluate(() => window.__deck ? window.__deck.count : 0);
+  if (!count) return { results: [], failures: ['找不到 window.__deck API'] };
+
+  // 1. Rapid-fire zero-lockout interruption test
+  const mainCount = await driver.evaluate(() => window.__deck.slides.filter(s => s.dataset.appendix !== '1').length);
+  if (mainCount >= 4) {
+    await driver.evaluate(() => window.__deck.go(0, true));
+    await driver.wait(80);
+    for (let k = 0; k < 4; k++) {
+      await driver.evaluate(() => window.__deck.step(1));
+      await driver.wait(45);
+    }
+    await driver.wait(1050);
+    const rapid = await driver.evaluate(() => {
+      const idx = window.__deck.index;
+      const morphLeft = document.getElementById('morph-layer')?.children.length || 0;
+      const hiddenMorph = [...document.querySelectorAll('[data-morph]')].filter(e => e.style.visibility === 'hidden').length;
+      const actives = document.querySelectorAll('.slide.active').length;
+      const leavings = document.querySelectorAll('.slide.leaving').length;
+      return { idx, morphLeft, hiddenMorph, actives, leavings };
+    });
+    if (rapid.idx >= 3 && rapid.morphLeft === 0 && rapid.hiddenMorph === 0 && rapid.actives === 1 && rapid.leavings === 0) {
+      results.push(`連按打斷測試（4 次／180ms）：通過（精準落於第 ${rapid.idx + 1} 頁，無殘留 clone 與鎖死）`);
+    } else {
+      failures.push(`連按打斷異常：index=${rapid.idx}, morphLeft=${rapid.morphLeft}, hiddenMorph=${rapid.hiddenMorph}, actives=${rapid.actives}, leavings=${rapid.leavings}`);
+    }
+  }
+
+  // 2. Magic Move mount & cleanup round-trip
+  const morphPair = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    for (let i = 0; i < sls.length - 1; i++) {
+      if (sls[i].dataset.appendix === '1' || sls[i + 1].dataset.appendix === '1') continue;
+      const aIds = new Set([...sls[i].querySelectorAll('[data-morph]')].map(e => e.dataset.morph));
+      for (const el of sls[i + 1].querySelectorAll('[data-morph]')) {
+        if (aIds.has(el.dataset.morph)) return { from: i, to: i + 1, id: el.dataset.morph };
+      }
+    }
+    return null;
+  });
+  if (morphPair) {
+    await driver.evaluate(i => window.__deck.go(i, true), morphPair.from);
+    await driver.wait(80);
+    await driver.evaluate(i => window.__deck.go(i, false), morphPair.to);
+    await driver.wait(120);
+    const midCount = await driver.evaluate(() => document.getElementById('morph-layer')?.children.length || 0);
+    await driver.wait(1000);
+    const post = await driver.evaluate(({ to, id }) => {
+      const layer = document.getElementById('morph-layer')?.children.length || 0;
+      const target = window.__deck.slides[to].querySelector(`[data-morph="${id}"]`);
+      const vis = target ? getComputedStyle(target).visibility : 'missing';
+      return { layer, vis };
+    }, morphPair);
+    // Test backward Magic Move too
+    await driver.evaluate(i => window.__deck.go(i, false), morphPair.from);
+    await driver.wait(1050);
+    const backPost = await driver.evaluate(() => document.getElementById('morph-layer')?.children.length || 0);
+    if (midCount > 0 && post.layer === 0 && post.vis === 'visible' && backPost === 0) {
+      results.push(`跨頁 Magic Move（第 ${morphPair.from + 1} ↔ ${morphPair.to + 1} 頁 \`${morphPair.id}\`）：通過（飛行中 clone=${midCount}，落地清理完整）`);
+    } else {
+      failures.push(`Magic Move 異常：mid=${midCount}, postLayer=${post.layer}, vis=${post.vis}, backLayer=${backPost}`);
+    }
+  }
+
+  // 3. Interactive live-figure slider isolation & recalculation
+  const liveInfo = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    for (let i = 0; i < sls.length; i++) {
+      const rng = sls[i].querySelector('.live-ctrl input[type="range"]');
+      if (rng) return { idx: i };
+    }
+    return null;
+  });
+  if (liveInfo) {
+    await driver.evaluate(i => window.__deck.go(i, true), liveInfo.idx);
+    await driver.wait(120);
+    const liveRes = await driver.evaluate(i => {
+      const sl = window.__deck.slides[i];
+      const rng = sl.querySelector('.live-ctrl input[type="range"]');
+      const beforeText = sl.innerText;
+      const origVal = rng.value;
+      rng.click();
+      const idxAfterClick = window.__deck.index;
+      const min = Number(rng.min || 0), max = Number(rng.max || 100);
+      rng.value = String(Number(origVal) === max ? min : max);
+      rng.dispatchEvent(new Event('input', { bubbles: true }));
+      const afterText = sl.innerText;
+      rng.value = origVal;
+      rng.dispatchEvent(new Event('input', { bubbles: true }));
+      return { idxAfterClick, expected: i, changed: beforeText !== afterText };
+    }, liveInfo.idx);
+    if (liveRes.idxAfterClick === liveRes.expected && liveRes.changed) {
+      results.push(`現場互動試算（第 ${liveInfo.idx + 1} 頁滑桿）：通過（點擊不誤翻頁、即時重算數值）`);
+    } else {
+      failures.push(`互動試算異常：idxAfterClick=${liveRes.idxAfterClick} (預期 ${liveRes.expected}), changed=${liveRes.changed}`);
+    }
+  }
+
+  // 4. Low-power static freeze toggle (B key API)
+  const lpRes = await driver.evaluate(() => {
+    const on = window.__deck.toggleLowPower(true);
+    const clsOn = document.body.classList.contains('low-power');
+    const stOn = window.__deck.isStatic();
+    const off = window.__deck.toggleLowPower(false);
+    const clsOff = document.body.classList.contains('low-power');
+    return { on, clsOn, stOn, off, clsOff };
+  });
+  if (lpRes.on && lpRes.clsOn && lpRes.stOn && !lpRes.off && !lpRes.clsOff) {
+    results.push('低耗電靜態凍結（B 鍵模式）：通過（開關與還原正常）');
+  } else {
+    failures.push(`低耗電模式異常：${JSON.stringify(lpRes)}`);
+  }
+
+  // 5. Appendix click-in & Esc/back return
+  const linkInfo = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    for (let i = 0; i < sls.length; i++) {
+      const btn = sls[i].querySelector('[data-link]');
+      if (btn) return { idx: i, target: btn.dataset.link };
+    }
+    return null;
+  });
+  if (linkInfo) {
+    await driver.evaluate(i => window.__deck.go(i, true), linkInfo.idx);
+    await driver.wait(80);
+    await driver.evaluate(id => window.__deck.openLink(id), linkInfo.target);
+    await driver.wait(450);
+    const inApp = await driver.evaluate(() => {
+      const sl = window.__deck.slides[window.__deck.index];
+      return { isApp: sl?.dataset.appendix === '1', id: sl?.dataset.id };
+    });
+    await driver.evaluate(() => window.__deck.back());
+    await driver.wait(450);
+    const backIdx = await driver.evaluate(() => window.__deck.index);
+    if (inApp.isApp && inApp.id === linkInfo.target && backIdx === linkInfo.idx) {
+      results.push(`附件點入與返回（第 ${linkInfo.idx + 1} 頁 → \`${linkInfo.target}\`）：通過`);
+    } else {
+      failures.push(`附件進出異常：inApp=${JSON.stringify(inApp)}, backIdx=${backIdx} (預期 ${linkInfo.idx})`);
+    }
+  }
+
+  const jsErrs = driver.getErrors();
+  for (const e of jsErrs) failures.push(`動態測試期間腳本錯誤：${e}`);
+  return { results, failures };
+}
+
 async function runDeckOrSingleMode(driver, targetFile, opts) {
   const filePath = path.resolve(targetFile);
   if (!fs.existsSync(filePath)) throw new Error(`找不到檔案：${filePath}`);
 
   driver.clearErrors();
   await driver.setViewport(1920, 1080);
-  await driver.goto(pathToFileURL(filePath).href);
-  await driver.addTempStyle('#hint { display: none !important; }', '__check_hide_hint');
+  await driver.goto(pathToFileURL(filePath).href + '?still=1');
+  await driver.addTempStyle('#hint, #toast { display: none !important; }', '__check_hide_hint');
 
   const isDeck = await driver.evaluate(() => Boolean(window.__deck && typeof window.__deck.count === 'number'));
 
@@ -585,10 +739,15 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
   }
 
   const jsErrs = driver.getErrors();
+  let motionReport = null;
+  if (opts.motion) {
+    motionReport = await runMotionAudit(driver, filePath);
+  }
+
   const lines = [
     `# 品管報告：${path.basename(filePath)}`,
     '',
-    `後端：${driver.name}｜共 ${count} 頁，截圖在 \`check/\`。全簡報最低文字對比：${Number.isFinite(minDeckContrast) ? minDeckContrast.toFixed(2) + ':1' : '—'}。`,
+    `後端：${driver.name}｜共 ${count} 頁（\`?still=1\` 靜態定格實測），截圖在 \`check/\`。全簡報最低文字對比：${Number.isFinite(minDeckContrast) ? minDeckContrast.toFixed(2) + ':1' : '—'}。`,
     '',
   ];
   if (jsErrs.length) lines.push('## 主控台／腳本錯誤', ...jsErrs.map(e => `- ${e}`), '');
@@ -600,7 +759,13 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
     }
     lines.push('');
   } else if (!jsErrs.length) {
-    lines.push('## 自動檢查：全部通過', '', '接著請逐張看截圖，確認美感、斷行與主標題階層符合預期。', '');
+    lines.push('## 自動靜態檢查：全部通過', '', '接著請逐張看截圖，確認美感、去小字程度、斷行與主標題階層符合預期。', '');
+  }
+  if (motionReport) {
+    lines.push('## 動態互動檢核（`--motion`）');
+    for (const r of motionReport.results) lines.push(`- ✅ ${r}`);
+    for (const f of motionReport.failures) lines.push(`- ❌ ${f}`);
+    lines.push('');
   }
   if (allWarnings.length) {
     lines.push('## 提醒');
@@ -614,7 +779,8 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
   const reportText = lines.join('\n');
   fs.writeFileSync(path.join(outDir, 'report.md'), reportText);
   console.log(reportText);
-  return (problems.length || jsErrs.length) ? 1 : 0;
+  const motionFailed = motionReport ? motionReport.failures.length > 0 : false;
+  return (problems.length || jsErrs.length || motionFailed) ? 1 : 0;
 }
 
 // ----------------------------------------------------------------------------- CLI
@@ -623,6 +789,7 @@ async function main() {
   const sheetIdx = argv.indexOf('--sheet');
   const pdf = argv.includes('--pdf');
   const jpg = argv.includes('--jpg');
+  const motion = argv.includes('--motion');
   const outIdx = argv.indexOf('--out');
   const out = outIdx >= 0 ? argv[outIdx + 1] : null;
 
@@ -637,10 +804,10 @@ async function main() {
     }
     const target = argv.find((a, idx) => !a.startsWith('--') && !(outIdx >= 0 && idx === outIdx + 1));
     if (!target) {
-      console.error('用法：node check.mjs path/to/deck.html [--pdf] [--jpg] | node check.mjs --sheet path/to/samples_dir');
+      console.error('用法：node check.mjs path/to/deck.html [--motion] [--pdf] [--jpg] | node check.mjs --sheet path/to/samples_dir');
       process.exit(2);
     }
-    const code = await runDeckOrSingleMode(driver, target, { pdf, jpg, out });
+    const code = await runDeckOrSingleMode(driver, target, { pdf, jpg, motion, out });
     await driver.close();
     process.exit(code);
   } catch (err) {

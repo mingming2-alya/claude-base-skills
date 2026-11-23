@@ -1279,3 +1279,28 @@
 
 
 
+
+## 2026-11-23｜Phase B 完成：反寫靜態工藝與原則 #26 ＋ 方案 1 動態核心實作 ＋ 8 頁全動態單檔示範（`v4-alive-demo`）
+
+- **使用者的綠燈拍板（互動表單）**：
+  - 全 6 頁減字標竿過關，指示直接將「原則 #26＋四大視覺工藝＋反割裂生圖規範」反寫入 `deck-architect`，並正式實作 **Phase B 方案 1（分層混合）**，一次交付全部 4 項動態優先項目（可打斷彈簧、跨頁 Magic Move、動態數據與 SVG 動畫、現場互動滑桿＋低耗電靜態保險）。
+- **一、Skill 本體回寫升級（`outputs/deck-architect/` v4.1，28 檔）**：
+  - 新增 `styles/workday.md`（現代 Bento 工作款 Style DNA，含淺／深雙底雙語意色、甘特與圓環進度、A/B 拍板卡、`crisp` 動效參數），並在 `styles/index.json` 標記為 `ready`（累計 4 款完整 Style DNA）。
+  - 新增 `references/motion-system.md`（方案 1 分層混合動態作者手冊：風格個性參數、宣告式 `data-*` 語法、`.live-ctrl` 互動控件規範、雙重靜態保險與 `#stage` 旗艦外掛事件契約）。
+  - 更新 `SKILL.md`、`references/presentation-rules.md`、`references/samples.md`、`templates/image-upgrade.md`、`styles/{apple,counsel,illustration}.md`：納入原則 #26（`delivery: talk` 每視覺群組最多 2 層文字、口白進 `notes`）、四大靜態工藝標準、反左右割裂生圖提示詞規範與 Phase B 各風格動態個性變數。
+- **二、方案 1 零依賴原生動態核心與工具鏈升級（~10 KB gzip，100% 離線單檔）**：
+  - `assets/shell.css`＋`assets/runtime.js`（嚴守授權紀律，僅吸收 MIT 演算法思路並標註來源；`B` 鍵概念從零獨立實作）：
+    1. **零鎖死可打斷解析彈簧**：移除 `if (busy) return;` 改以單調 `navToken`＋即時狀態提交＋`cleanupFlight()`，連按方向鍵立即中斷重導；內建閉式解析阻尼彈簧產生器（預設臨界阻尼 `bounce: 0`，依 `--motion-mode: spring|crisp|stepped` 切換手感），並維持離場頁 `opacity: 1` 墊底消除黑底閃爍。
+    2. **跨頁 Keynote Magic Move（`[data-morph="id"]`）**：正反向皆支援，自動以 `1920×1080` 舞台座標量測前後位置並於 `#morph-layer` 彈簧飛移、等比縮放（文字防拉扁）與同步內插主色／子標色，同時切頁改純 `280ms` 淡入避免位移搶戲；中途打斷時零殘留 clone 與零永久隱藏。
+    3. **語意數據與 SVG 動畫原語**：`[data-count]` 滾動數字（保留正負號、小數與 `<small>` 單位）、`[data-draw]` 支援 SVG `pathLength="1"` 路徑描繪與 `data-draw="ring"` 進度圓環掃描（虛線改安全 `scaleY` 不破虛線）、`[data-grow="x|y"]` 長條／柱狀生長、`[data-stagger]` 前快後斂非等距交錯（自動防父子重複進場）、`.flow-token` CSS `offset-path` 光點流動。
+    4. **安全 30fps Canvas 2D 背景氛圍層（`[data-fx="ambient-dust"|"soft-aurora"]`）**：僅在作用頁運行，離頁、`B` 鍵省電、`?still=1` 或 `prefers-reduced-motion` 立即 `cancelAnimationFrame` 並清空畫布。
+    5. **現場互動控件隔離與雙重靜態保險**：點擊或聚焦 `.live-ctrl`／`<input>` 絕不誤觸翻頁；`?still=1` 確定性定格於最終數值與圖表狀態；`B` 鍵即時切換 `body.low-power` 省電靜態凍結並提示 toast；`@media print` 自動隱藏 `.live-only` 滑桿外殼保留真實預設數據。
+    6. **旗艦外掛契約**：透過 `#stage` 派發 `deck:slideenter`、`deck:slideleave`、`deck:still`、`deck:lowpower` 並公開 `window.__deck` API。
+  - `scripts/assemble.py`：新增 `_inline_local_imgs()` 將自由畫布內相對路徑圖片自動 Base64 內嵌進單檔 `deck.html`；新增 `#morph-layer`、`#toast` 與更新鍵盤提示。
+  - `scripts/check.mjs`：靜態稽核全面自動附加 `?still=1` 確保實測像素 WCAG 永不抓到半動畫殘影；新增 `--motion` 五項動態互動自動實測套件。
+- **三、完整 8 頁動態互動示範與回歸驗證（`outputs/examples/v4-alive-demo/`）**：
+  - 建置 8 頁完整單檔簡報 `deck.html`（1.7 MB 含內嵌 2 張真實 AI 無字底圖）：① 電影感攝影封面（`ambient-dust` 微塵＋`4.2%` Magic Move 起點）→ ② 24 盤數據矩陣頁（`4.2%` Magic Move 接棒＋24 格漸進點亮＋滾動數字）→ ③ Apple 實景平板頁（`4.2%` Magic Move 飛入發光平板＋8 週折線描繪與光點流動＋點入附件鈕）→ ④ AI 3D 紙黏土三站頁（`4.2%` 著陸黏土平板＋`steps(5)` 逐格進場）→ ⑤ 電影級震撼轉折頁（黑幕停頓＋`soft-aurora`＋滾動數據）→ ⑥ 現場互動 ROI 試算頁（雙滑桿＋3 情境快選＋即時重算年省／回本／淨利與雙條圖）→ ⑦ 現代 Bento 五店進度儀表板（`crisp` 甘特＋圓環掃描＋整體 51% 迷你柱）→ ⑧ 附件「預報模型輸入與限制」（`Esc`／返回鈕）。
+  - 驗證結果：全 repo 5 份 `storyboard.yaml` 跑 `lint.py` 全部 **0 錯誤、0 警告**；`check.mjs --motion` 8 頁靜態像素對比全過（最低 **`4.70:1`**），5 項 `--motion` 動態測試全部 ✅；`annual-section` 與 `progress-overview` 商務元件回歸組裝通過；`deck.pdf` 匯出驗證通過。
+  - 清除 `__pycache__` 後重新打包 `outputs/deck-architect.skill`（126 KB，28 檔）。
+- **同步的檔案**：`outputs/deck-architect/`（v4.1 28 檔）、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：交付 Antigravity 動態預覽卡與 8 頁截圖畫廊供使用者實測體驗，確認後啟動 **Phase C｜第一份真實簡報端到端 PK**。

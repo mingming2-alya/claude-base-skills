@@ -1,0 +1,444 @@
+<style>
+.slide {
+  --bg: #11151C;
+  --panel: #191F29;
+  --panel-2: #212936;
+  --fg: #F3F1EB;
+  --fg-2: #C3C9D4;
+  --muted: #8E97A6;
+  --line: rgba(243, 241, 235, 0.13);
+  --mint: #4AD49A;
+  --mint-bg: rgba(74, 212, 154, 0.14);
+  --gold: #F2C96B;
+  --coral: #FF7657;
+  --sans: "Noto Sans TC", var(--font-sans-fallback);
+  --num: "Archivo", "Noto Sans TC", var(--font-sans-fallback);
+  --motion-mode: crisp;
+  --slider-thumb: #4AD49A;
+  --slider-ring: #11151C;
+  background:
+    radial-gradient(ellipse 820px 520px at 80% 18%, rgba(74, 212, 154, 0.11), transparent 68%),
+    radial-gradient(ellipse 700px 480px at 14% 92%, rgba(242, 201, 107, 0.08), transparent 68%),
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+}
+.slide nav.slide-nav {
+  position: absolute;
+  left: 100px;
+  top: 48px;
+  z-index: 3;
+  display: flex;
+  gap: 34px;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.slide nav.slide-nav b { color: var(--fg); font-weight: 800; }
+
+.slide .sim-badge {
+  position: absolute;
+  right: 100px;
+  top: 42px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: var(--mint-bg);
+  border: 1px solid rgba(74, 212, 154, 0.36);
+  font-size: 18px;
+  font-weight: 700;
+  color: #82F0C0;
+}
+.slide .sim-badge i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--mint);
+  display: block;
+}
+
+.slide .left {
+  position: absolute;
+  left: 100px;
+  top: 124px;
+  width: 720px;
+  z-index: 2;
+}
+.slide h1 {
+  font-size: 76px;
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+}
+.slide p.lead {
+  margin-top: 20px;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--fg-2);
+}
+.slide p.lead em { font-style: normal; font-weight: 900; color: var(--mint); }
+
+.slide .ctrl-card {
+  margin-top: 44px;
+  padding: 42px 40px 44px;
+  border-radius: 28px;
+  background: var(--panel);
+  border: 1px solid rgba(243, 241, 235, 0.14);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+}
+.slide .preset-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 38px;
+}
+.slide .preset-btn {
+  padding: 11px 20px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  color: var(--fg-2);
+  font: 700 19px/1 var(--sans);
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+}
+.slide .preset-btn.on {
+  background: var(--mint-bg);
+  border-color: rgba(74, 212, 154, 0.55);
+  color: #8AF2C5;
+}
+
+.slide .slider-block { margin-bottom: 42px; }
+.slide .slider-block:last-child { margin-bottom: 0; }
+.slide .s-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 18px;
+}
+.slide .s-head label {
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--fg);
+}
+.slide .s-val {
+  font-family: var(--num);
+  font-size: 40px;
+  font-weight: 900;
+  color: var(--mint);
+  font-variant-numeric: tabular-nums;
+}
+.slide .s-val.gold { color: var(--gold); }
+.slide .s-val small {
+  font-family: var(--sans);
+  font-size: 21px;
+  font-weight: 700;
+  margin-left: 5px;
+  color: var(--fg-2);
+}
+.slide .s-ticks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-family: var(--num);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.slide .right {
+  position: absolute;
+  right: 100px;
+  top: 124px;
+  width: 940px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.slide .hero-out {
+  padding: 40px 44px;
+  border-radius: 30px;
+  background: linear-gradient(145deg, rgba(74, 212, 154, 0.16) 0%, rgba(25, 31, 41, 0.96) 55%);
+  border: 1.5px solid rgba(74, 212, 154, 0.42);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slide .hero-out .ho-k {
+  font-size: 24px;
+  font-weight: 700;
+  color: #A4F5D1;
+}
+.slide .hero-out .ho-tag {
+  margin-top: 12px;
+  display: inline-block;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(17, 21, 28, 0.6);
+  border: 1px solid rgba(243, 241, 235, 0.16);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--fg-2);
+  font-variant-numeric: tabular-nums;
+}
+.slide .hero-out .ho-num {
+  font-family: var(--num);
+  font-size: 124px;
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.slide .hero-out .ho-num small {
+  font-family: var(--sans);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--mint);
+  margin-left: 8px;
+}
+
+.slide .kpi-trio {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+.slide .k-card {
+  padding: 32px 30px;
+  border-radius: 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.slide .k-card b {
+  display: block;
+  font-family: var(--num);
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.slide .k-card b.gold { color: var(--gold); }
+.slide .k-card b.mint { color: var(--mint); }
+.slide .k-card b small {
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fg-2);
+  margin-left: 5px;
+}
+.slide .k-card span {
+  display: block;
+  margin-top: 14px;
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.slide .bar-card {
+  padding: 36px 40px 40px;
+  border-radius: 26px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.slide .bar-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.slide .bar-title span { font-size: 19px; font-weight: 600; color: var(--muted); }
+.slide .bar-row {
+  display: grid;
+  grid-template-columns: 165px 1fr 145px;
+  align-items: center;
+  gap: 20px;
+}
+.slide .bar-row .b-lbl { font-size: 21px; font-weight: 700; color: var(--fg-2); }
+.slide .bar-row .b-bg {
+  height: 30px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.slide .bar-row .b-fg {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.25s cubic-bezier(.16, 1, .3, 1);
+}
+.slide .bar-row .b-fg.loss { background: var(--coral); }
+.slide .bar-row .b-fg.now { background: var(--mint); }
+.slide .bar-row .b-num {
+  text-align: right;
+  font-family: var(--num);
+  font-size: 24px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+}
+.slide .bar-row .b-num.loss { color: #FFA28C; }
+.slide .bar-row .b-num.now { color: #82F0C0; }
+
+.slide .src {
+  position: absolute;
+  left: 100px;
+  bottom: 24px;
+  z-index: 2;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--muted);
+}
+</style>
+<section class="slide canvas" data-nav="inline">
+  <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
+  <div class="sim-badge live-only"><i></i><span>現場互動試算</span></div>
+
+  <div class="left">
+    <h1 data-role="title">五店效益即時試算</h1>
+    <p class="lead" data-role="summary">拉動門市與報廢目標，<em>即時看年省與回本</em>。</p>
+
+    <div class="ctrl-card live-ctrl live-only" data-interactive>
+      <div class="preset-row" role="group" aria-label="快速情境">
+        <button type="button" class="preset-btn" data-stores="1" data-rate="4.2">單店試點</button>
+        <button type="button" class="preset-btn on" data-stores="5" data-rate="4.2">Q4 五店（提案）</button>
+        <button type="button" class="preset-btn" data-stores="12" data-rate="4.5">全區 12 店</button>
+      </div>
+
+      <div class="slider-block">
+        <div class="s-head">
+          <label for="sim-stores">導入門市數</label>
+          <span class="s-val" id="out-stores">5<small>家</small></span>
+        </div>
+        <input id="sim-stores" type="range" min="1" max="15" step="1" value="5">
+        <div class="s-ticks"><span>1 家</span><span>5 家</span><span>10 家</span><span>15 家</span></div>
+      </div>
+
+      <div class="slider-block">
+        <div class="s-head">
+          <label for="sim-rate">目標報廢率</label>
+          <span class="s-val gold" id="out-rate">4.2<small>%</small></span>
+        </div>
+        <input id="sim-rate" type="range" min="3.5" max="6.0" step="0.1" value="4.2">
+        <div class="s-ticks"><span>3.5%</span><span>4.2% 實測</span><span>6.0% 紅線</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="hero-out rv">
+      <div>
+        <div class="ho-k">預估年省原料費</div>
+        <div class="ho-tag" id="out-scenario">5 家門市 ・ 目標 4.2%</div>
+      </div>
+      <div class="ho-num" id="out-save">170<small>萬／年</small></div>
+    </div>
+
+    <div class="kpi-trio" data-stagger="60" data-delay="90">
+      <div class="k-card">
+        <b class="gold" id="out-payback">4.2<small>個月</small></b>
+        <span>導入回本週期</span>
+      </div>
+      <div class="k-card">
+        <b class="mint" id="out-margin">+1.8<small>%</small></b>
+        <span>單店淨利提升</span>
+      </div>
+      <div class="k-card">
+        <b id="out-trays">75<small>盤／日</small></b>
+        <span>全區少丟麵包</span>
+      </div>
+    </div>
+
+    <div class="bar-card rv" data-delay="180">
+      <div class="bar-title">
+        <strong>年度報廢原料支出對照</strong>
+        <span>基準未導入 11.4%</span>
+      </div>
+      <div class="bar-row">
+        <span class="b-lbl">未導入（11.4%）</span>
+        <div class="b-bg"><div class="b-fg loss" id="bar-old" style="width:88%" data-grow="x" data-delay="220"></div></div>
+        <span class="b-num loss" id="num-old">269 萬</span>
+      </div>
+      <div class="bar-row">
+        <span class="b-lbl" id="lbl-new">導入後（4.2%）</span>
+        <div class="b-bg"><div class="b-fg now" id="bar-new" style="width:32%" data-grow="x" data-delay="280"></div></div>
+        <span class="b-num now" id="num-new">99 萬</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="src" data-role="source">資料來源：財務部 2026 單店損益模型（以常態報廢基準 11.4% 推估）</p>
+</section>
+<script>
+const storesIn = slide.querySelector('#sim-stores');
+const rateIn = slide.querySelector('#sim-rate');
+const outStores = slide.querySelector('#out-stores');
+const outRate = slide.querySelector('#out-rate');
+const outScenario = slide.querySelector('#out-scenario');
+const outSave = slide.querySelector('#out-save');
+const outPayback = slide.querySelector('#out-payback');
+const outMargin = slide.querySelector('#out-margin');
+const outTrays = slide.querySelector('#out-trays');
+const barOld = slide.querySelector('#bar-old');
+const barNew = slide.querySelector('#bar-new');
+const numOld = slide.querySelector('#num-old');
+const numNew = slide.querySelector('#num-new');
+const lblNew = slide.querySelector('#lbl-new');
+const presets = [...slide.querySelectorAll('.preset-btn')];
+
+// Pure financial model calibrated to pilot baseline (11.4% -> 4.2% saves 34萬/store/yr, 15 trays/store/day, +1.8% net margin)
+function model(stores, rate) {
+  const dropRatio = Math.max(0.1, (11.4 - rate) / (11.4 - 4.2));
+  const annualSave = Math.round(stores * 34 * dropRatio);
+  const oldWaste = Math.round(stores * 53.8);
+  const newWaste = Math.max(1, oldWaste - annualSave);
+  const capex = stores * 12; // 12萬/店導入與培訓成本
+  const payback = Math.max(1.0, (capex / Math.max(1, annualSave)) * 12);
+  const margin = 1.8 * dropRatio;
+  const trays = Math.round(stores * 15 * dropRatio);
+  return { annualSave, oldWaste, newWaste, payback, margin, trays };
+}
+
+function render() {
+  const stores = Number(storesIn.value);
+  const rate = Number(rateIn.value);
+  const m = model(stores, rate);
+  outStores.innerHTML = stores + '<small>家</small>';
+  outRate.innerHTML = rate.toFixed(1) + '<small>%</small>';
+  outScenario.textContent = stores + ' 家門市 ・ 目標 ' + rate.toFixed(1) + '%';
+  outSave.innerHTML = m.annualSave + '<small>萬／年</small>';
+  outPayback.innerHTML = m.payback.toFixed(1) + '<small>個月</small>';
+  outMargin.innerHTML = '+' + m.margin.toFixed(1) + '<small>%</small>';
+  outTrays.innerHTML = m.trays + '<small>盤／日</small>';
+  lblNew.textContent = '導入後（' + rate.toFixed(1) + '%）';
+  numOld.textContent = m.oldWaste + ' 萬';
+  numNew.textContent = m.newWaste + ' 萬';
+  const maxBar = Math.max(m.oldWaste, 1);
+  barOld.style.width = '92%';
+  barNew.style.width = Math.max(10, Math.round((m.newWaste / maxBar) * 92)) + '%';
+
+  presets.forEach(b => {
+    const match = Number(b.dataset.stores) === stores && Math.abs(Number(b.dataset.rate) - rate) < 0.05;
+    b.classList.toggle('on', match);
+  });
+}
+
+storesIn.addEventListener('input', render);
+rateIn.addEventListener('input', render);
+presets.forEach(b => b.addEventListener('click', () => {
+  storesIn.value = b.dataset.stores;
+  rateIn.value = b.dataset.rate;
+  render();
+}));
+render();
+</script>

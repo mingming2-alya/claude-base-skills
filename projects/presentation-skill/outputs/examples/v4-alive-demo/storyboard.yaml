@@ -1,0 +1,139 @@
+meta:
+  title: 星塵烘焙・智慧補貨系統導入
+  subtitle: 預報驅動，把報廢壓進 6% 以內
+  kicker: 2026 Q4 營運提案
+  presenter: 營運企劃組
+  date: 2026.11
+  lang: zh-Hant
+  style: apple
+  mode: dark
+  format: deck
+  delivery: talk
+  minutes: 10
+  pages: 7
+
+structure:
+  start: 營運主管知道門市打烊報廢偏高，但擔心導入系統會增加店長負擔或需要換硬體
+  destination: 批准 Q4 五店導入計畫，並於 11/22 前拍板板橋店收銀回傳解法
+  axis: process
+  direction: 現況痛點 → 試點成果 → 導入節奏
+  sensitivity: true
+
+constraints:
+  limitations:
+    - 常態 8 週實測，不含中秋與春節禮盒檔期
+  forbidden:
+    - 零報廢
+    - 保證完全不缺貨
+  must_include:
+    - 4.2%
+    - 板橋車站店
+    - 11/22
+
+chapters:
+  - id: pain
+    label: 現況痛點
+    minutes: 3
+  - id: pilot
+    label: 試點成果
+    minutes: 4
+  - id: rollout
+    label: 導入節奏
+    minutes: 3
+
+slides:
+  - type: cover
+    file: slides/01-cover.html
+    notes: >
+      各位主管早安，今天用 10 分鐘向大家報告「星塵烘焙智慧補貨系統」Q4 五店導入提案。
+      信義旗艦店過去 8 週實測把報廢率壓進 4.2%，打烊報廢盤數少了 63%。
+      這份簡報會依序走過現況痛點、試點成果，最後一起確認五店導入進度與板橋店的拍板點。
+
+  - type: content
+    chapter: pain
+    title: 報廢痛點與降幅
+    layout: free
+    signature: true
+    file: slides/02-data-story.html
+    summary: 預報導入後，每天少丟 ==15 盤新鮮麵包==。
+    source: 2026 Q3 門市日結紀錄（常態 8 週，不含中秋檔期）
+    notes: >
+      目前未導入門市最大的消耗在雨天與連假估量誤差，雨天一來客流掉四成，烤爐卻還是照晴天出爐。
+      店長每天還要花 35 分鐘手工抄報表，同時熱門品項在下午尖峰又經常提早賣完。
+      右邊把每天打烊丟掉的 24 盤具體攤開：導入預報後只剩 9 盤（4.2%），直接省下 15 盤，
+      等於單店從月損 2.9 萬變成一年省下 34 萬。
+
+  - type: content
+    chapter: pilot
+    title: 星塵預報 2.0
+    layout: free
+    file: slides/03-apple-keynote.html
+    link: model
+    summary: 凌晨四點，算好 ==剛剛好的出爐量==。
+    source: 信義旗艦店 8 週試點系統紀錄（常態週期）
+    notes: >
+      這套系統怎麼運作？每天凌晨四點，模型自動整合歷史 POS 銷速、氣象局降雨機率與連假檔期，
+      在平板直接給出各品項建議盤數。店長早上只要花 12 分鐘確認排程，不用自己猜天氣。
+      實測 8 週，打烊報廢盤數減少 63%，單店一年可省下 34 萬原料費。
+      如果大家對模型輸入欄位與限制有興趣，可以直接點畫面右下角的「預報模型輸入」進附件看細節。
+
+  - type: content
+    chapter: pilot
+    title: 清晨到打烊的三個站
+    layout: free
+    file: slides/04-clay-stations.html
+    summary: 三個時段接力，把報廢壓進 ==4.2%==。
+    source: 信義旗艦店現場作業 SOP（2026.10）
+    notes: >
+      我們沒有改變師傅做麵包的手藝，只把決策拆成三個輕鬆的接力站：
+      清晨 04:00 烤爐站看平板自動減量；中午 12:00 櫃檯站看午間即時銷速；
+      下午 15:30 補貨站只針對熱銷品項在尖峰前小批補烤，避免打烊整盤報廢。
+      全天自然把報廢率穩穩壓在 4.2% 達標線內。
+
+  - type: shock
+    file: slides/05-shock.html
+    text: 少丟 1 盤麵包，門市淨利多 ==+1.8%==
+    source: 財務部 2026 單店損益模型
+    notes: >
+      停一秒看這個數字：烘焙業毛利受原料影響極深，每天只要少丟 1 盤麵包，
+      對單店淨利率的貢獻就是 +1.8%。五家門市同步導入，一年直接省下 170 萬原料費，
+      4.2 個月就能回本，而且完全沿用門市既有收銀機，零新硬體採購。
+
+  - type: content
+    chapter: rollout
+    title: 五店效益即時試算
+    layout: free
+    file: slides/06-live-simulator.html
+    summary: 調整門市數與目標報廢率，即時看 ==年省費用與回本週期==。
+    source: 財務部 2026 單店損益模型（以常態報廢基準 11.4% 推估）
+    notes: >
+      這頁可以直接在會議現場互動推演：如果我們維持保守估計，把目標報廢率放寬到 5.0%，
+      五店一年還是能省 151 萬、不到五個月回本；如果明年擴到全區 12 家門市，
+      年省效益直接突破 400 萬。預設停在這次提案的「5 家門市、4.2% 目標」，列印也會保留這個基準值。
+
+  - type: content
+    chapter: rollout
+    title: 五店導入進度與風險
+    layout: free
+    file: slides/07-bento-status.html
+    summary: 4 店按進度，==板橋車站店 11/22 前拍板==。
+    source: 營運企劃組 2026/11/19
+    notes: >
+      最後看五店導入進度：目前整體完成度 51%，信義已上線、東區 11/26 上線、台中與高雄按進度接棒。
+      唯一需要我們在 11/22 前拍板的是板橋車站店：夜間收銀斷線重傳卡住排程，預計延遲 1 週。
+      我們整理了兩個選項——建議選方案 A，由資訊組補齊自動排程、順延 7 天穩穩上線，
+      避免選方案 B 讓店長每天多花 15 分鐘手動匯出。請各位主管拍板。
+
+  - type: content
+    chapter: pilot
+    id: model
+    appendix: true
+    title: 預報模型輸入與限制
+    layout: free
+    file: slides/08-app-model.html
+    summary: 四項即時特徵驅動，==不含中秋與春節禮盒檔期==。
+    source: 資訊組預報模型規格書 v2.0（2026.10）
+    notes: >
+      這頁是現場被追問技術細節時點開的附件：模型僅使用門市既有 POS 日銷、氣象局鄉鎮預報、
+      國定連假檔期與門市促銷事件四項特徵。請特別留意適用邊界：目前實測為常態 8 週，
+      不含中秋與春節等大型禮盒檔期，特殊節慶仍由區域督導人工覆核。按 Esc 或右上角返回可回原頁。

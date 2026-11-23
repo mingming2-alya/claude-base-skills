@@ -1,0 +1,386 @@
+<style>
+.slide {
+  --stage-bg: #0A0C10;
+  --fg: #F5F6F8;
+  --sub: #A2A6B0;
+  --muted: #7C828E;
+  --grad: linear-gradient(92deg, #7CEEF9 0%, #4AC3FA 48%, #4BE2A5 100%);
+  --sans: "Noto Sans TC", var(--font-sans-fallback);
+  --num: "Geist", "Noto Sans TC", var(--font-sans-fallback);
+  --motion-mode: spring;
+  --spring-response: 0.56;
+  --spring-bounce: 0;
+  background: var(--stage-bg);
+  color: var(--fg);
+  font-family: var(--sans);
+}
+.slide svg.backdrop { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+.slide nav.slide-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 46px;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  gap: 44px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--muted);
+}
+.slide nav.slide-nav b { color: var(--fg); font-weight: 700; }
+
+.slide header {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 118px;
+  z-index: 3;
+  text-align: center;
+}
+.slide h1 {
+  font-size: 128px;
+  font-weight: 900;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.slide h1 span.ver {
+  font-family: var(--num);
+  font-weight: 800;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-left: 12px;
+}
+.slide p.tag {
+  margin-top: 22px;
+  font-size: 42px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #D2D5DC;
+}
+.slide p.tag em {
+  font-style: normal;
+  font-weight: 700;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.slide .device {
+  position: absolute;
+  left: 560px;
+  top: 446px;
+  width: 800px;
+  height: 664px;
+  z-index: 3;
+  border-radius: 48px 48px 0 0;
+  background: linear-gradient(180deg, #171B24 0%, #0E1118 62%, #090B10 100%);
+  padding: 36px 42px 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    0 28px 90px rgba(0, 0, 0, 0.65);
+}
+.slide .dev-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+}
+.slide .dev-store { font-size: 22px; font-weight: 700; color: #D9DDE5; }
+.slide .dev-weather {
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(74, 195, 250, 0.14);
+  border: 1px solid rgba(74, 195, 250, 0.34);
+  font-size: 18px;
+  font-weight: 700;
+  color: #7CEEF9;
+}
+
+.slide .dev-body {
+  display: grid;
+  grid-template-columns: 1.06fr 0.94fr;
+  gap: 30px;
+  margin-top: 28px;
+}
+.slide .metric-k { font-size: 19px; font-weight: 500; color: var(--sub); }
+.slide .metric-v {
+  margin-top: 8px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.slide .metric-v b {
+  display: inline-block;
+  font-family: var(--num);
+  font-size: 84px;
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.slide .metric-v b small { font-size: 38px; font-weight: 700; color: #4BE2A5; }
+.slide .badge-ok {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(75, 226, 165, 0.16);
+  border: 1px solid rgba(75, 226, 165, 0.35);
+  font-size: 18px;
+  font-weight: 700;
+  color: #6CEFB9;
+}
+
+.slide .chart-box {
+  position: relative;
+  margin-top: 24px;
+  padding: 18px 20px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.slide .chart-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--sub);
+  margin-bottom: 12px;
+}
+.slide .chart-head em { font-style: normal; color: #6CEFB9; }
+.slide .chart-stage { position: relative; width: 330px; height: 156px; }
+.slide .trend-token {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #7CEEF9;
+  box-shadow: 0 0 14px #7CEEF9;
+  offset-path: path('M 8 56 C 54 68, 94 88, 146 98 C 202 109, 260 116, 322 120');
+  --token-dur: 3.4s;
+}
+
+.slide .batch-list { display: flex; flex-direction: column; gap: 16px; }
+.slide .batch-title { font-size: 19px; font-weight: 700; color: var(--sub); margin-bottom: 2px; }
+.slide .batch-row {
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.slide .batch-row.hl {
+  background: rgba(74, 195, 250, 0.08);
+  border-color: rgba(74, 195, 250, 0.28);
+}
+.slide .b-top { display: flex; justify-content: space-between; align-items: baseline; }
+.slide .b-top strong { font-size: 22px; font-weight: 700; color: var(--fg); }
+.slide .b-top b {
+  font-family: var(--num);
+  font-size: 24px;
+  font-weight: 800;
+  color: #7CEEF9;
+  font-variant-numeric: tabular-nums;
+}
+.slide .b-track {
+  margin-top: 14px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  overflow: hidden;
+}
+.slide .b-fill { height: 100%; border-radius: 999px; background: var(--grad); }
+
+.slide .side { position: absolute; width: 370px; z-index: 3; }
+.slide .side.left { left: 96px; text-align: right; }
+.slide .side.right { left: 1454px; text-align: left; }
+.slide .side .hero-val {
+  font-family: var(--num);
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.slide .side .hero-val.accent {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.slide .side .hero-val small {
+  font-family: var(--sans);
+  font-size: 26px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+.slide .side .hero-title {
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--fg);
+}
+.slide .side .label {
+  margin-top: 10px;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--sub);
+}
+
+.slide .app-trigger {
+  position: absolute;
+  right: 96px;
+  bottom: 38px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 22px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(124, 238, 249, 0.36);
+  color: #B4F4FC;
+  font: 700 19px/1 var(--sans);
+  cursor: pointer;
+  transition: background .2s ease, transform .2s ease;
+}
+.slide .app-trigger:hover {
+  background: rgba(74, 195, 250, 0.2);
+  transform: translateY(-2px);
+}
+</style>
+<section class="slide canvas" data-nav="inline" data-fx="soft-aurora">
+  <svg class="backdrop" data-layer="bg" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
+    <defs>
+      <filter id="blur48" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480">
+        <feGaussianBlur stdDeviation="48"/>
+      </filter>
+      <filter id="blur14" filterUnits="userSpaceOnUse" x="-200" y="-200" width="2320" height="1480">
+        <feGaussianBlur stdDeviation="14"/>
+      </filter>
+      <linearGradient id="rimGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#67E8F9"/>
+        <stop offset="42%" stop-color="#38BDF8"/>
+        <stop offset="76%" stop-color="#34D399"/>
+        <stop offset="100%" stop-color="#FBBF24"/>
+      </linearGradient>
+    </defs>
+
+    <ellipse cx="960" cy="1080" rx="720" ry="200" fill="#2DD4BF" opacity="0.16" filter="url(#blur48)"/>
+    <ellipse cx="740" cy="940" rx="340" ry="180" fill="#38BDF8" opacity="0.14" filter="url(#blur48)"/>
+    <rect x="558" y="444" width="804" height="680" rx="50" fill="none" stroke="url(#rimGrad)" stroke-width="34" opacity="0.34" filter="url(#blur48)"/>
+    <rect x="558" y="444" width="804" height="680" rx="50" fill="none" stroke="url(#rimGrad)" stroke-width="6" opacity="0.82" filter="url(#blur14)"/>
+    <rect x="559" y="445" width="802" height="680" rx="49" fill="none" stroke="url(#rimGrad)" stroke-width="2.5"/>
+
+    <g stroke="rgba(255,255,255,0.24)" stroke-width="1.5">
+      <line x1="486" y1="628" x2="556" y2="628" data-draw data-delay="220" data-dur="460"/>
+      <line x1="486" y1="858" x2="556" y2="858" data-draw data-delay="280" data-dur="460"/>
+      <line x1="1364" y1="628" x2="1434" y2="628" data-draw data-delay="240" data-dur="460"/>
+      <line x1="1364" y1="858" x2="1434" y2="858" data-draw data-delay="300" data-dur="460"/>
+    </g>
+    <g fill="#7CEEF9">
+      <circle cx="556" cy="628" r="4"/>
+      <circle cx="556" cy="858" r="4"/>
+      <circle cx="1364" cy="628" r="4"/>
+      <circle cx="1364" cy="858" r="4"/>
+    </g>
+  </svg>
+
+  <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
+
+  <header class="rv">
+    <h1 data-role="title">星塵預報<span class="ver">2.0</span></h1>
+    <p class="tag" data-role="summary">凌晨四點，算好<em>剛剛好的出爐量</em>。</p>
+  </header>
+
+  <div class="device">
+    <div class="dev-top">
+      <span class="dev-store">信義旗艦店・今日排程</span>
+      <span class="dev-weather">降雨 80%・18°C</span>
+    </div>
+
+    <div class="dev-body">
+      <div>
+        <div class="metric-k">預估報廢率</div>
+        <div class="metric-v">
+          <b data-morph="hero-rate">4.2<small>%</small></b>
+          <span class="badge-ok">低於 6% 紅線</span>
+        </div>
+
+        <div class="chart-box">
+          <div class="chart-head">
+            <span>8 週走勢</span>
+            <em>4.2% vs 11.4%</em>
+          </div>
+          <div class="chart-stage">
+            <svg width="330" height="156" viewBox="0 0 330 156" aria-hidden="true">
+              <defs>
+                <linearGradient id="areaG" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#34D399" stop-opacity="0.34"/>
+                  <stop offset="100%" stop-color="#34D399" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="78" x2="330" y2="78" stroke="rgba(255,255,255,0.22)" stroke-width="1.2" stroke-dasharray="5 5"/>
+              <path d="M 8 36 C 52 26, 80 54, 120 40 C 160 26, 198 50, 242 32 C 274 20, 302 44, 322 30"
+                    fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="2" stroke-dasharray="6 5"/>
+              <path d="M 8 56 C 54 68, 94 88, 146 98 C 202 109, 260 116, 322 120 L 322 150 L 8 150 Z" fill="url(#areaG)"/>
+              <path d="M 8 56 C 54 68, 94 88, 146 98 C 202 109, 260 116, 322 120"
+                    fill="none" stroke="#4BE2A5" stroke-width="3.2" stroke-linecap="round" data-draw data-delay="220" data-dur="920"/>
+              <circle cx="322" cy="120" r="6" fill="#7CEEF9"/>
+              <circle cx="322" cy="120" r="12" fill="#7CEEF9" opacity="0.22"/>
+            </svg>
+            <div class="trend-token flow-token" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="batch-list">
+        <div class="batch-title">建議出爐盤數</div>
+        <div class="batch-row hl">
+          <div class="b-top"><strong>招牌鹽可頌</strong><b>18 盤</b></div>
+          <div class="b-track"><div class="b-fill" style="width:86%" data-grow="x" data-delay="260"></div></div>
+        </div>
+        <div class="batch-row">
+          <div class="b-top"><strong>酸種歐包</strong><b>6 盤</b></div>
+          <div class="b-track"><div class="b-fill" style="width:42%" data-grow="x" data-delay="330"></div></div>
+        </div>
+        <div class="batch-row">
+          <div class="b-top"><strong>職人生吐司</strong><b>10 盤</b></div>
+          <div class="b-track"><div class="b-fill" style="width:62%" data-grow="x" data-delay="400"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="side left rv" style="top:586px" data-delay="180">
+    <div class="hero-val accent" data-count data-delay="240">−63%</div>
+    <div class="label">打烊報廢盤數</div>
+  </div>
+  <div class="side left rv" style="top:820px" data-delay="260">
+    <div class="hero-title">氣象 × 連假</div>
+    <div class="label">雨天自動減量</div>
+  </div>
+
+  <div class="side right rv" style="top:586px" data-delay="200">
+    <div class="hero-val" data-count data-delay="260">12<small>分鐘</small></div>
+    <div class="label">清晨確認排程</div>
+  </div>
+  <div class="side right rv" style="top:820px" data-delay="280">
+    <div class="hero-val" data-count data-delay="320">34<small>萬</small></div>
+    <div class="label">單店年省原料</div>
+  </div>
+
+  <button class="app-trigger live-only" type="button" data-link="model">預報模型輸入 →</button>
+</section>

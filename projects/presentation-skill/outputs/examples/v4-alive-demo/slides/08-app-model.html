@@ -1,0 +1,178 @@
+<style>
+.slide {
+  --bg: #0D1016;
+  --panel: #161B24;
+  --fg: #F3F1EB;
+  --fg-2: #C2C8D4;
+  --muted: #8C95A6;
+  --line: rgba(243, 241, 235, 0.13);
+  --cyan: #67E8F9;
+  --amber: #F2C96B;
+  --amber-bg: rgba(242, 201, 107, 0.12);
+  --sans: "Noto Sans TC", var(--font-sans-fallback);
+  --num: "Geist", "Noto Sans TC", var(--font-sans-fallback);
+  --motion-mode: crisp;
+  background:
+    radial-gradient(ellipse 760px 460px at 85% 15%, rgba(103, 232, 249, 0.09), transparent 65%),
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+}
+.slide .back {
+  right: 96px;
+  top: 44px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--fg);
+  border-color: rgba(243, 241, 235, 0.24);
+}
+.slide .app-kicker {
+  position: absolute;
+  left: 104px;
+  top: 52px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+}
+.slide header {
+  position: absolute;
+  left: 104px;
+  right: 104px;
+  top: 108px;
+}
+.slide h1 {
+  font-size: 68px;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--fg);
+}
+.slide p.lead {
+  margin-top: 16px;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--fg-2);
+}
+.slide p.lead em { font-style: normal; font-weight: 800; color: var(--amber); }
+
+.slide .grid {
+  position: absolute;
+  left: 104px;
+  right: 104px;
+  top: 328px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 26px;
+}
+.slide .feat {
+  padding: 44px 36px 48px;
+  min-height: 290px;
+  border-radius: 26px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 3px solid rgba(103, 232, 249, 0.48);
+  display: flex;
+  flex-direction: column;
+}
+.slide .feat .idx {
+  font-family: var(--num);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--cyan);
+}
+.slide .feat strong {
+  display: block;
+  margin-top: 28px;
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.slide .feat span {
+  display: block;
+  margin-top: 16px;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.slide .limit-bar {
+  position: absolute;
+  left: 104px;
+  right: 104px;
+  bottom: 160px;
+  padding: 30px 38px;
+  border-radius: 24px;
+  background: var(--amber-bg);
+  border: 1.5px solid rgba(242, 201, 107, 0.36);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+.slide .limit-tag {
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(242, 201, 107, 0.22);
+  color: #FCE29C;
+  font-size: 19px;
+  font-weight: 800;
+  flex: none;
+}
+.slide .limit-text {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--fg);
+}
+.slide .limit-esc {
+  font-size: 19px;
+  font-weight: 600;
+  color: #E8D9B0;
+  flex: none;
+}
+.slide .src {
+  position: absolute;
+  left: 104px;
+  bottom: 28px;
+  font-size: 18px;
+  color: var(--muted);
+}
+</style>
+<section class="slide canvas" data-nav="none">
+  <button class="back" type="button">← 返回</button>
+  <div class="app-kicker">附件｜技術規格與適用邊界</div>
+
+  <header>
+    <h1 data-role="title">預報模型輸入與限制</h1>
+    <p class="lead" data-role="summary">四項即時特徵驅動，<em>不含中秋與春節禮盒檔期</em>。</p>
+  </header>
+
+  <div class="grid" data-stagger="55" data-delay="90">
+    <div class="feat">
+      <div class="idx">01</div>
+      <strong>POS 歷史日銷</strong>
+      <span>過去 90 天同品項銷速</span>
+    </div>
+    <div class="feat">
+      <div class="idx">02</div>
+      <strong>鄉鎮氣象預報</strong>
+      <span>降雨機率與氣溫變化</span>
+    </div>
+    <div class="feat">
+      <div class="idx">03</div>
+      <strong>連假與平日別</strong>
+      <span>週期人流與補班日</span>
+    </div>
+    <div class="feat">
+      <div class="idx">04</div>
+      <strong>門市活動標記</strong>
+      <span>新品上架與集點日</span>
+    </div>
+  </div>
+
+  <div class="limit-bar rv" data-delay="220">
+    <span class="limit-tag">適用邊界</span>
+    <span class="limit-text">常態 8 週實測數據，不含中秋與春節禮盒檔期（特殊節慶由區督導人工覆核）</span>
+    <span class="limit-esc">按 Esc 返回原頁</span>
+  </div>
+
+  <p class="src" data-role="source">資料來源：資訊組預報模型規格書 v2.0（2026.10）</p>
+</section>

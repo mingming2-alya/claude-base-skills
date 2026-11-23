@@ -332,6 +332,26 @@ def _populate_auto_nav(markup, chapters, chi):
     return AUTO_NAV_RE.sub(repl, markup)
 
 
+IMG_SRC_RE = re.compile(r'(<img\b[^>]*?\bsrc=")([^"]+)(")', re.I)
+
+
+def _inline_local_imgs(markup, base_dir):
+    """Inline relative local image files (e.g. assets/*.jpg) as base64 data URIs so deck.html is 100% standalone."""
+    def repl(m):
+        pre, src, post = m.groups()
+        if src.startswith(("data:", "http://", "https://", "//", "#")):
+            return m.group(0)
+        p = (base_dir / src).resolve()
+        if not p.is_file():
+            return m.group(0)
+        mime, _ = mimetypes.guess_type(str(p))
+        mime = mime or "image/png"
+        b64 = base64.b64encode(p.read_bytes()).decode("ascii")
+        return f"{pre}data:{mime};base64,{b64}{post}"
+
+    return IMG_SRC_RE.sub(repl, markup)
+
+
 def load_free_slide(path, rec, data, idx, base_dir, found_slots):
     """Parse a per-slide HTML fragment (either full HTML or <section class="slide"> fragment)."""
     raw = path.read_text(encoding="utf-8")
@@ -351,6 +371,7 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots):
     content, script_joined = _scope_defs_ids(content, script_joined, f"s{idx}")
     content = _populate_auto_nav(content, data.get("chapters") or [], rec["chi"])
     content = _replace_slots(content, base_dir / "assets", mode, found_slots)
+    content = _inline_local_imgs(content, base_dir)
 
     # Ensure outer <section class="slide canvas" ...> wrapper carries thin-shell data attributes
     extra_attrs = (
@@ -673,10 +694,12 @@ PAGE_TPL = """<!doctype html>
 <div id="viewport"><div id="stage">
 <div id="nav"></div><div id="tabs"></div>
 {slides}
+<div id="morph-layer" aria-hidden="true"></div>
 <div id="curtain"></div>
 </div></div>
 <div id="notes"></div>
-<div id="hint">← → 翻頁 · F 全螢幕 · N 備註 · P 列印</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="hint">← → 翻頁 · F 全螢幕 · N 備註 · B 靜態 · P 列印</div>
 <script>window.DECK={deck_json};</script>
 <script>{slide_js}</script>
 <script>{runtime_js}</script>

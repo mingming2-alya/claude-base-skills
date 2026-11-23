@@ -1,0 +1,315 @@
+<style>
+.slide {
+  --bg: #13161B;
+  --panel: #1A1E26;
+  --panel-2: #202530;
+  --fg: #F1EFEA;
+  --fg-2: #C2C7D0;
+  --muted: #8C93A0;
+  --line: rgba(241, 239, 234, 0.12);
+  --mint: #4AD49A;
+  --coral: #FF7657;
+  --sans: "Noto Sans TC", var(--font-sans-fallback);
+  --num: "Archivo", "Noto Sans TC", var(--font-sans-fallback);
+  --motion-mode: crisp;
+  --stagger-base: 38;
+  background:
+    radial-gradient(ellipse 880px 540px at 78% 24%, rgba(255, 118, 87, 0.10), transparent 66%),
+    radial-gradient(ellipse 760px 520px at 20% 90%, rgba(74, 212, 154, 0.08), transparent 66%),
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+}
+.slide .grain {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.slide nav.slide-nav {
+  position: absolute;
+  left: 100px;
+  top: 48px;
+  z-index: 3;
+  display: flex;
+  gap: 34px;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.slide nav.slide-nav b { color: var(--fg); font-weight: 800; }
+
+.slide .left {
+  position: absolute;
+  left: 100px;
+  top: 126px;
+  width: 700px;
+  z-index: 2;
+}
+.slide h1 {
+  font-size: 86px;
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: var(--fg);
+}
+.slide p.lead {
+  margin-top: 24px;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.42;
+  color: var(--fg-2);
+}
+.slide p.lead em { font-style: normal; font-weight: 900; color: var(--mint); }
+
+.slide .evidence {
+  margin-top: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.slide .ev-card {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: center;
+  gap: 20px;
+  padding: 32px 34px;
+  border-radius: 22px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.slide .ev-card b {
+  font-family: var(--num);
+  font-size: 64px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.slide .ev-card.hot b { color: var(--coral); }
+.slide .ev-card b small { font-size: 26px; font-weight: 700; margin-left: 5px; }
+.slide .ev-card strong {
+  display: block;
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--fg);
+}
+
+.slide .right {
+  position: absolute;
+  right: 100px;
+  top: 120px;
+  width: 970px;
+  height: 860px;
+  z-index: 2;
+  border-radius: 32px;
+  background: var(--panel);
+  border: 1px solid rgba(241, 239, 234, 0.14);
+  padding: 38px 42px;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+  display: flex;
+  flex-direction: column;
+}
+.slide .r-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.slide .r-kicker { font-size: 19px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; }
+.slide .r-headline { margin-top: 8px; font-size: 38px; font-weight: 900; color: var(--fg); }
+.slide .r-headline em { font-style: normal; color: var(--mint); }
+.slide .r-big { display: flex; align-items: baseline; gap: 10px; font-family: var(--num); font-variant-numeric: tabular-nums; }
+.slide .r-big .old { font-size: 46px; font-weight: 800; color: var(--muted); text-decoration: line-through; }
+.slide .r-big .arrow { font-size: 30px; color: var(--muted); }
+.slide .r-big .now { font-size: 78px; font-weight: 900; line-height: 0.9; color: var(--mint); }
+.slide .r-big small { font-family: var(--sans); font-size: 24px; font-weight: 700; color: var(--fg-2); }
+
+.slide .tray-grid {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+}
+.slide .tray {
+  height: 92px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 14px;
+  font-family: var(--num);
+  font-size: 18px;
+  font-weight: 700;
+}
+.slide .tray.kept {
+  background: linear-gradient(155deg, rgba(74, 212, 154, 0.24), rgba(14, 107, 79, 0.34));
+  border: 1.5px solid rgba(74, 212, 154, 0.56);
+  color: #93F2C8;
+}
+.slide .tray.saved {
+  background: repeating-linear-gradient(-45deg, rgba(255, 118, 87, 0.16) 0 8px, rgba(255, 118, 87, 0.06) 8px 16px);
+  border: 1.5px dashed rgba(255, 118, 87, 0.52);
+  color: #FFA08A;
+}
+.slide .tray .dot-row { display: flex; gap: 6px; }
+.slide .tray .dot-row i { width: 14px; height: 8px; border-radius: 4px; display: block; }
+.slide .tray.kept .dot-row i { background: #64E6AF; }
+.slide .tray.saved .dot-row i { background: rgba(255, 130, 102, 0.55); }
+
+.slide .legend {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  border-radius: 16px;
+  background: var(--panel-2);
+  font-size: 21px;
+  font-weight: 700;
+}
+.slide .leg-item { display: inline-flex; align-items: center; gap: 12px; }
+.slide .swatch { width: 18px; height: 18px; border-radius: 5px; display: block; }
+.slide .swatch.mint { background: var(--mint); }
+.slide .swatch.coral { background: var(--coral); }
+
+.slide .comp {
+  margin-top: auto;
+  padding-top: 22px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.slide .comp-box {
+  padding: 20px 24px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+}
+.slide .comp-box small { display: block; font-size: 19px; font-weight: 600; color: var(--muted); }
+.slide .comp-box .val-line {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 8px;
+  font-family: var(--num);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--fg);
+}
+.slide .comp-box.win .val-line,
+.slide .comp-box.win .rate-hero { color: var(--mint); }
+.slide .comp-box.loss .val-line { color: var(--coral); }
+.slide .comp-box .rate-hero {
+  display: inline-block;
+  font-family: var(--num);
+  font-size: 32px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+.slide .comp-box .rate-hero small {
+  display: inline;
+  font-size: 22px;
+  font-weight: 800;
+  color: inherit;
+}
+
+.slide .src {
+  position: absolute;
+  left: 100px;
+  bottom: 24px;
+  z-index: 2;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--muted);
+}
+</style>
+<section class="slide canvas" data-nav="inline">
+  <div class="grain" data-layer="bg" aria-hidden="true"></div>
+
+  <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
+
+  <div class="left">
+    <h1 data-role="title">報廢痛點與降幅</h1>
+    <p class="lead" data-role="summary">預報導入後，每天少丟 <em>15 盤新鮮麵包</em>。</p>
+
+    <div class="evidence" data-stagger="65" data-delay="90">
+      <div class="ev-card hot">
+        <b data-count data-delay="120">+42<small>%</small></b>
+        <strong>雨天估量誤差</strong>
+      </div>
+      <div class="ev-card">
+        <b data-count data-delay="180">35<small>分</small></b>
+        <strong>每日盤點工時</strong>
+      </div>
+      <div class="ev-card">
+        <b data-count data-delay="240">2.1<small>×</small></b>
+        <strong>熱門尖峰斷貨</strong>
+      </div>
+    </div>
+  </div>
+
+  <section class="right">
+    <div class="r-top">
+      <div>
+        <div class="r-kicker">1 格 ＝ 1 烤盤</div>
+        <div class="r-headline">每日打烊報廢 <em>−63%</em></div>
+      </div>
+      <div class="r-big">
+        <span class="old">24</span>
+        <span class="arrow">→</span>
+        <span class="now" data-count data-delay="160">9</span>
+        <small>盤／日</small>
+      </div>
+    </div>
+
+    <div class="tray-grid" data-stagger="26" data-delay="120" aria-label="24 盤報廢對比矩陣：9 盤為導入後剩餘，15 盤為系統省下">
+      <div class="tray kept"><span>01</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>02</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>03</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>04</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>05</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>06</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>07</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>08</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray kept"><span>09</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>10</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>11</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>12</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>13</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>14</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>15</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>16</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>17</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>18</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>19</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>20</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>21</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>22</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>23</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      <div class="tray saved"><span>24</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+    </div>
+
+    <div class="legend">
+      <span class="leg-item"><i class="swatch mint"></i>導入後餘量：9 盤（4.2%）</span>
+      <span class="leg-item"><i class="swatch coral"></i>預報省下：15 盤（−63%）</span>
+    </div>
+
+    <div class="comp">
+      <div class="comp-box loss">
+        <small>未導入・板橋店</small>
+        <div class="val-line"><strong>11.4%・月損 2.9 萬</strong></div>
+      </div>
+      <div class="comp-box win">
+        <small>已導入・信義店</small>
+        <div class="val-line"><b class="rate-hero" data-morph="hero-rate">4.2<small>%</small></b><span>・年省 34 萬</span></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="src" data-role="source">資料來源：2026 Q3 門市日結紀錄（常態 8 週，不含中秋檔期）</p>
+</section>

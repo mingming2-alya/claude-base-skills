@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-19｜Phase A 完成）**：`deck-architect` 已解凍並全面升級為 **v4 輕底盤、強自由混合架構**（`assemble.py`＋統一像素 WCAG `check.mjs`＋`oklch.py --palette`＋首批 3 款 Style DNA），並以虛構範例 `outputs/examples/v4-demo/` 跑通 Gate 2 三風格樣張、8 頁自由畫布＋商務元件混搭簡報與圖像插槽替換測試（全數通過）。下一步進入 **Phase B｜注入 HTML 獨有的「活」**。
+> **最新接手點（2026-11-23｜Phase B 完成 ✅）**：已完成四大靜態視覺工藝與原則 #26（去小字、口白進講者稿）反寫入 `deck-architect`（新增 `styles/workday.md`、`references/motion-system.md`、防割裂生圖規則），並以**方案 1｜分層混合架構**實作 ~10 KB 零依賴原生動態核心（可打斷解析彈簧、離頁保持 `opacity:1`、跨頁 Magic Move、動態圖表與滾動數字、互動滑桿 `.live-ctrl`、離頁即停 Canvas 2D、`B` 鍵省電靜態凍結、`?still=1` 確定性定格與 `--motion` 自動動態品管），於 8 頁完整可播放範例 `outputs/examples/v4-alive-demo/deck.html`（100% 離線單檔）全數驗證通過。下一步進入 **Phase C｜第一份真實簡報端到端 PK 🎯**。
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。
@@ -19,28 +19,28 @@
 
 - [x] Grill：目的、對象、時長、場合 → 起點與終點；互動表單；既有框架與模板先讀
 - [x] 架構：一條軸、單一方向；最上層不可並列；序幕、轉折點、尾聲
-- [x] 呈現：標題是路標（總結永遠不當主標題）、重點放大加突出色（不畫底線）、不寫過場、目錄與頁籤導航、震撼頁
+- [x] 呈現：標題是路標（總結永遠不當主標題）、原則 #26 去小字（最多 2 層文字、口白進講者稿）、重點放大加突出色（不畫底線）、不寫過場、目錄與頁籤導航、震撼頁
 - [x] 內容可信度：證據、限制、數字查核與出處（v4 已將 `constraints` 納入 `lint.py` 自動檢查）
-- [x] 類型：一頁總覽、可點入附件、進度回報狀態表、多人填寫檢查
+- [x] 類型：一頁總覽、可點入附件、現代 Bento 進度儀表板／狀態表、多人填寫檢查
 
 ### ② 設計美感與「活」（皮肉）：生成式風格憲法 ＋ HTML 主場優勢
-研究見 `inputs/research-html-slide-skills.md`、`inputs/design-research.md`、`inputs/style-research.md`、`inputs/reference-styles.md`。**借用前先確認授權**：MIT 等寬鬆授權可以借程式碼並標註來源；限制商用或未標授權的（如 guizang AGPL-3.0）只學做法與數值、自己實作。
+研究見 `inputs/research-html-slide-skills.md`、`inputs/design-research.md`、`inputs/style-research.md`、`inputs/reference-styles.md`、`inputs/motion-research.md`。**借用前先確認授權**：MIT 等寬鬆授權可以借程式碼並標註來源；限制商用或未標授權的（如 guizang AGPL-3.0）只學做法與數值、自己實作。
 
-- [x] **風格方向與首批定調（原 2a–2b）**：12 款風格清單定案（`inputs/style-list-v5.md`）；OKLCH「鎖規則、不鎖色碼、全淺深雙底」用色系統（`outputs/style-specs/color-system.md`）；首批三款（Apple 發表、顧問報告、插畫場景 15 種畫風與融合規則 A／B／C、淺深雙底）規格完成並實測對比通過
+- [x] **風格方向與首批定調（原 2a–2b）**：12 款風格清單定案（`inputs/style-list-v5.md`）；OKLCH「鎖規則、不鎖色碼、全淺深雙底」用色系統（`outputs/style-specs/color-system.md`）；首批四款（`counsel`、`apple`、`illustration` 15 種畫風、`workday` 現代 Bento）完整 Style DNA 已就緒
 - [x] **內容結構與容量基礎（原 v3.0 資產沿用）**：14 種結構＋5 種圖表結構（長條、圓環比例、折線趨勢、人形圖示、地圖）、容量規則、`series`、`lint.py`；已轉為 `references/content-shapes.md` 內容形狀指南
 - [x] **輕底盤、強自由混合架構（Phase A）**：Thin Shell 共用底盤（`shell.css`、`runtime.js`、`fit.js`、`assemble.py`）＋ 90%+ 頁面由 Agent 依 Style DNA 自由編排 HTML/CSS/SVG ＋ 高紀律商務頁（週報 `status-table`、`pillars`、`toc`）保留穩定元件（`components.css`）
-- [~] **多元風格憲法庫 Style DNA**：首批 3 款（`styles/apple.md`、`counsel.md`、`illustration.md`＋`color-system.md`、`index.json`）已接進 Skill（Phase A ✅）；其餘 9 款＋主題智能配對與外觀帳本於 Phase D 補齊
-- [~] **圖像層零等待＋可選升級**：底盤已實作 `.asset-slot[data-slot]` 自動換圖與 `IMAGE_UPGRADE.md` 清單（Phase A ✅）；進階接圖動態與微動背景於 Phase B 補齊
-- [ ] **HTML 核心動態（Phase B）**：可打斷的 spring 物理動態（`emilkowalski/skills` apple-design，MIT）、依軸運鏡、元素跨頁延續（Magic Move／交棒）、微動態背景（含效能降級與 `prefers-reduced-motion`）、動態圖表與滾動數字（引入 GSAP 前先問使用者）
-- [x] **排版細節與像素級品管**：中文不用斜體、字距 0、標點擠壓、balance 斷行、等寬數字、離線字體退路；統一 `check.mjs`（支援 Playwright＋零依賴 Chromium CDP、真實背景像素 WCAG 對比、漸層字逐段對比、主標題≥總結檢查、SVG 重複 ID 檢查）
+- [~] **多元風格憲法庫 Style DNA**：已就緒 4 款（`styles/workday.md`、`counsel.md`、`apple.md`、`illustration.md`＋`color-system.md`、`index.json`）；其餘 8 款＋主題智能配對與外觀帳本於 Phase D 補齊
+- [x] **圖像層真實無字 AI 融合＋自動單檔內嵌**：支援真實無字 AI 底圖 × HTML 真文字融合（含反左右割裂生圖規範）、`.asset-slot[data-slot]` 自動換圖、`assemble.py` 本機圖檔自動 Base64 內嵌與 `IMAGE_UPGRADE.md` 清單
+- [x] **HTML 核心動態（Phase B｜方案 1 分層混合）**：~10 KB 零依賴原生核心——可打斷解析彈簧（零鎖死、預設 `bounce: 0`，MIT `emilkowalski/skills`）、離頁保持 `opacity:1` 防閃底色與跨頁 Magic Move（`data-morph`，MIT `open-slide`）、SVG 描線／圓環／流動節點與互動滑桿（`data-draw`／`.live-ctrl`，MIT `visual-explainer`）、滾動數字（`data-count`，MIT `scrolline`）、離頁即停 30fps Canvas 2D（`data-fx`，MIT `lewislulu`）、雙重靜態保險（`B` 鍵低耗電凍結、`?still=1`、`prefers-reduced-motion`、列印自動隱控件）＋旗艦按需外掛事件契約
+- [x] **排版細節與像素＋動態雙重品管**：中文不用斜體、字距 0、標點擠壓、balance 斷行、等寬數字、離線字體退路；統一 `check.mjs`（支援 Playwright＋零依賴 Chromium CDP、`?still=1` 確定性真實背景像素 WCAG 對比、漸層字逐段對比、主標題≥總結、SVG 重複 ID、以及 `--motion` 5 項動態互動自動實測）
 
 ### ③ 全流程（從頭到尾）
 
 - [x] Grill → brief（含頁數算術、播放密度 `delivery`、簡體在地化指引）
 - [x] 架構展開 → storyboard → lint（含 `constraints` 地雷／限制檢查、動態字數、頁數拆解、簡體偵測、附件防濫用）
 - [x] 一次視覺關卡 Gate 2（Phase A）：`assemble.py --sheet`＋`check.mjs --sheet` 產出 3 款多元風格樣張並排＋`oklch.py --palette` 驗證三組 OKLCH 主題配色
-- [x] 製作 → `deck.html`（Phase A 靜態＋基礎過場完成；Phase B 補齊高階動態）
-- [~] 品管：統一強化版 `check.mjs` 已完成（Phase A ✅）；獨立評審留待 Phase E
+- [x] 製作 → `deck.html`（Phase A 靜態底盤＋Phase B 方案 1 動態互動引擎＋本機圖檔自動單檔內嵌全數完成）
+- [~] 品管：統一強化版 `check.mjs`（靜態像素 WCAG＋`--motion` 動態實測）已完成；獨立評審留待 Phase E
 - [ ] 交付（Phase E）：文字可編輯 PPTX、雙螢幕講者模式（備註、計時、下一頁預覽）、乾淨列印 PDF
 - [ ] 修改（Phase E）：在成品上按 `E` 直接改字回寫、畫面上點選留言讓 Agent 一次改完
 - [ ] 記憶（Phase D–E）：外觀帳本、品味記憶、常用風格與模板
@@ -59,10 +59,10 @@
 
 | 階段 | 名稱 | 核心交付 | 完成條件 | 狀態 |
 |---|---|---|---|---|
-| **A** | **地基對齊與輕底盤 v4** | 解凍 `deck-architect`：套用原則 #12–#25、清掉 11-14 實測待辦；建立「輕底盤、強自由」的 `deck-shell`（舞台、可客製導航契約、附件返回、商務元件掛鉤）；把 `render.cjs` 真實像素 WCAG 檢查併入 `check.mjs`；把首批 3 款 Style DNA 與「明暗＋依主題三組配色」接進單一視覺關卡 Gate 2 | 新架構可在虛構範例上由輕底盤＋自由編排跑通 Gate 2 到成品，並通過統一 `check.mjs`（`outputs/examples/v4-demo/` 全部通過） | ✅ |
-| **B** | **注入 HTML 獨有的「活」** | 在底盤實作可打斷 spring 動態（MIT `apple-design`）、依軸運鏡、Magic Move 跨頁延續、微動態背景與效能降級、動態圖表／滾動數字；強化圖像層零等待程式版與 `IMAGE_UPGRADE.md` 換圖進場體驗 | 樣本簡報具備明顯超越靜態圖片的動態與互動質感，且替換 AI 底圖後對比與排版零破版 | ⏭ 下一步 |
-| **C** | **第一份真實簡報端到端 PK 🎯** | 讓**全新 Agent 只靠 `SKILL.md`**，以真實簡報（如「內部工具推廣與部署說明」）從頭走到尾產出會動的多頁成品，直接跟原本的 `codex-ppt-skill` 版本 PK，並將摩擦點回修到 Skill | 使用者實測後確認「Gate 2 候選令人驚豔」且「成品比原本的做法更好」 | |
-| **D** | **多元風格庫全面成形** | 依驗證過的 Style DNA 格式補齊其餘 9 款風格（積木構成、水彩水墨、書卷刻本、孔版小誌、摩登金、日常工作款、攝影雜誌、年輕潮流、在地懷舊，各含淺深規則與動效個性）；整理插畫 15 種畫風配方與生圖公式；建立「主題→風格智能配對（穩健／大膽／驚喜）」與外觀帳本 | 面對不同主題（商務／發表／活動／文化／科普）的簡報，Gate 2 都能端出截然不同、貼題驚豔的三個候選且不撞款 | |
+| **A** | **地基對齊與輕底盤 v4** | 解凍 `deck-architect`：套用原則 #12–#25、清掉 11-14 實測待辦；建立「輕底盤、強自由」的 `deck-shell`；把 `render.cjs` 真實像素 WCAG 檢查併入 `check.mjs`；把首批 Style DNA 與三組 OKLCH 配色接進單一視覺關卡 Gate 2 | 新架構可在虛構範例上由輕底盤＋自由編排跑通 Gate 2 到成品，並通過統一 `check.mjs`（`outputs/examples/v4-demo/`＋`v4-visual-benchmark/` 靜態上限重練與原則 #26 減字全數通過） | ✅ |
+| **B** | **注入 HTML 獨有的「活」** | 反寫四大靜態視覺工藝與原則 #26（新增 `styles/workday.md`、`references/motion-system.md`、反割裂生圖規範）；以方案 1 分層混合架構實作可打斷解析彈簧、離頁不閃底色、跨頁 Magic Move、動態圖表與滾動數字、現場互動試算滑桿、離頁即停 Canvas 2D、`B` 鍵／`?still=1` 靜態凍結與 `check.mjs --motion` 自動實測 | 8 頁完整單檔範例 `outputs/examples/v4-alive-demo/deck.html` 靜態對比全數通過（最低 `4.70:1`）且 5 項 `--motion` 動態互動檢核全部 ✅，同時保持 100% 離線雙擊可播 | ✅ |
+| **C** | **第一份真實簡報端到端 PK 🎯** | 讓**全新 Agent 只靠 `SKILL.md`**，以真實簡報（如「內部工具推廣與部署說明」）從頭走到尾產出會動的多頁成品，直接跟原本的 `codex-ppt-skill` 版本 PK，並將摩擦點回修到 Skill | 使用者實測後確認「Gate 2 候選令人驚豔」且「成品比原本的做法更好」 | ⏭ 下一步 |
+| **D** | **多元風格庫全面成形** | 依驗證過的 Style DNA 格式補齊其餘 8 款風格（積木構成、水彩水墨、書卷刻本、孔版小誌、摩登金、攝影雜誌、年輕潮流、在地懷舊，各含淺深規則與動效個性）；整理插畫 15 種畫風配方與生圖公式；建立「主題→風格智能配對（穩健／大膽／驚喜）」與外觀帳本 | 面對不同主題（商務／發表／活動／文化／科普）的簡報，Gate 2 都能端出截然不同、貼題驚豔的三個候選且不撞款 | |
 | **E** | **交付、修改閉環與越用越省事** | 成品上按 `E` 直接改字並回寫、畫面上點選留言修改；雙螢幕講者模式（備註、計時、下一頁預覽）；文字可編輯 PPTX 匯出；品味記憶與獨立評審；評估搬進 `skills/` 由 `install.sh` 全域安裝 | 完整覆蓋日常製作→修改→上台→交付閉環，重複使用明顯更省事 | |
 
 每個階段的共同完成條件：用**真實簡報**做出成品，使用者覺得「比原本的做法好」。
