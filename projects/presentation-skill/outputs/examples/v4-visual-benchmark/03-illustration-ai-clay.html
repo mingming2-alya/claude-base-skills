@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<title>C｜驚喜・插畫場景（真實 AI 紙黏土底圖＋HTML 真文字融合）</title>
+<title>C｜驚喜・插畫場景（真實 AI 紙黏土底圖 × HTML 真文字・精簡減字版）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Nunito:wght@800;900&display=block" rel="stylesheet">
@@ -30,41 +30,23 @@
     font-synthesis: none;
   }
 
-  /* Replaceable AI generated full-bleed clay diorama layer */
-  .asset-slot {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-  }
-  .asset-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .asset-slot { position: absolute; inset: 0; z-index: 0; }
+  .asset-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  /* Subtle warm top diffusion wash to unify upper wall lightness without visible edge */
   .wash {
     position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    background: linear-gradient(180deg, rgba(251, 241, 230, 0.42) 0%, rgba(251, 241, 230, 0.16) 48%, rgba(251, 241, 230, 0) 64%);
+    background: linear-gradient(180deg, rgba(251, 241, 230, 0.42) 0%, rgba(251, 241, 230, 0.14) 48%, rgba(251, 241, 230, 0) 64%);
   }
 
-  /* Delicate vertical guide connectors from text stations down to real 3D clay objects */
-  svg.guides {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    pointer-events: none;
-  }
+  svg.guides { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
 
-  /* All typography floats directly in the warm cream space — zero hard boxes */
   nav {
     position: absolute;
     left: 112px;
-    top: 46px;
+    top: 48px;
     z-index: 3;
     display: flex;
     align-items: center;
@@ -80,98 +62,65 @@
     color: var(--ink);
     font-weight: 800;
   }
-  nav b i {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--terra);
-    display: block;
-  }
-
-  .ai-badge {
-    position: absolute;
-    right: 112px;
-    top: 44px;
-    z-index: 3;
-    padding: 8px 18px;
-    border-radius: 999px;
-    background: rgba(255, 250, 245, 0.72);
-    border: 1px solid rgba(110, 90, 76, 0.22);
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--ink-2);
-  }
+  nav b i { width: 10px; height: 10px; border-radius: 50%; background: var(--terra); display: block; }
 
   h1 {
     position: absolute;
     left: 112px;
-    top: 106px;
+    top: 114px;
     z-index: 3;
     font-family: var(--round);
-    font-size: 80px;
+    font-size: 86px;
     font-weight: 900;
-    line-height: 1.12;
+    line-height: 1.1;
     letter-spacing: -0.01em;
     color: var(--ink);
   }
   p.lead {
     position: absolute;
     left: 112px;
-    top: 206px;
+    top: 222px;
     z-index: 3;
-    font-size: 31px;
+    font-size: 32px;
     font-weight: 700;
-    line-height: 1.42;
+    line-height: 1.35;
     color: var(--ink-2);
   }
-  p.lead em {
-    font-style: normal;
-    color: var(--terra);
-  }
+  p.lead em { font-style: normal; color: var(--terra); }
 
-  /* C-layout stations centered cleanly over each of the 3 clay objects */
+  /* Ultra-airy 2-tier station hooks floating above the 3 clay objects — zero prose paragraphs */
   .station {
     position: absolute;
-    top: 306px;
-    width: 440px;
+    top: 368px;
+    width: 400px;
     z-index: 3;
     text-align: center;
   }
   .time-pill {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 18px;
+    padding: 9px 22px;
     border-radius: 999px;
     font-family: var(--num);
-    font-size: 19px;
+    font-size: 21px;
     font-weight: 800;
     line-height: 1;
     color: #FFFBF7;
-    box-shadow: 0 6px 16px rgba(80, 48, 28, 0.14);
+    box-shadow: 0 8px 18px rgba(80, 48, 28, 0.14);
   }
   .time-pill.terra { background: var(--terra); }
   .time-pill.sage { background: var(--sage); }
   .time-pill.ochre { background: var(--ochre); }
 
   .station h3 {
-    margin-top: 15px;
+    margin-top: 18px;
     font-family: var(--round);
-    font-size: 32px;
+    font-size: 38px;
     font-weight: 900;
-    line-height: 1.25;
+    line-height: 1.2;
     color: var(--ink);
   }
-  .station p {
-    margin-top: 10px;
-    font-size: 22px;
-    font-weight: 500;
-    line-height: 1.52;
-    color: var(--ink-2);
-    text-wrap: balance;
-  }
 
-  /* Live editable HTML overlay sitting INSIDE the blank clay tablet screen (center object) */
   .clay-screen {
     position: absolute;
     left: 830px;
@@ -185,12 +134,7 @@
     align-items: center;
     text-align: center;
   }
-  .clay-screen small {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--ink-2);
-    letter-spacing: 0.02em;
-  }
+  .clay-screen small { font-size: 18px; font-weight: 700; color: var(--ink-2); }
   .clay-screen b {
     margin-top: 4px;
     font-family: var(--num);
@@ -218,12 +162,11 @@
   </div>
   <div class="wash" aria-hidden="true"></div>
 
-  <!-- Soft leader lines connecting each centered station callout straight down to its clay object -->
   <svg class="guides" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
     <g stroke-width="2" stroke-dasharray="5 6" fill="none">
-      <line x1="298" y1="504" x2="298" y2="564" stroke="#AD4A2D" stroke-opacity="0.55"/>
-      <line x1="958" y1="504" x2="958" y2="638" stroke="#2F664E" stroke-opacity="0.55"/>
-      <line x1="1548" y1="504" x2="1548" y2="606" stroke="#96561D" stroke-opacity="0.55"/>
+      <line x1="298" y1="494" x2="298" y2="564" stroke="#AD4A2D" stroke-opacity="0.55"/>
+      <line x1="958" y1="494" x2="958" y2="638" stroke="#2F664E" stroke-opacity="0.55"/>
+      <line x1="1548" y1="494" x2="1548" y2="606" stroke="#96561D" stroke-opacity="0.55"/>
     </g>
     <circle cx="298" cy="566" r="5" fill="#AD4A2D"/>
     <circle cx="958" cy="640" r="5" fill="#2F664E"/>
@@ -237,27 +180,23 @@
   </nav>
 
   <h1>清晨到打烊的三個站</h1>
-  <p class="lead">預報系統接住每個時段，讓店裡<em>隨時有熱麵包、打烊不再剩滿架</em>。</p>
+  <p class="lead">三個時段接力，把報廢壓進 <em>4.2%</em>。</p>
 
-  <div class="station" style="left:78px">
+  <div class="station" style="left:98px">
     <span class="time-pill terra">04:00 烤爐站</span>
     <h3>依天氣自動減量</h3>
-    <p>凌晨產出首波備料盤數，雨天自動少烤冷門品，守住原料成本。</p>
   </div>
 
-  <div class="station" style="left:738px">
+  <div class="station" style="left:758px">
     <span class="time-pill sage">12:00 櫃檯站</span>
     <h3>午間即時看銷速</h3>
-    <p>收銀回傳前四小時賣出比例，熱門品賣超預期立刻亮起補烤提示。</p>
   </div>
 
-  <div class="station" style="left:1328px">
+  <div class="station" style="left:1348px">
     <span class="time-pill ochre">15:30 補貨站</span>
-    <h3>精準小批補烤</h3>
-    <p>下班尖峰前只補高周轉 3 款招牌品，把打烊報廢穩控在 4.2% 以內。</p>
+    <h3>尖峰前小批補烤</h3>
   </div>
 
-  <!-- Live HTML readout seamlessly nestled inside the clay tablet screen -->
   <div class="clay-screen">
     <small>今日報廢</small>
     <b>4.2%</b>

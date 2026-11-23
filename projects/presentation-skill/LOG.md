@@ -1259,6 +1259,22 @@
 - **同步的檔案**：`outputs/examples/v4-visual-benchmark/`（精修 HTML、重繪 `img/*.jpg` 與 `sheet.jpg`、`manifest.json`、`check-report.md`）、`STATUS.md`、`LOG.md`。
 - **下一步**：請使用者確認這版協調感精修（或提出其他頁細節微調），確認後即反寫四大工藝回 `deck-architect` 並啟動 Phase B 方案 1 動態引擎實作。
 
+## 2026-11-23｜原則 #26 定案（去小字、口白進講者稿）＋ 全 6 頁標竿減字手術
+
+- **使用者的核心洞察（直擊 AI 簡報通病）**：
+  - 使用者點出這幾種風格一個共通的大痛點：**「有很多小字／補充其實都是沒必要的特別寫上去，比較適合當講者稿的。」**
+  - 正式收錄為 `inputs/presentation-principles.md` **原則 #26**：上台講模式（`delivery: talk`）每個視覺群組嚴格**最多 2 層文字**（如 `巨數＋短標` 或 `時間牌＋短標題`），禁止為了填滿留白硬補第 3 層 1–2 行口語解說；凡是講者在台上本來就會口頭說明的背景補充、因果闡述、修辭金句，一律移進講者備註（`notes`）。
+- **對全 6 頁標竿執行減字手術（全數通過 `check.mjs` 真實像素 WCAG，最低對比 `4.70:1`–`7.52:1`）**：
+  1. `01-everyday-bento.html`（`4.72:1`，文字段數 69 → 58）：壓縮副標、圓環卡、決策選項卡與中南進度，只留開會拍板必看事實與 `11/22 前拍板`。
+  2. `02-apple-keynote.html`（`5.07:1`，文字段數 42 → 33）：砍掉左右 4 段 2 行解說小字與平板內 3 條品項說明，還原純正 2 層 Apple Keynote 巨數標註。
+  3. `03-illustration-ai-clay.html`（`4.70:1`，文字段數 22 → 16）：砍掉三站下方全部 3 段小字，只留時間膠囊＋6 字動作標與黏土平板 `4.2%`，畫面留白徹底打開。
+  4. `04-editorial-cover.html`（`7.52:1`）：38 字長副標縮成 11 字一句，KPI 標籤壓縮為 4 字。
+  5. `05-data-story.html`（`4.98:1`）：砍掉左側 3 張卡的全部 2 行灰字解說，純留大數字＋短標與右側 24 格烤盤矩陣。
+  6. `06-shock-cinematic.html`（`4.96:1`）：移除講者金句副標，底排三柱縮為 5–6 字短鉤子。
+- **同步的檔案**：`inputs/presentation-principles.md`（新增原則 #26）、`outputs/examples/v4-visual-benchmark/`（6 頁減字版 HTML、重繪 `img/*.jpg` 與 `sheet.jpg`、`check-report.md`）、`STATUS.md`、`LOG.md`。
+- **下一步**：待使用者檢視減字後的 6 頁標竿並確認尺度過關，隨即反寫四大工藝＋原則 #26 進 `deck-architect` 並啟動 Phase B 方案 1 動態實作。
+
+
 
 
 

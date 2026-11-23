@@ -1,22 +1,22 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-20｜四大視覺工藝與 Phase B 方案 1 正式定案 ✅ ＋ 標題與內容協調感精修完成 ✅）**：
+> **最新接手點（2026-11-23｜原則 #26「去小字、口白進講者稿」定案 ＋ 全 6 頁減字手術完成 ✅）**：
 >
-> 1. **使用者審閱 `v4-visual-benchmark` 結果與兩項關鍵拍板**：
->    - **四大視覺工藝全部定案納入 `deck-architect` 標準**：① 真實 AI 無字底圖 × HTML 可編輯真文字融合（紙黏土三站／晨光攝影封面）、② 現代 Bento 視覺化進度儀表板、③ 數據視覺主角化與深色紙紋質感（24 盤單位矩陣）、④ Apple 實景發光裝置 UI 與電影感震撼頁。
->    - **Phase B 動態技術路線正式定案為【方案 1｜分層混合】**：日常簡報用 ~8 KB 零依賴原生核心（可打斷 Spring＋WAAPI FLIP Magic Move＋SVG 描線流動＋互動滑桿＋離頁即停輕量 Canvas 2D），底盤預留生命週期契約，旗艦簡報才按需徵詢掛載 GSAP／Motion／GLSL／Three.js。
->    - **細部修正回饋**：使用者指出「Bento 的標題 & 內容的協調感有待加強」。
-> 2. **已完成標題與內容協調感精修（`outputs/examples/v4-visual-benchmark/`，6/6 通過 `check.mjs`）**：
->    - `01-everyday-bento.html`（`4.72:1`）：將 `W47` 收進右上膠囊、標題區改沉穩深墨＋右側狀態圖例＋細線分區；色系嚴格收斂為「松綠（按進度）＋赤橘（唯一卡關）」雙語意；左下卡由離題的 `-63%` 改為扣緊標題的「五店整體完成度 `51%` ＋ 五店迷你柱」。
->    - `03-illustration-ai-clay.html`（`4.61:1`）：三站文案改置中對齊並與下方黏土物件、虛線引導針形成垂直中軸。
->    - `04-editorial-cover.html`（`7.52:1`）：左下 KPI 強調色統一為暖金，與襯線大標和晨光麵包零跳色。
->    - `05-data-story.html`（`4.98:1`）：左標題改為「報廢痛點與降幅」，與右側 `24 → 9 盤` 矩陣講同一個完整故事。
+> 1. **使用者提出重大美感原則（寫入 `inputs/presentation-principles.md` 原則 #26）**：指出先前幾種風格有個共通缺點——「有很多小字／補充其實沒必要特別寫上去，比較適合當講者稿」。今後上台講模式（`delivery: talk`）每個視覺群組嚴格**最多 2 層文字**，凡是口頭會講的解說一律移進講者備註（`notes`），不塞上畫面。
+> 2. **已對全 6 頁標竿完成「去小字手術」（`outputs/examples/v4-visual-benchmark/`，6/6 通過 `check.mjs`，最低對比 `4.70:1`–`7.52:1`）**：
+>    - `01-everyday-bento.html`（`4.72:1`）：大幅精簡副標、圓環卡、A/B 決策卡與中南進度，只留開會拍板必要事實。
+>    - `02-apple-keynote.html`（`5.07:1`）：砍光左右 4 段 2 行解說與平板內品項小字，還原純正 2 層 Apple Keynote 極簡留白。
+>    - `03-illustration-ai-clay.html`（`4.70:1`）：砍光三站下方 3 段小字，只留時間膠囊＋6 字動作標＋黏土螢幕 `4.2%`，上方牆面徹底呼吸。
+>    - `04-editorial-cover.html`（`7.52:1`）：38 字長副標縮成 11 字，KPI 標籤精簡至 4 字。
+>    - `05-data-story.html`（`4.98:1`）：砍光左側 3 張卡的全部 2 行灰字，純留大數字＋短標配右側 24 格烤盤矩陣。
+>    - `06-shock-cinematic.html`（`4.96:1`）：拿掉口白式金句副標，讓 `少丟 1 盤麵包，門市淨利多 +1.8%` 獨佔舞台。
+> 3. **既定決策已鎖定**：四大靜態視覺工藝標準 ＋ **Phase B 動態技術路線＝方案 1｜分層混合**（~8 KB 零依賴原生核心＋旗艦按需外掛契約）。
 >
-> **下一步**：待使用者確認精修後的 `01` Bento 與協調感沒問題（或補充其他微調）後，立即將這四項視覺工藝規範＋防切分生圖提示法反寫回 `deck-architect`，並按已定案的**方案 1（分層混合）**正式啟動 **Phase B 動態引擎實作**。
+> **下一步**：待使用者檢視減字後的 6 頁標竿，確認這套「極致留白＋去小字」尺度到位後，一次將 **原則 #26＋四大視覺工藝＋防切分生圖規範** 反寫進 `deck-architect`，並正式啟動 **Phase B（方案 1 分層混合）動態引擎實作**。
 >
 > 主軸文件是 `ROADMAP.md`，執行紀錄在 `LOG.md`，專案規則在根目錄 `CLAUDE.md`。
 
-_最後更新：2026-11-20_
+_最後更新：2026-11-23_
 
 ## 新對話先做的事
 
@@ -34,9 +34,9 @@ _最後更新：2026-11-20_
 |---|---|---|
 | 0–1, 2a–2b | 市場研究、v1 四次真實迭代方法論、12 款風格清單、OKLCH 用色系統、首批 3 款規格與插畫 15 種畫風淺深雙底 | ✅ |
 | **Phase A** | **地基對齊與輕底盤 v4**：輕底盤＋自由畫布＋商務元件、統一像素 WCAG `check.mjs`、`oklch.py --palette`、清完 11-14 待辦、首批 3 款 Style DNA | ✅ |
-| **Phase A+ 補課** | **靜態美感上限重練＋協調感精修**：重做 Gate 2 三風格＋3 個關鍵頁突破（全 6 頁通過 `4.61`–`7.52:1`），四大工藝全部通過並完成 Bento／封面／數據／紙黏土協調感精修 | ✅（待最終確認即反寫 Skill） |
+| **Phase A+ 補課** | **靜態美感上限重練＋協調感精修＋去小字手術**：6 頁全通過 `4.70`–`7.52:1`，定案四大視覺工藝與原則 #26（口白進講者稿、最多 2 層視覺鉤子） | ✅（待最終檢視即反寫 Skill） |
 | **Phase B 預研** | **動態技術路線研究與定案**：實查 14 個 GitHub Repo（`inputs/motion-research.md`），使用者正式定案 **方案 1｜分層混合** | ✅ 定案 |
-| **Phase B** | **反寫四大靜態工藝 ＋ 注入方案 1 HTML 動態（「活」）**：可打斷 Spring、WAAPI FLIP Magic Move、SVG `pathLength`/`offset-path`、互動滑桿、滾動數字、離頁即停 Canvas 2D、低功耗 `B` 鍵與 `?still=1` | ⏭ 待精修確認即啟動 |
+| **Phase B** | **反寫四大靜態工藝與原則 #26 ＋ 注入方案 1 HTML 動態（「活」）**：可打斷 Spring、WAAPI FLIP Magic Move、SVG `pathLength`/`offset-path`、互動滑桿、滾動數字、離頁即停 Canvas 2D、低功耗 `B` 鍵與 `?still=1` | ⏭ 待減字版確認即啟動 |
 | **Phase C** | **第一份真實簡報端到端 PK 🎯**：全新 Agent 只靠 `SKILL.md` 跑完全程，產出會動的多頁成品與原本 Codex 版直接比較並回修 | 未開始 |
 | **Phase D** | **多元風格庫全面成形**：補齊其餘 9 款 Style DNA（各含淺深規則與動效個性）、整理插畫 15 種畫風配方表、主題→風格智能配對（穩健／大膽／驚喜）與外觀帳本 | 未開始 |
 | **Phase E** | **交付、修改閉環與記憶**：成品按 `E` 改字回寫、畫面上點選留言修改、雙螢幕講者模式、文字可編輯 PPTX 匯出、品味記憶與獨立評審、評估搬進 `skills/` 正式安裝 | 未開始 |
@@ -54,12 +54,13 @@ _最後更新：2026-11-20_
 | **預設零等待全自動產出＋可選 `IMAGE_UPGRADE.md`**：每頁預留 `.asset-slot[data-slot]` 可無縫換入 AI 底圖或照片 | 11-19 | 原則 #25、`scripts/assemble.py` |
 | **四大靜態視覺工藝標準**：真實 AI 無字底圖 × HTML 真文字融合、現代 Bento 進度儀表板（取代黑白表格）、數據視覺主角化（單位矩陣／圖表）、Apple 實景 UI 與電影景深震撼頁；並嚴格把關標題與內容協調感 | 11-20 | `outputs/examples/v4-visual-benchmark/` |
 | **Phase B 動態技術路線＝方案 1｜分層混合**：日常 ~8 KB 零依賴原生核心（可打斷 Spring＋WAAPI FLIP Magic Move＋SVG 描線流動＋互動滑桿＋離頁即停輕量 Canvas 2D），底盤預留外掛契約，旗艦簡報才按需徵詢掛載 GSAP／Motion／GLSL／Three.js | 11-20 | `inputs/motion-research.md`、`LOG.md` |
+| **原則 #26｜口白進講者稿，畫面只留視覺鉤子（去小字原則）**：`delivery: talk` 下每個視覺群組最多 2 層文字，禁止為了填白硬補第 3 層說明小字，口語脈絡全進講者備註 `notes` | 11-23 | `inputs/presentation-principles.md` |
 
 ## 交付物地圖
 
 | 路徑 | 內容 |
 |---|---|
-| `outputs/examples/v4-visual-benchmark/` | **靜態美感上限重練標竿・協調感精修版（2026-11-20，6 頁全通過）**：重做 Gate 2 三風格（現代 Bento／Apple 實景 UI／真實 AI 3D 紙黏土融合）＋ 3 個關鍵頁突破（AI 攝影封面／24 盤數據矩陣／電影震撼頁），含 `assets/`、`sheet.jpg`、`check-report.md` |
+| `outputs/examples/v4-visual-benchmark/` | **靜態美感上限重練標竿・去小字極致留白版（2026-11-23，6 頁全通過）**：Gate 2 三風格＋3 個關鍵頁突破，含 `assets/`、`sheet.jpg`、`check-report.md` |
 | `outputs/deck-architect/` | **v4 現行 Skill 原始碼（26 檔，零舊版殘留）** |
 | `outputs/deck-architect.skill` | v4 打包檔（103 KB，26 檔） |
 | `outputs/examples/v4-demo/` | Phase A 初版虛構端到端範例（供對照重練前後落差） |
@@ -68,11 +69,11 @@ _最後更新：2026-11-20_
 | `outputs/color-modes/` | Apple 與顧問淺深兩底 × 三組配色參考（`sheet.jpg`） |
 | `outputs/illustration-integration/` | 插畫 15 種畫風融合版與淺深雙底參考（`sheet3.jpg`、`sheet4.jpg`、`sheet5.jpg`） |
 | `outputs/style-moodboard-v5/` | 12 款風格意象圖視覺錨點（Phase D 撰寫其餘 9 款 Style DNA 的依據） |
-| `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–25 條 |
+| `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–26 條 |
 
 ## 待使用者決定（適時用表單確認）
 
-- **（本輪）精修版 `01` Bento 與協調感驗收**：確認這輪精修過關（或補充其他頁面細節）後，直接反寫進 `deck-architect` 並啟動 Phase B 動態實作。
+- **（本輪）去小字版 6 頁驗收**：確認減字尺度與靜態視覺完全到位後，即反寫四大工藝＋原則 #26 回 `deck-architect` 並啟動 Phase B 方案 1 動態實作。
 - Phase C 真實簡報端到端 PK 要沿用「內部工具推廣與部署說明」（可與當時 Codex 6 頁成品直接 PK），還是改用一份新的真實簡報。
 - 埃及壁畫、瑪雅抄本是否要生圖做升級插槽實測。
 - 日式留白之後要不要在 Phase D 當獨立一款。

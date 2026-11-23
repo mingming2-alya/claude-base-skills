@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<title>關鍵頁突破 2｜有張力的數據故事頁（24 盤 → 9 盤單位視覺矩陣）</title>
+<title>關鍵頁 2｜報廢痛點與降幅（24 盤 → 9 盤・精簡減字版）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;800;900&display=block" rel="stylesheet">
@@ -16,9 +16,7 @@
     --muted: #8C93A0;
     --line: rgba(241, 239, 234, 0.12);
     --mint: #4AD49A;
-    --mint-bg: rgba(74, 212, 154, 0.14);
     --coral: #FF7657;
-    --coral-bg: rgba(255, 118, 87, 0.16);
     --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     --num: "Archivo", "Noto Sans TC", sans-serif;
   }
@@ -38,7 +36,6 @@
     font-synthesis: none;
   }
 
-  /* Subtle static noise grain via data URI */
   .grain {
     position: absolute;
     inset: 0;
@@ -49,7 +46,7 @@
 
   nav {
     position: absolute;
-    left: 104px;
+    left: 100px;
     top: 48px;
     display: flex;
     gap: 34px;
@@ -59,52 +56,48 @@
   }
   nav b { color: var(--fg); font-weight: 800; }
 
-  /* Left editorial narrative column */
+  /* Left editorial narrative — strictly 2 tiers per card, zero spoken paragraphs */
   .left {
     position: absolute;
     left: 100px;
-    top: 120px;
-    width: 716px;
+    top: 126px;
+    width: 700px;
   }
   h1 {
-    font-size: 82px;
+    font-size: 86px;
     font-weight: 900;
-    line-height: 1.1;
+    line-height: 1.08;
     letter-spacing: -0.015em;
     color: var(--fg);
   }
   p.lead {
     margin-top: 24px;
-    font-size: 31px;
-    font-weight: 500;
-    line-height: 1.5;
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.42;
     color: var(--fg-2);
   }
-  p.lead em {
-    font-style: normal;
-    font-weight: 900;
-    color: var(--coral);
-  }
+  p.lead em { font-style: normal; font-weight: 900; color: var(--mint); }
 
   .evidence {
-    margin-top: 44px;
+    margin-top: 56px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 22px;
   }
   .ev-card {
     display: grid;
-    grid-template-columns: 164px 1fr;
+    grid-template-columns: 200px 1fr;
     align-items: center;
-    gap: 18px;
-    padding: 24px 28px;
-    border-radius: 20px;
+    gap: 20px;
+    padding: 32px 34px;
+    border-radius: 22px;
     background: var(--panel);
     border: 1px solid var(--line);
   }
   .ev-card b {
     font-family: var(--num);
-    font-size: 56px;
+    font-size: 64px;
     font-weight: 900;
     line-height: 1;
     letter-spacing: -0.03em;
@@ -112,32 +105,20 @@
     font-variant-numeric: tabular-nums;
   }
   .ev-card.hot b { color: var(--coral); }
-  .ev-card b small {
-    font-size: 24px;
-    font-weight: 700;
-    margin-left: 4px;
-  }
+  .ev-card b small { font-size: 26px; font-weight: 700; margin-left: 5px; }
   .ev-card strong {
     display: block;
-    font-size: 24px;
+    font-size: 30px;
     font-weight: 800;
     color: var(--fg);
   }
-  .ev-card span {
-    display: block;
-    margin-top: 6px;
-    font-size: 19px;
-    font-weight: 400;
-    line-height: 1.48;
-    color: var(--fg-2);
-  }
 
-  /* Right visual centerpiece: 24-tray unit waffle matrix + comparative cost bar */
+  /* Right visual centerpiece: 24-tray unit waffle matrix */
   .right {
     position: absolute;
     right: 100px;
     top: 120px;
-    width: 960px;
+    width: 970px;
     height: 860px;
     border-radius: 32px;
     background: var(--panel);
@@ -154,53 +135,15 @@
     padding-bottom: 24px;
     border-bottom: 1px solid var(--line);
   }
-  .r-kicker {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--muted);
-    letter-spacing: 0.04em;
-  }
-  .r-headline {
-    margin-top: 8px;
-    font-size: 36px;
-    font-weight: 900;
-    color: var(--fg);
-  }
-  .r-headline em {
-    font-style: normal;
-    color: var(--mint);
-  }
-  .r-big {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-    font-family: var(--num);
-    font-variant-numeric: tabular-nums;
-  }
-  .r-big .old {
-    font-size: 46px;
-    font-weight: 800;
-    color: var(--muted);
-    text-decoration: line-through;
-  }
-  .r-big .arrow {
-    font-size: 30px;
-    color: var(--muted);
-  }
-  .r-big .now {
-    font-size: 76px;
-    font-weight: 900;
-    line-height: 0.9;
-    color: var(--mint);
-  }
-  .r-big small {
-    font-family: var(--sans);
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--fg-2);
-  }
+  .r-kicker { font-size: 19px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; }
+  .r-headline { margin-top: 8px; font-size: 38px; font-weight: 900; color: var(--fg); }
+  .r-headline em { font-style: normal; color: var(--mint); }
+  .r-big { display: flex; align-items: baseline; gap: 10px; font-family: var(--num); font-variant-numeric: tabular-nums; }
+  .r-big .old { font-size: 46px; font-weight: 800; color: var(--muted); text-decoration: line-through; }
+  .r-big .arrow { font-size: 30px; color: var(--muted); }
+  .r-big .now { font-size: 78px; font-weight: 900; line-height: 0.9; color: var(--mint); }
+  .r-big small { font-family: var(--sans); font-size: 24px; font-weight: 700; color: var(--fg-2); }
 
-  /* 6x4 visual tray waffle grid (24 real trays) */
   .tray-grid {
     margin-top: 30px;
     display: grid;
@@ -228,16 +171,8 @@
     border: 1.5px dashed rgba(255, 118, 87, 0.52);
     color: #FFA08A;
   }
-  .tray .dot-row {
-    display: flex;
-    gap: 6px;
-  }
-  .tray .dot-row i {
-    width: 14px;
-    height: 8px;
-    border-radius: 4px;
-    display: block;
-  }
+  .tray .dot-row { display: flex; gap: 6px; }
+  .tray .dot-row i { width: 14px; height: 8px; border-radius: 4px; display: block; }
   .tray.kept .dot-row i { background: #64E6AF; }
   .tray.saved .dot-row i { background: rgba(255, 130, 102, 0.55); }
 
@@ -246,27 +181,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 22px;
+    padding: 18px 24px;
     border-radius: 16px;
     background: var(--panel-2);
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 700;
   }
-  .leg-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .swatch {
-    width: 18px;
-    height: 18px;
-    border-radius: 5px;
-    display: block;
-  }
+  .leg-item { display: inline-flex; align-items: center; gap: 12px; }
+  .swatch { width: 18px; height: 18px; border-radius: 5px; display: block; }
   .swatch.mint { background: var(--mint); }
   .swatch.coral { background: var(--coral); }
 
-  /* Bottom comparison strip inside right card */
   .comp {
     margin-top: auto;
     padding-top: 22px;
@@ -275,22 +200,17 @@
     gap: 18px;
   }
   .comp-box {
-    padding: 18px 22px;
+    padding: 20px 24px;
     border-radius: 16px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--line);
   }
-  .comp-box small {
-    display: block;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--muted);
-  }
+  .comp-box small { display: block; font-size: 19px; font-weight: 600; color: var(--muted); }
   .comp-box strong {
     display: block;
     margin-top: 8px;
     font-family: var(--num);
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 800;
     color: var(--fg);
   }
@@ -319,29 +239,20 @@
 
   <div class="left">
     <h1>報廢痛點與降幅</h1>
-    <p class="lead">人工估量每天打烊倒掉<em>24 盤新鮮麵包</em>，導入預報後直接壓回 9 盤。</p>
+    <p class="lead">預報導入後，每天少丟 <em>15 盤新鮮麵包</em>。</p>
 
     <div class="evidence">
       <div class="ev-card hot">
         <b>+42<small>%</small></b>
-        <div>
-          <strong>雨天估量誤差最大</strong>
-          <span>氣溫驟降或午後陣雨，店長仍沿用前週晴天銷量。</span>
-        </div>
+        <strong>雨天估量誤差</strong>
       </div>
       <div class="ev-card">
         <b>35<small>分</small></b>
-        <div>
-          <strong>每日盤點耗費工時</strong>
-          <span>早班師傅與店長靠紙本回推補貨，耗時且難累積準度。</span>
-        </div>
+        <strong>每日盤點工時</strong>
       </div>
       <div class="ev-card">
         <b>2.1<small>×</small></b>
-        <div>
-          <strong>熱門斷貨、冷門剩滿架</strong>
-          <span>下班尖峰招牌可頌缺貨，歐包與甜麵包打烊被迫報廢。</span>
-        </div>
+        <strong>熱門尖峰斷貨</strong>
       </div>
     </div>
   </div>
@@ -349,8 +260,8 @@
   <section class="right">
     <div class="r-top">
       <div>
-        <div class="r-kicker">單店每日打烊報廢視覺拆解（1 格 ＝ 1 烤盤）</div>
-        <div class="r-headline">每天救回 <em>15 盤新鮮麵包</em></div>
+        <div class="r-kicker">1 格 ＝ 1 烤盤</div>
+        <div class="r-headline">每日打烊報廢 <em>−63%</em></div>
       </div>
       <div class="r-big">
         <span class="old">24</span>
@@ -361,7 +272,6 @@
     </div>
 
     <div class="tray-grid" aria-label="24 盤報廢對比矩陣：9 盤為導入後剩餘，15 盤為系統省下">
-      <!-- 9 remaining trays (mint) -->
       <div class="tray kept"><span>01</span><div class="dot-row"><i></i><i></i><i></i></div></div>
       <div class="tray kept"><span>02</span><div class="dot-row"><i></i><i></i><i></i></div></div>
       <div class="tray kept"><span>03</span><div class="dot-row"><i></i><i></i><i></i></div></div>
@@ -371,7 +281,6 @@
       <div class="tray kept"><span>07</span><div class="dot-row"><i></i><i></i><i></i></div></div>
       <div class="tray kept"><span>08</span><div class="dot-row"><i></i><i></i><i></i></div></div>
       <div class="tray kept"><span>09</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <!-- 15 saved trays (coral hatched) -->
       <div class="tray saved"><span>10</span><div class="dot-row"><i></i><i></i><i></i></div></div>
       <div class="tray saved"><span>11</span><div class="dot-row"><i></i><i></i><i></i></div></div>
       <div class="tray saved"><span>12</span><div class="dot-row"><i></i><i></i><i></i></div></div>
@@ -390,23 +299,23 @@
     </div>
 
     <div class="legend">
-      <span class="leg-item"><i class="swatch mint"></i>導入後合理餘量：9 盤（報廢率 4.2%）</span>
-      <span class="leg-item"><i class="swatch coral"></i>預報省下報廢：15 盤（−63%）</span>
+      <span class="leg-item"><i class="swatch mint"></i>導入後餘量：9 盤（4.2%）</span>
+      <span class="leg-item"><i class="swatch coral"></i>預報省下：15 盤（−63%）</span>
     </div>
 
     <div class="comp">
       <div class="comp-box loss">
-        <small>板橋店現況（人工經驗估量）</small>
-        <strong>報廢 11.4%・月損 2.9 萬</strong>
+        <small>未導入・板橋店</small>
+        <strong>11.4%・月損 2.9 萬</strong>
       </div>
       <div class="comp-box win">
-        <small>信義店試點（系統預報 8 週）</small>
-        <strong>報廢 4.2%・年省 34 萬</strong>
+        <small>已導入・信義店</small>
+        <strong>4.2%・年省 34 萬</strong>
       </div>
     </div>
   </section>
 
-  <p class="src">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（常態營運日 8 週試點，不含中秋節慶檔期）</p>
+  <p class="src">資料來源：2026 Q3 門市日結紀錄（常態 8 週，不含中秋檔期）</p>
 </div>
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
-<title>關鍵頁突破 1｜電影級攝影雜誌封面（真實 AI 攝影底圖＋HTML 真文字）</title>
+<title>關鍵頁 1｜電影感攝影雜誌封面（精簡減字版）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;900&display=block" rel="stylesheet">
@@ -11,7 +11,6 @@
     --fg: #F4F1EA;
     --sub: #C8C4BA;
     --gold: #E8B86B;
-    --mint: #63D9A6;
     --serif: "Noto Serif TC", "Songti TC", Georgia, serif;
     --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     --num: "Archivo", "Noto Sans TC", sans-serif;
@@ -28,19 +27,9 @@
     font-synthesis: none;
   }
 
-  .asset-slot {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-  }
-  .asset-slot img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .asset-slot { position: absolute; inset: 0; z-index: 0; }
+  .asset-slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-  /* Directional editorial scrim: guarantees ultra-crisp text on the left and along top masthead while preserving radiant sunlit bread */
   .scrim {
     position: absolute;
     inset: 0;
@@ -51,7 +40,6 @@
       linear-gradient(180deg, rgba(12, 14, 17, 0.78) 0%, rgba(12, 14, 17, 0.34) 14%, rgba(12, 14, 17, 0) 28%, rgba(12, 14, 17, 0.45) 100%);
   }
 
-  /* Top subtle publication rule */
   .masthead {
     position: absolute;
     left: 112px;
@@ -68,55 +56,40 @@
     letter-spacing: 0.08em;
     color: var(--gold);
   }
-  .masthead span.right {
-    color: #EFECE4;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-  }
+  .masthead span.right { color: #EFECE4; font-weight: 600; letter-spacing: 0.04em; }
 
   .hero {
     position: absolute;
     left: 112px;
-    top: 204px;
+    top: 230px;
     width: 960px;
     z-index: 2;
   }
   h1 {
     font-family: var(--serif);
-    font-size: 116px;
+    font-size: 122px;
     font-weight: 900;
     line-height: 1.08;
     letter-spacing: -0.015em;
     color: var(--fg);
   }
-  h1 span {
-    display: block;
-    margin-top: 8px;
-    color: var(--gold);
-  }
-  .rule {
-    margin-top: 34px;
-    width: 84px;
-    height: 3px;
-    background: var(--gold);
-  }
+  h1 span { display: block; margin-top: 8px; color: var(--gold); }
+  .rule { margin-top: 36px; width: 84px; height: 3px; background: var(--gold); }
   p.sub {
     margin-top: 28px;
-    max-width: 720px;
-    font-size: 32px;
-    font-weight: 400;
-    line-height: 1.55;
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 1.4;
     color: #DFDCD4;
   }
 
-  /* Frosted editorial KPI glass bar anchored lower-left (clear of the right-side sourdough) */
   .kpi-strip {
     position: absolute;
     left: 112px;
-    bottom: 84px;
+    bottom: 88px;
     z-index: 2;
     display: grid;
-    grid-template-columns: repeat(3, 252px);
+    grid-template-columns: repeat(3, 236px);
     background: rgba(16, 19, 23, 0.72);
     border: 1px solid rgba(244, 241, 234, 0.16);
     border-radius: 20px;
@@ -124,14 +97,14 @@
     overflow: hidden;
   }
   .kpi-cell {
-    padding: 24px 28px;
+    padding: 26px 28px;
     border-right: 1px solid rgba(244, 241, 234, 0.12);
   }
   .kpi-cell:last-child { border-right: 0; }
   .kpi-cell b {
     display: block;
     font-family: var(--num);
-    font-size: 52px;
+    font-size: 56px;
     font-weight: 900;
     line-height: 1;
     letter-spacing: -0.03em;
@@ -139,15 +112,11 @@
     font-variant-numeric: tabular-nums;
   }
   .kpi-cell b.hl { color: var(--gold); }
-  .kpi-cell b small {
-    font-size: 24px;
-    font-weight: 700;
-    margin-left: 3px;
-  }
+  .kpi-cell b small { font-size: 24px; font-weight: 700; margin-left: 3px; }
   .kpi-cell span {
     display: block;
     margin-top: 10px;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
     color: var(--sub);
   }
@@ -161,28 +130,28 @@
   <div class="scrim" aria-hidden="true"></div>
 
   <div class="masthead">
-    <span>2026 Q4 營運提案・STARDUST BAKERY</span>
+    <span>2026 Q4 營運提案</span>
     <span class="right">營運企劃組｜2026.11</span>
   </div>
 
   <div class="hero">
     <h1>星塵烘焙<span>智慧補貨系統</span></h1>
     <div class="rule"></div>
-    <p class="sub">從經驗估量走向預報驅動，在清晨四點前鎖定每店出爐量，把每日報廢率穩穩壓進 6% 以內。</p>
+    <p class="sub">預報驅動，把報廢壓進 6% 以內。</p>
   </div>
 
   <div class="kpi-strip">
     <div class="kpi-cell">
       <b class="hl">4.2<small>%</small></b>
-      <span>信義試點 8 週報廢率</span>
+      <span>試點報廢率</span>
     </div>
     <div class="kpi-cell">
       <b>−63<small>%</small></b>
-      <span>每日打烊剩餘盤數降幅</span>
+      <span>報廢盤數</span>
     </div>
     <div class="kpi-cell">
       <b>5<small>家</small></b>
-      <span>Q4 預計同步上線主力店</span>
+      <span>Q4 導入門市</span>
     </div>
   </div>
 </div>
