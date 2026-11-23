@@ -12,21 +12,13 @@
   --sans: "Noto Sans TC", var(--font-sans-fallback);
   --num: "Archivo", "Noto Sans TC", var(--font-sans-fallback);
   --motion-mode: crisp;
-  --stagger-base: 38;
+  --stagger-base: 55;
   background:
     radial-gradient(ellipse 880px 540px at 78% 24%, rgba(255, 118, 87, 0.10), transparent 66%),
     radial-gradient(ellipse 760px 520px at 20% 90%, rgba(74, 212, 154, 0.08), transparent 66%),
     var(--bg);
   color: var(--fg);
   font-family: var(--sans);
-}
-.slide .grain {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: 0.04;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 .slide nav.slide-nav {
   position: absolute;
@@ -109,7 +101,7 @@
   background: var(--panel);
   border: 1px solid rgba(241, 239, 234, 0.14);
   padding: 38px 42px;
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.42);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.34);
   display: flex;
   flex-direction: column;
 }
@@ -129,8 +121,14 @@
 .slide .r-big .now { font-size: 78px; font-weight: 900; line-height: 0.9; color: var(--mint); }
 .slide .r-big small { font-family: var(--sans); font-size: 24px; font-weight: 700; color: var(--fg-2); }
 
-.slide .tray-grid {
+/* 4-row grouped tray matrix (4 lightweight row waves instead of 24 heavy GPU layers!) */
+.slide .tray-matrix {
   margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.slide .tray-row {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   gap: 14px;
@@ -190,6 +188,10 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--line);
 }
+.slide .comp-box.win {
+  --spot-color: rgba(74, 212, 154, 0.42);
+  border-color: rgba(74, 212, 154, 0.34);
+}
 .slide .comp-box small { display: block; font-size: 19px; font-weight: 600; color: var(--muted); }
 .slide .comp-box .val-line {
   display: flex;
@@ -228,33 +230,33 @@
   color: var(--muted);
 }
 </style>
-<section class="slide canvas" data-nav="inline">
-  <div class="grain" data-layer="bg" aria-hidden="true"></div>
-
+<section class="slide canvas" data-nav="inline" data-transition="push">
   <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
 
   <div class="left">
     <h1 data-role="title">報廢痛點與降幅</h1>
     <p class="lead" data-role="summary">預報導入後，每天少丟 <em>15 盤新鮮麵包</em>。</p>
 
-    <div class="evidence" data-stagger="65" data-delay="90">
+    <!-- Beat 3: Root causes enter cleanly AFTER the right 24->9 tray visual makes its point -->
+    <div class="evidence" data-stagger="80" data-delay="620">
       <div class="ev-card hot">
-        <b data-count data-delay="120">+42<small>%</small></b>
+        <b data-count data-delay="680">+42<small>%</small></b>
         <strong>雨天估量誤差</strong>
       </div>
       <div class="ev-card">
-        <b data-count data-delay="180">35<small>分</small></b>
+        <b data-count data-delay="760">35<small>分</small></b>
         <strong>每日盤點工時</strong>
       </div>
       <div class="ev-card">
-        <b data-count data-delay="240">2.1<small>×</small></b>
+        <b data-count data-delay="840">2.1<small>×</small></b>
         <strong>熱門尖峰斷貨</strong>
       </div>
     </div>
   </div>
 
+  <!-- Beat 1-2: Eye starts on the 24->9 hero visual; 4 lightweight rows sweep cleanly down to the 4.2% win card -->
   <section class="right">
-    <div class="r-top">
+    <div class="r-top" data-beat="1" data-from="none">
       <div>
         <div class="r-kicker">1 格 ＝ 1 烤盤</div>
         <div class="r-headline">每日打烊報廢 <em>−63%</em></div>
@@ -262,49 +264,57 @@
       <div class="r-big">
         <span class="old">24</span>
         <span class="arrow">→</span>
-        <span class="now" data-count data-delay="160">9</span>
+        <span class="now" data-count data-delay="260">9</span>
         <small>盤／日</small>
       </div>
     </div>
 
-    <div class="tray-grid" data-stagger="26" data-delay="120" aria-label="24 盤報廢對比矩陣：9 盤為導入後剩餘，15 盤為系統省下">
-      <div class="tray kept"><span>01</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray kept"><span>02</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray kept"><span>03</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray kept"><span>04</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray kept"><span>05</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray kept"><span>06</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray kept"><span>07</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray kept"><span>08</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray kept"><span>09</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>10</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>11</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>12</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>13</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>14</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>15</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>16</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>17</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>18</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>19</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>20</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>21</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>22</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>23</span><div class="dot-row"><i></i><i></i><i></i></div></div>
-      <div class="tray saved"><span>24</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+    <div class="tray-matrix" data-stagger="90" data-delay="180" aria-label="24 盤報廢對比矩陣：9 盤為導入後剩餘，15 盤為系統省下">
+      <div class="tray-row">
+        <div class="tray kept"><span>01</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray kept"><span>02</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray kept"><span>03</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray kept"><span>04</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray kept"><span>05</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray kept"><span>06</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="tray-row">
+        <div class="tray kept"><span>07</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray kept"><span>08</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray kept"><span>09</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>10</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>11</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>12</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="tray-row">
+        <div class="tray saved"><span>13</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>14</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>15</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>16</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>17</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>18</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      </div>
+      <div class="tray-row">
+        <div class="tray saved"><span>19</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>20</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>21</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>22</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>23</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+        <div class="tray saved"><span>24</span><div class="dot-row"><i></i><i></i><i></i></div></div>
+      </div>
     </div>
 
-    <div class="legend">
+    <div class="legend" data-beat="2" data-delay="480" data-from="none">
       <span class="leg-item"><i class="swatch mint"></i>導入後餘量：9 盤（4.2%）</span>
       <span class="leg-item"><i class="swatch coral"></i>預報省下：15 盤（−63%）</span>
     </div>
 
     <div class="comp">
-      <div class="comp-box loss">
+      <div class="comp-box loss" data-beat="4" data-delay="860">
         <small>未導入・板橋店</small>
         <div class="val-line"><strong>11.4%・月損 2.9 萬</strong></div>
       </div>
-      <div class="comp-box win">
+      <div class="comp-box win" data-beat="4" data-delay="960" data-spotlight>
         <small>已導入・信義店</small>
         <div class="val-line"><b class="rate-hero" data-morph="hero-rate">4.2<small>%</small></b><span>・年省 34 萬</span></div>
       </div>

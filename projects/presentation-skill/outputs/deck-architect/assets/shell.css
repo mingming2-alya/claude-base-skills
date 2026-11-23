@@ -1,16 +1,13 @@
-/* deck-architect v4.1 Thin Shell CSS (Phase B Layered Hybrid Motion Core)
+/* deck-architect v4.2 Thin Shell CSS (Phase B.2 — 60fps GPU Core + Eye-Guidance Choreography)
  *
  * Locks only invariants that must never break across slides:
- *  - 1920x1080 auto-scaled stage & hold-outgoing slide visibility layering
+ *  - 1920x1080 auto-scaled stage with compositor isolation (contain: layout style paint)
  *  - Offline CJK + Latin system font fallback stacks
  *  - Single-source navigation/tab hooks (fully styleable or replaceable via data-nav="inline")
- *  - Style-driven motion personality tokens (--motion-mode: spring | crisp | stepped)
- *  - Magic Move overlay (#morph-layer), Canvas 2D FX layer (.fx-canvas), and toast (#toast)
+ *  - 60fps GPU-composited transition archetypes (push | zoom-rise | iris | shock | morph | sheet-up | modal)
+ *  - Visual eye-guidance choreography helpers (data-spotlight, flow-token, data-beat)
  *  - Interactive live-figure controls (.live-ctrl / .live-only) with print/static isolation
- *  - Replaceable image-layer slot (.asset-slot) for zero-wait SVG + AI/photo fusion
  *  - Dual static freeze (?still=1, B low-power mode, prefers-reduced-motion) & exact 16:9 print/PDF
- *
- * Free-canvas slides (<section class="slide canvas">) keep 100% layout freedom.
  */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -67,14 +64,12 @@
   --nav-accent: var(--accent);
   --nav-border: var(--line-2);
 
-  /* Phase B motion personality tokens (spring | crisp | stepped) */
+  /* Phase B.2 60fps motion personality tokens (spring | crisp | tactile) */
   --motion-mode: spring;
-  --spring-response: 0.54;
-  --spring-bounce: 0;
-  --step-frames: 5;
-  --stagger-base: 48;
-  --morph-ms: 780;
-  --enter-easing: cubic-bezier(.16, 1, .3, 1);
+  --spring-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --stagger-base: 46;
+  --morph-ms: 680;
 }
 
 html, body {
@@ -102,7 +97,7 @@ html, body {
   background: var(--bg);
 }
 
-/* ---------------------------------------------------------------- slide container */
+/* ---------------------------------------------------------------- slide container (GPU-isolated) */
 .slide {
   position: absolute;
   inset: 0;
@@ -118,16 +113,22 @@ html, body {
   visibility: hidden;
   z-index: 1;
   overflow: hidden;
+  contain: layout style paint;
+  backface-visibility: hidden;
 }
 /* Hold outgoing slide at opacity 1 underneath incoming slide to prevent dark flashes (open-slide MIT) */
 .slide.leaving {
   visibility: visible;
   z-index: 2;
   pointer-events: none;
+  will-change: transform, opacity;
 }
 .slide.active {
   visibility: visible;
   z-index: 4;
+}
+.slide.in-flight {
+  will-change: transform, opacity, clip-path;
 }
 .slide h1, .slide h2, .slide h3 { text-wrap: balance; font-feature-settings: "halt" 1; }
 .slide p { text-wrap: pretty; }
@@ -144,7 +145,7 @@ mark.em {
 .unit { font-size: .42em; font-weight: 500; letter-spacing: 0; opacity: .75; margin-left: .08em; font-family: var(--font-body); }
 .ph { display: inline-block; max-width: 100%; }
 
-/* ---------------------------------------------------------------- replaceable image/scene slot & FX canvas */
+/* ---------------------------------------------------------------- replaceable image/scene slot & low-res FX canvas */
 .asset-slot {
   position: absolute;
   inset: 0;
@@ -160,11 +161,12 @@ mark.em {
   height: 100%;
   object-fit: cover;
 }
+/* Logical 480x270 canvas stretched smoothly by GPU -> 16x cheaper than 1920x1080 buffer */
 .fx-canvas {
   position: absolute;
   inset: 0;
-  width: 1920px;
-  height: 1080px;
+  width: 100%;
+  height: 100%;
   z-index: 1;
   pointer-events: none;
 }
@@ -180,7 +182,7 @@ mark.em {
   pointer-events: none;
 }
 
-/* ---------------------------------------------------------------- Phase B overlays & motion helpers */
+/* ---------------------------------------------------------------- Phase B overlays & visual guidance helpers */
 #morph-layer {
   position: absolute;
   inset: 0;
@@ -199,6 +201,16 @@ mark.em {
 .flow-token {
   pointer-events: none;
   animation: deck-token-flow var(--token-dur, 3.2s) cubic-bezier(.4, 0, .2, 1) infinite;
+}
+
+/* Single crisp focus-ring cue that guides the eye onto a priority card once (never obnoxious looping) */
+@keyframes deck-spotlight-ring {
+  0% { box-shadow: 0 0 0 0 var(--spot-color, rgba(192, 60, 30, 0.48)); }
+  45% { box-shadow: 0 0 0 10px var(--spot-color, rgba(192, 60, 30, 0.18)); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+}
+.spot-pulse {
+  animation: deck-spotlight-ring 850ms cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
 /* Interactive live controls (isolated from slide click-to-advance) */
@@ -249,13 +261,13 @@ mark.em {
   font: 500 var(--nav-size)/1 var(--font-label);
   letter-spacing: var(--label-tracking);
   color: var(--nav-color);
-  transition: opacity .28s ease;
+  transition: opacity .24s ease;
   pointer-events: none;
 }
 #nav span {
   position: relative;
   padding-bottom: 10px;
-  transition: color .35s ease;
+  transition: color .28s ease;
 }
 #nav span.on {
   color: var(--nav-active);
@@ -266,7 +278,7 @@ mark.em {
   bottom: 0;
   height: 2px;
   background: var(--nav-accent);
-  transition: left .5s cubic-bezier(.65, 0, .35, 1), width .5s cubic-bezier(.65, 0, .35, 1);
+  transition: left .42s cubic-bezier(.22, 1, .36, 1), width .42s cubic-bezier(.22, 1, .36, 1);
 }
 #nav.with-rule::after {
   content: "";
@@ -288,13 +300,13 @@ mark.em {
   font: 500 19px/1 var(--font-label);
   letter-spacing: var(--label-tracking);
   color: var(--nav-color);
-  transition: opacity .28s ease;
+  transition: opacity .24s ease;
   pointer-events: none;
 }
 #tabs span {
   padding: 5px 0;
   border-bottom: 2px solid transparent;
-  transition: color .3s ease, border-color .3s ease;
+  transition: color .25s ease, border-color .25s ease;
 }
 #tabs span.on {
   color: var(--nav-active);
@@ -423,9 +435,7 @@ body.low-power *::after {
   transition: none !important;
 }
 html.still .fx-canvas,
-body.low-power .fx-canvas {
-  display: none !important;
-}
+body.low-power .fx-canvas,
 html.still .flow-token,
 body.low-power .flow-token {
   display: none !important;
@@ -489,6 +499,7 @@ body.hide-ctrl .live-only {
     break-after: page;
     opacity: 1 !important;
     transform: none !important;
+    clip-path: none !important;
   }
   .slide * { opacity: 1; transform: none !important; animation: none !important; }
   .toc li.off { opacity: .28 !important; }

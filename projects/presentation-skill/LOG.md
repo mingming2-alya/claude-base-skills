@@ -1304,3 +1304,28 @@
   - 清除 `__pycache__` 後重新打包 `outputs/deck-architect.skill`（126 KB，28 檔）。
 - **同步的檔案**：`outputs/deck-architect/`（v4.1 28 檔）、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
 - **下一步**：交付 Antigravity 動態預覽卡與 8 頁截圖畫廊供使用者實測體驗，確認後啟動 **Phase C｜第一份真實簡報端到端 PK**。
+
+## 2026-11-23｜Phase B.2 體檢重構：手機 60fps 順滑化 ＋ 頁內視線引導編排 ＋ 六種敘事切頁與三數齊飛 Magic Move
+
+- **使用者於手機實測後的 3 點關鍵回饋**：
+  1. 「呈現效果有點卡頓」
+  2. 「同一頁的效果沒有起到視覺的指引效果」
+  3. 「頁與頁之間的切換的連貫性與效果有點單一」
+- **第一性原理根因診斷與全面重構（同步反寫進 `outputs/deck-architect/` v4.2 與 `outputs/examples/v4-alive-demo/`）**：
+  1. **消除 60fps 效能瓶頸（`assets/shell.css`、`assets/runtime.js`、各頁 HTML）**：
+     - 拔除第 3 頁 `2320×1480` `<feGaussianBlur stdDeviation="48"/>`、第 2 頁 live `<feTurbulence>` 與第 1 頁 `backdrop-filter: blur(16px)` 等行動端 GPU 重繪殺手，改以純 CSS 漸層光暈＋邊框發光達成同等甚至更銳利的視覺質感。
+     - 切頁與進場改用純 2 關鍵影格 GPU 合成器曲線（`cubic-bezier(0.22,1,0.36,1)`／Apple `cubic-bezier(0.32,0.72,0,1)`），移除 28 格 JS 取樣與整頁 `steps(5)` 跳格感；`.slide` 加上 `contain: layout style paint`。
+     - Canvas 2D 背景層縮為 `480×270` 緩衝區由 GPU 拉伸（像素開銷降 16 倍）並延遲至切頁後 520ms 啟動；第 2 頁 24 烤盤改 4 排輕量波浪；`[data-count]` 改 30Hz 節流更新。
+  2. **建立頁內視線引導語法（`data-beat` / `data-from` / `data-grow="x-left|y-down"` / `data-spotlight`）**：
+     - 徹底告別「全頁同時淡入」，改寫每頁為明確三拍視線劇本：第 2 頁先看 24→9 烤盤矩陣再引導至三痛點與 `4.2%`；第 3 頁由平板邊緣向外射出 4 條細線點亮左右標註＋折線由左向右拉至端點；第 4 頁頂部時間軸細線搭 `04:00 → 12:00 → 15:30` 由左至右依序落針指向三個紙黏土物件；第 6 頁三數著陸後以柔和單次光環指向左側互動滑桿；第 7 頁先亮唯一紅卡板橋延遲甘特條→視線下帶至 `11/22` 拍板卡→最後四張綠卡安靜掃入。
+  3. **擴充 6 種敘事切頁語法（`data-transition`，支援往回鏡像倒放）＋三數編隊 Magic Move**：
+     - `1→2` 鏡頭橫移（`push`）
+     - `2→3` 放大聚焦＋`4.2%` 2.6× Magic Move（`zoom-rise`）
+     - `3→4` 由平板中心 `48% 74%` 向外綻放的圓形日光光圈（`iris`）無縫進入紙黏土現場（往回翻則優雅收斂回深色平板）
+     - `4→5` 俐落震撼黑幕（`shock`，節奏壓緊不拖沓）
+     - `5→6` **三組財務數字（`+1.8%`、`170 萬／年`、`4.2 個月`）同步齊飛**進第 6 頁現場試算器（`morph`）
+     - `6→7` 亮色主管決策 Bento 看板由底升起（`sheet-up`）
+     - `3↔8` 景深縮放附件（`modal`）
+  4. **新增行動端友善觸控滑動與免 localhost 內嵌播放器**：`runtime.js` 原生內建左右滑動手勢（嚴格排除 `.live-ctrl` 滑桿誤觸）；同步更新 `references/motion-system.md` 寫入 60fps 效能禁忌、6 種敘事切頁與視線引導規範。
+- **驗證結果**：`check.mjs --motion` 8 頁靜態像素對比全通過（最低 `4.70:1`）、5 項動態測試全 ✅；手機 390px 實測全 6 種轉場與第 5→6 頁 3 數齊飛（`midClones=3, postClones=0`）零 JS 錯誤；重新打包 `outputs/deck-architect.skill`（127 KB，28 檔）。
+- **同步的檔案**：`outputs/deck-architect/{assets/shell.css,assets/runtime.js,references/motion-system.md}`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`STATUS.md`、`LOG.md`。

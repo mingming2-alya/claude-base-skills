@@ -9,9 +9,7 @@
   --round: "Chiron GoRound TC", var(--font-round-fallback);
   --sans: "Noto Sans TC", var(--font-sans-fallback);
   --num: "Nunito", "Noto Sans TC", var(--font-round-fallback);
-  --motion-mode: stepped;
-  --step-frames: 5;
-  --stagger-base: 90;
+  --motion-mode: spring;
   background: #F5E6D6;
   color: var(--ink);
   font-family: var(--sans);
@@ -76,6 +74,18 @@
   color: var(--ink-2);
 }
 .slide p.lead em { font-style: normal; color: var(--terra); }
+
+/* Horizontal chronological rail linking 04:00 -> 12:00 -> 15:30 to guide eye left to right */
+.slide .time-rail {
+  position: absolute;
+  left: 386px;
+  top: 386px;
+  width: 1074px;
+  height: 2px;
+  z-index: 2;
+  background: linear-gradient(90deg, rgba(173, 74, 45, 0.36) 0%, rgba(47, 102, 78, 0.4) 50%, rgba(150, 86, 29, 0.38) 100%);
+  pointer-events: none;
+}
 
 .slide .station {
   position: absolute;
@@ -143,17 +153,19 @@
   color: #21523D;
 }
 </style>
-<section class="slide canvas" data-nav="inline" data-motion-mode="stepped">
+<section class="slide canvas" data-nav="inline" data-transition="iris" data-iris-origin="48% 74%">
   <div class="asset-slot" data-slot="bakery-clay" data-mode="light">
     <img src="assets/clay-bakery-scene.jpg" alt="手工紙黏土烘焙坊三站場景底圖">
   </div>
   <div class="wash" data-layer="bg" aria-hidden="true"></div>
+  <div class="time-rail" data-grow="x" data-delay="340" data-dur="760" aria-hidden="true"></div>
 
+  <!-- Pins shoot downward onto each physical clay object in chronological left -> center -> right order -->
   <svg class="guides" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
     <g stroke-width="2" stroke-dasharray="5 6" fill="none">
-      <line x1="298" y1="494" x2="298" y2="564" stroke="#AD4A2D" stroke-opacity="0.55" data-draw data-delay="180"/>
-      <line x1="958" y1="494" x2="958" y2="638" stroke="#2F664E" stroke-opacity="0.55" data-draw data-delay="280"/>
-      <line x1="1548" y1="494" x2="1548" y2="606" stroke="#96561D" stroke-opacity="0.55" data-draw data-delay="380"/>
+      <line x1="298" y1="494" x2="298" y2="564" stroke="#AD4A2D" stroke-opacity="0.65" data-grow="y-down" data-delay="440" data-dur="320"/>
+      <line x1="958" y1="494" x2="958" y2="638" stroke="#2F664E" stroke-opacity="0.65" data-grow="y-down" data-delay="740" data-dur="340"/>
+      <line x1="1548" y1="494" x2="1548" y2="606" stroke="#96561D" stroke-opacity="0.65" data-grow="y-down" data-delay="1040" data-dur="320"/>
     </g>
     <circle cx="298" cy="566" r="5" fill="#AD4A2D"/>
     <circle cx="958" cy="640" r="5" fill="#2F664E"/>
@@ -165,17 +177,18 @@
   <h1 data-role="title">清晨到打烊的三個站</h1>
   <p class="lead" data-role="summary">三個時段接力，把報廢壓進 <em>4.2%</em>。</p>
 
-  <div class="station rv" style="left:98px" data-delay="120">
+  <!-- Clear left -> center -> right 300ms chronological wave walking the viewer through the day -->
+  <div class="station" style="left:98px" data-beat="2" data-delay="320" data-from="down">
     <span class="time-pill terra">04:00 烤爐站</span>
     <h3>依天氣自動減量</h3>
   </div>
 
-  <div class="station rv" style="left:758px" data-delay="240">
+  <div class="station" style="left:758px" data-beat="3" data-delay="620" data-from="down">
     <span class="time-pill sage">12:00 櫃檯站</span>
     <h3>午間即時看銷速</h3>
   </div>
 
-  <div class="station rv" style="left:1348px" data-delay="360">
+  <div class="station" style="left:1348px" data-beat="4" data-delay="920" data-from="down">
     <span class="time-pill ochre">15:30 補貨站</span>
     <h3>尖峰前小批補烤</h3>
   </div>

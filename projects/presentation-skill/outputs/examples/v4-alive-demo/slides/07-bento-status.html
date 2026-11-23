@@ -118,19 +118,17 @@
   border: 1px solid var(--line);
   border-radius: 26px;
   padding: 30px 34px;
-  box-shadow:
-    0 1px 2px rgba(16, 24, 40, 0.04),
-    0 12px 30px rgba(16, 24, 40, 0.055);
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.055);
 }
 .slide .card.focus-risk {
   border: 1.5px solid var(--risk-line);
-  box-shadow:
-    0 1px 2px rgba(192, 60, 30, 0.05),
-    0 14px 34px rgba(192, 60, 30, 0.075);
+  --spot-color: rgba(192, 60, 30, 0.42);
+  box-shadow: 0 10px 28px rgba(192, 60, 30, 0.075);
 }
 .slide .card.decision {
   background: var(--risk-bg);
   border: 1.5px solid var(--risk-line);
+  --spot-color: rgba(14, 107, 79, 0.34);
 }
 .slide .head { display: flex; align-items: center; gap: 14px; }
 .slide .head strong { font-size: 27px; font-weight: 800; line-height: 1.2; color: var(--ink); }
@@ -315,7 +313,7 @@
   color: var(--muted);
 }
 </style>
-<section class="slide canvas" data-nav="inline">
+<section class="slide canvas" data-nav="inline" data-transition="sheet-up">
   <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
 
   <div class="meta-pill"><i></i><b>W47</b><span>Q4 五店追蹤</span></div>
@@ -331,7 +329,8 @@
     </div>
   </header>
 
-  <section class="card focus-risk rv" style="left:96px;top:276px;width:790px;height:356px" data-delay="60">
+  <!-- Beat 1: Executive eye goes FIRST to the ONLY red risk card + Gantt delay bar shooting past 12/01 -->
+  <section class="card focus-risk" style="left:96px;top:276px;width:790px;height:356px" data-beat="1" data-delay="120" data-spotlight>
     <div class="head">
       <span class="pill risk">延遲 1 週</span>
       <strong>板橋車站店</strong>
@@ -339,81 +338,23 @@
     </div>
     <div class="gantt">
       <div class="g-row-label" style="top:16px">原訂</div>
-      <div class="g-bar" style="left:76px;top:14px;width:450px;background:#D6DCE4" data-grow="x" data-delay="120"></div>
+      <div class="g-bar" style="left:76px;top:14px;width:450px;background:#D6DCE4" data-grow="x" data-delay="180" data-dur="420"></div>
       <div class="g-date" style="left:450px;top:-16px;color:var(--ink)">12/01</div>
 
       <div class="g-row-label" style="top:76px">實際</div>
-      <div class="g-bar" style="left:76px;top:74px;width:270px;background:var(--ink)" data-grow="x" data-delay="190"></div>
-      <div class="g-bar" style="left:352px;top:74px;width:240px;background:repeating-linear-gradient(-45deg,#F3B8A4 0 8px,#FCE3D9 8px 16px);border:2px dashed var(--risk)" data-grow="x" data-delay="280"></div>
+      <div class="g-bar" style="left:76px;top:74px;width:270px;background:var(--ink)" data-grow="x" data-delay="300" data-dur="360"></div>
+      <div class="g-bar" style="left:352px;top:74px;width:240px;background:repeating-linear-gradient(-45deg,#F3B8A4 0 8px,#FCE3D9 8px 16px);border:2px dashed var(--risk)" data-grow="x" data-delay="460" data-dur="440"></div>
       <div class="g-date" style="left:508px;top:108px;color:var(--risk-text)">預估 12/08</div>
 
       <div class="g-note">
         <span>卡點：夜間收銀斷線重傳</span>
-        <b data-count data-delay="220">45%</b>
+        <b data-count data-delay="460">45%</b>
       </div>
     </div>
   </section>
 
-  <section class="card rv" style="left:910px;top:276px;width:445px;height:356px" data-delay="110">
-    <div class="head">
-      <strong>東區概念店</strong>
-      <span class="pill ok" style="margin-left:auto">按進度</span>
-    </div>
-    <div class="ring-wrap">
-      <div class="ring">
-        <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
-          <circle cx="88" cy="88" r="72" fill="none" stroke="#E5EAF0" stroke-width="15"/>
-          <circle cx="88" cy="88" r="72" fill="none" stroke="#2E7D63" stroke-width="15" stroke-linecap="round"
-                  stroke-dasharray="452.4" stroke-dashoffset="113.1" transform="rotate(-90 88 88)"
-                  data-draw="ring" data-delay="180" data-dur="880"/>
-        </svg>
-        <b data-count data-delay="180">75<span>%</span></b>
-      </div>
-      <div class="ring-copy">
-        <span class="date">11/26 上線</span>
-        <span class="cue">培訓完成・待串接</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="card rv" style="left:1379px;top:276px;width:445px;height:356px" data-delay="150">
-    <div class="head">
-      <strong>信義旗艦店</strong>
-      <span class="pill ok" style="margin-left:auto">已上線</span>
-    </div>
-    <div class="ring-wrap">
-      <div class="ring">
-        <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
-          <circle cx="88" cy="88" r="72" fill="none" stroke="#E2F2EB" stroke-width="15"/>
-          <circle cx="88" cy="88" r="72" fill="none" stroke="#0E6B4F" stroke-width="15" stroke-linecap="round"
-                  stroke-dasharray="452.4" stroke-dashoffset="0" transform="rotate(-90 88 88)"
-                  data-draw="ring" data-delay="240" data-dur="940"/>
-        </svg>
-        <b data-count data-delay="220">100<span>%</span></b>
-      </div>
-      <div class="ring-copy">
-        <span class="date">報廢 4.2%</span>
-        <span class="cue ok">年省 34 萬</span>
-      </div>
-    </div>
-  </section>
-
-  <section class="card rv" style="left:96px;top:656px;width:416px;height:358px" data-delay="190">
-    <div class="head"><strong>五店整體完成度</strong></div>
-    <div class="overall-top">
-      <div class="overall-num" data-count data-delay="220">51<span>%</span></div>
-      <div class="overall-cap">1 店已上線</div>
-    </div>
-    <div class="mini-bars" aria-label="五家門市進度條對照">
-      <div class="mb-col"><div class="mb-track"><div class="mb-fill" style="height:100%" data-grow="y" data-delay="240"></div></div><span>信義</span></div>
-      <div class="mb-col"><div class="mb-track"><div class="mb-fill soft" style="height:75%" data-grow="y" data-delay="290"></div></div><span>東區</span></div>
-      <div class="mb-col"><div class="mb-track"><div class="mb-fill risk" style="height:45%" data-grow="y" data-delay="340"></div></div><span class="risk">板橋</span></div>
-      <div class="mb-col"><div class="mb-track"><div class="mb-fill muted" style="height:25%" data-grow="y" data-delay="390"></div></div><span>台中</span></div>
-      <div class="mb-col"><div class="mb-track"><div class="mb-fill muted" style="height:12%" data-grow="y" data-delay="440"></div></div><span>高雄</span></div>
-    </div>
-  </section>
-
-  <section class="card decision rv" style="left:536px;top:656px;width:819px;height:358px" data-delay="230">
+  <!-- Beat 2: Eye immediately follows the risk card DOWN to the 11/22 decision card! -->
+  <section class="card decision" style="left:536px;top:656px;width:819px;height:358px" data-beat="2" data-delay="620" data-from="down" data-spotlight>
     <div class="head">
       <strong>板橋店收銀回傳解法</strong>
       <span class="pill deadline">11/22 前拍板</span>
@@ -432,7 +373,67 @@
     </div>
   </section>
 
-  <section class="card rv" style="left:1379px;top:656px;width:445px;height:358px" data-delay="270">
+  <!-- Beat 3: The 4 healthy green on-track cards settle calmly around the risk + decision spine -->
+  <section class="card" style="left:910px;top:276px;width:445px;height:356px" data-beat="3" data-delay="820">
+    <div class="head">
+      <strong>東區概念店</strong>
+      <span class="pill ok" style="margin-left:auto">按進度</span>
+    </div>
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
+          <circle cx="88" cy="88" r="72" fill="none" stroke="#E5EAF0" stroke-width="15"/>
+          <circle cx="88" cy="88" r="72" fill="none" stroke="#2E7D63" stroke-width="15" stroke-linecap="round"
+                  stroke-dasharray="452.4" stroke-dashoffset="113.1" transform="rotate(-90 88 88)"
+                  data-draw="ring" data-delay="880" data-dur="740"/>
+        </svg>
+        <b data-count data-delay="880">75<span>%</span></b>
+      </div>
+      <div class="ring-copy">
+        <span class="date">11/26 上線</span>
+        <span class="cue">培訓完成・待串接</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="left:1379px;top:276px;width:445px;height:356px" data-beat="3" data-delay="880">
+    <div class="head">
+      <strong>信義旗艦店</strong>
+      <span class="pill ok" style="margin-left:auto">已上線</span>
+    </div>
+    <div class="ring-wrap">
+      <div class="ring">
+        <svg width="176" height="176" viewBox="0 0 176 176" aria-hidden="true">
+          <circle cx="88" cy="88" r="72" fill="none" stroke="#E2F2EB" stroke-width="15"/>
+          <circle cx="88" cy="88" r="72" fill="none" stroke="#0E6B4F" stroke-width="15" stroke-linecap="round"
+                  stroke-dasharray="452.4" stroke-dashoffset="0" transform="rotate(-90 88 88)"
+                  data-draw="ring" data-delay="940" data-dur="780"/>
+        </svg>
+        <b data-count data-delay="940">100<span>%</span></b>
+      </div>
+      <div class="ring-copy">
+        <span class="date">報廢 4.2%</span>
+        <span class="cue ok">年省 34 萬</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" style="left:96px;top:656px;width:416px;height:358px" data-beat="3" data-delay="940">
+    <div class="head"><strong>五店整體完成度</strong></div>
+    <div class="overall-top">
+      <div class="overall-num" data-count data-delay="980">51<span>%</span></div>
+      <div class="overall-cap">1 店已上線</div>
+    </div>
+    <div class="mini-bars" aria-label="五家門市進度條對照">
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill" style="height:100%" data-grow="y" data-delay="1000"></div></div><span>信義</span></div>
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill soft" style="height:75%" data-grow="y" data-delay="1050"></div></div><span>東區</span></div>
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill risk" style="height:45%" data-grow="y" data-delay="1100"></div></div><span class="risk">板橋</span></div>
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill muted" style="height:25%" data-grow="y" data-delay="1150"></div></div><span>台中</span></div>
+      <div class="mb-col"><div class="mb-track"><div class="mb-fill muted" style="height:12%" data-grow="y" data-delay="1200"></div></div><span>高雄</span></div>
+    </div>
+  </section>
+
+  <section class="card" style="left:1379px;top:656px;width:445px;height:358px" data-beat="3" data-delay="1000">
     <div class="head">
       <strong>中南二店接棒</strong>
       <span class="pill ok" style="margin-left:auto">按進度</span>
@@ -440,12 +441,12 @@
     <div class="queue">
       <div class="q-item">
         <div class="q-top"><span>台中公益店</span><small>25%</small></div>
-        <div class="q-track"><div class="q-fill" style="width:25%" data-grow="x" data-delay="320"></div></div>
+        <div class="q-track"><div class="q-fill" style="width:25%" data-grow="x" data-delay="1040"></div></div>
         <div class="q-meta">12/12 上線</div>
       </div>
       <div class="q-item">
         <div class="q-top"><span>高雄巨蛋店</span><small>10%</small></div>
-        <div class="q-track"><div class="q-fill" style="width:14%" data-grow="x" data-delay="380"></div></div>
+        <div class="q-track"><div class="q-fill" style="width:14%" data-grow="x" data-delay="1100"></div></div>
         <div class="q-meta">12/15 上線</div>
       </div>
     </div>

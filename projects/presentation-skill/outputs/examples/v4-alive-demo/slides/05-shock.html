@@ -8,7 +8,6 @@
   --sans: "Noto Sans TC", var(--font-sans-fallback);
   --num: "Archivo", "Noto Sans TC", var(--font-sans-fallback);
   --motion-mode: spring;
-  --spring-response: 0.62;
   background:
     radial-gradient(ellipse 920px 620px at 78% 48%, rgba(58, 217, 155, 0.14), rgba(58, 217, 155, 0) 68%),
     radial-gradient(ellipse 680px 460px at 24% 88%, rgba(242, 201, 107, 0.08), rgba(242, 201, 107, 0) 68%),
@@ -68,6 +67,7 @@
   color: var(--fg);
 }
 .slide h1 .hl {
+  display: inline-block;
   font-family: var(--num);
   font-weight: 900;
   background: var(--grad);
@@ -91,7 +91,7 @@
   gap: 48px;
 }
 .slide .p-item b {
-  display: block;
+  display: inline-block;
   font-family: var(--num);
   font-size: 58px;
   font-weight: 900;
@@ -128,20 +128,21 @@
   <div class="dots" data-layer="bg" aria-hidden="true"></div>
   <div class="watermark" aria-hidden="true">1.8%</div>
 
-  <div class="eyebrow rv" data-delay="80"><i></i><span>單店損益試算</span></div>
+  <div class="eyebrow" data-beat="1" data-from="left"><i></i><span>單店損益試算</span></div>
 
   <h1 data-role="shock">
     少丟 1 盤麵包，<br>
-    門市淨利多<span class="hl">+1.8%</span>
+    門市淨利多<span class="hl" data-morph="hero-margin">+1.8%</span>
   </h1>
 
-  <div class="proof-row" data-stagger="90" data-delay="220">
+  <!-- All 3 core financial metrics carry data-morph so they fly IN FORMATION onto Slide 6's live simulator! -->
+  <div class="proof-row" data-stagger="110" data-delay="360">
     <div class="p-item">
-      <b class="mint" data-count data-delay="260">170<small>萬／年</small></b>
+      <b class="mint" data-morph="hero-save">170<small>萬／年</small></b>
       <span>五店年省原料費</span>
     </div>
     <div class="p-item">
-      <b data-count data-delay="340">4.2<small>個月</small></b>
+      <b data-morph="hero-payback">4.2<small>個月</small></b>
       <span>導入回本週期</span>
     </div>
     <div class="p-item">

@@ -88,8 +88,9 @@
   padding: 42px 40px 44px;
   border-radius: 28px;
   background: var(--panel);
-  border: 1px solid rgba(243, 241, 235, 0.14);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+  border: 1.5px solid rgba(74, 212, 154, 0.28);
+  --spot-color: rgba(74, 212, 154, 0.44);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
 }
 .slide .preset-row {
   display: flex;
@@ -168,7 +169,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: border-color .22s ease;
 }
+.slide .hero-out.flash { border-color: rgba(124, 238, 249, 0.85); }
 .slide .hero-out .ho-k {
   font-size: 24px;
   font-weight: 700;
@@ -187,6 +190,7 @@
   font-variant-numeric: tabular-nums;
 }
 .slide .hero-out .ho-num {
+  display: inline-block;
   font-family: var(--num);
   font-size: 124px;
   font-weight: 900;
@@ -215,7 +219,7 @@
   border: 1px solid var(--line);
 }
 .slide .k-card b {
-  display: block;
+  display: inline-block;
   font-family: var(--num);
   font-size: 56px;
   font-weight: 900;
@@ -300,7 +304,7 @@
   color: var(--muted);
 }
 </style>
-<section class="slide canvas" data-nav="inline">
+<section class="slide canvas" data-nav="inline" data-transition="morph">
   <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
   <div class="sim-badge live-only"><i></i><span>現場互動試算</span></div>
 
@@ -308,7 +312,8 @@
     <h1 data-role="title">五店效益即時試算</h1>
     <p class="lead" data-role="summary">拉動門市與報廢目標，<em>即時看年省與回本</em>。</p>
 
-    <div class="ctrl-card live-ctrl live-only" data-interactive>
+    <!-- Beat 2: After the 3 financial KPIs land via Magic Move, spotlight guides the eye straight to the live sliders! -->
+    <div class="ctrl-card live-ctrl live-only" data-interactive data-beat="2" data-delay="420" data-from="left" data-spotlight>
       <div class="preset-row" role="group" aria-label="快速情境">
         <button type="button" class="preset-btn" data-stores="1" data-rate="4.2">單店試點</button>
         <button type="button" class="preset-btn on" data-stores="5" data-rate="4.2">Q4 五店（提案）</button>
@@ -336,42 +341,42 @@
   </div>
 
   <div class="right">
-    <div class="hero-out rv">
+    <div class="hero-out" id="hero-out">
       <div>
         <div class="ho-k">預估年省原料費</div>
         <div class="ho-tag" id="out-scenario">5 家門市 ・ 目標 4.2%</div>
       </div>
-      <div class="ho-num" id="out-save">170<small>萬／年</small></div>
+      <div class="ho-num" id="out-save" data-morph="hero-save">170<small>萬／年</small></div>
     </div>
 
-    <div class="kpi-trio" data-stagger="60" data-delay="90">
+    <div class="kpi-trio">
       <div class="k-card">
-        <b class="gold" id="out-payback">4.2<small>個月</small></b>
+        <b class="gold" id="out-payback" data-morph="hero-payback">4.2<small>個月</small></b>
         <span>導入回本週期</span>
       </div>
       <div class="k-card">
-        <b class="mint" id="out-margin">+1.8<small>%</small></b>
+        <b class="mint" id="out-margin" data-morph="hero-margin">+1.8<small>%</small></b>
         <span>單店淨利提升</span>
       </div>
-      <div class="k-card">
+      <div class="k-card" data-beat="3" data-delay="520">
         <b id="out-trays">75<small>盤／日</small></b>
         <span>全區少丟麵包</span>
       </div>
     </div>
 
-    <div class="bar-card rv" data-delay="180">
+    <div class="bar-card" data-beat="3" data-delay="580">
       <div class="bar-title">
         <strong>年度報廢原料支出對照</strong>
         <span>基準未導入 11.4%</span>
       </div>
       <div class="bar-row">
         <span class="b-lbl">未導入（11.4%）</span>
-        <div class="b-bg"><div class="b-fg loss" id="bar-old" style="width:88%" data-grow="x" data-delay="220"></div></div>
+        <div class="b-bg"><div class="b-fg loss" id="bar-old" style="width:92%" data-grow="x" data-delay="620"></div></div>
         <span class="b-num loss" id="num-old">269 萬</span>
       </div>
       <div class="bar-row">
         <span class="b-lbl" id="lbl-new">導入後（4.2%）</span>
-        <div class="b-bg"><div class="b-fg now" id="bar-new" style="width:32%" data-grow="x" data-delay="280"></div></div>
+        <div class="b-bg"><div class="b-fg now" id="bar-new" style="width:34%" data-grow="x" data-delay="700"></div></div>
         <span class="b-num now" id="num-new">99 萬</span>
       </div>
     </div>
@@ -394,22 +399,23 @@ const barNew = slide.querySelector('#bar-new');
 const numOld = slide.querySelector('#num-old');
 const numNew = slide.querySelector('#num-new');
 const lblNew = slide.querySelector('#lbl-new');
+const heroOut = slide.querySelector('#hero-out');
 const presets = [...slide.querySelectorAll('.preset-btn')];
+let flashTimer = 0;
 
-// Pure financial model calibrated to pilot baseline (11.4% -> 4.2% saves 34萬/store/yr, 15 trays/store/day, +1.8% net margin)
 function model(stores, rate) {
   const dropRatio = Math.max(0.1, (11.4 - rate) / (11.4 - 4.2));
   const annualSave = Math.round(stores * 34 * dropRatio);
   const oldWaste = Math.round(stores * 53.8);
   const newWaste = Math.max(1, oldWaste - annualSave);
-  const capex = stores * 12; // 12萬/店導入與培訓成本
+  const capex = stores * 12;
   const payback = Math.max(1.0, (capex / Math.max(1, annualSave)) * 12);
   const margin = 1.8 * dropRatio;
   const trays = Math.round(stores * 15 * dropRatio);
   return { annualSave, oldWaste, newWaste, payback, margin, trays };
 }
 
-function render() {
+function render(fromUser) {
   const stores = Number(storesIn.value);
   const rate = Number(rateIn.value);
   const m = model(stores, rate);
@@ -431,14 +437,20 @@ function render() {
     const match = Number(b.dataset.stores) === stores && Math.abs(Number(b.dataset.rate) - rate) < 0.05;
     b.classList.toggle('on', match);
   });
+
+  if (fromUser && heroOut) {
+    heroOut.classList.add('flash');
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => heroOut.classList.remove('flash'), 260);
+  }
 }
 
-storesIn.addEventListener('input', render);
-rateIn.addEventListener('input', render);
+storesIn.addEventListener('input', () => render(true));
+rateIn.addEventListener('input', () => render(true));
 presets.forEach(b => b.addEventListener('click', () => {
   storesIn.value = b.dataset.stores;
   rateIn.value = b.dataset.rate;
-  render();
+  render(true);
 }));
-render();
+render(false);
 </script>

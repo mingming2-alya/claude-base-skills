@@ -1,19 +1,14 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-23｜Phase B 完成 ✅：靜態工藝反寫 ＋ 方案 1 動態引擎實作 ＋ 8 頁全動態單檔示範驗收）**：
+> **最新接手點（2026-11-23｜Phase B.2 完成 ✅：60fps 順滑度重構 ＋ 頁內視線引導編排 ＋ 六種敘事切頁與三數齊飛 Magic Move）**：
 >
-> 1. **靜態視覺工藝與原則 #26 已全數反寫進 `outputs/deck-architect/`（v4.1，28 檔）**：
->    - 新增 `styles/workday.md`（現代 Bento 工作款 Style DNA，淺深雙底＋雙語意色＋`crisp` 動效參數）並在 `styles/index.json` 標記為 `ready`（累計 4 款完整 Style DNA）。
->    - 新增 `references/motion-system.md`（方案 1 分層混合動態手冊與旗艦外掛契約）。
->    - 更新 `SKILL.md`、`references/presentation-rules.md`、`references/samples.md`、`templates/image-upgrade.md` 與 `styles/{apple,counsel,illustration}.md`，寫入**原則 #26（最多 2 層視覺鉤子、口白進講者稿）**、**四大靜態工藝標準**、**反左右割裂 AI 生圖原則**與各風格動態個性參數。
-> 2. **方案 1 分層混合零依賴動態引擎實作完成（~10 KB gzip，100% 離線單檔）**：
->    - `assets/runtime.js`＋`assets/shell.css`：取消 `busy` 鎖死實現**即時可打斷解析彈簧**（預設 `bounce: 0`）；離頁保持 `opacity: 1` 防閃底色；**跨頁 Magic Move（`data-morph`，正反向皆支援＋字色與子標同步過渡）**；**滾動數字（`data-count`）**、**SVG 路徑／圓環描繪（`data-draw`）**、**長條生長（`data-grow`）**、**非等距交錯（`data-stagger`，防父子重複進場）**、**CSS `offset-path` 光點流動**；**離頁即停 30fps Canvas 2D 背景氛圍層（`data-fx`）**；**互動控件隔離（`.live-ctrl`／`.live-only`）**；**雙重靜態保險（`B` 鍵低耗電凍結、`?still=1`、`prefers-reduced-motion`、列印自動隱控件）**；以及 `#stage` 旗艦外掛事件契約。
->    - `scripts/assemble.py` 新增本機圖檔自動 Base64 內嵌（單檔 `deck.html` 隨手拷貝可離線播放）；`scripts/check.mjs` 全面改以 `?still=1` 確定性靜態定格做實測像素 WCAG，並新增 `--motion` 五項動態互動自動檢核。
-> 3. **8 頁完整可播放動態示範 `outputs/examples/v4-alive-demo/deck.html`（1.7 MB 單檔）全部通過驗證**：
->    - `lint.py` 全 5 份 storyboard **0 錯誤、0 警告**；`check.mjs --motion` 8 頁靜態像素對比全過（最低 **`4.70:1`**），5 項動態測試（連按 4 次打斷零鎖死、Magic Move `hero-rate` 跨 4 頁接力、第 6 頁互動 ROI 滑桿點擊隔離與即時重算、`B` 鍵凍結、第 3 頁進附件 `model` 與返回）**全部 ✅**。
->    - 已重新打包 `outputs/deck-architect.skill`（126 KB，28 檔，零 `__pycache__`）。
+> 1. **回應使用者手機實測的三點關鍵體檢，全面升級 `outputs/deck-architect/`（v4.2，28 檔）與 `v4-alive-demo`**：
+>    - **解卡頓（鎖定 60fps）**：拔除第 3 頁 `2320×1480` `<feGaussianBlur stdDeviation="48">`、第 2 頁 `<feTurbulence>` 與第 1 頁 `backdrop-filter: blur(16px)` 等行動端 GPU 殺手，改純 CSS 零耗能漸層光暈；第 2 頁 24 烤盤由 24 個獨立層整合為 4 排輕量波浪；全頁轉場改 2 關鍵影格純 GPU 合成器曲線並禁止整頁 `steps(5)` 跳格感；Canvas 2D 氛圍層降為 `480×270` 並延遲至切頁完成後 520ms 才啟動；數字滾動改 30Hz 節流避免搶排版。
+>    - **頁內視線引導編排（`data-beat` / `data-grow="x-left|y-down"` / `data-spotlight`）**：從「全頁同時淡入」改為明確三拍視線劇本——第 2 頁先看 24→9 烤盤矩陣再引導至左側三痛點與右下 `4.2%` 焦點；第 3 頁平板向外發射 4 條引導線點亮左右標註＋折線由左向右帶至端點；第 4 頁頂部時間細線配 `04:00 → 12:00 → 15:30` 由左到右依序垂降引導針；第 6 頁三指標落地後柔和光環指向左側互動滑桿；第 7 頁先亮唯一紅卡板橋延遲甘特條→引導視線往下看 `11/22` 拍板卡→最後四張綠卡安靜展開。
+>    - **六種敘事切頁變化＋多元素編隊 Magic Move（`data-transition`，支援往回鏡像倒放）**：`1→2` 鏡頭橫移（`push`）、`2→3` 放大聚焦＋`4.2%` 2.6× Magic Move（`zoom-rise`）、`3→4` 由平板中心向外綻放的圓形日光光圈（`iris`）無縫切入紙黏土現場、`4→5` 俐落震撼黑幕（`shock`）、`5→6` **三組財務數字（`+1.8%`、`170 萬`、`4.2 個月`）同步齊飛**進互動試算器（`morph`）、`6→7` 亮色主管決策看板由底升起（`sheet-up`）、`3↔8` 景深縮放附件（`modal`）。
+> 2. **驗證全數通過**：`check.mjs --motion` 8 頁靜態像素 WCAG 最低 **`4.70:1`**、5 項動態檢核全 ✅；手機 390px 實測全 6 種轉場與 3 數齊飛（`midClones=3, postClones=0`）零 JS 錯誤；已重新打包 `outputs/deck-architect.skill`（127 KB，28 檔）。
 >
-> **下一步**：待使用者實際在預覽卡把玩 `v4-alive-demo` 的動態與互動體驗並驗收後，進入 **Phase C｜第一份真實簡報端到端 PK 🎯**。
+> **下一步**：請使用者於手機內嵌播放器實測這版 60fps＋視線引導＋六種切頁升級，確認滿意後進入 **Phase C｜第一份真實簡報端到端 PK 🎯**。
 >
 > 主軸文件是 `ROADMAP.md`，執行紀錄在 `LOG.md`，專案規則在根目錄 `CLAUDE.md`。
 
