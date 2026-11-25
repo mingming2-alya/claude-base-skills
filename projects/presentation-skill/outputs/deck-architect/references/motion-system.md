@@ -49,7 +49,7 @@
 - **因果現場演變（`data-transform-at="780"`）**：
   - HTML 原始 DOM 預設為最終正確態；動態進頁時底盤先掛上 `.pre-transform` 展現舊態（如 24 盤全紅報廢），於指定毫秒移除並短暫掛 `.transforming` 演繹轉變為新態（9 綠＋15 省下虛線），`?still=1` 與打斷時瞬間停在最終態。
 - **語意節拍（`data-beat="1|2|3|4"` + `data-from="left|right|up|down|none"`）**：
-  - `data-beat="1"`（60ms）：首要焦點錨定；`2`（420ms）：變化／引導線；`3`（840ms）：被指向的結論／拍板區；`4`（1260ms）：次要背景支撐（可搭配 `data-delay` 精細微調，總長建議 1.5–2.3 秒）。
+  - `data-beat="1"`（120ms）：首要焦點錨定；`2`（760ms）：變化／引導線；`3`（1480ms）：被指向的結論／拍板區；`4`（2200ms）：次要背景支撐（可搭配 `data-delay` 精細微調；每主要焦點拍停留 **1.3–1.8 秒**讓觀眾從容讀完）。
 - **真描線與方向揭露（零變形、禁對 0 寬高 SVG `<line>` 用 `scaleX/Y`）**：
   - **實線引導線／因果箭頭**：用 SVG `<path d="M 起點 L 終點" data-draw>`（`pathLength="1"`），順視線方向繪出；圓環進度用 `data-draw="ring"`。
   - **虛線引導針／時間軌／斜刪線**：用 HTML 元素加 `data-wipe="down|right|left|up"`（純 GPU `clip-path: inset(...)` 揭露，虛線節距零拉扯）。

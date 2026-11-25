@@ -82,15 +82,19 @@
   display: block;
 }
 
+/* Full-height balanced two-column grid (y=124..986, exact 862px tall on BOTH sides -> zero empty bottom void!) */
 .slide .left {
   position: absolute;
   left: 100px;
   top: 124px;
   width: 720px;
+  height: 862px;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
 }
 .slide h1 {
-  font-size: 76px;
+  font-size: 80px;
   font-weight: 900;
   line-height: 1.08;
   letter-spacing: -0.015em;
@@ -98,7 +102,7 @@
 }
 .slide p.lead {
   margin-top: 20px;
-  font-size: 30px;
+  font-size: 31px;
   font-weight: 600;
   line-height: 1.4;
   color: var(--fg-2);
@@ -106,27 +110,30 @@
 .slide p.lead em { font-style: normal; font-weight: 900; color: var(--mint); }
 
 .slide .ctrl-card {
-  margin-top: 44px;
-  padding: 40px 40px 44px;
-  border-radius: 28px;
+  flex: 1;
+  margin-top: 38px;
+  padding: 44px 44px 40px;
+  border-radius: 30px;
   background: var(--panel);
   border: 1.5px solid rgba(74, 212, 154, 0.30);
   --spot-border: rgba(74, 212, 154, 0.92);
   --spot-glow: rgba(74, 212, 154, 0.24);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.32);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 .slide .preset-row {
   display: flex;
-  gap: 12px;
-  margin-bottom: 36px;
+  gap: 14px;
 }
 .slide .preset-btn {
-  padding: 11px 20px;
+  padding: 13px 22px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--line);
   color: var(--fg-2);
-  font: 700 19px/1 var(--sans);
+  font: 700 20px/1 var(--sans);
   cursor: pointer;
   transition: background .18s ease, border-color .18s ease, color .18s ease;
 }
@@ -136,16 +143,19 @@
   color: #8AF2C5;
 }
 
+.slide .sliders-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
 .slide .slider-block {
-  margin-bottom: 38px;
-  padding: 16px 20px 18px;
-  margin-left: -20px;
-  margin-right: -20px;
-  border-radius: 18px;
+  padding: 20px 22px 22px;
+  margin-left: -22px;
+  margin-right: -22px;
+  border-radius: 20px;
   border: 1px solid transparent;
   transition: background 240ms ease, border-color 240ms ease;
 }
-.slide .slider-block:last-child { margin-bottom: 0; }
 .slide .slider-block.ctrl-active {
   background: rgba(74, 212, 154, 0.07);
   border-color: rgba(74, 212, 154, 0.34);
@@ -154,7 +164,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 .slide .s-label-wrap {
   display: inline-flex;
@@ -162,14 +172,14 @@
   gap: 12px;
 }
 .slide .s-head label {
-  font-size: 23px;
+  font-size: 25px;
   font-weight: 700;
   color: var(--fg);
 }
 .slide .drag-cue {
   display: inline-flex;
   align-items: center;
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 999px;
   background: rgba(74, 212, 154, 0.16);
   border: 1px solid rgba(74, 212, 154, 0.42);
@@ -181,7 +191,7 @@
 .slide .drag-cue.used { opacity: 0; pointer-events: none; }
 .slide .s-val {
   font-family: var(--num);
-  font-size: 40px;
+  font-size: 46px;
   font-weight: 900;
   color: var(--mint);
   font-variant-numeric: tabular-nums;
@@ -189,19 +199,48 @@
 .slide .s-val.gold { color: var(--gold); }
 .slide .s-val small {
   font-family: var(--sans);
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 700;
   margin-left: 5px;
   color: var(--fg-2);
 }
+.slide .live-ctrl input[type="range"] { height: 10px; }
+.slide .live-ctrl input[type="range"]::-webkit-slider-thumb { width: 28px; height: 28px; }
 .slide .s-ticks {
   display: flex;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: 14px;
   font-family: var(--num);
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 600;
   color: var(--muted);
+}
+
+.slide .model-assump {
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.slide .assump-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(243, 241, 235, 0.08);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.slide .assump-item b {
+  font-family: var(--num);
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--fg-2);
+  font-variant-numeric: tabular-nums;
 }
 
 .slide .right {
@@ -209,13 +248,15 @@
   right: 100px;
   top: 124px;
   width: 940px;
+  height: 862px;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 26px;
 }
 .slide .hero-out {
-  padding: 40px 44px;
+  padding: 48px 48px;
+  min-height: 248px;
   border-radius: 30px;
   background: linear-gradient(145deg, rgba(74, 212, 154, 0.16) 0%, rgba(25, 31, 41, 0.96) 55%);
   border: 1.5px solid rgba(74, 212, 154, 0.42);
@@ -229,12 +270,12 @@
   box-shadow: 0 0 0 4px rgba(124, 238, 249, 0.24);
 }
 .slide .hero-out .ho-k {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   color: #A4F5D1;
 }
 .slide .hero-out .ho-tags {
-  margin-top: 12px;
+  margin-top: 16px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -242,18 +283,18 @@
 }
 .slide .hero-out .ho-tag {
   display: inline-block;
-  padding: 7px 16px;
+  padding: 8px 18px;
   border-radius: 999px;
   background: rgba(17, 21, 28, 0.6);
   border: 1px solid rgba(243, 241, 235, 0.16);
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--fg-2);
   font-variant-numeric: tabular-nums;
 }
 .slide .delta-pill {
   display: none;
-  padding: 6px 14px;
+  padding: 7px 14px;
   border-radius: 999px;
   font-family: var(--num);
   font-size: 18px;
@@ -274,7 +315,7 @@
 .slide .hero-out .ho-num {
   display: inline-block;
   font-family: var(--num);
-  font-size: 124px;
+  font-size: 136px;
   font-weight: 900;
   line-height: 0.92;
   letter-spacing: -0.04em;
@@ -283,7 +324,7 @@
 }
 .slide .hero-out .ho-num small {
   font-family: var(--sans);
-  font-size: 36px;
+  font-size: 38px;
   font-weight: 700;
   color: var(--mint);
   margin-left: 8px;
@@ -292,13 +333,17 @@
 .slide .kpi-trio {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
+  gap: 24px;
 }
 .slide .k-card {
-  padding: 32px 30px;
-  border-radius: 24px;
+  padding: 40px 34px;
+  min-height: 214px;
+  border-radius: 26px;
   background: var(--panel);
   border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   transition: border-color .22s ease, box-shadow .24s ease;
 }
 .slide .k-card.k-flash {
@@ -308,7 +353,7 @@
 .slide .k-card b {
   display: inline-block;
   font-family: var(--num);
-  font-size: 56px;
+  font-size: 64px;
   font-weight: 900;
   line-height: 1;
   color: var(--fg);
@@ -318,20 +363,19 @@
 .slide .k-card b.mint { color: var(--mint); }
 .slide .k-card b small {
   font-family: var(--sans);
-  font-size: 22px;
+  font-size: 23px;
   font-weight: 700;
   color: var(--fg-2);
   margin-left: 5px;
 }
 .slide .k-card .k-foot {
-  margin-top: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
 }
 .slide .k-card span.k-lbl {
-  font-size: 21px;
+  font-size: 22px;
   font-weight: 600;
   color: var(--muted);
 }
@@ -347,13 +391,14 @@
 .slide .k-card .k-delta.warn { color: #FFA58E; }
 
 .slide .bar-card {
-  padding: 36px 40px 40px;
-  border-radius: 26px;
+  flex: 1;
+  padding: 44px 44px 40px;
+  border-radius: 28px;
   background: var(--panel);
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  justify-content: space-between;
   transition: border-color .22s ease;
 }
 .slide .bar-card.k-flash {
@@ -363,57 +408,70 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
-  font-size: 22px;
+  font-size: 25px;
   font-weight: 800;
   color: var(--fg);
 }
 .slide .bar-save-pill {
-  padding: 6px 14px;
+  padding: 8px 18px;
   border-radius: 999px;
   background: var(--mint-bg);
   border: 1px solid rgba(74, 212, 154, 0.42);
   font-family: var(--num);
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 800;
   color: #8AF2C5;
   font-variant-numeric: tabular-nums;
 }
+.slide .bar-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
 .slide .bar-row {
   display: grid;
-  grid-template-columns: 165px 1fr 145px;
+  grid-template-columns: 185px 1fr 145px;
   align-items: center;
-  gap: 20px;
+  gap: 22px;
 }
-.slide .bar-row .b-lbl { font-size: 21px; font-weight: 700; color: var(--fg-2); }
+.slide .bar-row .b-lbl { font-size: 22px; font-weight: 700; color: var(--fg-2); }
 .slide .bar-row .b-bg {
-  height: 30px;
-  border-radius: 12px;
+  height: 40px;
+  border-radius: 14px;
   background: var(--panel-2);
   overflow: hidden;
 }
 .slide .bar-row .b-fg {
   height: 100%;
-  border-radius: 12px;
-  transition: width 0.25s cubic-bezier(.16, 1, .3, 1);
+  border-radius: 14px;
+  transition: width 0.30s cubic-bezier(.16, 1, .3, 1);
 }
 .slide .bar-row .b-fg.loss { background: var(--coral); }
 .slide .bar-row .b-fg.now { background: var(--mint); }
 .slide .bar-row .b-num {
   text-align: right;
   font-family: var(--num);
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 900;
   font-variant-numeric: tabular-nums;
   color: var(--fg);
 }
 .slide .bar-row .b-num.loss { color: #FFA28C; }
 .slide .bar-row .b-num.now { color: #82F0C0; }
+.slide .bar-axis {
+  padding-top: 18px;
+  border-top: 1px solid rgba(243, 241, 235, 0.08);
+  display: flex;
+  justify-content: space-between;
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--muted);
+}
 
 .slide .src {
   position: absolute;
   left: 100px;
-  bottom: 24px;
+  bottom: 30px;
   z-index: 2;
   font-size: 18px;
   font-weight: 400;
@@ -421,11 +479,11 @@
 }
 </style>
 <section class="slide canvas" data-nav="inline" data-transition="morph">
-  <!-- Permanent subtle directional linkage arrow in the 60px gap (x=820..880) connecting Controls -> Live Outputs -->
+  <!-- Directional linkage arrow centered vertically on the full-height control card (y=660) -->
   <svg class="link-bridge" id="link-bridge" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
-    <circle class="bridge-dot" cx="826" cy="568" r="4.5" data-pop data-delay="720"/>
-    <path class="bridge-stroke" d="M 826 568 L 870 568" fill="none" stroke-width="2.6" stroke-linecap="round" data-draw data-delay="760" data-dur="320"/>
-    <path class="bridge-stroke" d="M 860 558 L 872 568 L 860 578" fill="none" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" data-pop data-delay="1040"/>
+    <circle class="bridge-dot" cx="826" cy="660" r="5" data-pop data-delay="1060"/>
+    <path class="bridge-stroke" d="M 826 660 L 870 660" fill="none" stroke-width="2.8" stroke-linecap="round" data-draw data-delay="1120" data-dur="460"/>
+    <path class="bridge-stroke" d="M 860 650 L 872 660 L 860 670" fill="none" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" data-pop data-delay="1540"/>
   </svg>
 
   <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
@@ -435,33 +493,40 @@
     <h1 data-role="title">五店效益即時試算</h1>
     <p class="lead" data-role="summary">拉動門市與報廢目標，<em>即時看年省與回本</em>。</p>
 
-    <!-- Beat 2 (after 3 financial numbers finish Magic Move at ~680ms): high-contrast emerald spotlight + drag nudge -->
-    <div class="ctrl-card live-ctrl live-only" data-interactive data-beat="2" data-delay="640" data-from="left" data-spotlight>
+    <!-- Calm Beat 2 (after 3 financial numbers finish Magic Move at ~820ms): spotlight + drag nudge -->
+    <div class="ctrl-card live-ctrl live-only" data-interactive data-beat="2" data-delay="960" data-from="left" data-spotlight>
       <div class="preset-row" role="group" aria-label="快速情境">
         <button type="button" class="preset-btn" data-stores="1" data-rate="4.2">單店試點</button>
         <button type="button" class="preset-btn on" data-stores="5" data-rate="4.2">Q4 五店（提案）</button>
         <button type="button" class="preset-btn" data-stores="12" data-rate="4.5">全區 12 店</button>
       </div>
 
-      <div class="slider-block" id="block-stores">
-        <div class="s-head">
-          <span class="s-label-wrap">
-            <label for="sim-stores">導入門市數</label>
-            <span class="drag-cue live-only" id="drag-cue" data-nudge="x" data-delay="960">⇄ 拖曳試算</span>
-          </span>
-          <span class="s-val" id="out-stores">5<small>家</small></span>
+      <div class="sliders-wrap">
+        <div class="slider-block" id="block-stores">
+          <div class="s-head">
+            <span class="s-label-wrap">
+              <label for="sim-stores">導入門市數</label>
+              <span class="drag-cue live-only" id="drag-cue" data-nudge="x" data-delay="1650">⇄ 拖曳試算</span>
+            </span>
+            <span class="s-val" id="out-stores">5<small>家</small></span>
+          </div>
+          <input id="sim-stores" type="range" min="1" max="15" step="1" value="5">
+          <div class="s-ticks"><span>1 家</span><span>5 家</span><span>10 家</span><span>15 家</span></div>
         </div>
-        <input id="sim-stores" type="range" min="1" max="15" step="1" value="5">
-        <div class="s-ticks"><span>1 家</span><span>5 家</span><span>10 家</span><span>15 家</span></div>
+
+        <div class="slider-block" id="block-rate">
+          <div class="s-head">
+            <label for="sim-rate">目標報廢率</label>
+            <span class="s-val gold" id="out-rate">4.2<small>%</small></span>
+          </div>
+          <input id="sim-rate" type="range" min="3.5" max="6.0" step="0.1" value="4.2">
+          <div class="s-ticks"><span>3.5%</span><span>4.2% 實測</span><span>6.0% 紅線</span></div>
+        </div>
       </div>
 
-      <div class="slider-block" id="block-rate">
-        <div class="s-head">
-          <label for="sim-rate">目標報廢率</label>
-          <span class="s-val gold" id="out-rate">4.2<small>%</small></span>
-        </div>
-        <input id="sim-rate" type="range" min="3.5" max="6.0" step="0.1" value="4.2">
-        <div class="s-ticks"><span>3.5%</span><span>4.2% 實測</span><span>6.0% 紅線</span></div>
+      <div class="model-assump">
+        <div class="assump-item"><span>單店建置</span><b>12 萬</b></div>
+        <div class="assump-item"><span>預估總投入</span><b id="out-capex">60 萬</b></div>
       </div>
     </div>
   </div>
@@ -487,26 +552,32 @@
         <b class="mint" id="out-margin" data-morph="hero-margin">+1.8<small>%</small></b>
         <div class="k-foot"><span class="k-lbl">單店淨利提升</span><span class="k-delta" id="delta-margin"></span></div>
       </div>
-      <div class="k-card" id="card-trays" data-beat="3" data-delay="740">
+      <div class="k-card" id="card-trays" data-beat="3" data-delay="1120">
         <b id="out-trays">75<small>盤／日</small></b>
         <div class="k-foot"><span class="k-lbl">全區少丟麵包</span><span class="k-delta" id="delta-trays"></span></div>
       </div>
     </div>
 
-    <div class="bar-card" id="bar-card" data-beat="3" data-delay="820">
+    <div class="bar-card" id="bar-card" data-beat="3" data-delay="1280">
       <div class="bar-title">
         <strong>年度報廢原料支出對照</strong>
         <span class="bar-save-pill" id="bar-save-tag">年省 170 萬</span>
       </div>
-      <div class="bar-row">
-        <span class="b-lbl">未導入（11.4%）</span>
-        <div class="b-bg"><div class="b-fg loss" id="bar-old" style="width:92%" data-grow="x" data-delay="880"></div></div>
-        <span class="b-num loss" id="num-old">269 萬</span>
+      <div class="bar-rows">
+        <div class="bar-row">
+          <span class="b-lbl">未導入（11.4%）</span>
+          <div class="b-bg"><div class="b-fg loss" id="bar-old" style="width:92%" data-grow="x" data-delay="1420" data-dur="740"></div></div>
+          <span class="b-num loss" id="num-old">269 萬</span>
+        </div>
+        <div class="bar-row">
+          <span class="b-lbl" id="lbl-new">導入後（4.2%）</span>
+          <div class="b-bg"><div class="b-fg now" id="bar-new" style="width:34%" data-grow="x" data-delay="1620" data-dur="740"></div></div>
+          <span class="b-num now" id="num-new">99 萬</span>
+        </div>
       </div>
-      <div class="bar-row">
-        <span class="b-lbl" id="lbl-new">導入後（4.2%）</span>
-        <div class="b-bg"><div class="b-fg now" id="bar-new" style="width:34%" data-grow="x" data-delay="960"></div></div>
-        <span class="b-num now" id="num-new">99 萬</span>
+      <div class="bar-axis">
+        <span>未導入基準：常態 11.4% 報廢率</span>
+        <span id="bar-ratio-tag">報廢原料支出 −63%</span>
       </div>
     </div>
   </div>
@@ -527,11 +598,13 @@ const outSave = slide.querySelector('#out-save');
 const outPayback = slide.querySelector('#out-payback');
 const outMargin = slide.querySelector('#out-margin');
 const outTrays = slide.querySelector('#out-trays');
+const outCapex = slide.querySelector('#out-capex');
 const deltaSave = slide.querySelector('#delta-save');
 const deltaPayback = slide.querySelector('#delta-payback');
 const deltaMargin = slide.querySelector('#delta-margin');
 const deltaTrays = slide.querySelector('#delta-trays');
 const barSaveTag = slide.querySelector('#bar-save-tag');
+const barRatioTag = slide.querySelector('#bar-ratio-tag');
 const barOld = slide.querySelector('#bar-old');
 const barNew = slide.querySelector('#bar-new');
 const numOld = slide.querySelector('#num-old');
@@ -552,7 +625,8 @@ function model(stores, rate) {
   const payback = Math.max(1.0, (capex / Math.max(1, annualSave)) * 12);
   const margin = 1.8 * dropRatio;
   const trays = Math.round(stores * 15 * dropRatio);
-  return { annualSave, oldWaste, newWaste, payback, margin, trays };
+  const pctDrop = Math.round((annualSave / Math.max(1, oldWaste)) * 100);
+  return { annualSave, oldWaste, newWaste, capex, payback, margin, trays, pctDrop };
 }
 const BASE = model(5, 4.2);
 
@@ -583,7 +657,9 @@ function render(fromUser, source) {
   outPayback.innerHTML = m.payback.toFixed(1) + '<small>個月</small>';
   outMargin.innerHTML = '+' + m.margin.toFixed(1) + '<small>%</small>';
   outTrays.innerHTML = m.trays + '<small>盤／日</small>';
+  if (outCapex) outCapex.textContent = m.capex + ' 萬';
   barSaveTag.textContent = '年省 ' + m.annualSave + ' 萬';
+  if (barRatioTag) barRatioTag.textContent = '報廢原料支出 −' + m.pctDrop + '%';
   lblNew.textContent = '導入後（' + rate.toFixed(1) + '%）';
   numOld.textContent = m.oldWaste + ' 萬';
   numNew.textContent = m.newWaste + ' 萬';
@@ -615,7 +691,7 @@ function render(fromUser, source) {
       if (linkBridge) linkBridge.classList.remove('pulse');
       if (barCard) barCard.classList.remove('k-flash');
       kCards.forEach(c => c.classList.remove('k-flash'));
-    }, 340);
+    }, 380);
   }
 }
 

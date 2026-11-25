@@ -593,7 +593,7 @@ async function runMotionAudit(driver, filePath) {
     await driver.evaluate(i => window.__deck.go(i, false), morphPair.to);
     await driver.wait(120);
     const midCount = await driver.evaluate(() => document.getElementById('morph-layer')?.children.length || 0);
-    await driver.wait(1000);
+    await driver.wait(1250);
     const post = await driver.evaluate(({ to, id }) => {
       const layer = document.getElementById('morph-layer')?.children.length || 0;
       const target = window.__deck.slides[to].querySelector(`[data-morph="${id}"]`);
@@ -602,7 +602,7 @@ async function runMotionAudit(driver, filePath) {
     }, morphPair);
     // Test backward Magic Move too
     await driver.evaluate(i => window.__deck.go(i, false), morphPair.from);
-    await driver.wait(1050);
+    await driver.wait(1250);
     const backPost = await driver.evaluate(() => document.getElementById('morph-layer')?.children.length || 0);
     if (midCount > 0 && post.layer === 0 && post.vis === 'visible' && backPost === 0) {
       results.push(`跨頁 Magic Move（第 ${morphPair.from + 1} ↔ ${morphPair.to + 1} 頁 \`${morphPair.id}\`）：通過（飛行中 clone=${midCount}，落地清理完整）`);

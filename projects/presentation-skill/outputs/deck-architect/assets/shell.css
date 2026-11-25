@@ -68,8 +68,8 @@
   --motion-mode: spring;
   --spring-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
-  --stagger-base: 46;
-  --morph-ms: 680;
+  --stagger-base: 64;
+  --morph-ms: 780;
 }
 
 html, body {
@@ -222,16 +222,16 @@ mark.em {
   }
 }
 .spot-pulse {
-  animation: deck-spotlight-ring 960ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+  animation: deck-spotlight-ring 1250ms cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
 /* Phase B.3 3-tier focus dimming + high-contrast spotlight choreographer ([data-focus-plan] + [data-focus]) */
 #stage .slide [data-focus] {
   transition:
-    opacity 380ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 420ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 360ms ease;
+    opacity 500ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 540ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 540ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 460ms ease;
 }
 #stage .slide.is-focusing [data-focus].focus-dim {
   opacity: var(--focus-dim-opacity, 0.30);

@@ -277,33 +277,32 @@
 }
 </style>
 <section class="slide canvas" data-nav="inline" data-transition="zoom-rise" data-fx="soft-aurora">
-  <!-- Phase B.3 Hub -> Left Cluster -> Right Cluster (ZERO ping-pong, TRUE directional SVG pathLength="1" draw + synced anchor pops!) -->
+  <!-- Phase B.3 Hub -> Left Cluster -> Right Cluster (Calm human-reading cadence, ZERO ping-pong) -->
   <svg class="leaders" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
     <g stroke="rgba(124,238,249,0.58)" stroke-width="2.2" fill="none" stroke-linecap="round">
-      <!-- Left Cluster (Beat 2: draws genuinely RIGHT->LEFT from tablet rim 556 to callout 486) -->
-      <path d="M 556 628 L 486 628" data-draw data-delay="1020" data-dur="320"/>
-      <path d="M 556 858 L 486 858" data-draw data-delay="1090" data-dur="320"/>
-      <!-- Right Cluster (Beat 3: draws genuinely LEFT->RIGHT from tablet rim 1364 to callout 1434) -->
-      <path d="M 1364 628 L 1434 628" data-draw data-delay="1500" data-dur="320"/>
-      <path d="M 1364 858 L 1434 858" data-draw data-delay="1570" data-dur="320"/>
+      <!-- Left Cluster (Beat 2: 1.95s) -->
+      <path d="M 556 628 L 486 628" data-draw data-delay="1940" data-dur="480"/>
+      <path d="M 556 858 L 486 858" data-draw data-delay="2060" data-dur="480"/>
+      <!-- Right Cluster (Beat 3: 3.15s) -->
+      <path d="M 1364 628 L 1434 628" data-draw data-delay="3140" data-dur="480"/>
+      <path d="M 1364 858 L 1434 858" data-draw data-delay="3260" data-dur="480"/>
     </g>
     <g fill="#7CEEF9">
-      <!-- Rim anchor dots pop RIGHT as each cluster launches (never floating prematurely!) -->
-      <circle cx="556" cy="628" r="5" data-pop data-delay="960"/>
-      <circle cx="556" cy="858" r="5" data-pop data-delay="1030"/>
-      <circle cx="1364" cy="628" r="5" data-pop data-delay="1440"/>
-      <circle cx="1364" cy="858" r="5" data-pop data-delay="1510"/>
+      <circle cx="556" cy="628" r="5" data-pop data-delay="1840"/>
+      <circle cx="556" cy="858" r="5" data-pop data-delay="1960"/>
+      <circle cx="1364" cy="628" r="5" data-pop data-delay="3040"/>
+      <circle cx="1364" cy="858" r="5" data-pop data-delay="3160"/>
     </g>
   </svg>
 
   <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
 
-  <header data-beat="1" data-delay="40" data-from="none">
+  <header data-beat="1" data-delay="60" data-from="none">
     <h1 data-role="title">星塵預報<span class="ver">2.0</span></h1>
     <p class="tag" data-role="summary">凌晨四點，算好<em>剛剛好的出爐量</em>。</p>
   </header>
 
-  <!-- Beat 1 (0.15-0.92s): Center tablet is the SOLE focal stage while 8-week curve draws into 4.2% endpoint ripple -->
+  <!-- Beat 1 (0.2-1.75s): Center tablet holds center stage while 8-week curve draws smoothly into endpoint ripple -->
   <div class="device-shell">
     <div class="device">
       <div class="dev-top">
@@ -316,7 +315,7 @@
           <div class="metric-k">預估報廢率</div>
           <div class="metric-v">
             <b data-morph="hero-rate">4.2<small>%</small></b>
-            <span class="badge-ok" data-pop data-delay="740">低於 6% 紅線</span>
+            <span class="badge-ok" data-pop data-delay="1120">低於 6% 紅線</span>
           </div>
 
           <div class="chart-box">
@@ -337,11 +336,11 @@
                       fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="2" stroke-dasharray="6 5"/>
                 <path d="M 8 56 C 54 68, 94 88, 146 98 C 202 109, 260 116, 322 120 L 322 150 L 8 150 Z" fill="url(#areaG)"/>
                 <path d="M 8 56 C 54 68, 94 88, 146 98 C 202 109, 260 116, 322 120"
-                      fill="none" stroke="#4BE2A5" stroke-width="3.2" stroke-linecap="round" data-draw data-delay="220" data-dur="640"/>
-                <circle cx="322" cy="120" r="6" fill="#7CEEF9" data-pop data-delay="820"/>
-                <circle cx="322" cy="120" r="12" fill="#7CEEF9" opacity="0.22" data-pop data-delay="820"/>
+                      fill="none" stroke="#4BE2A5" stroke-width="3.2" stroke-linecap="round" data-draw data-delay="360" data-dur="960"/>
+                <circle cx="322" cy="120" r="6" fill="#7CEEF9" data-pop data-delay="1260"/>
+                <circle cx="322" cy="120" r="12" fill="#7CEEF9" opacity="0.22" data-pop data-delay="1260"/>
               </svg>
-              <span class="target-ripple" style="left:322px;top:120px;--ripple-color:#7CEEF9;--ripple-soft:rgba(124,238,249,0.28)" data-ripple data-delay="820" aria-hidden="true"></span>
+              <span class="target-ripple" style="left:322px;top:120px;--ripple-color:#7CEEF9;--ripple-soft:rgba(124,238,249,0.28)" data-ripple data-delay="1260" aria-hidden="true"></span>
               <div class="trend-token flow-token" aria-hidden="true"></div>
             </div>
           </div>
@@ -351,40 +350,40 @@
           <div class="batch-title">建議出爐盤數</div>
           <div class="batch-row hl">
             <div class="b-top"><strong>招牌鹽可頌</strong><b>18 盤</b></div>
-            <div class="b-track"><div class="b-fill" style="width:86%" data-grow="x" data-delay="340" data-dur="440"></div></div>
+            <div class="b-track"><div class="b-fill" style="width:86%" data-grow="x" data-delay="560" data-dur="620"></div></div>
           </div>
           <div class="batch-row">
             <div class="b-top"><strong>酸種歐包</strong><b>6 盤</b></div>
-            <div class="b-track"><div class="b-fill" style="width:42%" data-grow="x" data-delay="440" data-dur="440"></div></div>
+            <div class="b-track"><div class="b-fill" style="width:42%" data-grow="x" data-delay="740" data-dur="620"></div></div>
           </div>
           <div class="batch-row">
             <div class="b-top"><strong>職人生吐司</strong><b>10 盤</b></div>
-            <div class="b-track"><div class="b-fill" style="width:62%" data-grow="x" data-delay="540" data-dur="440"></div></div>
+            <div class="b-track"><div class="b-fill" style="width:62%" data-grow="x" data-delay="920" data-dur="620"></div></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Beat 2 (Left Cluster — 成效與成因): arrives smoothly RIGHT as the two left paths touch! -->
-  <div class="side left" style="top:586px" data-beat="3" data-delay="1180" data-from="right">
+  <!-- Beat 2 (Left Cluster — 成效與成因): unhurried 1.1s reading window -->
+  <div class="side left" style="top:586px" data-beat="3" data-delay="2200" data-from="right">
     <div class="hero-val accent">−63%</div>
     <div class="label">打烊報廢盤數</div>
   </div>
-  <div class="side left" style="top:820px" data-beat="3" data-delay="1250" data-from="right">
+  <div class="side left" style="top:820px" data-beat="3" data-delay="2340" data-from="right">
     <div class="hero-title">氣象 × 連假</div>
     <div class="label">雨天自動減量</div>
   </div>
 
-  <!-- Beat 3 (Right Cluster — 效率與回報): arrives smoothly RIGHT as the two right paths touch! -->
-  <div class="side right" style="top:586px" data-beat="4" data-delay="1660" data-from="left">
+  <!-- Beat 3 (Right Cluster — 效率與回報): unhurried 1.1s reading window -->
+  <div class="side right" style="top:586px" data-beat="4" data-delay="3400" data-from="left">
     <div class="hero-val">12<small>分鐘</small></div>
     <div class="label">清晨確認排程</div>
   </div>
-  <div class="side right" style="top:820px" data-beat="4" data-delay="1730" data-from="left">
+  <div class="side right" style="top:820px" data-beat="4" data-delay="3540" data-from="left">
     <div class="hero-val">34<small>萬</small></div>
     <div class="label">單店年省原料</div>
   </div>
 
-  <button class="app-trigger live-only" type="button" data-link="model" data-beat="4" data-delay="1940" data-spotlight>預報模型輸入 →</button>
+  <button class="app-trigger live-only" type="button" data-link="model" data-beat="4" data-delay="4020" data-spotlight>預報模型輸入 →</button>
 </section>

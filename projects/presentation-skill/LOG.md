@@ -1356,3 +1356,27 @@
   - `lint.py` 全 3 份範例 0 錯 0 警；`check.mjs --jpg --motion` 全 8 頁靜態像素 WCAG 全過（最低 **`4.70:1`**）、**7 項動態與視覺指引實測全 ✅**；390px 手機實測全轉場與第 5→6 頁三數齊飛（`mid=3, post=0`）零 JS 錯誤；`annual-section` 與 `progress-overview` 商務元件回歸組裝通過；重新打包 `outputs/deck-architect.skill`（135 KB，29 檔）；並產出含行動端一鍵 `↺ 重播` 列的獨立互動預覽頁（`v4_alive_demo_b3.html`）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,references/visual-guidance.md,references/motion-system.md,references/presentation-rules.md,assets/shell.css,assets/runtime.js,scripts/check.mjs}`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
 - **下一步**：待使用者於互動預覽播放器實測 Phase B.3 視覺指引體感，確認後啟動 **Phase C｜第一份真實簡報端到端 PK 🎯**。
+
+## 2026-11-24｜Phase B.3.1 實測精修：閱讀節奏從容化 ＋ 試算頁滿版均衡 ＋ 看板頁左主軸→右總覽重排
+
+- **使用者於互動預覽播放器實測 Phase B.3 後的 3 點回饋**：
+  1. 整體動態效果速度偏快，沒辦法讓人好好閱讀。
+  2. 試算頁（第 6 頁）整個畫面的下方空白很大，畫面不協調。
+  3. 看板頁（第 7 頁）視覺指引很好，但排列順序很亂：會從左上到中下，再看向四散的小卡片。
+- **系統性修正與反寫規格（同步更新 `outputs/deck-architect/` 與 `outputs/examples/v4-alive-demo/`）**：
+  1. **從容閱讀節奏校準（全底盤＋規格＋全 8 頁）**：
+     - 更新 `references/visual-guidance.md`、`references/motion-system.md`、`assets/shell.css`、`assets/runtime.js`：將每個視覺焦點停留拉長至 **1.3–1.8 秒**（多階段頁總演繹 3.2–4.6 秒），`BEAT_MS` 調慢為 `{1:120, 2:760, 3:1480, 4:2200}`，切頁轉場校準為 `620–780ms`（`--morph-ms: 780`），仍維持 100% 零鎖死可隨時打斷；同步將 `scripts/check.mjs` Magic Move 靜止等待調整至 `1250ms` 以配合從容飛移。
+     - 全 8 頁（`01–08*.html`）逐頁重校時序：第 2 頁進場先停足 1.35 秒看清 24 紅烤盤再 4 排波浪削去（`0–2900 / 2900–4450ms`）；第 3 頁依序中央平板（0–1.75s）→ 左集群（1.85–2.95s）→ 右集群（3.05–4.15s）；第 4 頁時間軌光珠以 2.88 秒順滑走過三站（每站 1.45s）；第 5、6、7、8 頁同步放緩。
+  2. **第 6 頁（現場互動試算）消除下方大片空白（`06-live-simulator.html`＋`visual-guidance.md`）**：
+     - 寫入「16:9 底部基線對齊鐵律」至 `references/visual-guidance.md`：互動試算與雙欄比較頁主體高度須與同簡報基線齊平（約 `y = 124..986px`），嚴禁底部留出大面積黑底空洞。
+     - 將左右兩欄同步設為 `top: 124px; height: 862px` 精準齊底：左 `.ctrl-card` 改 `flex: 1` 均分上下空間，並於底部加入雙格即時參數列（`單店建置 12 萬` ｜ 隨門市數動態更新的 `預估總投入 60 萬`，同時消除原本 `11.4%` 三重重複）；右欄放大年省主卡（`min-height: 248px`）、三張 KPI 卡（`min-height: 214px`）與支出對照長條卡（`flex: 1`，40px 條高＋底部即時 `報廢原料支出 −63%` 比例列）；左右因果連接箭頭置中於控制卡中軸 `y = 660px`。
+  3. **第 7 頁（現代 Bento 進度看板）重組為「左欄行動主軸 → 右欄健康總覽」二區動線（`07-bento-status.html`＋`styles/workday.md`＋`visual-guidance.md`）**：
+     - 將「空間分群防四散鐵律」反寫進 `styles/workday.md` 與 `references/visual-guidance.md`：Bento 儀表板禁止讓風險與拍板跨欄斜跳或讓正常項目四散角落。
+     - **左欄行動主軸（`x: 96..920`, `w: 824px`）**：Stage 1（`0–1750ms`）左上「板橋車站店｜延遲 1 週」甘特紅條衝破 `12/01` 紅線 → 沿 `x = 508px` **垂直正向下**赤橘因果箭頭＋落點波紋 → Stage 2（`1750–3450ms`）正下方同寬「板橋店收銀回傳解法｜11/22 前拍板」（同步修正 `.opt-tag` 選擇器權重讓「建議方案 A／過渡方案 B」以俐落膠囊呈現、選項卡垂直置中均衡）。
+     - **右欄健康總覽群組（`x: 956..1824`, `w: 868px`）**：Stage 3（`3450–4650ms`）整欄平順由 0.30 亮至 1.00（明確關閉群組容器的縮放與外陰影），由上而下單調遞減排序「五店整體完成度 51%（寬卡＋五店迷你柱）」→「信義 100%｜東區 75%（並排雙圓環）」→「中南二店接棒（台中 25%｜高雄 10%，與左欄精準齊底 `y = 1014px`）」。
+- **驗證與交付**：
+  - `lint.py` 全 3 份範例（`v4-alive-demo`、`annual-section`、`progress-overview`）0 錯 0 警，商務元件回歸組裝通過。
+  - `check.mjs --jpg --motion` 全 8 頁真實像素 WCAG 全通過（最低 **`4.70:1`**）、**7 項動態與視覺指引實測全 ✅**；逐張肉眼檢視桌機 `slide-06.jpg`／`slide-07.jpg` 與 390px 手機中場截圖（第 5→6 頁三數齊飛 `mid=3, post=0`、第 6 頁點 `全區 12 店` 即時重算 `391 萬／年` 與 `預估總投入 144 萬`、第 7 頁 Stage 1→2→3→終態零殘留、零 JS 錯誤）。
+  - 重新打包 `outputs/deck-architect.skill`（29 檔，零 `__pycache__`），並重建互動預覽成品 `v4_alive_demo_b3.html` 且經 Chrome 實測各頁切換與 `↺ 重播` 零錯誤。
+- **同步的檔案**：`outputs/deck-architect/{assets/shell.css,assets/runtime.js,references/visual-guidance.md,references/motion-system.md,styles/workday.md,scripts/check.mjs}`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：請使用者透過更新版互動預覽實測這 3 項精修，確認到位後啟動 **Phase C｜第一份真實簡報端到端 PK 🎯**。

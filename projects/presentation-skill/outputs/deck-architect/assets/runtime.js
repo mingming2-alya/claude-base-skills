@@ -252,8 +252,8 @@
     return out.sort((a, b) => a.start - b.start);
   }
 
-  // Semantic beat delay helper: Beat 1 = immediate anchor, Beat 2 = causal visual cue, Beat 3 = takeaway, Beat 4 = supporting
-  const BEAT_MS = { '1': 60, '2': 420, '3': 840, '4': 1260 };
+  // Semantic beat delay helper: Beat 1 = immediate anchor, Beat 2 = causal cue, Beat 3 = takeaway, Beat 4 = supporting
+  const BEAT_MS = { '1': 120, '2': 760, '3': 1480, '4': 2200 };
   function beatDelay(el, fallback) {
     if (el.dataset.delay !== undefined) return parseFloat(el.dataset.delay) || 0;
     const b = el.dataset.beat;
@@ -304,14 +304,14 @@
 
     // 0b. Live Causal State Transformation ([data-transform-at="ms"]: .pre-transform -> final DOM state)
     sl.querySelectorAll('[data-transform-at]').forEach(el => {
-      const ms = parseFloat(el.dataset.transformAt) || 720;
+      const ms = parseFloat(el.dataset.transformAt) || 1200;
       el.classList.remove('transforming');
       el.classList.add('pre-transform');
       later(() => {
         if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
         el.classList.remove('pre-transform');
         el.classList.add('transforming');
-        later(() => { el.classList.remove('transforming'); }, 760);
+        later(() => { el.classList.remove('transforming'); }, 840);
       }, baseDelay + ms);
     });
 
@@ -319,15 +319,15 @@
     const staggeredSet = new Set();
     sl.querySelectorAll('[data-stagger]').forEach(group => {
       const stepMs = parseFloat(group.getAttribute('data-stagger')) || cfg.staggerBase;
-      const gDelay = baseDelay + beatDelay(group, 100);
+      const gDelay = baseDelay + beatDelay(group, 140);
       const items = [...group.children].filter(el => el.nodeType === 1);
       items.forEach((el, i) => {
         staggeredSet.add(el);
         if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
-        const d = gDelay + Math.round(stepMs * Math.pow(i, 0.78));
+        const d = gDelay + Math.round(stepMs * Math.pow(i, 0.82));
         trackAnim(el.animate(
-          [{ opacity: 0, transform: 'translate3d(0,14px,0)' }, { opacity: 1, transform: 'none' }],
-          { duration: 420, delay: d, easing: cfg.ease, fill: 'backwards' }
+          [{ opacity: 0, transform: 'translate3d(0,16px,0)' }, { opacity: 1, transform: 'none' }],
+          { duration: 560, delay: d, easing: cfg.ease, fill: 'backwards' }
         ));
       });
     });
@@ -343,7 +343,7 @@
       ) return;
       if (el.parentElement && el.parentElement.closest('.rv, [data-stagger]')) return;
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
-      const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.82)));
+      const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)));
       const dir = el.dataset.from || 'up';
       const fromT = dir === 'left' ? 'translate3d(-24px,0,0)'
         : dir === 'right' ? 'translate3d(24px,0,0)'
@@ -352,18 +352,18 @@
         : 'translate3d(0,18px,0)';
       trackAnim(el.animate(
         [{ opacity: 0, transform: fromT }, { opacity: 1, transform: 'none' }],
-        { duration: 460, delay: d, easing: cfg.ease, fill: 'backwards' }
+        { duration: 600, delay: d, easing: cfg.ease, fill: 'backwards' }
       ));
     });
 
     // 3. Mobile-visible high-contrast spotlight cues ([data-spotlight])
     sl.querySelectorAll('[data-spotlight]').forEach(el => {
       el.classList.remove('spot-pulse');
-      const d = baseDelay + beatDelay(el, 380);
+      const d = baseDelay + beatDelay(el, 540);
       later(() => {
         if (token !== navToken || isStatic()) return;
         el.classList.add('spot-pulse');
-        later(() => el.classList.remove('spot-pulse'), 1020);
+        later(() => el.classList.remove('spot-pulse'), 1320);
       }, d);
     });
 
@@ -379,8 +379,8 @@
       const hasComma = numRaw.includes(',');
       const dec = numRaw.includes('.') ? numRaw.split('.')[1].length : 0;
       const target = parseFloat(numRaw.replace(/,/g, ''));
-      const dur = parseFloat(el.dataset.dur) || 580;
-      const delay = baseDelay + beatDelay(el, 220);
+      const dur = parseFloat(el.dataset.dur) || 820;
+      const delay = baseDelay + beatDelay(el, 280);
       const fmt = v => {
         let s = dec > 0 ? v.toFixed(dec) : String(Math.round(v));
         if (hasComma) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -397,7 +397,7 @@
         if (p >= 1) { tn.nodeValue = finalStr; return; }
         if (now - lastPaint >= 30) {
           lastPaint = now;
-          const eased = 1 - Math.pow(2, -9 * p);
+          const eased = 1 - Math.pow(2, -8 * p);
           tn.nodeValue = fmt(target * eased);
         }
         id = requestAnimationFrame(tick);
@@ -409,8 +409,8 @@
 
     // 5. True SVG stroke draw & progress rings ([data-draw])
     sl.querySelectorAll('[data-draw]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 220);
-      const dur = parseFloat(el.dataset.dur) || 720;
+      const delay = baseDelay + beatDelay(el, 280);
+      const dur = parseFloat(el.dataset.dur) || 880;
       if (el.getAttribute('data-draw') === 'ring') {
         const circ = parseFloat(el.dataset.circ || '0');
         const fin = parseFloat(el.dataset.ringFinal || '0');
@@ -422,7 +422,7 @@
       } else if (el.dataset.drawDashed) {
         trackAnim(el.animate(
           [{ opacity: 0 }, { opacity: 1 }],
-          { duration: Math.min(380, dur), delay, easing: EASE_CRISP, fill: 'backwards' }
+          { duration: Math.min(480, dur), delay, easing: EASE_CRISP, fill: 'backwards' }
         ));
       } else {
         el.style.strokeDasharray = '1';
@@ -439,8 +439,8 @@
     // 6. Directional bar growth ([data-grow="x|x-left|y|y-down"])
     sl.querySelectorAll('[data-grow]').forEach((el, idx) => {
       const dir = (el.getAttribute('data-grow') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 160 + idx * 45);
-      const dur = parseFloat(el.dataset.dur) || 560;
+      const delay = baseDelay + beatDelay(el, 220 + idx * 65);
+      const dur = parseFloat(el.dataset.dur) || 720;
       if (el instanceof SVGElement) el.style.transformBox = 'fill-box';
       if (dir === 'x-left') {
         el.style.transformOrigin = 'right center';
@@ -460,8 +460,8 @@
     // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"]) — zero dash distortion!
     sl.querySelectorAll('[data-wipe]').forEach(el => {
       const dir = (el.getAttribute('data-wipe') || 'right').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 220);
-      const dur = parseFloat(el.dataset.dur) || 440;
+      const delay = baseDelay + beatDelay(el, 280);
+      const dur = parseFloat(el.dataset.dur) || 540;
       const fromClip = dir === 'left' ? 'inset(0 0 0 100%)'
         : dir === 'down' ? 'inset(0 0 100% 0)'
         : dir === 'up' ? 'inset(100% 0 0 0)'
@@ -474,22 +474,22 @@
 
     // 8. Endpoint dot / arrowhead / badge crisp pop ([data-pop])
     sl.querySelectorAll('[data-pop]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 260);
-      const dur = parseFloat(el.dataset.dur) || 260;
+      const delay = baseDelay + beatDelay(el, 320);
+      const dur = parseFloat(el.dataset.dur) || 340;
       if (el instanceof SVGElement) {
         el.style.transformBox = 'fill-box';
         el.style.transformOrigin = 'center center';
       }
       trackAnim(el.animate(
         [{ opacity: 0, transform: 'scale(0.22)' }, { opacity: 1, transform: 'scale(1)' }],
-        { duration: dur, delay, easing: 'cubic-bezier(0.22, 1.28, 0.36, 1)', fill: 'backwards' }
+        { duration: dur, delay, easing: 'cubic-bezier(0.22, 1.24, 0.36, 1)', fill: 'backwards' }
       ));
     });
 
     // 9. Target-lock concentric ripple ([data-ripple])
     sl.querySelectorAll('[data-ripple]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 480);
-      const dur = parseFloat(el.dataset.dur) || 820;
+      const delay = baseDelay + beatDelay(el, 560);
+      const dur = parseFloat(el.dataset.dur) || 1050;
       trackAnim(el.animate(
         [
           { opacity: 0, transform: 'scale(0.35)' },
@@ -504,8 +504,8 @@
     sl.querySelectorAll('[data-travel]').forEach(el => {
       const axis = (el.getAttribute('data-travel') || 'x').toLowerCase();
       const dist = parseFloat(el.dataset.travelDist || '800');
-      const delay = baseDelay + beatDelay(el, 280);
-      const dur = parseFloat(el.dataset.dur) || 1200;
+      const delay = baseDelay + beatDelay(el, 320);
+      const dur = parseFloat(el.dataset.dur) || 2400;
       const p0 = 'translate3d(0,0,0)';
       const p1 = axis === 'y'
         ? 'translate3d(0,' + (dist * 0.05).toFixed(1) + 'px,0)'
@@ -516,19 +516,19 @@
       trackAnim(el.animate(
         [
           { opacity: 0, transform: p0 + ' scale(0.5)' },
-          { opacity: 1, transform: p1 + ' scale(1)', offset: 0.06 },
-          { opacity: 1, transform: p2 + ' scale(1)', offset: 0.92 },
+          { opacity: 1, transform: p1 + ' scale(1)', offset: 0.05 },
+          { opacity: 1, transform: p2 + ' scale(1)', offset: 0.93 },
           { opacity: 0, transform: p2 + ' scale(0.55)' },
         ],
-        { duration: dur, delay, easing: 'cubic-bezier(0.28, 0.08, 0.28, 1)', fill: 'both' }
+        { duration: dur, delay, easing: 'cubic-bezier(0.25, 0.06, 0.25, 1)', fill: 'both' }
       ));
     });
 
     // 11. Single subtle interactive control affordance nudge ([data-nudge="x|y"])
     sl.querySelectorAll('[data-nudge]').forEach(el => {
       const axis = (el.getAttribute('data-nudge') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 700);
-      const dur = parseFloat(el.dataset.dur) || 740;
+      const delay = baseDelay + beatDelay(el, 1100);
+      const dur = parseFloat(el.dataset.dur) || 920;
       const frames = axis === 'y'
         ? [
             { transform: 'translate3d(0,0,0)' },
@@ -891,12 +891,12 @@
             if (st) {
               trackAnim(st.animate(
                 [{ opacity: 0, transform: 'translate3d(0,26px,0) scale(0.97)' }, { opacity: 1, transform: 'none' }],
-                { duration: 680, delay: 70, easing: EASE_SPRING, fill: 'backwards' }
+                { duration: 860, delay: 90, easing: EASE_SPRING, fill: 'backwards' }
               ));
             }
-            animateSlideContent(next, 180, token, null);
-            startFx(next, 520, token);
-          }, 190);
+            animateSlideContent(next, 240, token, null);
+            startFx(next, 620, token);
+          }, 220);
         }, () => {});
       } else {
         // Hold outgoing slide opacity:1 underneath so background NEVER flashes
@@ -905,53 +905,53 @@
         next.classList.add('active', 'in-flight');
 
         const waits = [];
-        let contentDelay = 120;
+        let contentDelay = 160;
 
         if (kind === 'iris') {
           const origin = (dir > 0 ? next.dataset.irisOrigin : prev.dataset.irisOrigin) || '48% 72%';
           if (dir > 0) {
             const aIn = trackAnim(next.animate(
               [{ clipPath: 'circle(4% at ' + origin + ')' }, { clipPath: 'circle(145% at ' + origin + ')' }],
-              { duration: 640, easing: EASE_CINEMA }
+              { duration: 760, easing: EASE_CINEMA }
             ));
             waits.push(aIn.finished);
-            if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 660));
-            contentDelay = 240;
+            if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 780));
+            contentDelay = 300;
           } else {
             // Reverse iris: incoming dark tablet sits behind while warm clay contracts smoothly into the tablet!
             prev.style.zIndex = '5';
             next.style.zIndex = '4';
             const aOut = trackAnim(prev.animate(
               [{ clipPath: 'circle(145% at ' + origin + ')' }, { clipPath: 'circle(0% at ' + origin + ')' }],
-              { duration: 540, easing: EASE_CINEMA, fill: 'forwards' }
+              { duration: 640, easing: EASE_CINEMA, fill: 'forwards' }
             ));
             waits.push(aOut.finished);
-            if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 580));
-            contentDelay = 160;
+            if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 680));
+            contentDelay = 200;
           }
         } else if (kind === 'push') {
           const sx = dir > 0 ? '100%' : '-100%';
           const ox = dir > 0 ? '-14%' : '14%';
           const aOut = trackAnim(prev.animate(
             [{ transform: 'translate3d(0,0,0)' }, { transform: 'translate3d(' + ox + ',0,0)' }],
-            { duration: 540, easing: EASE_CINEMA }
+            { duration: 640, easing: EASE_CINEMA }
           ));
           const aIn = trackAnim(next.animate(
             [{ transform: 'translate3d(' + sx + ',0,0)' }, { transform: 'translate3d(0,0,0)' }],
-            { duration: 540, easing: EASE_CINEMA }
+            { duration: 640, easing: EASE_CINEMA }
           ));
           waits.push(aOut.finished, aIn.finished);
-          if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 640));
-          contentDelay = 200;
+          if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 740));
+          contentDelay = 260;
         } else if (kind === 'sheet-up') {
           if (dir > 0) {
             const aOut = trackAnim(prev.animate(
               [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0.95)', opacity: 0.72 }],
-              { duration: 560, easing: EASE_CINEMA }
+              { duration: 660, easing: EASE_CINEMA }
             ));
             const aIn = trackAnim(next.animate(
               [{ transform: 'translate3d(0,100%,0)' }, { transform: 'translate3d(0,0,0)' }],
-              { duration: 560, easing: EASE_CINEMA }
+              { duration: 660, easing: EASE_CINEMA }
             ));
             waits.push(aOut.finished, aIn.finished);
           } else {
@@ -959,53 +959,53 @@
             next.style.zIndex = '4';
             const aOut = trackAnim(prev.animate(
               [{ transform: 'translate3d(0,0,0)' }, { transform: 'translate3d(0,100%,0)' }],
-              { duration: 480, easing: EASE_CINEMA, fill: 'forwards' }
+              { duration: 560, easing: EASE_CINEMA, fill: 'forwards' }
             ));
             const aIn = trackAnim(next.animate(
               [{ transform: 'scale(0.95)', opacity: 0.75 }, { transform: 'scale(1)', opacity: 1 }],
-              { duration: 480, easing: EASE_CINEMA }
+              { duration: 560, easing: EASE_CINEMA }
             ));
             waits.push(aOut.finished, aIn.finished);
           }
-          contentDelay = 210;
+          contentDelay = 280;
         } else if (kind === 'zoom-rise') {
           const aOut = trackAnim(prev.animate(
             [{ transform: 'scale(1)', opacity: 1 }, { transform: dir > 0 ? 'scale(0.94)' : 'scale(1.04)', opacity: 0.5 }],
-            { duration: 460, easing: EASE_CINEMA }
+            { duration: 560, easing: EASE_CINEMA }
           ));
           const aIn = trackAnim(next.animate(
             [{ opacity: 0, transform: dir > 0 ? 'translate3d(0,48px,0) scale(0.97)' : 'translate3d(0,-36px,0) scale(1.02)' }, { opacity: 1, transform: 'none' }],
-            { duration: 520, easing: EASE_SPRING }
+            { duration: 620, easing: EASE_SPRING }
           ));
           waits.push(aOut.finished, aIn.finished);
           if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, cfg.morphMs));
-          contentDelay = 190;
+          contentDelay = 240;
         } else if (kind === 'modal') {
           const intoApp = next.dataset.appendix === '1';
           const aIn = trackAnim(next.animate(
             [{ opacity: 0, transform: intoApp ? 'scale(0.93)' : 'scale(1.04)' }, { opacity: 1, transform: 'none' }],
-            { duration: 360, easing: EASE_SPRING }
+            { duration: 440, easing: EASE_SPRING }
           ));
           waits.push(aIn.finished);
-          contentDelay = 90;
+          contentDelay = 140;
         } else if (kind === 'morph' && morphPairs.length) {
           const aIn = trackAnim(next.animate(
             [{ opacity: 0 }, { opacity: 1 }],
-            { duration: 260, easing: 'ease-out', fill: 'backwards' }
+            { duration: 320, easing: 'ease-out', fill: 'backwards' }
           ));
           waits.push(aIn.finished, ...launchMorphClones(morphPairs, cfg.morphMs));
-          contentDelay = 180;
+          contentDelay = 240;
         } else {
           const aIn = trackAnim(next.animate(
             [{ opacity: 0, transform: 'translate3d(0,12px,0)' }, { opacity: 1, transform: 'none' }],
-            { duration: 320, easing: cfg.ease }
+            { duration: 400, easing: cfg.ease }
           ));
           waits.push(aIn.finished);
-          contentDelay = 80;
+          contentDelay = 120;
         }
 
         animateSlideContent(next, contentDelay, token, morphedIds);
-        startFx(next, 520, token);
+        startFx(next, 620, token);
 
         Promise.all(waits).then(() => {
           if (token !== navToken) return;
