@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-24｜Phase B / B.2 / B.3＋B.3.1 完成 ✅）**：已完成四大靜態視覺工藝與原則 #26 反寫入 `deck-architect`（v4.3，29 檔），落地 **Phase B 方案 1 動態引擎**、**Phase B.2 60fps GPU 順滑重構與 6 種敘事切頁**、以及 **Phase B.3＋B.3.1 視覺指引規格書與從容閱讀節奏校準**（新增 `references/visual-guidance.md`、更新 `styles/workday.md` 二區行動主軸→健康總覽 Bento 語法，實作三層聚光壓暗、因果現場演變、真描線／方向揭露／波紋／光珠、16:9 底部基線滿版對齊與互動因果回饋，保持單次操作翻頁不變），於 8 頁完整可播放範例 `outputs/examples/v4-alive-demo/deck.html`（100% 離線單檔）通過靜態像素 WCAG（最低 `4.70:1`）與 7 項 `--motion` 動態＋視覺指引實測。下一步進入 **Phase C｜第一份真實簡報端到端 PK 🎯**。
+> **最新接手點（2026-11-24｜Phase B / B.2 / B.3.2 完成 ✅）**：已完成四大靜態視覺工藝與原則 #26 反寫入 `deck-architect`（v4.3，29 檔），落地 **Phase B 方案 1 動態引擎**、**Phase B.2 60fps GPU 順滑重構與 6 種敘事切頁**、以及 **Phase B.3–B.3.2 視覺指引規格書與語意閱讀順序精修**（新增 `references/visual-guidance.md` 納入「內容語意順序高於轉場花招」與「分段靜讀軌線反移動球劫持」兩條鐵律、更新 `styles/workday.md` 二區行動主軸→健康總覽 Bento 語法），於 8 頁完整可播放範例 `outputs/examples/v4-alive-demo/deck.html`（100% 離線單檔）通過靜態像素 WCAG（最低 `4.70:1`）與 7 項 `--motion` 動態＋視覺指引實測。下一步進入 **Phase C｜第一份真實簡報端到端 PK 🎯**。
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。

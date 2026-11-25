@@ -1380,3 +1380,24 @@
   - 重新打包 `outputs/deck-architect.skill`（29 檔，零 `__pycache__`），並重建互動預覽成品 `v4_alive_demo_b3.html` 且經 Chrome 實測各頁切換與 `↺ 重播` 零錯誤。
 - **同步的檔案**：`outputs/deck-architect/{assets/shell.css,assets/runtime.js,references/visual-guidance.md,references/motion-system.md,styles/workday.md,scripts/check.mjs}`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
 - **下一步**：請使用者透過更新版互動預覽實測這 3 項精修，確認到位後啟動 **Phase C｜第一份真實簡報端到端 PK 🎯**。
+
+## 2026-11-24｜Phase B.3.2 實測精修：平板與試算語意閱讀順序重整 ＋ 黏土頁移除移動球改分段靜讀
+
+- **使用者於實測後的 3 點精準回饋與互動表單定案**：
+  1. **平板頁（第 3 頁）**：原本先看 `4.2%` 與趨勢線，右側三張出爐建議卡同時跑完根本來不及看、給人急促感，而且依內容邏輯閱讀順序不對 → 使用者選定 **方案 1（推薦）**：改為「先看怎麼算（氣象輸入＋3 張建議出爐卡）→ 再看預報結果（`4.2%` 與 8 週走勢）→ 最後看業務成效（`−63%`、`34 萬`）」，同步理順平板內外左右分組。
+  2. **黏土頁（第 4 頁）**：時間軸上持續滑動的亮球劫持人眼平滑追視反射，導致其他文字與黏土物件被忽視 → 移除移動光球，改為分段靜讀軌線。
+  3. **試算頁（第 6 頁）**：原本由前頁飛入右側結果數字再跳回左側控制盤、再跳回右側長條，閱讀順序倒置且左右乒乓 → 使用者選定 **方案 1（推薦）**：純因果「先聚光左側設定條件 → 因果箭頭 → 一次看右側完整試算結果」，第 5→6 頁改採平順 `push` 橫移避免右半搶先出現。
+- **一、反寫兩條第一性原理新鐵律至 `outputs/deck-architect/references/visual-guidance.md`**：
+  - 新增反模式 **「移動球劫持視線（Motion Capture）」**：嚴禁在多站時間軸放置橫跨多站連續移動的亮球；每站動作後須保留 **0.6–0.9 秒完全靜止閱讀窗**，僅在換站瞬間以 350–380ms 鋪出下一段短橋接軌線。
+  - 新增鐵律 **「內容語意順序永遠高於轉場花招」**：產品介面頁左右內外分組必一致、絕不兩欄同時搶跑；試算器必守「左條件 → 箭頭 → 右結果」單向因果流，且使用者提早互動須立即解除壓暗。
+  - 重新打包 `outputs/deck-architect.skill`（139 KB，29 檔，零 `__pycache__`）。
+- **二、重構 `outputs/examples/v4-alive-demo/` 關鍵頁面**：
+  - `03-apple-keynote.html`（＋移除 `02-data-story.html` 搶焦 `data-morph`）：平板頂列將 `降雨 80%・18°C` 移至左上、內欄對調為左「建議出爐盤數 3 張卡」右「`4.2%`＋`8 週走勢`」，外標重整為左「`氣象 × 連假`、`12 分鐘確認排程`」、右「`−63%`、`34 萬`」；以 `data-focus-plan="1@0-2500, 2@2500-4450, 3@4450-5850"` 三拍由左向右單調聚光（三張建議卡逐張從容進場、拔除折線上會干擾閱讀的無限循環移動光點），同時保留第 3 ↔ 4 頁 `4.2%` 數位平板→黏土平板 Magic Move。
+  - `04-clay-stations.html`：徹底移除 `.rail-bead` 移動球，將時間軌拆為兩段短橋接線（`seg-1` 於 `1900ms` 鋪至第 2 站、`seg-2` 於 `3520ms` 鋪至第 3 站），`data-focus-plan="1@0-2200, 2@2200-3820, 3@3820-5350"` 讓每站落針與波紋後均享有 660–740ms 完全靜止閱讀時間。
+  - `06-live-simulator.html`（＋清理 `05-shock.html` 未使用 `data-morph`）：切頁改為 `data-transition="push"`，以 `data-focus-plan="1@0-2100, 2@2100-4150"` 先聚光左側條件控制卡（`⇄ 拖曳試算` 於 `950ms` 輕微提示，右側安靜壓暗 `0.26`）→ `1860–2260ms` 畫出左→右因果箭頭 → 右側整體一次亮顯（`170 萬`→三 KPI→長條對照）；並於 `render(fromUser)` 加入搶先互動立即解除聚光壓暗保護。
+- **三、驗證與交付**：
+  - `lint.py` 0 錯 0 警；`check.mjs --jpg --motion` 全 8 頁真實像素 WCAG 全過（最低 **`4.70:1`**）、**7 項動態與視覺指引實測全 ✅**（涵蓋第 2／3／4／6／7 共 5 頁聚光壓暗復原零殘留、第 3 ↔ 4 頁 `hero-rate` 正反向 Magic Move、以及 9 條描線／10 處揭露零退化）。
+  - 逐張肉眼檢視更新後靜態截圖與 7 張動態中場實拍（第 3 頁 Stage 1/2/3、第 4 頁 Stage 1/2 零移動球、第 6 頁 Stage 1/2 與提早點擊 `全區 12 店` 即時解除壓暗重算 `391萬／年`），零 JS 錯誤。
+  - 同步重建互動預覽檔 `v4_alive_demo_b3.html`。
+- **同步的檔案**：`outputs/deck-architect/references/visual-guidance.md`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：請使用者於更新後的互動預覽實測第 3、4、6 頁閱讀動線，確認後進入 **Phase C｜第一份真實簡報端到端 PK 🎯**。

@@ -254,10 +254,16 @@
   flex-direction: column;
   gap: 26px;
 }
+.slide.is-focusing .right.focus-active {
+  transform: none !important;
+  box-shadow: none !important;
+}
 .slide .hero-out {
   padding: 48px 48px;
   min-height: 248px;
   border-radius: 30px;
+  --spot-border: rgba(74, 212, 154, 0.88);
+  --spot-glow: rgba(74, 212, 154, 0.22);
   background: linear-gradient(145deg, rgba(74, 212, 154, 0.16) 0%, rgba(25, 31, 41, 0.96) 55%);
   border: 1.5px solid rgba(74, 212, 154, 0.42);
   display: flex;
@@ -478,12 +484,12 @@
   color: var(--muted);
 }
 </style>
-<section class="slide canvas" data-nav="inline" data-transition="morph">
-  <!-- Directional linkage arrow centered vertically on the full-height control card (y=660) -->
+<section class="slide canvas" data-nav="inline" data-transition="push" data-focus-plan="1@0-2100, 2@2100-4150" style="--focus-dim-opacity:0.26">
+  <!-- Directional linkage arrow bridges cleanly Left Conditions (Stage 1) -> Right Results (Stage 2) -->
   <svg class="link-bridge" id="link-bridge" width="1920" height="1080" viewBox="0 0 1920 1080" aria-hidden="true">
-    <circle class="bridge-dot" cx="826" cy="660" r="5" data-pop data-delay="1060"/>
-    <path class="bridge-stroke" d="M 826 660 L 870 660" fill="none" stroke-width="2.8" stroke-linecap="round" data-draw data-delay="1120" data-dur="460"/>
-    <path class="bridge-stroke" d="M 860 650 L 872 660 L 860 670" fill="none" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" data-pop data-delay="1540"/>
+    <circle class="bridge-dot" cx="826" cy="660" r="5" data-pop data-delay="1860"/>
+    <path class="bridge-stroke" d="M 826 660 L 870 660" fill="none" stroke-width="2.8" stroke-linecap="round" data-draw data-delay="1920" data-dur="380"/>
+    <path class="bridge-stroke" d="M 860 650 L 872 660 L 860 670" fill="none" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" data-pop data-delay="2260"/>
   </svg>
 
   <nav class="slide-nav" data-auto-nav aria-label="章節"></nav>
@@ -493,8 +499,8 @@
     <h1 data-role="title">五店效益即時試算</h1>
     <p class="lead" data-role="summary">拉動門市與報廢目標，<em>即時看年省與回本</em>。</p>
 
-    <!-- Calm Beat 2 (after 3 financial numbers finish Magic Move at ~820ms): spotlight + drag nudge -->
-    <div class="ctrl-card live-ctrl live-only" data-interactive data-beat="2" data-delay="960" data-from="left" data-spotlight>
+    <!-- STAGE 1 (0-2.10s): INPUT CONDITIONS FIRST — emerald spotlight + calm drag cue while eye is already on Left -->
+    <div class="ctrl-card live-ctrl live-only" data-interactive data-focus="1">
       <div class="preset-row" role="group" aria-label="快速情境">
         <button type="button" class="preset-btn" data-stores="1" data-rate="4.2">單店試點</button>
         <button type="button" class="preset-btn on" data-stores="5" data-rate="4.2">Q4 五店（提案）</button>
@@ -506,7 +512,7 @@
           <div class="s-head">
             <span class="s-label-wrap">
               <label for="sim-stores">導入門市數</label>
-              <span class="drag-cue live-only" id="drag-cue" data-nudge="x" data-delay="1650">⇄ 拖曳試算</span>
+              <span class="drag-cue live-only" id="drag-cue" data-nudge="x" data-delay="950">⇄ 拖曳試算</span>
             </span>
             <span class="s-val" id="out-stores">5<small>家</small></span>
           </div>
@@ -531,8 +537,9 @@
     </div>
   </div>
 
-  <div class="right">
-    <div class="hero-out" id="hero-out">
+  <!-- STAGE 2 (2.10-4.15s): COMPLETE SIMULATED OUTPUT — unified top-to-bottom reveal after causal arrow arrives -->
+  <div class="right" data-focus="2" data-focus-style="clean">
+    <div class="hero-out" id="hero-out" data-spotlight data-delay="2260">
       <div>
         <div class="ho-k">預估年省原料費</div>
         <div class="ho-tags">
@@ -540,25 +547,25 @@
           <span class="delta-pill" id="delta-save"></span>
         </div>
       </div>
-      <div class="ho-num" id="out-save" data-morph="hero-save">170<small>萬／年</small></div>
+      <div class="ho-num" id="out-save">170<small>萬／年</small></div>
     </div>
 
     <div class="kpi-trio">
       <div class="k-card" id="card-payback">
-        <b class="gold" id="out-payback" data-morph="hero-payback">4.2<small>個月</small></b>
+        <b class="gold" id="out-payback">4.2<small>個月</small></b>
         <div class="k-foot"><span class="k-lbl">導入回本週期</span><span class="k-delta" id="delta-payback"></span></div>
       </div>
       <div class="k-card" id="card-margin">
-        <b class="mint" id="out-margin" data-morph="hero-margin">+1.8<small>%</small></b>
+        <b class="mint" id="out-margin">+1.8<small>%</small></b>
         <div class="k-foot"><span class="k-lbl">單店淨利提升</span><span class="k-delta" id="delta-margin"></span></div>
       </div>
-      <div class="k-card" id="card-trays" data-beat="3" data-delay="1120">
+      <div class="k-card" id="card-trays">
         <b id="out-trays">75<small>盤／日</small></b>
         <div class="k-foot"><span class="k-lbl">全區少丟麵包</span><span class="k-delta" id="delta-trays"></span></div>
       </div>
     </div>
 
-    <div class="bar-card" id="bar-card" data-beat="3" data-delay="1280">
+    <div class="bar-card" id="bar-card">
       <div class="bar-title">
         <strong>年度報廢原料支出對照</strong>
         <span class="bar-save-pill" id="bar-save-tag">年省 170 萬</span>
@@ -566,12 +573,12 @@
       <div class="bar-rows">
         <div class="bar-row">
           <span class="b-lbl">未導入（11.4%）</span>
-          <div class="b-bg"><div class="b-fg loss" id="bar-old" style="width:92%" data-grow="x" data-delay="1420" data-dur="740"></div></div>
+          <div class="b-bg"><div class="b-fg loss" id="bar-old" style="width:92%" data-grow="x" data-delay="2580" data-dur="660"></div></div>
           <span class="b-num loss" id="num-old">269 萬</span>
         </div>
         <div class="bar-row">
           <span class="b-lbl" id="lbl-new">導入後（4.2%）</span>
-          <div class="b-bg"><div class="b-fg now" id="bar-new" style="width:34%" data-grow="x" data-delay="1620" data-dur="740"></div></div>
+          <div class="b-bg"><div class="b-fg now" id="bar-new" style="width:34%" data-grow="x" data-delay="2840" data-dur="660"></div></div>
           <span class="b-num now" id="num-new">99 萬</span>
         </div>
       </div>
@@ -678,6 +685,9 @@ function render(fromUser, source) {
   });
 
   if (fromUser) {
+    // Immediately reveal both columns at 100% if user interacts before intro focus-plan finishes
+    slide.classList.remove('is-focusing');
+    slide.querySelectorAll('[data-focus]').forEach(el => el.classList.remove('focus-dim', 'focus-active', 'focus-visited'));
     if (dragCue) dragCue.classList.add('used');
     if (blockStores) blockStores.classList.toggle('ctrl-active', source === 'stores' || source === 'preset');
     if (blockRate) blockRate.classList.toggle('ctrl-active', source === 'rate' || source === 'preset');
