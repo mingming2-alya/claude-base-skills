@@ -54,7 +54,7 @@
   color: var(--fg);
 }
 .slide h1 span { display: block; margin-top: 8px; color: var(--gold); }
-.slide .rule { margin-top: 36px; width: 84px; height: 3px; background: var(--gold); }
+.slide .rule { margin-top: 36px; width: 92px; height: 3px; background: var(--gold); }
 .slide p.sub {
   margin-top: 28px;
   font-size: 36px;
@@ -76,6 +76,8 @@
   box-shadow: inset 0 1px 0 rgba(244, 241, 234, 0.14);
   border-radius: 20px;
   overflow: hidden;
+  --spot-border: rgba(232, 184, 107, 0.82);
+  --spot-glow: rgba(232, 184, 107, 0.18);
 }
 .slide .kpi-cell {
   padding: 26px 28px;
@@ -108,18 +110,19 @@
   </div>
   <div class="scrim" aria-hidden="true"></div>
 
-  <div class="masthead" data-beat="1" data-from="none">
+  <div class="masthead" data-beat="1" data-delay="60" data-from="none">
     <span>2026 Q4 營運提案</span>
     <span class="right">營運企劃組｜2026.11</span>
   </div>
 
-  <div class="hero" data-beat="1">
-    <h1>星塵烘焙<span>智慧補貨系統</span></h1>
-    <div class="rule" data-grow="x" data-delay="180"></div>
-    <p class="sub">預報驅動，把報廢壓進 6% 以內。</p>
+  <!-- Editorial Eye Path: Title -> Gold Rule Wipe -> Subtitle -> Bottom KPI Anchor -->
+  <div class="hero">
+    <h1 data-beat="1" data-delay="80">星塵烘焙<span>智慧補貨系統</span></h1>
+    <div class="rule" data-wipe="right" data-delay="340" data-dur="420"></div>
+    <p class="sub" data-beat="2" data-delay="480" data-from="left">預報驅動，把報廢壓進 6% 以內。</p>
   </div>
 
-  <div class="kpi-strip" data-beat="2">
+  <div class="kpi-strip" data-beat="3" data-delay="700" data-spotlight>
     <div class="kpi-cell">
       <b class="hl">4.2<small>%</small></b>
       <span>試點報廢率</span>

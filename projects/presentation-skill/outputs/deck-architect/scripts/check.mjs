@@ -565,12 +565,13 @@ async function runMotionAudit(driver, filePath) {
       const hiddenMorph = [...document.querySelectorAll('[data-morph]')].filter(e => e.style.visibility === 'hidden').length;
       const actives = document.querySelectorAll('.slide.active').length;
       const leavings = document.querySelectorAll('.slide.leaving').length;
-      return { idx, morphLeft, hiddenMorph, actives, leavings };
+      const staleBgFocus = [...document.querySelectorAll('.slide:not(.active)')].filter(s => s.classList.contains('is-focusing') || s.querySelector('.focus-dim, .pre-transform')).length;
+      return { idx, morphLeft, hiddenMorph, actives, leavings, staleBgFocus };
     });
-    if (rapid.idx >= 3 && rapid.morphLeft === 0 && rapid.hiddenMorph === 0 && rapid.actives === 1 && rapid.leavings === 0) {
-      results.push(`連按打斷測試（4 次／180ms）：通過（精準落於第 ${rapid.idx + 1} 頁，無殘留 clone 與鎖死）`);
+    if (rapid.idx >= 3 && rapid.morphLeft === 0 && rapid.hiddenMorph === 0 && rapid.actives === 1 && rapid.leavings === 0 && rapid.staleBgFocus === 0) {
+      results.push(`連按打斷測試（4 次／180ms）：通過（精準落於第 ${rapid.idx + 1} 頁，無殘留 clone、壓暗與鎖死）`);
     } else {
-      failures.push(`連按打斷異常：index=${rapid.idx}, morphLeft=${rapid.morphLeft}, hiddenMorph=${rapid.hiddenMorph}, actives=${rapid.actives}, leavings=${rapid.leavings}`);
+      failures.push(`連按打斷異常：index=${rapid.idx}, morphLeft=${rapid.morphLeft}, hiddenMorph=${rapid.hiddenMorph}, actives=${rapid.actives}, leavings=${rapid.leavings}, staleBgFocus=${rapid.staleBgFocus}`);
     }
   }
 
@@ -685,6 +686,95 @@ async function runMotionAudit(driver, filePath) {
     } else {
       failures.push(`附件進出異常：inApp=${JSON.stringify(inApp)}, backIdx=${backIdx} (預期 ${linkInfo.idx})`);
     }
+  }
+
+  // 6. Phase B.3 Visual Guidance round-trip (focus-plan dimming & causal transform-at settle cleanly to 100%)
+  const guidanceTargets = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    const out = [];
+    for (let i = 0; i < sls.length; i++) {
+      const plan = sls[i].dataset.focusPlan || '';
+      const hasTransform = Boolean(sls[i].querySelector('[data-transform-at]'));
+      if (!plan && !hasTransform) continue;
+      let minStart = Infinity;
+      let maxEnd = 0;
+      for (const m of plan.matchAll(/@(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)/g)) {
+        minStart = Math.min(minStart, parseFloat(m[1]));
+        maxEnd = Math.max(maxEnd, parseFloat(m[2]));
+      }
+      if (!Number.isFinite(minStart)) minStart = 0;
+      for (const el of sls[i].querySelectorAll('[data-transform-at]')) {
+        maxEnd = Math.max(maxEnd, (parseFloat(el.dataset.transformAt) || 720) + 800);
+      }
+      out.push({ idx: i, hasPlan: Boolean(plan), hasTransform, minStart, maxEnd });
+    }
+    return out;
+  });
+  if (guidanceTargets.length) {
+    const checkedSlides = [];
+    for (const gt of guidanceTargets) {
+      const fromIdx = gt.idx === 0 ? Math.min(1, count - 1) : gt.idx - 1;
+      await driver.evaluate(i => window.__deck.go(i, true), fromIdx);
+      await driver.wait(60);
+      await driver.evaluate(i => window.__deck.go(i, false), gt.idx);
+      const midWait = Math.min(gt.minStart + 320, Math.max(240, gt.maxEnd - 100));
+      await driver.wait(midWait);
+      const mid = await driver.evaluate(i => {
+        const sl = window.__deck.slides[i];
+        return {
+          focusing: sl.classList.contains('is-focusing'),
+          active: sl.querySelectorAll('.focus-active').length,
+          dim: sl.querySelectorAll('.focus-dim').length,
+          pre: sl.querySelectorAll('.pre-transform').length,
+        };
+      }, gt.idx);
+      await driver.wait(Math.max(400, gt.maxEnd - midWait + 560));
+      const end = await driver.evaluate(i => {
+        const sl = window.__deck.slides[i];
+        return {
+          focusing: sl.classList.contains('is-focusing'),
+          active: sl.querySelectorAll('.focus-active').length,
+          dim: sl.querySelectorAll('.focus-dim').length,
+          pre: sl.querySelectorAll('.pre-transform').length,
+        };
+      }, gt.idx);
+      const midOk = (!gt.hasPlan || (mid.focusing && mid.active > 0)) && (!gt.hasTransform || mid.pre > 0);
+      const endOk = !end.focusing && end.active === 0 && end.dim === 0 && end.pre === 0;
+      if (midOk && endOk) {
+        checkedSlides.push(`第 ${gt.idx + 1} 頁`);
+      } else {
+        failures.push(`第 ${gt.idx + 1} 頁視覺指引復原異常：mid=${JSON.stringify(mid)}, end=${JSON.stringify(end)}`);
+      }
+    }
+    if (checkedSlides.length === guidanceTargets.length) {
+      results.push(`視覺指引聚光壓暗／因果演變（${checkedSlides.join('、')}）：通過（演繹期間明確聚焦，結束 100% 復原零殘留）`);
+    }
+  }
+
+  // 7. Phase B.3 SVG connector integrity (no zero-bbox SVG <line data-grow> anti-pattern; all [data-draw] valid)
+  const connAudit = await driver.evaluate(() => {
+    const bad = [];
+    let drawCount = 0;
+    let wipeCount = 0;
+    for (let i = 0; i < window.__deck.slides.length; i++) {
+      const sl = window.__deck.slides[i];
+      for (const el of sl.querySelectorAll('svg line[data-grow]')) {
+        bad.push(`第 ${i + 1} 頁對 SVG <line> 誤用 data-grow（應改用 <path data-draw> 或 HTML data-wipe）`);
+      }
+      for (const el of sl.querySelectorAll('[data-draw]')) {
+        drawCount++;
+        if (typeof el.getTotalLength === 'function' && el.getTotalLength() <= 0) {
+          bad.push(`第 ${i + 1} 頁 [data-draw] 路徑長度為 0`);
+        }
+      }
+      wipeCount += sl.querySelectorAll('[data-wipe]').length;
+    }
+    return { bad, drawCount, wipeCount };
+  });
+  if (connAudit.bad.length) {
+    failures.push(...connAudit.bad);
+  } else {
+    results.push(`引導線與描繪原語檢核（${connAudit.drawCount} 條 SVG 描線／${connAudit.wipeCount} 處方向揭露）：通過（零退化 SVG 縮放）`);
   }
 
   const jsErrs = driver.getErrors();

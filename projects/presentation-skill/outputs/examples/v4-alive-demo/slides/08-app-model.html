@@ -94,6 +94,31 @@
   color: var(--muted);
 }
 
+/* Vertical amber boundary guide dropping from feature cards down to the applicability warning */
+.slide .bound-guide {
+  position: absolute;
+  left: 959px;
+  top: 636px;
+  width: 3px;
+  height: 164px;
+  border-left: 2.5px dashed rgba(242, 201, 107, 0.54);
+  z-index: 2;
+  pointer-events: none;
+}
+.slide .bound-dot {
+  position: absolute;
+  left: 960px;
+  top: 804px;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--amber);
+  z-index: 3;
+  pointer-events: none;
+}
+
 .slide .limit-bar {
   position: absolute;
   left: 104px;
@@ -102,7 +127,9 @@
   padding: 30px 38px;
   border-radius: 24px;
   background: var(--amber-bg);
-  border: 1.5px solid rgba(242, 201, 107, 0.36);
+  border: 1.5px solid rgba(242, 201, 107, 0.38);
+  --spot-border: rgba(242, 201, 107, 0.90);
+  --spot-glow: rgba(242, 201, 107, 0.22);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -145,7 +172,7 @@
     <p class="lead" data-role="summary">四項即時特徵驅動，<em>不含中秋與春節禮盒檔期</em>。</p>
   </header>
 
-  <div class="grid" data-stagger="55" data-delay="90">
+  <div class="grid" data-stagger="90" data-delay="120">
     <div class="feat">
       <div class="idx">01</div>
       <strong>POS 歷史日銷</strong>
@@ -168,7 +195,11 @@
     </div>
   </div>
 
-  <div class="limit-bar rv" data-delay="220">
+  <!-- Directional guide sweeps down into the amber boundary notice so limitations are never skipped -->
+  <div class="bound-guide" data-wipe="down" data-delay="560" data-dur="280" aria-hidden="true"></div>
+  <span class="bound-dot" data-pop data-delay="820" aria-hidden="true"></span>
+
+  <div class="limit-bar" data-beat="3" data-delay="740" data-spotlight>
     <span class="limit-tag">適用邊界</span>
     <span class="limit-text">常態 8 週實測數據，不含中秋與春節禮盒檔期（特殊節慶由區督導人工覆核）</span>
     <span class="limit-esc">按 Esc 返回原頁</span>

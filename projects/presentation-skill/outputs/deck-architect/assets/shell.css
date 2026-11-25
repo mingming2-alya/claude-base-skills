@@ -1,11 +1,11 @@
-/* deck-architect v4.2 Thin Shell CSS (Phase B.2 — 60fps GPU Core + Eye-Guidance Choreography)
+/* deck-architect v4.3 Thin Shell CSS (Phase B.3 — 60fps GPU Core + Visual Guidance Spec)
  *
  * Locks only invariants that must never break across slides:
  *  - 1920x1080 auto-scaled stage with compositor isolation (contain: layout style paint)
  *  - Offline CJK + Latin system font fallback stacks
  *  - Single-source navigation/tab hooks (fully styleable or replaceable via data-nav="inline")
  *  - 60fps GPU-composited transition archetypes (push | zoom-rise | iris | shock | morph | sheet-up | modal)
- *  - Visual eye-guidance choreography helpers (data-spotlight, flow-token, data-beat)
+ *  - Phase B.3 Visual Guidance helpers: 3-tier focus dimming, mobile-visible spotlight, target ripples, rail travel beads
  *  - Interactive live-figure controls (.live-ctrl / .live-only) with print/static isolation
  *  - Dual static freeze (?still=1, B low-power mode, prefers-reduced-motion) & exact 16:9 print/PDF
  */
@@ -203,14 +203,90 @@ mark.em {
   animation: deck-token-flow var(--token-dur, 3.2s) cubic-bezier(.4, 0, .2, 1) infinite;
 }
 
-/* Single crisp focus-ring cue that guides the eye onto a priority card once (never obnoxious looping) */
+/* Mobile-visible high-contrast focus-ring cue (4px sharp rim + 22px halo = clearly readable even at 390px) */
 @keyframes deck-spotlight-ring {
-  0% { box-shadow: 0 0 0 0 var(--spot-color, rgba(192, 60, 30, 0.48)); }
-  45% { box-shadow: 0 0 0 10px var(--spot-color, rgba(192, 60, 30, 0.18)); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+  0% {
+    box-shadow:
+      0 0 0 0 var(--spot-border, var(--spot-color, rgba(192, 60, 30, 0.85))),
+      0 0 0 0 var(--spot-glow, rgba(192, 60, 30, 0.24));
+  }
+  38% {
+    box-shadow:
+      0 0 0 4px var(--spot-border, var(--spot-color, rgba(192, 60, 30, 0.85))),
+      0 0 0 22px var(--spot-glow, rgba(192, 60, 30, 0.22));
+  }
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(0, 0, 0, 0),
+      0 0 0 0 rgba(0, 0, 0, 0);
+  }
 }
 .spot-pulse {
-  animation: deck-spotlight-ring 850ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+  animation: deck-spotlight-ring 960ms cubic-bezier(0.22, 1, 0.36, 1) 1;
+}
+
+/* Phase B.3 3-tier focus dimming + high-contrast spotlight choreographer ([data-focus-plan] + [data-focus]) */
+#stage .slide [data-focus] {
+  transition:
+    opacity 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 360ms ease;
+}
+#stage .slide.is-focusing [data-focus].focus-dim {
+  opacity: var(--focus-dim-opacity, 0.30);
+}
+#stage .slide.is-focusing [data-focus].focus-visited {
+  opacity: var(--focus-visited-opacity, 0.82);
+}
+#stage .slide.is-focusing [data-focus].focus-active {
+  opacity: 1;
+  transform: translate3d(0, -3px, 0) scale(1.012);
+  box-shadow:
+    0 0 0 4px var(--spot-border, rgba(192, 60, 30, 0.88)),
+    0 0 0 22px var(--spot-glow, rgba(192, 60, 30, 0.20)),
+    0 18px 42px rgba(0, 0, 0, 0.14);
+  z-index: 6;
+}
+#stage .slide.is-focusing [data-focus][data-focus-style="clean"].focus-active {
+  box-shadow: none;
+  transform: translate3d(0, -4px, 0) scale(1.035);
+}
+
+/* Instant zero-cost BEFORE state setup for [data-transform-at] (zero reverse paint transitions on slide entry!) */
+.slide .pre-transform,
+.slide .pre-transform * {
+  transition: none !important;
+}
+
+/* Target-lock concentric ripple over physical anchors or chart endpoints (100% GPU, hidden in static/print) */
+.target-ripple {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  margin-top: -12px;
+  border-radius: 50%;
+  border: 3px solid var(--ripple-color, #7CEEF9);
+  box-shadow: 0 0 0 4px var(--ripple-soft, rgba(124, 238, 249, 0.22));
+  pointer-events: none;
+  opacity: 0;
+  z-index: 4;
+}
+
+/* Chronological rail travel bead (100% GPU translate3d, hidden in static/print) */
+.rail-bead {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: var(--bead-color, #AD4A2D);
+  box-shadow: 0 0 0 7px var(--bead-glow, rgba(173, 74, 45, 0.24));
+  pointer-events: none;
+  opacity: 0;
+  z-index: 4;
 }
 
 /* Interactive live controls (isolated from slide click-to-advance) */
@@ -437,8 +513,18 @@ body.low-power *::after {
 html.still .fx-canvas,
 body.low-power .fx-canvas,
 html.still .flow-token,
-body.low-power .flow-token {
+body.low-power .flow-token,
+html.still [data-ripple],
+body.low-power [data-ripple],
+html.still [data-travel],
+body.low-power [data-travel] {
   display: none !important;
+}
+html.still .slide [data-focus],
+body.low-power .slide [data-focus] {
+  opacity: 1 !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 html.hide-ctrl .live-only,
 body.hide-ctrl .live-only {
@@ -490,7 +576,7 @@ body.hide-ctrl .live-only {
   html, body { height: auto; overflow: visible; background: none; }
   #viewport { position: static; display: block; background: none; }
   #stage { transform: none !important; width: 1920px; height: auto; overflow: visible; }
-  #nav, #tabs, #curtain, #morph-layer, #notes, #hint, #toast, .back, .more-btn, .live-only, .fx-canvas, .flow-token { display: none !important; }
+  #nav, #tabs, #curtain, #morph-layer, #notes, #hint, #toast, .back, .more-btn, .live-only, .fx-canvas, .flow-token, [data-ripple], [data-travel] { display: none !important; }
   .slide {
     position: relative;
     visibility: visible !important;
@@ -527,6 +613,6 @@ body.hide-ctrl .live-only {
 
 @media (prefers-reduced-motion: reduce) {
   #nav .ind, #tabs span, #nav span, #toast { transition: none !important; }
-  .fx-canvas, .flow-token { display: none !important; }
+  .fx-canvas, .flow-token, [data-ripple], [data-travel] { display: none !important; }
   .slide * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }

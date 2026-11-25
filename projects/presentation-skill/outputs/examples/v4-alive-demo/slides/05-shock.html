@@ -53,7 +53,7 @@
   letter-spacing: 0.08em;
   color: #74F2BE;
 }
-.slide .eyebrow i { width: 36px; height: 2px; background: #74F2BE; display: block; }
+.slide .eyebrow i { width: 42px; height: 2.5px; background: #74F2BE; display: block; }
 
 .slide h1 {
   position: absolute;
@@ -78,6 +78,15 @@
   margin-left: 16px;
 }
 
+.slide .proof-rule {
+  position: absolute;
+  left: 140px;
+  right: 140px;
+  bottom: 264px;
+  height: 1px;
+  z-index: 3;
+  background: linear-gradient(90deg, rgba(116, 242, 190, 0.55) 0%, rgba(244, 242, 236, 0.16) 45%, rgba(244, 242, 236, 0.08) 100%);
+}
 .slide .proof-row {
   position: absolute;
   left: 140px;
@@ -85,7 +94,6 @@
   bottom: 132px;
   z-index: 3;
   padding-top: 36px;
-  border-top: 1px solid rgba(244, 242, 236, 0.16);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 48px;
@@ -128,15 +136,21 @@
   <div class="dots" data-layer="bg" aria-hidden="true"></div>
   <div class="watermark" aria-hidden="true">1.8%</div>
 
-  <div class="eyebrow" data-beat="1" data-from="left"><i></i><span>單店損益試算</span></div>
+  <div class="eyebrow">
+    <i data-wipe="right" data-delay="40" data-dur="340"></i>
+    <span data-beat="1" data-delay="120" data-from="left">單店損益試算</span>
+  </div>
 
   <h1 data-role="shock">
     少丟 1 盤麵包，<br>
     門市淨利多<span class="hl" data-morph="hero-margin">+1.8%</span>
   </h1>
 
-  <!-- All 3 core financial metrics carry data-morph so they fly IN FORMATION onto Slide 6's live simulator! -->
-  <div class="proof-row" data-stagger="110" data-delay="360">
+  <!-- Directional rule sweeps L->R guiding eye smoothly down to the 3 financial proof anchors -->
+  <div class="proof-rule" data-wipe="right" data-delay="520" data-dur="460" aria-hidden="true"></div>
+
+  <!-- All 3 core financial metrics carry data-morph so they fly IN FORMATION onto Slide 6's live simulator -->
+  <div class="proof-row" data-stagger="130" data-delay="640">
     <div class="p-item">
       <b class="mint" data-morph="hero-save">170<small>萬／年</small></b>
       <span>五店年省原料費</span>

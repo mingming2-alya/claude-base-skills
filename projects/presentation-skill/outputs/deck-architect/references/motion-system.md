@@ -40,23 +40,29 @@
 
 ---
 
-## 3. 頁內視線引導語法（Eye-Guidance Choreography）
+## 3. 頁內視線引導語法（Eye-Guidance Choreography — 詳見 `references/visual-guidance.md`）
 
-透過宣告式屬性編排觀眾視線路徑，**避免全頁同時淡入**：
+撰寫自由畫布頁前，先依 **`references/visual-guidance.md`** 選定四大靜態視覺動線原型之一，再以以下宣告式屬性導演視線（**嚴守一拍一主角、禁止左右跨螢幕乒乓、保持原有翻頁互動契約不變**）：
 
+- **聚光＋非焦點壓暗排程（`data-focus-plan="1@0-1000, 2@1000-1800"` ＋ `data-focus="1|2|3"`）**：
+  - 在多卡片／分區頁面（如 Bento、數據故事、三站插畫），當拍主角高反差亮出（`.focus-active`，粗亮框＋22px 外光暈＋微抬升，390px 手機亦清晰），已演完的因果脈絡維持 `.focus-visited`（`0.82`），未出場配角退為 `.focus-dim`（`0.32`）；整段演完或被打斷瞬間自動歸零回復 100% 平衡。
+- **因果現場演變（`data-transform-at="780"`）**：
+  - HTML 原始 DOM 預設為最終正確態；動態進頁時底盤先掛上 `.pre-transform` 展現舊態（如 24 盤全紅報廢），於指定毫秒移除並短暫掛 `.transforming` 演繹轉變為新態（9 綠＋15 省下虛線），`?still=1` 與打斷時瞬間停在最終態。
 - **語意節拍（`data-beat="1|2|3|4"` + `data-from="left|right|up|down|none"`）**：
-  - `data-beat="1"`（60ms）：主視覺／首要焦點先錨定。
-  - `data-beat="2"`（320ms）：方向性引導線／關鍵變化動作（帶走視線）。
-  - `data-beat="3"`（580ms）：被指向的結論卡／拍板行動區亮起。
-  - `data-beat="4"`（820ms）：次要背景支撐資料安靜就位。
-- **方向性延伸指針與長條（`data-grow="x|x-left|y|y-down"`）**：
-  - `x`（由左向右長）、`x-left`（由右向左長，適合從中央裝置向右側與左側同時發射引導細線！）、`y`（由底向上長）、`y-down`（由頂向下垂降引導針！）。
-- **單次聚焦光環（`data-spotlight`）**：在多卡片工作看板（如現代 Bento）中，替「唯一需要主管處理的風險卡或拍板卡」加上 `data-spotlight`（搭配 `--spot-color`），進入該拍時柔和呼吸一次把全場目光鎖過去，絕不無限閃爍干擾閱讀。
-- **多元素跨頁 Magic Move（`data-morph="id"`，MIT `open-slide`）**：
-  - 前後兩頁對齊 1–4 個核心錨點（如 `hero-save`、`hero-payback`、`hero-margin`），切頁時會同步編隊起飛、等比縮放並平順轉換字色（亦支援漸層字銜接純色字）。
-- **節流滾動數字（`data-count`，MIT `scrolline`）**：30Hz 節流更新、預設延至切頁啟動後才滾動，避免與轉場搶排版資源；自動保留正負號、小數與 `<small>` 單位。
-- **SVG 路徑與圓環描繪（`data-draw` / `data-draw="ring"`，MIT `visual-explainer`）**：曲線由左向右描出將視線引至終點節點；圓環由 0 順時針掃至目標進度。
-- **低耗能延遲 Canvas 2D 氛圍層（`data-fx="ambient-dust"|"soft-aurora"`，MIT `lewislulu`）**：`480×270` 緩衝區拉伸、切頁後延遲啟動、離頁即停零殘留。
+  - `data-beat="1"`（60ms）：首要焦點錨定；`2`（420ms）：變化／引導線；`3`（840ms）：被指向的結論／拍板區；`4`（1260ms）：次要背景支撐（可搭配 `data-delay` 精細微調，總長建議 1.5–2.3 秒）。
+- **真描線與方向揭露（零變形、禁對 0 寬高 SVG `<line>` 用 `scaleX/Y`）**：
+  - **實線引導線／因果箭頭**：用 SVG `<path d="M 起點 L 終點" data-draw>`（`pathLength="1"`），順視線方向繪出；圓環進度用 `data-draw="ring"`。
+  - **虛線引導針／時間軌／斜刪線**：用 HTML 元素加 `data-wipe="down|right|left|up"`（純 GPU `clip-path: inset(...)` 揭露，虛線節距零拉扯）。
+  - **長條／柱狀圖生長**：`data-grow="x|x-left|y|y-down"`。
+- **端點綻放、目標波紋與軌道行進光珠**：
+  - `data-pop`：引導線起點錨點、終點圓點或箭頭尖端於線條抵達瞬間綻放（**絕不讓孤點提前漂浮**）。
+  - `data-ripple`：純 HTML 雙圈目標擴散波紋（`--ripple-color`），釘住 3D 插畫物件或折線端點（靜態／列印自動隱藏）。
+  - `data-travel="x|y"`（配 `data-travel-dist`）：沿水平／垂直軌道滑行的行進光珠，帶動眼睛橫掃時間軸。
+  - `data-nudge="x"`：互動控制項進場後單次微動暗示可拖曳。
+- **高反差單次聚光框（`data-spotlight`）**：升級雙層亮邊＋外光暈（`--spot-border`、`--spot-glow`），縮放至 390px 手機依然一眼辨識。
+- **多元素跨頁 Magic Move（`data-morph="id"`，MIT `open-slide`）**：前後頁 1–4 個核心錨點同步編隊飛移、等比縮放並平順轉換字色。
+- **節流滾動數字（`data-count`，MIT `scrolline`）**：30Hz 節流更新，保留正負號、小數與 `<small>` 單位。
+- **低耗能延遲 Canvas 2D 氛圍層（`data-fx="ambient-dust"|"soft-aurora"`，MIT `lewislulu`）**：`480×270` 緩衝區拉伸、切頁後延遲 520ms 啟動、離頁即停零殘留。
 
 ---
 

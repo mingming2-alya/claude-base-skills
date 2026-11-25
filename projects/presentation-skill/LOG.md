@@ -1329,3 +1329,30 @@
   4. **新增行動端友善觸控滑動與免 localhost 內嵌播放器**：`runtime.js` 原生內建左右滑動手勢（嚴格排除 `.live-ctrl` 滑桿誤觸）；同步更新 `references/motion-system.md` 寫入 60fps 效能禁忌、6 種敘事切頁與視線引導規範。
 - **驗證結果**：`check.mjs --motion` 8 頁靜態像素對比全通過（最低 `4.70:1`）、5 項動態測試全 ✅；手機 390px 實測全 6 種轉場與第 5→6 頁 3 數齊飛（`midClones=3, postClones=0`）零 JS 錯誤；重新打包 `outputs/deck-architect.skill`（127 KB，28 檔）。
 - **同步的檔案**：`outputs/deck-architect/{assets/shell.css,assets/runtime.js,references/motion-system.md}`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`STATUS.md`、`LOG.md`。
+
+## 2026-11-24｜Phase B.3 完成：視覺指引規格書 ＋ 三層聚光壓暗／因果演變／真描線底盤 v4.3 ＋ `v4-alive-demo` 全 8 頁重構
+
+- **使用者的指示與定案（互動表單）**：
+  - 指示接續進行 **Phase B.3 視覺指引**，解決 Phase B.2 頁內動畫在 ~1 秒內密集演完、390px 手機聚光環不明顯、SVG `<line>` `data-grow` 零高寬縮放異常與左右乒乓等問題。
+  - **三項決策**：
+    1. **先訂正式《視覺指引規格書》，同時保持既有翻頁／手勢／快捷鍵互動行為不變**（不改單次點擊或方向鍵翻頁直覺，不強塞額外逐拍點擊鎖）。
+    2. **四大視覺指引手法全數納入**：① 聚光＋非焦點壓暗（390px 手機依然清晰）、② 因果現場演變（第 2 頁 24 烤盤現場消去成 9 綠＋15 省下；第 7 頁從板橋紅卡畫線直指 `11/22` 拍板卡）、③ 視線動線重排與真描線修正（第 3 頁成組展開不左右乒乓、修正點線時序；第 4 頁時間軌行進光珠＋黏土物件目標波紋）、④ 互動頁因果回饋（第 6 頁進頁微動暗示滑桿可拖、拖曳時即時標亮連動指標與相對提案差額）。
+    3. **採完整閉環交付**：規格書＋底盤原語＋`v4-alive-demo` 全 8 頁重構＋`check.mjs` 動態檢核升級＋390px 手機實測與互動預覽。
+- **一、正式規格書與 Skill 文件升級（`outputs/deck-architect/` v4.3，29 檔）**：
+  - 新增 `references/visual-guidance.md`：明定五大假指引反模式、四大靜態視覺動線原型（因果對照流／中心放射集群／時間軌跡流／控制→結果聯動流）、五條動態節奏與高反差鐵律、宣告式原語速查表與 Step 5 六問品管清單。
+  - 同步更新 `SKILL.md`、`references/motion-system.md`、`references/presentation-rules.md`，將視覺指引規格納入 Step 4 撰寫與 Step 5 品管必讀。
+- **二、輕底盤視覺指引原語升級（`assets/shell.css`、`assets/runtime.js` v4.3，100% 60fps GPU、既有翻頁互動零改動）**：
+  - 新增 **`[data-focus-plan]`＋`[data-focus]`** 三層聚光壓暗排程器（`.focus-active` 採 `#stage` 高權重 4px 亮框＋22px 外光暈＋微抬升，390px 手機亦清晰可見；`.focus-visited` 留 0.82 因果脈絡；`.focus-dim` 配角退至 0.30；演完／打斷／離頁／`?still=1` 100% 自動清除零殘留）。
+  - 新增 **`[data-transform-at]`** 因果現場演變（HTML 原態即為最終完稿，動態進頁瞬間加 `.pre-transform` 且以 `transition: none` 零重繪成本初始化，到點移除翻轉為最終態）。
+  - 新增 **`[data-wipe="right|left|down|up"]`**（純 GPU `clip-path` 方向揭露，專治虛線引導針與斜刪線）、**`[data-pop]`**（端點圓點與箭頭精準同步綻放）、**`[data-ripple]`**（雙圈目標擴散波紋）、**`[data-travel="x|y"]`**（軌道行進光珠）、**`[data-nudge="x|y"]`**（互動微動暗示）；同步升級 `[data-spotlight]` 為手機清晰可見的雙層光暈。
+  - 升級 `scripts/check.mjs --motion` 由 5 項增為 **7 項自動實測**：新增聚光壓暗／因果演變演繹中與復原後零殘留測試、SVG 引導線防退化（禁止對 SVG `<line>` 誤用 `data-grow`）檢核，以及連按打斷零背景殘留壓暗檢查。
+- **三、`v4-alive-demo` 全 8 頁重構與實戰踩坑修正**：
+  - 8 頁全部按四大視覺動線原型重編（詳見 `STATUS.md` 與各頁 `slides/01–08`）。
+  - **實測抓出並修掉的三個關鍵問題**：
+    1. 第 2 頁 `24` 刪除線初版採亮珊瑚 `#FF7657` 壓過灰字 `#8C93A0`，`check.mjs` 真實像素測出對比僅 `1.14:1` → 改 `#D5D9E2` 搭深緋紅 `#B83520` 3px 刪線，實測恢復 `4.70:1` 全過。
+    2. 第 2 頁初版把 `transition` 掛在 24 張 `.tray` 與 72 顆點上，引發 218 個非合成器重繪動畫拖慢反向 Magic Move → 在 `shell.css` 加上 `.pre-transform * { transition: none !important; }` 並改為 4 排獨立 `data-transform-at` 輕量翻轉波浪，運行中動畫由 **218 驟降至 4**，60fps 順滑回升。
+    3. 肉眼檢視 390px 手機中場截圖時發現，`.slide.is-focusing .focus-active` 權重輸給各頁作用域 `#s-N .card.focus-risk` 導致首拍紅卡沒顯示外框光暈 → 改以 `#stage .slide.is-focusing [data-focus].focus-active` 補齊權重並重截手機 390px 畫面確認紅框／綠框清晰醒目。
+- **四、驗證與交付**：
+  - `lint.py` 全 3 份範例 0 錯 0 警；`check.mjs --jpg --motion` 全 8 頁靜態像素 WCAG 全過（最低 **`4.70:1`**）、**7 項動態與視覺指引實測全 ✅**；390px 手機實測全轉場與第 5→6 頁三數齊飛（`mid=3, post=0`）零 JS 錯誤；`annual-section` 與 `progress-overview` 商務元件回歸組裝通過；重新打包 `outputs/deck-architect.skill`（135 KB，29 檔）；並產出含行動端一鍵 `↺ 重播` 列的獨立互動預覽頁（`v4_alive_demo_b3.html`）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,references/visual-guidance.md,references/motion-system.md,references/presentation-rules.md,assets/shell.css,assets/runtime.js,scripts/check.mjs}`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：待使用者於互動預覽播放器實測 Phase B.3 視覺指引體感，確認後啟動 **Phase C｜第一份真實簡報端到端 PK 🎯**。

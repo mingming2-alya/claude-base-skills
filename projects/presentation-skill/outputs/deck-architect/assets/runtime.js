@@ -1,17 +1,21 @@
-/* deck-architect v4.2 Thin Shell Runtime (Phase B.2 — 60fps GPU Core + Eye-Guidance + Varied Transitions)
+/* deck-architect v4.3 Thin Shell Runtime (Phase B.3 — 60fps GPU Core + Visual Guidance Spec)
  *
- * Zero external dependencies (~10 KB gzip), 100% offline single-file HTML playback:
+ * Zero external dependencies (~11 KB gzip), 100% offline single-file HTML playback:
  *  - Silky 60/120fps compositor-only WAAPI transitions (zero JS keyframe bloat, zero lockout)
  *  - 6 narrative transition archetypes (data-transition="push|zoom-rise|iris|shock|morph|sheet-up|modal")
  *    with automatic directional reversal on backward navigation
  *  - Multi-element Keynote Magic Move ([data-morph="id"], MIT open-slide) with zero layout thrash
- *  - Visual eye-guidance choreography:
- *      [data-beat="1|2|3|4"] sequential reading rhythm (never simultaneous soup)
- *      [data-draw] SVG path & ring draw (MIT visual-explainer)
- *      [data-grow="x|x-left|y|y-down"] directional pointer/bar growth
- *      [data-spotlight] single crisp executive focus-ring cue
- *      [data-count] throttled post-transition rolling numbers (MIT scrolline)
- *      [data-stagger] non-uniform ease-out stagger (guarded against double entrance)
+ *  - Phase B.3 Visual Guidance Choreography (preserves single-click/key slide navigation unchanged):
+ *      [data-focus-plan] + [data-focus] 3-tier spotlight + context dimming (auto-clears to 100%)
+ *      [data-transform-at] live causal state flip (.pre-transform -> final state)
+ *      [data-draw] true SVG pathLength="1" directional stroke draw & progress rings (MIT visual-explainer)
+ *      [data-wipe="right|left|down|up"] pure GPU clip-path directional reveal (dashed pins, rails, slashes)
+ *      [data-pop] crisp endpoint dot/arrowhead bloom synced to connector arrival
+ *      [data-ripple] single target-lock concentric ring over physical anchors
+ *      [data-travel="x|y"] chronological rail travel bead (pure GPU translate3d)
+ *      [data-nudge="x|y"] subtle interactive slider affordance cue
+ *      [data-spotlight] mobile-visible high-contrast focus ring
+ *      [data-beat] / [data-grow] / [data-count] / [data-stagger]
  *  - Deferred 480x270 Canvas 2D ambient FX lifecycle ([data-fx]; MIT lewislulu/html-ppt-skill)
  *  - Native mobile touch swipe + interactive live-figure isolation (.live-ctrl / [data-interactive])
  *  - Dual static freeze (?still=1, B low-power toggle, prefers-reduced-motion, @media print)
@@ -204,8 +208,26 @@
   }
   initPrimitives();
 
+  function clearFocusClasses(sl) {
+    if (!sl) return;
+    sl.classList.remove('is-focusing');
+    sl.querySelectorAll('[data-focus]').forEach(el => {
+      el.classList.remove('focus-dim', 'focus-active', 'focus-visited');
+    });
+  }
+
+  function clearGuidanceState(sl) {
+    if (!sl) return;
+    clearFocusClasses(sl);
+    sl.querySelectorAll('[data-transform-at]').forEach(el => {
+      el.classList.remove('pre-transform', 'transforming');
+    });
+    sl.querySelectorAll('.spot-pulse').forEach(el => el.classList.remove('spot-pulse'));
+  }
+
   function snapSlideFinal(sl) {
     if (!sl) return;
+    clearGuidanceState(sl);
     sl.querySelectorAll('[data-count]').forEach(el => {
       const tn = findNumTextNode(el);
       if (tn && el.dataset.countFinal !== undefined) tn.nodeValue = el.dataset.countFinal;
@@ -218,11 +240,20 @@
         el.style.strokeDashoffset = '';
       }
     });
-    sl.querySelectorAll('.spot-pulse').forEach(el => el.classList.remove('spot-pulse'));
+  }
+
+  function parseFocusPlan(raw) {
+    if (!raw) return [];
+    const out = [];
+    for (const part of raw.split(',')) {
+      const m = part.trim().match(/^([^\s@]+)@(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/);
+      if (m) out.push({ id: m[1], start: parseFloat(m[2]), end: parseFloat(m[3]) });
+    }
+    return out.sort((a, b) => a.start - b.start);
   }
 
   // Semantic beat delay helper: Beat 1 = immediate anchor, Beat 2 = causal visual cue, Beat 3 = takeaway, Beat 4 = supporting
-  const BEAT_MS = { '1': 60, '2': 320, '3': 580, '4': 820 };
+  const BEAT_MS = { '1': 60, '2': 420, '3': 840, '4': 1260 };
   function beatDelay(el, fallback) {
     if (el.dataset.delay !== undefined) return parseFloat(el.dataset.delay) || 0;
     const b = el.dataset.beat;
@@ -233,6 +264,56 @@
   function animateSlideContent(sl, baseDelay, token, morphedIds) {
     if (!sl || isStatic()) { snapSlideFinal(sl); return; }
     const cfg = slideMotion(sl);
+
+    // 0a. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
+    const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
+    const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
+    if (focusPlan.length && focusEls.length) {
+      const visited = new Set();
+      const applyStage = activeId => {
+        if (token !== navToken || isStatic()) return;
+        sl.classList.add('is-focusing');
+        for (const el of focusEls) {
+          const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
+          const isAct = ids.includes(activeId);
+          const isVis = !isAct && ids.some(id => visited.has(id));
+          el.classList.toggle('focus-active', isAct);
+          el.classList.toggle('focus-visited', isVis);
+          el.classList.toggle('focus-dim', !isAct && !isVis);
+        }
+      };
+      let maxEnd = 0;
+      focusPlan.forEach((step, idx) => {
+        maxEnd = Math.max(maxEnd, step.end);
+        const startAt = step.start === 0 ? 0 : baseDelay + step.start;
+        if (startAt === 0 && idx === 0) {
+          applyStage(step.id);
+        } else {
+          later(() => {
+            if (token !== navToken || isStatic()) return;
+            for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
+            applyStage(step.id);
+          }, startAt);
+        }
+      });
+      later(() => {
+        if (token !== navToken) return;
+        clearFocusClasses(sl);
+      }, baseDelay + maxEnd);
+    }
+
+    // 0b. Live Causal State Transformation ([data-transform-at="ms"]: .pre-transform -> final DOM state)
+    sl.querySelectorAll('[data-transform-at]').forEach(el => {
+      const ms = parseFloat(el.dataset.transformAt) || 720;
+      el.classList.remove('transforming');
+      el.classList.add('pre-transform');
+      later(() => {
+        if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
+        el.classList.remove('pre-transform');
+        el.classList.add('transforming');
+        later(() => { el.classList.remove('transforming'); }, 760);
+      }, baseDelay + ms);
+    });
 
     // 1. Non-uniform staggered groups ([data-stagger]) — lightweight 2-keyframe compositor only
     const staggeredSet = new Set();
@@ -251,11 +332,15 @@
       });
     });
 
-    // 2. Semantic directional reveals (.rv, [data-beat]) — strictly skip nested & morphed
+    // 2. Semantic directional reveals (.rv, [data-beat]) — strictly skip nested, specialized & morphed
     let rvIdx = 0;
     sl.querySelectorAll('.rv, [data-beat]').forEach(el => {
       if (staggeredSet.has(el)) return;
-      if (el.hasAttribute('data-stagger') || el.hasAttribute('data-grow') || el.hasAttribute('data-draw')) return;
+      if (
+        el.hasAttribute('data-stagger') || el.hasAttribute('data-grow') || el.hasAttribute('data-draw') ||
+        el.hasAttribute('data-wipe') || el.hasAttribute('data-pop') || el.hasAttribute('data-ripple') ||
+        el.hasAttribute('data-travel') || el.hasAttribute('data-nudge')
+      ) return;
       if (el.parentElement && el.parentElement.closest('.rv, [data-stagger]')) return;
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
       const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.82)));
@@ -271,14 +356,14 @@
       ));
     });
 
-    // 3. Visual eye-guidance spotlight cues ([data-spotlight]) — single clean ring pulse on priority card
+    // 3. Mobile-visible high-contrast spotlight cues ([data-spotlight])
     sl.querySelectorAll('[data-spotlight]').forEach(el => {
       el.classList.remove('spot-pulse');
       const d = baseDelay + beatDelay(el, 380);
       later(() => {
         if (token !== navToken || isStatic()) return;
         el.classList.add('spot-pulse');
-        later(() => el.classList.remove('spot-pulse'), 920);
+        later(() => el.classList.remove('spot-pulse'), 1020);
       }, d);
     });
 
@@ -322,7 +407,7 @@
       activeRafs.add(id);
     });
 
-    // 5. SVG stroke draw & progress rings ([data-draw])
+    // 5. True SVG stroke draw & progress rings ([data-draw])
     sl.querySelectorAll('[data-draw]').forEach(el => {
       const delay = baseDelay + beatDelay(el, 220);
       const dur = parseFloat(el.dataset.dur) || 720;
@@ -335,11 +420,9 @@
           { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }
         ));
       } else if (el.dataset.drawDashed) {
-        el.style.transformBox = 'fill-box';
-        el.style.transformOrigin = '50% 0%';
         trackAnim(el.animate(
-          [{ opacity: 0, transform: 'scaleY(0)' }, { opacity: 1, transform: 'scaleY(1)' }],
-          { duration: Math.min(420, dur), delay, easing: EASE_CRISP, fill: 'backwards' }
+          [{ opacity: 0 }, { opacity: 1 }],
+          { duration: Math.min(380, dur), delay, easing: EASE_CRISP, fill: 'backwards' }
         ));
       } else {
         el.style.strokeDasharray = '1';
@@ -353,7 +436,7 @@
       }
     });
 
-    // 6. Directional bar & pointer growth ([data-grow="x|x-left|y|y-down"])
+    // 6. Directional bar growth ([data-grow="x|x-left|y|y-down"])
     sl.querySelectorAll('[data-grow]').forEach((el, idx) => {
       const dir = (el.getAttribute('data-grow') || 'x').toLowerCase();
       const delay = baseDelay + beatDelay(el, 160 + idx * 45);
@@ -372,6 +455,94 @@
         el.style.transformOrigin = 'left center';
         trackAnim(el.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }));
       }
+    });
+
+    // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"]) — zero dash distortion!
+    sl.querySelectorAll('[data-wipe]').forEach(el => {
+      const dir = (el.getAttribute('data-wipe') || 'right').toLowerCase();
+      const delay = baseDelay + beatDelay(el, 220);
+      const dur = parseFloat(el.dataset.dur) || 440;
+      const fromClip = dir === 'left' ? 'inset(0 0 0 100%)'
+        : dir === 'down' ? 'inset(0 0 100% 0)'
+        : dir === 'up' ? 'inset(100% 0 0 0)'
+        : 'inset(0 100% 0 0)';
+      trackAnim(el.animate(
+        [{ clipPath: fromClip }, { clipPath: 'inset(0 0 0 0)' }],
+        { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }
+      ));
+    });
+
+    // 8. Endpoint dot / arrowhead / badge crisp pop ([data-pop])
+    sl.querySelectorAll('[data-pop]').forEach(el => {
+      const delay = baseDelay + beatDelay(el, 260);
+      const dur = parseFloat(el.dataset.dur) || 260;
+      if (el instanceof SVGElement) {
+        el.style.transformBox = 'fill-box';
+        el.style.transformOrigin = 'center center';
+      }
+      trackAnim(el.animate(
+        [{ opacity: 0, transform: 'scale(0.22)' }, { opacity: 1, transform: 'scale(1)' }],
+        { duration: dur, delay, easing: 'cubic-bezier(0.22, 1.28, 0.36, 1)', fill: 'backwards' }
+      ));
+    });
+
+    // 9. Target-lock concentric ripple ([data-ripple])
+    sl.querySelectorAll('[data-ripple]').forEach(el => {
+      const delay = baseDelay + beatDelay(el, 480);
+      const dur = parseFloat(el.dataset.dur) || 820;
+      trackAnim(el.animate(
+        [
+          { opacity: 0, transform: 'scale(0.35)' },
+          { opacity: 0.92, transform: 'scale(0.88)', offset: 0.16 },
+          { opacity: 0, transform: 'scale(2.85)' },
+        ],
+        { duration: dur, delay, easing: EASE_SPRING, fill: 'both' }
+      ));
+    });
+
+    // 10. Chronological rail travel bead ([data-travel="x|y"])
+    sl.querySelectorAll('[data-travel]').forEach(el => {
+      const axis = (el.getAttribute('data-travel') || 'x').toLowerCase();
+      const dist = parseFloat(el.dataset.travelDist || '800');
+      const delay = baseDelay + beatDelay(el, 280);
+      const dur = parseFloat(el.dataset.dur) || 1200;
+      const p0 = 'translate3d(0,0,0)';
+      const p1 = axis === 'y'
+        ? 'translate3d(0,' + (dist * 0.05).toFixed(1) + 'px,0)'
+        : 'translate3d(' + (dist * 0.05).toFixed(1) + 'px,0,0)';
+      const p2 = axis === 'y'
+        ? 'translate3d(0,' + dist + 'px,0)'
+        : 'translate3d(' + dist + 'px,0,0)';
+      trackAnim(el.animate(
+        [
+          { opacity: 0, transform: p0 + ' scale(0.5)' },
+          { opacity: 1, transform: p1 + ' scale(1)', offset: 0.06 },
+          { opacity: 1, transform: p2 + ' scale(1)', offset: 0.92 },
+          { opacity: 0, transform: p2 + ' scale(0.55)' },
+        ],
+        { duration: dur, delay, easing: 'cubic-bezier(0.28, 0.08, 0.28, 1)', fill: 'both' }
+      ));
+    });
+
+    // 11. Single subtle interactive control affordance nudge ([data-nudge="x|y"])
+    sl.querySelectorAll('[data-nudge]').forEach(el => {
+      const axis = (el.getAttribute('data-nudge') || 'x').toLowerCase();
+      const delay = baseDelay + beatDelay(el, 700);
+      const dur = parseFloat(el.dataset.dur) || 740;
+      const frames = axis === 'y'
+        ? [
+            { transform: 'translate3d(0,0,0)' },
+            { transform: 'translate3d(0,8px,0)', offset: 0.35 },
+            { transform: 'translate3d(0,-3px,0)', offset: 0.72 },
+            { transform: 'translate3d(0,0,0)' },
+          ]
+        : [
+            { transform: 'translate3d(0,0,0)' },
+            { transform: 'translate3d(14px,0,0)', offset: 0.35 },
+            { transform: 'translate3d(-5px,0,0)', offset: 0.72 },
+            { transform: 'translate3d(0,0,0)' },
+          ];
+      trackAnim(el.animate(frames, { duration: dur, delay, easing: EASE_SPRING, fill: 'none' }));
     });
   }
 
@@ -616,6 +787,7 @@
     for (const sl of slides) {
       sl.classList.remove('in-flight');
       sl.style.zIndex = '';
+      if (sl !== keepPrev) clearGuidanceState(sl);
       if (sl !== keepPrev && sl !== keepNext) {
         sl.classList.remove('active', 'leaving');
         sl.style.opacity = '';
@@ -709,6 +881,7 @@
         cIn.finished.then(() => {
           if (token !== navToken) return;
           prev.classList.remove('leaving', 'active');
+          clearGuidanceState(prev);
           next.classList.add('active');
           later(() => {
             if (token !== navToken) return;
@@ -846,6 +1019,7 @@
           prev.classList.remove('leaving', 'active', 'in-flight');
           prev.style.zIndex = '';
           prev.style.clipPath = '';
+          clearGuidanceState(prev);
           next.classList.remove('in-flight');
           next.style.zIndex = '';
           next.style.clipPath = '';

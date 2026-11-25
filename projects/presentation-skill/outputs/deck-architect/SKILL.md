@@ -78,9 +78,9 @@ node <skill>/scripts/check.mjs --sheet decks/<name>/samples
 ### Step 4｜製作 → `deck.html`（＋可選 `IMAGE_UPGRADE.md`）
 
 1. 將選定的 `style`、`mode` 與配色寫入 `storyboard.yaml` 與 `deck.css`。
-2. 讀 `references/motion-system.md`，依選定的 Style DNA 與動態個性（`spring`／`crisp`／`stepped`），逐頁在 `slides/` 撰寫自由編排 HTML 片段（商務 `status-table`／`pillars` 可直接交給底盤元件渲染）：
+2. 讀 `references/visual-guidance.md` 與 `references/motion-system.md`，依選定的 Style DNA 與動態個性（`spring`／`crisp`），逐頁在 `slides/` 撰寫自由編排 HTML 片段（商務 `status-table`／`pillars` 可直接交給底盤元件渲染）：
    - **真實無字 AI 底圖優先**：插畫或攝影頁若當下有生圖工具，優先依反左右割裂規則生出 16:9 無字底圖放進 `assets/` 並與 HTML 真文字層融合（拒絕簡陋幾何色塊假裝手繪）；若無生圖工具則先給程式版並將場景包進 `.asset-slot[data-slot]`。
-   - **注入克制動態**：為跨頁焦點元素標記 `data-morph`，關鍵數字加 `data-count`，SVG 折線／圓環加 `data-draw`，長條加 `data-grow`，適合現場推演的決策頁加入 `.live-ctrl` 互動試算控件。
+   - **先定靜態動線、再編排動態視覺指引**：每頁依 `references/visual-guidance.md` 選定視覺動線原型（因果對照／中心放射集群／時間軌跡／控制聯動），搭配 `data-focus-plan` 聚光壓暗、`data-transform-at` 因果演變、SVG `<path data-draw>` 真描線＋HTML `data-wipe` 虛線揭露、`data-pop`／`data-ripple` 端點波紋、`data-morph` 跨頁 Magic Move 與 `.live-ctrl` 互動試算控件，**嚴禁 1 秒一鍋端與左右乒乓**。
 3. 組裝單檔簡報（`assemble.py` 會自動把本機 `assets/` 圖片內嵌進單檔 `deck.html`）：
 
 ```bash
@@ -95,7 +95,7 @@ python3 <skill>/scripts/assemble.py decks/<name>/storyboard.yaml --write-upgrade
 node <skill>/scripts/check.mjs decks/<name>/deck.html --motion
 ```
 
-`check.mjs` 會先以 `?still=1` 靜態最終狀態逐頁截圖並自動檢查：**真實背景像素 WCAG 對比**（含漸層字每段色標）、主標題≥總結字級、文字溢出與邊界、最小字級、SVG 重複 ID、圖片載入、腳本錯誤；加上 `--motion` 則自動實測**連按方向鍵零鎖死打斷、Magic Move 掛載與清理、互動滑桿點擊隔離、`B` 鍵靜態凍結與附件進出**。接著**親自檢視截圖**（含去小字程度、標題與內容和諧度、斷行美感），有問題就修對應 `slides/` 或 `storyboard.yaml` 後重建，**最多修 2 輪**；未解項目如實回報。
+`check.mjs` 會先以 `?still=1` 靜態最終狀態逐頁截圖並自動檢查：**真實背景像素 WCAG 對比**（含漸層字每段色標）、主標題≥總結字級、文字溢出與邊界、最小字級、SVG 重複 ID、圖片載入、腳本錯誤；加上 `--motion` 則自動實測**連按方向鍵零鎖死打斷、Magic Move 掛載與清理、聚光壓暗與因果狀態復原零殘留、SVG 引導線實測有效尺寸、互動滑桿點擊隔離、`B` 鍵靜態凍結與附件進出**。接著**親自檢視截圖**（含靜態視覺動線、去小字程度、標題與內容和諧度、斷行美感），有問題就修對應 `slides/` 或 `storyboard.yaml` 後重建，**最多修 2 輪**；未解項目如實回報。
 
 ### Step 6｜交付　⛔ 關卡三
 
@@ -111,7 +111,7 @@ node <skill>/scripts/check.mjs decks/<name>/deck.html --motion
 6. **不寫過場文字**：位置感交給導航（>3 章自動目錄、單章 >2 頁顯示頁籤）。
 7. **震撼頁稀少且有鋪陳**：全場 0–2 次、間隔 ≥3 頁、打破導航與規則（唯開場提問 `role: opener` 例外）。
 8. **裝飾可與文字交錯，可讀性由像素 WCAG 把關**：底色禁純白純黑、禁紫漸層、變暗不等於夜晚。
-9. **把圖與動態拿掉，文字依然完整可讀**：所有動態必須可打斷、零回彈預設且支援 `?still=1`／`B` 鍵／列印完美定格；真文字隨時可編輯。
+9. **把圖與動態拿掉，文字依然完整可讀**：所有視覺指引與動態必須 60fps 可打斷、不改變翻頁直覺且支援 `?still=1`／`B` 鍵／列印完美定格；真文字隨時可編輯。
 
 ## 參考檔索引（用到才讀）
 
@@ -123,7 +123,8 @@ node <skill>/scripts/check.mjs decks/<name>/deck.html --motion
 | `references/presentation-rules.md` | Step 2 展開內容、原則 #26 去小字、繁體在地化、Step 5 品管時 |
 | `references/content-shapes.md` | Step 2–4 判斷內容形狀（14 結構＋5 圖表）與容量上限時 |
 | `references/samples.md` | Step 3 挑選三款多元風格與製作 Gate 2 樣張時 |
-| `references/motion-system.md` | Step 4 撰寫自由畫布、加入 Magic Move／數據動畫／互動控件與動態品管時 |
+| `references/visual-guidance.md` | Step 4–5 規劃靜態視覺動線、聚光壓暗、因果演變與引導線時序時 |
+| `references/motion-system.md` | Step 4 撰寫自由畫布、加入 60fps 切頁／Magic Move／數據動畫／互動控件時 |
 | `references/progress-report.md` | 定期進度回報、多單位 PPTX 檢核（`check_reports.py`）時 |
 | `styles/index.json`、`styles/color-system.md`、`styles/<id>.md` | Step 3–4 撰寫樣張、推薦三組 OKLCH 配色與編排每一頁（含 `workday`、`counsel`、`apple`、`illustration`）時 |
 | `templates/brief.md`、`templates/storyboard.yaml`、`templates/image-upgrade.md` | 建立對應產出物與撰寫反左右割裂生圖提示詞時 |
