@@ -1247,6 +1247,61 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
     await driver.pdf(path.join(path.dirname(filePath), 'deck.pdf'));
   }
 
+  const liveliness = await driver.evaluate(() => {
+    const sls = window.__deck.slides.filter(s => s.dataset.appendix !== '1');
+    const stageMode = (window.__deck.stageMode || document.documentElement.dataset.stageMode || 'pitch').toLowerCase();
+    const contentSlides = [];
+    const primitives = new Set();
+    const primChecks = [
+      ['data-focus-plan', sl => sl.hasAttribute('data-focus-plan')],
+      ['data-draw', sl => Boolean(sl.querySelector('[data-draw]'))],
+      ['data-wipe', sl => Boolean(sl.querySelector('[data-wipe]'))],
+      ['data-grow', sl => Boolean(sl.querySelector('[data-grow]'))],
+      ['data-morph', sl => Boolean(sl.querySelector('[data-morph]'))],
+      ['data-count', sl => Boolean(sl.querySelector('[data-count]'))],
+      ['data-step', sl => Boolean(sl.querySelector('[data-step], [data-step-only]'))],
+      ['data-transform-at', sl => Boolean(sl.querySelector('[data-transform-at]'))],
+      ['interactive-module', sl => Boolean(sl.querySelector('[data-flow-carousel], [data-coverflow], [data-marquee], [data-compare-slider], [data-code-stage], [data-ref], [data-sound-ab], [data-sound-demo], [data-slide-video], .live-ctrl input[type="range"], [data-segmented]'))],
+    ];
+    let visualCount = 0;
+    let maxFlatStreak = 0;
+    let curFlatStreak = 0;
+    const flatSlides = [];
+    sls.forEach((sl, idx) => {
+      for (const [name, fn] of primChecks) if (fn(sl)) primitives.add(name);
+      const kind = sl.dataset.kind || 'content';
+      if (kind !== 'content') { curFlatStreak = 0; return; }
+      const hasBigSvg = [...sl.querySelectorAll('svg')].some(g => {
+        const vb = (g.getAttribute('viewBox') || '').split(/[\s,]+/).map(Number);
+        const w = parseFloat(g.getAttribute('width') || '0') || (vb[2] || 0);
+        return w >= 120;
+      });
+      const hasMediaOrWidget = Boolean(sl.querySelector('img, .asset-slot, video, audio, table, [data-flow-carousel], [data-coverflow], [data-compare-slider], [data-code-stage], [data-ref], [data-marquee], .pillars, .device-browser, .device-frame, .live-ctrl input[type="range"]'));
+      const isVisual = hasBigSvg || hasMediaOrWidget;
+      const hasMotion = primChecks.some(([, fn]) => fn(sl));
+      contentSlides.push({ slideNum: idx + 1, isVisual, hasMotion });
+      if (isVisual) {
+        visualCount++;
+        curFlatStreak = 0;
+      } else {
+        curFlatStreak++;
+        maxFlatStreak = Math.max(maxFlatStreak, curFlatStreak);
+        flatSlides.push({ slideNum: idx + 1, score: hasMotion ? 1 : 0 });
+      }
+    });
+    const totalContent = contentSlides.length;
+    const visualRatio = totalContent ? Math.round((visualCount / totalContent) * 100) : 100;
+    return {
+      stageMode,
+      totalContent,
+      visualCount,
+      visualRatio,
+      primitives: [...primitives],
+      maxFlatStreak,
+      polishCandidates: flatSlides.sort((a, b) => a.score - b.score).slice(0, 3).map(x => x.slideNum),
+    };
+  });
+
   const jsErrs = driver.getErrors();
   let motionReport = null;
   if (opts.motion) {
@@ -1269,6 +1324,34 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
     lines.push('');
   } else if (!jsErrs.length) {
     lines.push('## 自動靜態檢查：全部通過', '', '接著請逐張看截圖，確認美感、去小字程度、斷行與主標題階層符合預期。', '');
+  }
+  if (liveliness && liveliness.totalContent > 0) {
+    const mode = liveliness.stageMode || 'pitch';
+    const minVis = mode === 'briefing' ? 40 : (mode === 'keynote' ? 75 : 55);
+    const minPrim = mode === 'briefing' ? 1 : (mode === 'keynote' ? 4 : 2);
+    const maxStreakAllow = mode === 'briefing' ? 3 : 2;
+    const liveWarns = [];
+    if (liveliness.visualRatio < minVis) {
+      liveWarns.push(`視覺／圖表／互動內容頁佔比 ${liveliness.visualRatio}%（${mode} 建議 ≥ ${minVis}%）`);
+    }
+    if (liveliness.primitives.length < minPrim) {
+      liveWarns.push(`動態與互動原語僅 ${liveliness.primitives.length} 種（${mode} 建議 ≥ ${minPrim} 種，避免全場只剩單調淡入）`);
+    }
+    if (liveliness.maxFlatStreak > maxStreakAllow) {
+      liveWarns.push(`出現連續 ${liveliness.maxFlatStreak} 頁純文字無圖解頁面`);
+    }
+    lines.push(`## 生動度與反單調體檢（Liveliness Audit · \`stage_mode=${mode}\`）`);
+    lines.push(`- 視覺／圖表／互動頁佔比：**${liveliness.visualCount}/${liveliness.totalContent}（${liveliness.visualRatio}%）**（標準 ≥ ${minVis}%）`);
+    lines.push(`- 動態與互動原語多樣性：**${liveliness.primitives.length} 種**（${liveliness.primitives.join('、') || '無'}；標準 ≥ ${minPrim} 種）`);
+    if (liveWarns.length) {
+      for (const lw of liveWarns) lines.push(`- ⚠️ [WARN] ${lw}`);
+      if (liveliness.polishCandidates.length) {
+        lines.push(`- 建議於 Polish Pass 優先升級視覺之頁面：第 ${liveliness.polishCandidates.join('、')} 頁`);
+      }
+    } else {
+      lines.push('- ✅ 達標：視覺豐富度與節奏變化符合此場合標準。');
+    }
+    lines.push('');
   }
   if (motionReport) {
     lines.push('## 動態互動檢核（`--motion`）');

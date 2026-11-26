@@ -99,6 +99,11 @@ slides:
     title: 導入時間
     signature: true
     layout: compare
+    director:                           # 4 行極簡分鏡（briefing 僅關鍵頁填寫；pitch/keynote 建議逐頁填寫）
+      hero: 左右拖曳前後對比畫面（45 天人工導入 vs 12 天標準化陪跑）
+      archetype: interactive-proof      # 對應 references/recipes/：bento-causal / linked-diagram / interactive-proof / product-story / editorial-drama
+      module: compare-slider            # 預計使用之 Layer 2 模組（無則填 none）
+      choreo: "transition=zoom-rise; 靜態停 50% 即看懂差距，現場可拖曳"
     left:
       heading: 轉型前
       items: [平均 45 天上線, 客戶要自己讀文件]

@@ -1,21 +1,18 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-25｜`deck-architect` v4.5 三層按需架構＋亂中有序治理＋三批能力擴充全部完成 ✅）**：
+> **最新接手點（2026-11-25｜`deck-architect` v4.6 導演驅動閉環＋依場合三段調檔＋風格圖鑑快選＋分批精雕＋生動度體檢完成 ✅）**：
 >
-> 1. **GitHub 10 大簡報 Skill 二次盤點（`inputs/modular-capabilities-audit.md`）＋「亂中有序」五支柱治理落地**：
->    - **三層分離架構**：Layer 0 核心輕底盤（`shell.css`／`runtime.js`，新增中央 Overlay 優先級註冊表 `annotator(90) > lightbox(80) > grid(70) > appendix`、`addCtrlButton` 與 `?noscale=1`）、Layer 1 講者臨場工具（`assets/presenter/`）、Layer 2 細粒度按需內容模組（`assets/components/*`、`assets/modules/fx/*`、`assets/modules/*`、`assets/fit.js`）。
->    - **漸進揭露文件體系**：瘦身 `SKILL.md`，建立一頁決策表 `references/modules-catalog.md` 與三本按需子手冊（`references/modules/{media-and-gallery,interactive-explainers,presenter-and-fx}.md`）。
->    - **軟性防呆（`[WARN]` 不卡死）**：`assemble.py` 與 `lint.py` 自動提醒單頁多主角模組衝突、`stage_mode` 預算超額（`briefing` 禁高氛圍模組、`pitch` 最多 1 頁 `ambient-fx`）與可選 `meta.modules` 白名單漂移。
-> 2. **三批完整能力實作（未用到一律 0 KB）**：
->    - **Batch 1｜深化原有 7 大模組**：`ambient-fx` 細拆為 6 支讀色票單特效插件（`ambient-dust`/`soft-aurora`/`constellation`/`data-stream`/`orbit-ring`/`confetti-burst`）；`media` 新增影片 `data-start`/`data-end` 片段循環、`data-rate` 倍速、全螢幕與 `[data-sound-ab]` 同步 A/B 音軌切換；`flow-carousel` 擴為 `vertical|horizontal|stepper|chat` 4 模式（含節點聯動與底部時間軸）；`coverflow` 補齊 `[data-marquee]` 無縫跑馬燈（靜態自動轉網格）與 `[data-cf-lightbox]`；`live-controls` 補齊 `[data-segmented]`／`[data-toggle]`／`[data-presets]`／`[data-reset]` 與互動 JS；`components` 細拆為 6 支單檔 CSS（新增 `device-frame.css`）；`fit` 新增 `data-fit="box"` 防爆框＋`?noscale=1`。
->    - **Batch 2｜3 項 Layer 1 講者臨場工具（依 `delivery` 自動掛載，可用 `meta.presenter_tools` 覆寫）**：`grid-overview`（`G` 鍵 16:9 縮圖矩陣跳頁）、`annotator`（`A` 鍵 1920×1080 座標鎖定畫筆／螢光筆＋`C` 清除＋`L` 鍵雷射筆）、`speaker-view`（`S` 鍵 `BroadcastChannel` 雙螢幕講者控制台）。
->    - **Batch 3｜4 項殺手級說服力模組**：`linked-highlight`（`[data-ref]` 文圖雙向聯動）、`compare-slider`（`[data-compare-slider]` 前後對比拉桿）、`code-stage`（`[data-code-stage]` 零依賴語法上色＋`data-step-lines` 步進行聚焦＋`[data-typewriter]`）、`visual-flair`（`[data-zoomable]` 圖表放大燈箱＋`[data-tilt]`≤5°＋`[data-spotlight-hover]`）。
-> 3. **13 項自動實測＋四範例全綠＋重打包驗證**：
->    - `scripts/check.mjs --motion` 擴充至 **13 項**（新增 Check 12 Layer 1 講者工具 `G`/`A`/`L`/`S` 與 Esc 層級退出、Check 13 v4.5 說服力模組實測）。
->    - 全新虛構技術示範 `outputs/examples/v45-modular-demo/`（6 頁涵蓋全部新模組與升級能力）`lint.py` 0 錯 0 警、`check.mjs --jpg --motion` 靜態（最低 **`4.84:1`**）＋全部動態全 ✅ 且 6 張截圖目視檢核通過。
->    - 既有三範例零回歸全過：`v44-keynote-demo`（最低 `4.53:1`，省 61.0 KB）、`v4-alive-demo`（最低 `4.70:1`，省 **105.1 KB**）、`v4-demo`（最低 `4.81:1`，省 **115.9 KB**）；重打包 `outputs/deck-architect.skill`（**67 檔，220.9 KB**，零 `__pycache__`）。
+> 1. **根治「Demo 很生動 vs 真實需求簡報偏平淡」五大結構落差（全面依 `stage_mode` 三段自動調檔，日常匯報不浮誇、提案／發表會不平淡）**：
+>    - **Step 1 依場合自動調檔（`references/grill.md`、`templates/brief.md`）**：`briefing` 不硬挖煽情故事、主打「內容減法提案」（長文歸 `notes` 守三秒掃讀）；`pitch` 抓 1 個痛點反差＋以白話提案 1–2 個實用互動頁（不丟模組術語）；`keynote` 完整挖故事張力與原話＋提案 2–3 個吸睛招牌亮點頁，由 Agent 幕後映射按需模組。
+>    - **Step 2 逐頁 4 行視覺分鏡（`templates/storyboard.yaml`、`scripts/deck_model.py`、`scripts/lint.py`）**：新增輕量 `director:`（`hero`／`archetype`／`module`／`choreo`），`briefing` 僅標關鍵頁、`pitch`/`keynote` 逐頁防退化成純文字卡片。
+>    - **Step 3 兩階段精準視覺關卡（`assets/style-library.html`、`references/samples.md`）**：Step 3a 先以 Motion Library 式「風格與動效圖鑑」（收錄目前 4 款完整就緒風格：`workday`／`counsel`／`apple`／`illustration`，內建淺／深切換、試播動效與 `?stage=` 場合高亮）秒選 1 款風格 → Step 3b 集中 100% 火力畫該風格的 2–3 張真實高工藝樣張＋3 組 OKLCH 配色；確認後直接沿用進成品並作為 Step 4 活範本（Live Style Anchor）。
+>    - **Step 4 分批乾淨分身精雕＋5 支黃金工藝配方（`SKILL.md`、`references/recipes/*.md`）**：內建 5 支精選語意變數版高工藝配方（`bento-causal`、`linked-diagram`、`interactive-proof`、`product-story`、`editorial-drama`）；超過 6 頁自動拆成每 3–4 頁一小批派乾淨上下文子代理並行精雕（吃 `deck.css`＋Step 3b 活範本＋該批 `director:`＋對應配方），消除長對話後面滑坡。
+>    - **Step 5 雙門檻品管（`scripts/check.mjs`）**：保留下限像素 WCAG＋13 項動態實測，新增依 `stage_mode` 調檔之 **Liveliness Audit（生動度與反單調體檢）**，自動量測視覺頁佔比、原語多樣性與連續純文字單調頁，點名最平淡頁面進入 Polish Pass。
+> 2. **驗證與重打包**：
+>    - `lint.py` 通過 `templates/storyboard.yaml`（含 `director:`）與全數 4 個範例（0 錯）；`check.mjs --jpg --motion` 於 `v45-modular-demo`（視覺 100%、4 種原語 ✅）與 `v44-keynote-demo`（視覺 100%、5 種原語 ✅）Liveliness Audit 全數達標；`assets/style-library.html` 已透過無頭 Chrome 截圖目視驗收通過。
+>    - 重新打包 `outputs/deck-architect.skill`（**73 檔，237.4 KB**，零 `__pycache__`）。
 >
-> **下一步（Phase C.2 收官驗收 → Phase D）**：以升級後完整的 `deck-architect` v4.5 進行真實簡報 PK 複驗（由使用者指定題材或沿用 Phase C 案例重構驗證），確認滿意後推進 **Phase D｜補齊其餘 8 款 Style DNA 與主題智能配對**。
+> **下一步（Phase C.2 收官驗收 → Phase D）**：以升級後完整的 `deck-architect` v4.6 進行真實簡報 PK 複驗，確認滿意後推進 **Phase D｜補齊其餘 8 款 Style DNA 並逐款上架 Style & Motion Library**。
 >
 > 主軸文件是 `ROADMAP.md`，執行紀錄在 `LOG.md`，專案規則在根目錄 `CLAUDE.md`。
 
@@ -29,7 +26,7 @@ _最後更新：2026-11-25_
    - 每個段落結束就同步：`STATUS.md`、`LOG.md`、commit、push。
    - Stop hook 會檢查有沒有沒推的變更。
    - **所有要問使用者的問題一律用互動表單（AskUserQuestion）**。每題能單獨看懂，題目互不依賴，一題最多 4 個選項，推薦的放第一個並標「（推薦）」。
-4. 驗證腳本 `scripts/check.mjs` 已支援 Playwright 與系統 Chromium CDP 自動退路，加 `--motion` 可一併執行最多 13 項動態與 v4.5 引擎實測；執行 `lint.py` 若遇 pyenv 缺 PyYAML，改用 `/usr/bin/python3`。
+4. 驗證腳本 `scripts/check.mjs` 已支援 Playwright 與系統 Chromium CDP 自動退路，加 `--motion` 可一併執行最多 13 項動態實測＋Liveliness Audit 生動度稽核；執行 `lint.py` 若遇 pyenv 缺 PyYAML，改用 `/usr/bin/python3`。
 
 ## 階段與進度
 
@@ -41,8 +38,8 @@ _最後更新：2026-11-25_
 | **Phase B 預研** | **動態技術路線研究與定案**：實查 14 個 GitHub Repo（`inputs/motion-research.md`），定案 **方案 1｜分層混合** | ✅ 定案 |
 | **Phase B / B.2 / B.3** | **反寫靜態工藝與原則 #26 ＋ 60fps 動態引擎 ＋ 視覺指引規格與原語（v4.3）**：`v4-alive-demo` 8 頁靜態＋7 項動態實測全過 | ✅ |
 | **Phase C.1** | **真實旗艦標竿對照 ＋ v4.4-spec 規格與 Grill v2 全面升級**：三段式舞台光譜、設計樹 Grill v2（融合 `mattpocock/skills`）、原則 #27–#30、9 份核心規格反寫並重打包 | ✅ |
-| **Phase C.2** | **v4.4→v4.5 三層按需引擎全面實作 ＋ 3 項講者工具 ＋ 11 項細粒度內容模組 ＋ 13 項實測驗證**：引擎、模組、亂中有序治理、`v44-keynote-demo`＋`v45-modular-demo`、零回歸與打包完成 ✅；待真實簡報 PK 複驗收官 | 🟡 引擎完成／待實戰 PK |
-| **Phase D** | **多元風格庫全面成形**：補齊其餘 8 款 Style DNA（各含淺深規則與動效個性）、整理插畫 15 種畫風配方表、主題→風格智能配對（穩健／大膽／驚喜）與外觀帳本 | 未開始 |
+| **Phase C.2** | **v4.4→v4.6 三層按需引擎＋導演驅動閉環全面實作**：Layer 1 `G/A/L/S`、Layer 2 11 項細粒度模組、場合三段調檔 Grill、4 行 `director:` 分鏡、Style & Motion Library 圖鑑＋單風格活範本、>6 頁分批乾淨分身、5 支黃金配方、13 項動態＋Liveliness Audit 全完成 ✅；待真實簡報 PK 複驗收官 | 🟡 引擎與流程完成／待實戰 PK |
+| **Phase D** | **多元風格庫全面成形**：補齊其餘 8 款 Style DNA（各含淺深規則與動效個性並上架 `style-library.html`）、整理插畫 15 種畫風配方表、主題→風格智能配對與外觀帳本 | 未開始 |
 | **Phase E** | **交付、修改閉環與記憶**：成品按 `E` 改字回寫、畫面上點選留言修改、文字可編輯 PPTX 匯出、品味記憶與獨立評審、評估搬進 `skills/` 正式安裝（註：雙螢幕講者模式 `S` 鍵已提前於 v4.5 完成） | 未開始 |
 
 ## 已經定案的事
@@ -50,38 +47,39 @@ _最後更新：2026-11-25_
 | 決定 | 日期 | 寫在哪裡 |
 |---|---|---|
 | 風格清單十二款（插畫場景、積木構成、水彩水墨、Apple 發表、書卷刻本、顧問報告、孔版小誌、摩登金、日常工作款、攝影雜誌、年輕潮流、在地懷舊） | 11-18 | `inputs/style-list-v5.md`、`styles/index.json` |
-| 首批四款完整 Style DNA：顧問報告、Apple 發表、插畫場景（含 15 種畫風）、日常工作款（現代 Bento） | 11-23 | `outputs/deck-architect/styles/` |
+| 首批四款完整 Style DNA：顧問報告、Apple 發表、插畫場景（含 15 種畫風）、日常工作款（現代 Bento） | 11-23 | `outputs/deck-architect/styles/`、`assets/style-library.html` |
 | **用色鎖規則、不鎖色碼、不放品牌色、全部風格淺深雙底** | 11-19 | 原則 #17–19、`styles/color-system.md` |
 | **風格本質固定，元素、用色、介面依內容調整；變暗不等於夜晚** | 11-19 | 原則 #21–22、`styles/illustration.md` |
 | **多元風格採生成式 Style DNA**，放棄原 2c 19×4 靜態排法矩陣 | 11-19 | 原則 #23、`ROADMAP.md` |
-| **三層按需架構＋亂中有序治理（v4.5）**：Layer 0 核心輕底盤（含 Overlay 優先級註冊表）、Layer 1 講者工具（`G`/`A`/`L`/`S`，依 `delivery` 自動掛載）、Layer 2 11 項細粒度按需模組（含單檔元件與單特效 FX，未用到 0 KB）、漸進揭露手冊（`modules-catalog.md`＋3 子手冊）與軟性 `[WARN]` 場合／多主角防呆 | 11-19 / 11-25 | 原則 #24、`scripts/assemble.py`、`references/modules-catalog.md` |
+| **三層按需架構＋亂中有序治理（v4.5）**：Layer 0 輕底盤（Overlay 優先級棧）、Layer 1 講者工具（`G`/`A`/`L`/`S`）、Layer 2 11 項細粒度按需模組（未用到 0 KB）、漸進揭露手冊與軟性 `[WARN]` 防呆 | 11-19 / 11-25 | 原則 #24、`scripts/assemble.py`、`references/modules-catalog.md` |
+| **導演驅動閉環＋兩階段視覺關卡（v4.6）**：Step 1 依 `stage_mode` 三段自動調檔（減法／反差／白話亮點頁）→ Step 2 4 行 `director:` 分鏡 → Step 3a 風格與動效圖鑑（4 款就緒）快選 → Step 3b 單風格 2–3 張高工藝樣張直接沿用為活範本 → Step 4 >6 頁每 3–4 頁乾淨分身精雕 → Step 5 Liveliness Audit 生動度稽核 | 11-25 | `SKILL.md`、`assets/style-library.html`、`references/{grill.md,samples.md,recipes/*}`、`scripts/check.mjs` |
 | **預設零等待全自動產出＋可選 `IMAGE_UPGRADE.md`**：每頁預留 `.asset-slot[data-slot]` 可無縫換入 AI 底圖或照片，本機圖檔自動內嵌單檔 | 11-23 | 原則 #25、`scripts/assemble.py` |
 | **四大靜態視覺工藝標準＋原則 #26（含三項合法豁免）**：真實 AI 無字底圖融合、現代 Bento、數據故事化、精緻暗場；`delivery: talk` 每一般群組 ≤2 層文字（豁免：原話暗房證言、產品情感短句、活流程步進微標） | 11-23 / 11-25 | 原則 #26、`references/presentation-rules.md` |
 | **Phase B 動態技術路線＝方案 1｜分層混合 ＋ Phase B.3 視覺指引規範**：60fps GPU 核心、6 種敘事切頁、三層聚光壓暗、因果現場演變、真描線／方向揭露／分段靜讀與語意順序優先 | 11-23 / 11-24 | `references/motion-system.md`、`references/visual-guidance.md` |
-| **三段式舞台光譜（`stage_mode`：`briefing`/`pitch`/`keynote`）**：依場合動態決定光暗雙極、去框化比例、導航模式與戲劇層，絕不一刀切 | 11-25 | 原則 #27、`references/contexts.md`、`references/visual-guidance.md` |
-| **Step 1 Grill v2（融合 `mattpocock/skills` 始祖機制）**：設計樹前沿不設輪次上限直到零靜默假設、先查事實只問決定、體感預期＋承重母題、**標準模式全面必給 1 個跳脫思維破框候選**、Grounding 著陸與說服載體辯論＋按需模組對齊 | 11-25 | 原則 #28、`references/grill.md`、`references/structure.md`、`templates/brief.md` |
-| **雙軌節拍（自動指引＋講者 `data-step`）＋雙軌多媒體＋三層按需引擎**：全部實作並由 `check.mjs --motion` 13 項實測把關 | 11-25 | 原則 #29–30、`assets/shell.css`、`assets/runtime.js`、`assets/presenter/`、`assets/modules/` |
+| **三段式舞台光譜（`stage_mode`：`briefing`/`pitch`/`keynote`）**：依場合動態決定光暗雙極、去框化比例、導航模式與生動度門檻，絕不一刀切 | 11-25 | 原則 #27、`references/contexts.md`、`references/visual-guidance.md` |
+| **Step 1 Grill v2（融合 `mattpocock/skills` 始祖機制）**：設計樹前沿直到零靜默假設、先查事實只問決定、體感預期＋承重母題、標準模式必給跳脫思維破框候選、Grounding 與白話招牌頁提案＋減法清單 | 11-25 | 原則 #28、`references/grill.md`、`references/structure.md`、`templates/brief.md` |
+| **雙軌節拍＋雙軌多媒體＋三層按需引擎**：全部實作並由 `check.mjs --motion` 13 項實測＋Liveliness Audit 把關 | 11-25 | 原則 #29–30、`assets/shell.css`、`assets/runtime.js`、`assets/presenter/`、`assets/modules/` |
 
 ## 交付物地圖
 
 | 路徑 | 內容 |
 |---|---|
-| `outputs/deck-architect/` | **v4.5 完整版 Skill 原始碼（67 檔：Layer 0 輕底盤＋Layer 1 3 項講者工具＋Layer 2 11 項細粒度模組＋漸進揭露模組手冊＋13 項 `check.mjs --motion`）** |
-| `outputs/deck-architect.skill` | v4.5 打包檔（220.9 KB，67 檔，零 `__pycache__`） |
-| `outputs/examples/v45-modular-demo/` | **v4.5 三層引擎與全部新／升級模組虛構技術示範**（6 頁涵蓋 `constellation`/`confetti-burst`、`marquee`、`linked-highlight`、`zoomable`、`compare-slider`、`code-stage`+`data-step`+`typewriter`、`live-controls` 全套件、`sound-ab` 同步 A/B、`flow-carousel="chat"`、`device-frame` 與 `G/A/L/S`；最低對比 `4.84:1`，全項 ✅） |
-| `outputs/examples/v44-keynote-demo/` | Phase C.2 v4.4 旗艦五大新能力虛構示範（7 頁，最低對比 `4.53:1`，省 61.0 KB，全項 ✅） |
+| `outputs/deck-architect/` | **v4.6 完整版 Skill 原始碼（73 檔：三層按需引擎＋`style-library.html` 4 款風格圖鑑＋5 支 `references/recipes/` 黃金配方＋Liveliness Audit）** |
+| `outputs/deck-architect.skill` | v4.6 打包檔（237.4 KB，73 檔，零 `__pycache__`） |
+| `outputs/examples/v45-modular-demo/` | v4.5/v4.6 三層引擎與全部新／升級模組虛構技術示範（6 頁，最低對比 `4.84:1`，Liveliness Audit 視覺 100% ✅） |
+| `outputs/examples/v44-keynote-demo/` | Phase C.2 v4.4 旗艦五大新能力虛構示範（7 頁，最低對比 `4.53:1`，Liveliness Audit 視覺 100% ✅） |
 | `inputs/modular-capabilities-audit.md` | 10 個 GitHub 簡報 Skill 二次盤點：按需模組深化與漏網 Nice-to-Have 報告 |
 | `inputs/phase-c-teardown-learnings.md` | Phase C 旗艦標竿對照與 `mattpocock/skills` 始祖回溯研究筆記（去敏版） |
 | `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–30 條 |
-| `outputs/examples/v4-alive-demo/` | Phase B.3.2 視覺指引＋60fps 全動態互動單檔示範（v4.5 重建省 105.1 KB，8 頁全過，最低 `4.70:1`） |
+| `outputs/examples/v4-alive-demo/` | Phase B.3.2 視覺指引＋60fps 全動態互動單檔示範（重建省 105.1 KB，8 頁全過，最低 `4.70:1`） |
 | `outputs/examples/v4-visual-benchmark/` | 靜態美感上限重練標竿・去小字極致留白版（6 頁全通過） |
-| `outputs/examples/v4-demo/` | Phase A 初版虛構端到端範例（v4.5 重建省 115.9 KB，8 頁全過，最低 `4.81:1`） |
+| `outputs/examples/v4-demo/` | Phase A 初版虛構端到端範例（重建省 115.9 KB，8 頁全過，最低 `4.81:1`） |
 | `inputs/motion-research.md` | Phase B 動態技術路線研究（14 個 GitHub Repo 實查，已定案方案 1） |
 | `outputs/style-specs/`、`outputs/color-modes/`、`outputs/illustration-integration/`、`outputs/style-moodboard-v5/` | 首批風格詳規、淺深雙底配色、插畫 15 畫風融合與 12 款風格視覺錨點 |
 
 ## 待使用者決定（適時用表單確認）
 
-- **Phase C.2 實戰 PK 複驗 vs 直接進 Phase D**：是否以升級後 `deck-architect` v4.5 立即進行真實簡報 PK 複驗，或直接推進 Phase D 補齊其餘 8 款 Style DNA。
+- **Phase C.2 實戰 PK 複驗 vs 直接進 Phase D**：是否以升級後 `deck-architect` v4.6 立即進行真實簡報 PK 複驗，或直接推進 Phase D 補齊其餘 8 款 Style DNA 並上架風格圖鑑。
 - 埃及壁畫、瑪雅抄本是否要生圖做升級插槽實測。
 - 日式留白之後要不要在 Phase D 當獨立一款。
 - `deck-architect` 什麼時間點搬進 `skills/` 由 `install.sh` 全域安裝（建議 Phase C 或 E 後）。

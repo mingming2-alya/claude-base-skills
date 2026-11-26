@@ -67,7 +67,7 @@ COMMON_FIELDS = {
     "type", "chapter", "title", "tab", "layout", "notes", "source", "link",
     "appendix", "id", "role", "variant", "series", "signature", "file",
     "component", "summary", "key", "slot", "visual", "data", "items",
-    "points", "text", "sub", "surface", "nav", "transition",
+    "points", "text", "sub", "surface", "nav", "transition", "director",
 }
 
 STAGE_MODES = {"briefing", "pitch", "keynote"}
@@ -172,7 +172,7 @@ _NON_TEXT_KEYS = {
     "appendix", "role", "variant", "series", "bar", "signature", "file",
     "component", "slot", "visual", "scene_layout", "art_style", "state",
     "risk", "progress", "order", "stagger", "continued", "surface", "nav",
-    "transition",
+    "transition", "director",
 }
 
 

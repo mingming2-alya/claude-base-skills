@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Deck Architect｜Style &amp; Motion Library（4 款就緒風格圖鑑）</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --page-bg: #F3F2EE;
+      --card-bg: #FFFFFF;
+      --ink: #161922;
+      --ink-2: #475063;
+      --ink-3: #647087;
+      --line: rgba(22, 25, 34, 0.12);
+      --brand: #0F766E;
+      --font-sans: "Space Grotesk", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+    body {
+      background: var(--page-bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      padding: 36px 40px 56px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 28px;
+    }
+    .kicker {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 6px;
+    }
+    h1 { font-size: 34px; font-weight: 900; letter-spacing: -0.02em; }
+    .sub { font-size: 16px; color: var(--ink-2); margin-top: 6px; }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .flt-btn {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--card-bg);
+      color: var(--ink-2);
+      padding: 9px 16px;
+      border-radius: 999px;
+      font: 700 14px/1 var(--font-sans);
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+    .flt-btn:hover { border-color: var(--brand); color: var(--ink); }
+    .flt-btn.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 26px;
+    }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+
+    .style-card {
+      background: var(--card-bg);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(22, 25, 34, 0.05);
+      transition: transform .22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow .22s ease, opacity .22s ease, border-color .22s ease;
+    }
+    .style-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 42px rgba(22, 25, 34, 0.10);
+    }
+    .style-card.is-rec {
+      border: 2px solid var(--brand);
+      box-shadow: 0 14px 36px rgba(15, 118, 110, 0.14);
+    }
+    .style-card.is-muted {
+      opacity: 0.42;
+    }
+
+    /* 16:9 Live Miniature Stage */
+    .stage-box {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      padding: 22px 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: background-color .3s ease, color .3s ease;
+    }
+    .stage-tools {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 6;
+      display: flex;
+      gap: 6px;
+    }
+    .mini-btn {
+      appearance: none;
+      border: 1px solid rgba(128, 128, 128, 0.28);
+      background: rgba(20, 24, 34, 0.72);
+      color: #F4F5F7;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font: 700 12px/1 var(--font-sans);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: transform .15s ease, background .18s ease;
+    }
+    .mini-btn:hover { background: rgba(20, 24, 34, 0.92); transform: scale(1.03); }
+
+    /* Card Metadata */
+    .meta {
+      padding: 20px 24px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .meta-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .meta-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .meta-title h2 { font-size: 22px; font-weight: 900; }
+    .meta-title code { font-size: 13px; color: var(--ink-3); background: #F1F2F6; padding: 3px 8px; border-radius: 6px; }
+    .rec-badge {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.12);
+      color: var(--brand);
+      display: none;
+    }
+    .style-card.is-rec .rec-badge { display: inline-block; }
+    .desc { font-size: 14px; color: var(--ink-2); }
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #F4F5F8;
+      color: var(--ink-2);
+    }
+    .motion-pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #EEF2FF;
+      color: #3730A3;
+    }
+
+    /* ---- Style 1: workday (Modern Bento) ---- */
+    .st-workday[data-m="light"] { background: #F5F6F8; color: #171B24; --wa: #0F766E; --wc: #FFFFFF; --wl: rgba(23,27,36,0.10); --wsub: #525B6B; }
+    .st-workday[data-m="dark"]  { background: #10151F; color: #F1F5F9; --wa: #34D399; --wc: #18202E; --wl: rgba(241,245,249,0.14); --wsub: #94A3B8; }
+    .wd-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 12px; flex: 1; margin-top: 12px; }
+    .wd-col { display: flex; flex-direction: column; gap: 10px; }
+    .wd-card { background: var(--wc); border: 1px solid var(--wl); border-radius: 12px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .wd-risk { border-left: 4px solid #E11D48; }
+    .wd-act { border-left: 4px solid var(--wa); }
+    .wd-bar-bg { height: 7px; border-radius: 999px; background: var(--wl); overflow: hidden; margin-top: 6px; }
+    .wd-bar-fill { height: 100%; border-radius: 999px; background: var(--wa); transform-origin: left; }
+
+    /* ---- Style 2: counsel (Editorial Data Authority) ---- */
+    .st-counsel[data-m="light"] { background: #F8F6F0; color: #1B1D21; --ca: #1D4ED8; --cm: #64748B; --cl: rgba(27,29,33,0.16); }
+    .st-counsel[data-m="dark"]  { background: #12151C; color: #F3F1EC; --ca: #60A5FA; --cm: #94A3B8; --cl: rgba(243,241,236,0.18); }
+    .cs-body { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 18px; align-items: end; flex: 1; margin-top: 10px; }
+    .cs-big { font-size: 56px; font-weight: 900; line-height: 1; color: var(--ca); letter-spacing: -0.03em; }
+    .cs-bars { display: flex; align-items: flex-end; gap: 14px; height: 120px; border-bottom: 2px solid var(--cl); padding-bottom: 6px; position: relative; }
+    .cs-b { flex: 1; border-radius: 4px 4px 0 0; transform-origin: bottom; }
+    .cs-target { position: absolute; left: 0; right: 0; top: 34px; border-top: 1.5px dashed var(--ca); font-size: 11px; color: var(--ca); text-align: right; padding-top: 2px; }
+
+    /* ---- Style 3: apple (Keynote Stage) ---- */
+    .st-apple[data-m="dark"]  { background: radial-gradient(circle at 72% 45%, rgba(56,189,248,0.22), transparent 55%), #090C12; color: #F5F6F8; --aa: #38BDF8; --ac: rgba(255,255,255,0.06); --al: rgba(255,255,255,0.14); --asub: #94A3B8; }
+    .st-apple[data-m="light"] { background: radial-gradient(circle at 72% 45%, rgba(14,165,233,0.14), transparent 55%), #F8FAFC; color: #0F172A; --aa: #0284C7; --ac: #FFFFFF; --al: rgba(15,23,42,0.12); --asub: #475569; }
+    .ap-body { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; align-items: center; flex: 1; }
+    .ap-hero { font-size: 32px; font-weight: 900; line-height: 1.15; letter-spacing: -0.02em; }
+    .ap-grad { background: linear-gradient(90deg, var(--aa), #34D399); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .ap-orb { width: 126px; height: 126px; margin: 0 auto; border-radius: 28px; border: 1px solid var(--al); background: var(--ac); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 20px 44px rgba(56,189,248,0.22); }
+
+    /* ---- Style 4: illustration (Warm Tactile Story) ---- */
+    .st-illus[data-m="light"] { background: #FAF4E8; color: #2B2118; --ia: #C85A32; --ic: #FFFDF8; --il: rgba(43,33,24,0.14); --isub: #6B5B4B; }
+    .st-illus[data-m="dark"]  { background: #1B1815; color: #F7EFE4; --ia: #F59E6C; --ic: #27221D; --il: rgba(247,239,228,0.16); --isub: #C2B5A5; }
+    .il-stage { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: center; margin-top: 10px; }
+    .il-node { background: var(--ic); border: 1.5px solid var(--il); border-radius: 18px; padding: 12px; text-align: center; box-shadow: 0 8px 18px rgba(43,33,24,0.08); }
+    .il-blob { width: 42px; height: 42px; border-radius: 14px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; }
+
+    /* Motion replay animations */
+    .is-playing .anim-up { animation: m-up .65s cubic-bezier(0.22,1,0.36,1) both; }
+    .is-playing .anim-grow { animation: m-grow .72s cubic-bezier(0.16,1,0.3,1) both; }
+    .is-playing .anim-scale { animation: m-scale .75s cubic-bezier(0.22,1,0.36,1) both; }
+    .is-playing .anim-d1 { animation-delay: .05s; }
+    .is-playing .anim-d2 { animation-delay: .18s; }
+    .is-playing .anim-d3 { animation-delay: .32s; }
+    @keyframes m-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    @keyframes m-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+    @keyframes m-scale { from { opacity: 0; transform: scale(0.86) translateY(10px); } to { opacity: 1; transform: none; } }
+
+    footer {
+      margin-top: 32px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      font-size: 14px;
+      color: var(--ink-3);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div class="kicker">DECK ARCHITECT · STEP 3A STYLE &amp; MOTION LIBRARY</div>
+      <h1>風格與動效圖鑑（4 款完整就緒）</h1>
+      <p class="sub">先依場合挑中 1 款風格（可切換淺／深底、試播動效個性），我們再集中火力為你畫出該風格的 2–3 張真實內容樣張。</p>
+    </div>
+    <div class="filters" role="tablist" aria-label="依場合篩選推薦風格">
+      <button class="flt-btn on" type="button" data-flt="all">全部 4 款</button>
+      <button class="flt-btn" type="button" data-flt="briefing">📊 日常匯報 briefing</button>
+      <button class="flt-btn" type="button" data-flt="pitch">💡 提案分享 pitch</button>
+      <button class="flt-btn" type="button" data-flt="keynote">🎬 發表會 keynote</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- 1. workday -->
+    <article class="style-card" data-id="workday" data-fit="briefing pitch">
+      <div class="stage-box st-workday" data-m="light">
+        <div class="stage-tools">
+          <button class="mini-btn" type="button" data-act="mode">淺／深</button>
+          <button class="mini-btn" type="button" data-act="play">▶ 試播動效</button>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--wa);letter-spacing:.1em">Q3 OPERATIONS</div>
+          <div style="font-size:21px;font-weight:900">關鍵進度與拍板看板</div>
+        </div>
+        <div class="wd-grid">
+          <div class="wd-col">
+            <div class="wd-card wd-risk anim-up anim-d1">
+              <div style="font-size:11px;font-weight:700;color:#E11D48">唯一風險</div>
+              <div style="font-size:14px;font-weight:800">北區倉儲延遲 4 天</div>
+            </div>
+            <div class="wd-card wd-act anim-up anim-d2">
+              <div style="font-size:11px;font-weight:700;color:var(--wa)">建議拍板</div>
+              <div style="font-size:14px;font-weight:800">調撥 2 條備援線</div>
+            </div>
+          </div>
+          <div class="wd-card anim-up anim-d3">
+            <div style="font-size:12px;font-weight:700;color:var(--wsub)">健康項目進度</div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>核心排程</span><span>94%</span></div>
+              <div class="wd-bar-bg"><div class="wd-bar-fill" style="width:94%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>客服移轉</span><span>82%</span></div>
+              <div class="wd-bar-bg"><div class="wd-bar-fill" style="width:82%"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>自動化驗證</span><span>76%</span></div>
+              <div class="wd-bar-bg"><div class="wd-bar-fill" style="width:76%"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-head">
+          <div class="meta-title"><h2>日常工作款</h2><code>workday</code></div>
+          <span class="rec-badge">★ 此場合推薦</span>
+        </div>
+        <p class="desc">現代 Bento 狀態看板、紅／綠雙語意風險階層與「風險 ↓ 拍板」因果動線，主管三秒掃完。</p>
+        <div class="tags">
+          <span class="motion-pill">動效：俐落聚焦（crisp）</span>
+          <span class="tag">週進度回報</span><span class="tag">專案群總覽</span><span class="tag">例會拍板</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 2. counsel -->
+    <article class="style-card" data-id="counsel" data-fit="briefing pitch">
+      <div class="stage-box st-counsel" data-m="light">
+        <div class="stage-tools">
+          <button class="mini-btn" type="button" data-act="mode">淺／深</button>
+          <button class="mini-btn" type="button" data-act="play">▶ 試播動效</button>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--cm);letter-spacing:.1em">EXECUTIVE EVIDENCE</div>
+          <div style="font-size:21px;font-weight:900">導入週期壓縮 73%</div>
+        </div>
+        <div class="cs-body">
+          <div class="anim-up anim-d1">
+            <div class="cs-big">12 天</div>
+            <div style="font-size:13px;color:var(--cm);margin-top:6px">原 45 天 → 單一焦點色＋虛線目標基準</div>
+          </div>
+          <div class="cs-bars">
+            <div class="cs-target">目標線 15 天</div>
+            <div class="cs-b anim-grow anim-d1" style="height:96%;background:var(--cl)"></div>
+            <div class="cs-b anim-grow anim-d2" style="height:68%;background:var(--cl)"></div>
+            <div class="cs-b anim-grow anim-d3" style="height:32%;background:var(--ca)"></div>
+          </div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-head">
+          <div class="meta-title"><h2>顧問報告</h2><code>counsel</code></div>
+          <span class="rec-badge">★ 此場合推薦</span>
+        </div>
+        <p class="desc">色塊即圖表、極簡高權威編輯排版、單一焦點色＋中性灰，最適合商業論證與高階決策。</p>
+        <div class="tags">
+          <span class="motion-pill">動效：數據生長（snappy）</span>
+          <span class="tag">策略提案</span><span class="tag">高階決策</span><span class="tag">成效對照</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 3. apple -->
+    <article class="style-card" data-id="apple" data-fit="pitch keynote">
+      <div class="stage-box st-apple" data-m="dark">
+        <div class="stage-tools">
+          <button class="mini-btn" type="button" data-act="mode">淺／深</button>
+          <button class="mini-btn" type="button" data-act="play">▶ 試播動效</button>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--aa);letter-spacing:.12em">KEYNOTE STAGE</div>
+        <div class="ap-body">
+          <div class="anim-up anim-d1">
+            <div class="ap-hero">毫秒級<br><span class="ap-grad">邊緣推論引擎</span></div>
+            <div style="font-size:13px;color:var(--asub);margin-top:8px">光暗雙極呼吸 · 大留白去框舞台</div>
+          </div>
+          <div class="ap-orb anim-scale anim-d2">
+            <div style="font-size:28px;font-weight:900;color:var(--aa)">8.4 ms</div>
+            <div style="font-size:11px;color:var(--asub)">15W 無風扇基準</div>
+          </div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-head">
+          <div class="meta-title"><h2>Apple 發表</h2><code>apple</code></div>
+          <span class="rec-badge">★ 此場合推薦</span>
+        </div>
+        <p class="desc">暗／亮雙極大留白舞台、發光主角視覺、去框巨數與點擊懸念步進，張力最強。</p>
+        <div class="tags">
+          <span class="motion-pill">動效：電影緩升（cinema-spring）</span>
+          <span class="tag">產品發表</span><span class="tag">年度峰會</span><span class="tag">技術揭曉</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- 4. illustration -->
+    <article class="style-card" data-id="illustration" data-fit="pitch keynote">
+      <div class="stage-box st-illus" data-m="light">
+        <div class="stage-tools">
+          <button class="mini-btn" type="button" data-act="mode">淺／深</button>
+          <button class="mini-btn" type="button" data-act="play">▶ 試播動效</button>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--ia);letter-spacing:.1em">STORY WORLD · 15 種畫風</div>
+          <div style="font-size:21px;font-weight:900">讓物件自己說完三段故事</div>
+        </div>
+        <div class="il-stage">
+          <div class="il-node anim-up anim-d1">
+            <div class="il-blob" style="background:rgba(200,90,50,0.16);color:var(--ia)">01</div>
+            <div style="font-size:13px;font-weight:800">溫感手感</div>
+            <div style="font-size:11px;color:var(--isub)">紙黏土／手繪</div>
+          </div>
+          <div class="il-node anim-up anim-d2">
+            <div class="il-blob" style="background:rgba(15,118,110,0.16);color:#0F766E">02</div>
+            <div style="font-size:13px;font-weight:800">全景融圖</div>
+            <div style="font-size:11px;color:var(--isub)">無字底圖＋真字</div>
+          </div>
+          <div class="il-node anim-up anim-d3">
+            <div class="il-blob" style="background:rgba(217,119,6,0.16);color:#B45309">03</div>
+            <div style="font-size:13px;font-weight:800">高記憶點</div>
+            <div style="font-size:11px;color:var(--isub)">科普／文化分享</div>
+          </div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="meta-head">
+          <div class="meta-title"><h2>插畫場景</h2><code>illustration</code></div>
+          <span class="rec-badge">★ 此場合推薦</span>
+        </div>
+        <p class="desc">全頁同源底材、內容住進場景，內含紙黏土／手繪／素描／浮世繪／皮影戲等 15 種畫風淺深雙底。</p>
+        <div class="tags">
+          <span class="motion-pill">動效：溫潤分段（story-spring）</span>
+          <span class="tag">知識分享</span><span class="tag">品牌故事</span><span class="tag">新人引導</span>
+        </div>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <span>目前收錄 4 款已完整驗證 Style DNA 之風格（皆支援淺／深雙底與 OKLCH 動態配色）。</span>
+    <span>其餘 8 款風格將於 Phase D 逐款補齊後上架圖鑑。</span>
+  </footer>
+
+  <script>
+    const cards = [...document.querySelectorAll('.style-card')];
+    const flts = [...document.querySelectorAll('.flt-btn')];
+
+    function applyFilter(mode) {
+      flts.forEach(b => b.classList.toggle('on', b.dataset.flt === mode));
+      cards.forEach(c => {
+        if (mode === 'all') {
+          c.classList.remove('is-rec', 'is-muted');
+        } else {
+          const fits = (c.dataset.fit || '').split(/\s+/).includes(mode);
+          c.classList.toggle('is-rec', fits);
+          c.classList.toggle('is-muted', !fits);
+        }
+      });
+    }
+    flts.forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.flt)));
+
+    cards.forEach(c => {
+      const box = c.querySelector('.stage-box');
+      c.querySelector('[data-act="mode"]').addEventListener('click', () => {
+        box.dataset.m = box.dataset.m === 'dark' ? 'light' : 'dark';
+      });
+      c.querySelector('[data-act="play"]').addEventListener('click', () => {
+        box.classList.remove('is-playing');
+        void box.offsetWidth;
+        box.classList.add('is-playing');
+      });
+    });
+
+    // Optional URL parameter ?stage=briefing|pitch|keynote auto-highlights recommended styles
+    const st = new URLSearchParams(location.search).get('stage');
+    if (st && ['briefing', 'pitch', 'keynote'].includes(st)) applyFilter(st);
+  </script>
+</body>
+</html>

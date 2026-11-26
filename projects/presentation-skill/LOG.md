@@ -1467,3 +1467,20 @@
   - 重新打包 `outputs/deck-architect.skill`（**67 檔，220.9 KB**，零 `__pycache__`）。
 - **同步的檔案**：`inputs/modular-capabilities-audit.md`、`outputs/deck-architect/{SKILL.md,assets/{shell.css,runtime.js,fit.js,components/*,presenter/*,modules/*,modules/fx/*},scripts/{deck_model.py,lint.py,assemble.py,check.mjs},references/{modules-catalog.md,modules/*,motion-system.md,grill.md},templates/{brief.md,storyboard.yaml}}`、`outputs/deck-architect.skill`、`outputs/examples/{v45-modular-demo/,v44-keynote-demo/,v4-alive-demo/,v4-demo/}`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：交由使用者審閱 v4.5 完整能力與範例，決定進行 Phase C.2 真實簡報 PK 複驗或推進 Phase D。
+
+## 2026-11-25｜`deck-architect` v4.6 完成：根治「Demo 很生動 vs 真實簡報偏平淡」全流程五處補洞
+
+- **問題診斷與使用者拍板**：
+  - 使用者點出關鍵觀察：技能做完的 Demo 非常生動，但從真實需求從頭聊完架構後產出的簡報反而不如 Demo 生動；進一步對齊出兩條黃金原則：① 生動度不該一刀切，須完全依 `stage_mode`（`briefing`/`pitch`/`keynote`）自動三段調檔；② Step 3 應採類似 Motion Library 的「先從風格圖鑑挑 1 款風格 → 再集中火力畫該風格 2–3 張真實高工藝樣張 → 確認後直接沿用進 Step 4 分批精雕」。
+- **本輪五處核心升級（v4.6）**：
+  1. **Step 1 依場合三段自動調檔（`references/grill.md`、`templates/brief.md`）**：`briefing` 不硬挖煽情故事、主打「內容減法提案」（長文移進 `notes` 守三秒掃讀）；`pitch` 抓 1 個核心痛點反差＋以白話提案 1–2 個實用互動頁（不丟工程模組代號）；`keynote` 完整挖故事張力與原話＋提案 2–3 個吸睛招牌亮點頁，由 Agent 幕後映射按需模組。
+  2. **Step 2 逐頁 4 行 `director:` 分鏡（`templates/storyboard.yaml`、`scripts/deck_model.py`、`scripts/lint.py`）**：支援 `director: { hero, archetype, module, choreo }`（自動排除於字數計算），`briefing` 保持輕量、`pitch`/`keynote` 未填分鏡時由 `lint.py` 溫和提醒。
+  3. **Step 3 兩階段精準視覺關卡（`assets/style-library.html`、`references/samples.md`）**：建立 100% 離線可互動之 **Style & Motion Library**（收錄目前 4 款完整就緒風格：`workday`、`counsel`、`apple`、`illustration`，內建淺／深切換、試播動效與 `?stage=` 場合推薦高亮）；3a 秒選 1 款 → 3b 集中火力畫 2–3 張真實樣張＋3 組 OKLCH 配色，拍板後直接轉入 `slides/` 作為 Step 4 活範本（Live Style Anchor）。
+  4. **Step 4 分批乾淨分身精雕 ＋ 5 支黃金工藝配方（`SKILL.md`、`references/recipes/*.md`）**：內建 5 支語意變數版高工藝配方（`bento-causal`、`linked-diagram`、`interactive-proof`、`product-story`、`editorial-drama`）；超過 6 頁自動每 3–4 頁派乾淨上下文分身並行精雕（吃 `deck.css`＋Step 3b 活範本＋該批分鏡＋對應配方）。
+  5. **Step 5 雙門檻品管（`scripts/check.mjs`）**：在既有下限像素 WCAG＋13 項動態外，新增依 `stage_mode` 自動調檔之 **Liveliness Audit（生動度與反單調稽核）**，量測視覺頁佔比、原語多樣性與連續純文字單調頁，點名最平淡 1–3 頁進入 Polish Pass。
+- **驗證與打包**：
+  - `lint.py` 通過 `templates/storyboard.yaml` 與全數 4 個範例（0 錯）；`check.mjs --jpg --motion` 於 `v45-modular-demo`（視覺 4/4＝100%、4 種原語 ✅）與 `v44-keynote-demo`（視覺 5/5＝100%、5 種原語 ✅）Liveliness Audit 全部達標。
+  - 無頭 Chrome 截圖目視檢核 `assets/style-library.html` 通過。
+  - 重新打包 `outputs/deck-architect.skill`（**73 檔，237.4 KB**，零 `__pycache__`）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/style-library.html,references/{grill.md,samples.md,recipes/*},scripts/{deck_model.py,lint.py,check.mjs},templates/{brief.md,storyboard.yaml}}`、`outputs/deck-architect.skill`、`outputs/examples/{v45-modular-demo/check/report.md,v44-keynote-demo/check/report.md}`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+- **下一步**：交由使用者審閱 v4.6 與風格圖鑑原型，擇期以真實簡報跑一次端到端實戰 PK 複驗，或推進 Phase D 補齊其餘 8 款 Style DNA。

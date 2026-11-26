@@ -465,7 +465,26 @@ def lint(data):
 
     # ---- signature page hint for Gate 2 samples
     if n_main >= 4 and signatures == 0:
-        I("slides", "尚未標註招牌頁（signature: true）。在最重要的一頁加上 signature: true，Gate 2 樣張才會優先挑中它。")
+        I("slides", "尚未標註招牌頁（signature: true）。在最重要的一頁加上 signature: true，Step 3b 樣張才會優先挑中它。")
+
+    # ---- v4.6 per-slide director spec soft check (pitch/keynote only; briefing stays frictionless)
+    content_main = [
+        (n, s) for n, s in enumerate(slides, 1)
+        if isinstance(s, dict) and not s.get("appendix") and s.get("type", "content") == "content"
+    ]
+    dir_count = 0
+    for n, s in content_main:
+        d = s.get("director")
+        if d is None:
+            continue
+        if not isinstance(d, dict):
+            W(f"slides[{n}].director", "director 應為 mapping（建議含 hero / archetype / module / choreo）。")
+        else:
+            dir_count += 1
+            if not d.get("hero"):
+                W(f"slides[{n}].director", "缺少 hero（這頁最吸睛的視覺主角是什麼）。")
+    if stage_mode in ("pitch", "keynote") and len(content_main) >= 4 and dir_count == 0:
+        I("slides.director", f"stage_mode={stage_mode} 目前尚未填寫逐頁 director 分鏡（hero/archetype/module/choreo）；建議至少替關鍵頁補齊，避免 Step 4 退回純文字卡片。")
 
     # ---- visual rhythm: adjacent slides should vary unless in same series
     flow = [(n, s) for n, s in enumerate(slides, 1) if isinstance(s, dict) and not s.get("appendix")]
