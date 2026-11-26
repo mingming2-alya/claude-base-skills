@@ -87,3 +87,12 @@
   --stagger-base: 90;
   ```
 - **建議動態標記**：站點標籤加 `.rv` 逐格落位；SVG 引導虛線加 `data-draw`；畫面內裝置數字（如黏土平板螢幕 `4.2%`）可承接上一頁的 `data-morph` 飛入著陸！
+
+## 6. 專屬動態模組（`motion-story` · 按需注入，未用到 0 KB）
+
+- **動態個性**：**手感敘事（Tactile Bounce）**——溫潤彈性過衝回正、主角先落定、配角與標籤慢半拍跟上（Disney follow-through）。
+- **綁定原語**（用法見 `references/modules/style-motion-kits.md`）：
+  - `[data-popup-fold]`：立體書 3D 翻折立起舞台＋標籤主從延遲彈跳（適合三幕故事、知識概念場景化）。
+  - `[data-chat-replay]`：對話氣泡實況劇院，含輸入脈動「…」（適合還原真實用戶痛點、客服／團隊情境）。
+- **搭配模組**：`flow-carousel`、`linked-highlight`、`coverflow`。
+- **禁忌動態**：禁用冷硬的 `code-stage` 與 `data-stream`。

@@ -3,29 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Deck Architect｜Style &amp; Motion Library（4 款就緒風格圖鑑）</title>
+  <title>Deck Architect｜風格 × 動態 DNA 圖鑑（4 款完整就緒）</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --page-bg: #F3F2EE;
-      --card-bg: #FFFFFF;
-      --ink: #161922;
-      --ink-2: #475063;
-      --ink-3: #647087;
-      --line: rgba(22, 25, 34, 0.12);
-      --brand: #0F766E;
+      --bg: #0C0F16;
+      --panel: #141925;
+      --panel-2: #1A2131;
+      --ink: #F1F5F9;
+      --ink-2: #A6B2C6;
+      --ink-3: #6E7B91;
+      --line: rgba(241, 245, 249, 0.11);
+      --brand: #2DD4BF;
       --font-sans: "Space Grotesk", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     }
     body {
-      background: var(--page-bg);
+      background:
+        radial-gradient(900px 420px at 15% -5%, rgba(45, 212, 191, 0.10), transparent 60%),
+        radial-gradient(800px 380px at 88% 0%, rgba(56, 189, 248, 0.10), transparent 60%),
+        var(--bg);
       color: var(--ink);
       font-family: var(--font-sans);
       line-height: 1.5;
-      padding: 36px 40px 56px;
-      max-width: 1440px;
+      padding: 32px 36px 56px;
+      max-width: 1460px;
       margin: 0 auto;
     }
     header {
@@ -34,215 +38,402 @@
       align-items: flex-end;
       justify-content: space-between;
       gap: 20px;
-      padding-bottom: 24px;
+      padding-bottom: 22px;
       border-bottom: 1px solid var(--line);
-      margin-bottom: 28px;
+      margin-bottom: 26px;
     }
     .kicker {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--brand);
       margin-bottom: 6px;
     }
-    h1 { font-size: 34px; font-weight: 900; letter-spacing: -0.02em; }
-    .sub { font-size: 16px; color: var(--ink-2); margin-top: 6px; }
-    .filters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    h1 { font-size: 32px; font-weight: 900; letter-spacing: -0.02em; }
+    .sub { font-size: 15px; color: var(--ink-2); margin-top: 6px; max-width: 720px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; }
     .flt-btn {
       appearance: none;
       border: 1px solid var(--line);
-      background: var(--card-bg);
+      background: var(--panel);
       color: var(--ink-2);
-      padding: 9px 16px;
+      padding: 9px 15px;
       border-radius: 999px;
-      font: 700 14px/1 var(--font-sans);
+      font: 700 13px/1 var(--font-sans);
       cursor: pointer;
       transition: all .18s ease;
     }
     .flt-btn:hover { border-color: var(--brand); color: var(--ink); }
-    .flt-btn.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .flt-btn.on { background: var(--ink); color: #0C0F16; border-color: var(--ink); }
 
     .grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 26px;
     }
-    @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 1020px) { .grid { grid-template-columns: 1fr; } }
 
     .style-card {
-      background: var(--card-bg);
+      background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 22px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 30px rgba(22, 25, 34, 0.05);
-      transition: transform .22s cubic-bezier(0.22, 1, 0.36, 1), box-shadow .22s ease, opacity .22s ease, border-color .22s ease;
-    }
-    .style-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 18px 42px rgba(22, 25, 34, 0.10);
+      box-shadow: 0 18px 46px rgba(0, 0, 0, 0.35);
+      transition: border-color .24s ease, box-shadow .24s ease, opacity .24s ease;
     }
     .style-card.is-rec {
-      border: 2px solid var(--brand);
-      box-shadow: 0 14px 36px rgba(15, 118, 110, 0.14);
+      border-color: var(--brand);
+      box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.45), 0 22px 54px rgba(15, 118, 110, 0.24);
     }
-    .style-card.is-muted {
-      opacity: 0.42;
-    }
+    .style-card.is-muted { opacity: 0.38; }
 
-    /* 16:9 Live Miniature Stage */
-    .stage-box {
+    /* Interactive Stage Container */
+    .stage-wrap {
       position: relative;
-      aspect-ratio: 16 / 9;
+      height: 332px;
       overflow: hidden;
-      padding: 22px 26px;
+      padding: 18px 22px 54px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: background-color .3s ease, color .3s ease;
+      transition: background-color .32s ease, color .32s ease;
     }
-    .stage-tools {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      z-index: 6;
+    .stage-top {
       display: flex;
-      gap: 6px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 6;
+      position: relative;
     }
+    .stage-kicker {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      opacity: 0.85;
+    }
+    .stage-tools { display: flex; gap: 6px; }
     .mini-btn {
       appearance: none;
       border: 1px solid rgba(128, 128, 128, 0.28);
-      background: rgba(20, 24, 34, 0.72);
-      color: #F4F5F7;
-      padding: 6px 11px;
+      background: rgba(15, 20, 30, 0.72);
+      color: #F1F5F9;
+      padding: 5px 10px;
       border-radius: 999px;
       font: 700 12px/1 var(--font-sans);
       cursor: pointer;
       backdrop-filter: blur(8px);
       transition: transform .15s ease, background .18s ease;
     }
-    .mini-btn:hover { background: rgba(20, 24, 34, 0.92); transform: scale(1.03); }
+    .mini-btn:hover { background: rgba(15, 20, 30, 0.94); transform: translateY(-1px); }
 
-    /* Card Metadata */
-    .meta {
-      padding: 20px 24px 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .meta-head {
+    /* Bottom Dock Inside Stage: Signature Move Tabs */
+    .move-dock {
+      position: absolute;
+      left: 14px; right: 14px; bottom: 12px;
+      z-index: 8;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
+      pointer-events: none;
     }
-    .meta-title {
-      display: flex;
-      align-items: baseline;
-      gap: 10px;
-    }
-    .meta-title h2 { font-size: 22px; font-weight: 900; }
-    .meta-title code { font-size: 13px; color: var(--ink-3); background: #F1F2F6; padding: 3px 8px; border-radius: 6px; }
-    .rec-badge {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 10px;
+    .move-tabs {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
       border-radius: 999px;
-      background: rgba(15, 118, 110, 0.12);
-      color: var(--brand);
-      display: none;
+      background: rgba(12, 16, 24, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      backdrop-filter: blur(10px);
+      pointer-events: auto;
+    }
+    .mv-tab {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #CBD5E1;
+      padding: 6px 11px;
+      border-radius: 999px;
+      font: 700 12px/1 var(--font-sans);
+      cursor: pointer;
+      transition: all .18s ease;
+    }
+    .mv-tab:hover { color: #fff; }
+    .mv-tab.on { background: #fff; color: #0F172A; }
+    .hint-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(12, 16, 24, 0.65);
+      color: #E2E8F0;
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .scene { display: none; flex: 1; flex-direction: column; justify-content: center; gap: 10px; position: relative; z-index: 2; }
+    .scene.is-active { display: flex; }
+
+    /* Card Metadata Footer */
+    .meta {
+      padding: 18px 22px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+    }
+    .meta-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .meta-title { display: flex; align-items: baseline; gap: 10px; }
+    .meta-title h2 { font-size: 21px; font-weight: 900; }
+    .meta-title code { font-size: 12px; color: var(--ink-2); background: var(--panel-2); padding: 3px 8px; border-radius: 6px; border: 1px solid var(--line); }
+    .rec-badge {
+      font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px;
+      background: rgba(45, 212, 191, 0.16); color: var(--brand); display: none;
     }
     .style-card.is-rec .rec-badge { display: inline-block; }
     .desc { font-size: 14px; color: var(--ink-2); }
-    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-    .tag {
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #F4F5F8;
-      color: var(--ink-2);
+    .dna-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .phys-pill {
+      font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 999px;
+      background: rgba(56, 189, 248, 0.14); color: #7DD3FC;
     }
-    .motion-pill {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: #EEF2FF;
-      color: #3730A3;
+    .kit-code {
+      font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      padding: 2px 6px; border-radius: 6px;
+      background: rgba(255, 255, 255, 0.06); color: #CBD5E1; border: 1px solid var(--line);
     }
 
-    /* ---- Style 1: workday (Modern Bento) ---- */
-    .st-workday[data-m="light"] { background: #F5F6F8; color: #171B24; --wa: #0F766E; --wc: #FFFFFF; --wl: rgba(23,27,36,0.10); --wsub: #525B6B; }
-    .st-workday[data-m="dark"]  { background: #10151F; color: #F1F5F9; --wa: #34D399; --wc: #18202E; --wl: rgba(241,245,249,0.14); --wsub: #94A3B8; }
-    .wd-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 12px; flex: 1; margin-top: 12px; }
-    .wd-col { display: flex; flex-direction: column; gap: 10px; }
-    .wd-card { background: var(--wc); border: 1px solid var(--wl); border-radius: 12px; padding: 12px 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
-    .wd-risk { border-left: 4px solid #E11D48; }
-    .wd-act { border-left: 4px solid var(--wa); }
-    .wd-bar-bg { height: 7px; border-radius: 999px; background: var(--wl); overflow: hidden; margin-top: 6px; }
-    .wd-bar-fill { height: 100%; border-radius: 999px; background: var(--wa); transform-origin: left; }
+    /* ============================================================
+       STYLE 1: WORKDAY (Crisp Snap — Ruler Progress + Bento Expand)
+       ============================================================ */
+    .st-workday[data-m="light"] {
+      background: #F4F6F9; color: #151A24;
+      --accent: #0F766E; --danger: #E11D48; --card: #FFFFFF; --line-s: rgba(21,26,36,0.11); --sub: #525B6B;
+    }
+    .st-workday[data-m="dark"] {
+      background: #0F1520; color: #F1F5F9;
+      --accent: #34D399; --danger: #FB7185; --card: #182132; --line-s: rgba(241,245,249,0.14); --sub: #94A3B8;
+    }
+    .wd-seg { display: flex; gap: 6px; }
+    .wd-pill {
+      border: 1px solid var(--line-s); background: var(--card); color: var(--sub);
+      padding: 5px 11px; border-radius: 999px; font: 700 12px/1 var(--font-sans); cursor: pointer;
+      transition: all .18s ease;
+    }
+    .wd-pill.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .rp-box {
+      background: var(--card); border: 1px solid var(--line-s); border-radius: 14px;
+      padding: 14px 16px;
+    }
+    .rp-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+    .rp-val { font-size: 32px; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--accent); transition: transform .25s cubic-bezier(0.2,0.9,0.25,1); }
+    .rp-val.is-hit { transform: scale(1.08); }
+    .rp-track {
+      position: relative; height: 42px; border-radius: 10px;
+      background: rgba(128,128,128,0.12); overflow: hidden; cursor: pointer;
+    }
+    .rp-fill {
+      position: absolute; inset: 0 auto 0 0; width: var(--rp-pct, 0%);
+      background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 48%, transparent));
+      border-right: 3px solid var(--accent);
+      transition: width .72s cubic-bezier(0.2, 0.9, 0.25, 1);
+    }
+    .rp-ticks {
+      position: absolute; inset: 0; pointer-events: none;
+      background: repeating-linear-gradient(90deg, transparent 0, transparent calc(5% - 1px), rgba(128,128,128,0.28) calc(5% - 1px), rgba(128,128,128,0.28) 5%);
+    }
+    .rp-goal {
+      position: absolute; top: 0; bottom: 0; left: 80%; width: 2px;
+      background: var(--danger); transition: background-color .25s ease;
+    }
+    .rp-goal span {
+      position: absolute; top: 4px; right: 6px; font-size: 11px; font-weight: 800; color: var(--danger); white-space: nowrap;
+    }
+    .rp-box.is-passed .rp-goal { background: var(--accent); }
+    .rp-box.is-passed .rp-goal span { color: var(--accent); }
 
-    /* ---- Style 2: counsel (Editorial Data Authority) ---- */
-    .st-counsel[data-m="light"] { background: #F8F6F0; color: #1B1D21; --ca: #1D4ED8; --cm: #64748B; --cl: rgba(27,29,33,0.16); }
-    .st-counsel[data-m="dark"]  { background: #12151C; color: #F3F1EC; --ca: #60A5FA; --cm: #94A3B8; --cl: rgba(243,241,236,0.18); }
-    .cs-body { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 18px; align-items: end; flex: 1; margin-top: 10px; }
-    .cs-big { font-size: 56px; font-weight: 900; line-height: 1; color: var(--ca); letter-spacing: -0.03em; }
-    .cs-bars { display: flex; align-items: flex-end; gap: 14px; height: 120px; border-bottom: 2px solid var(--cl); padding-bottom: 6px; position: relative; }
-    .cs-b { flex: 1; border-radius: 4px 4px 0 0; transform-origin: bottom; }
-    .cs-target { position: absolute; left: 0; right: 0; top: 34px; border-top: 1.5px dashed var(--ca); font-size: 11px; color: var(--ca); text-align: right; padding-top: 2px; }
+    .wd-bento { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .wd-item {
+      background: var(--card); border: 1px solid var(--line-s); border-left: 4px solid var(--accent);
+      border-radius: 12px; padding: 10px 14px; cursor: pointer;
+      transition: transform .34s cubic-bezier(0.2,0.9,0.25,1), opacity .26s ease, box-shadow .28s ease;
+    }
+    .wd-item.risk { border-left-color: var(--danger); }
+    .wd-bento.has-open .wd-item:not(.is-open) { opacity: 0.36; transform: scale(0.985); }
+    .wd-item.is-open { box-shadow: 0 12px 26px rgba(0,0,0,0.12); transform: translateY(-1px); }
+    .wd-item-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 14px; }
+    .wd-detail { display: grid; grid-template-rows: 0fr; opacity: 0; transition: grid-template-rows .34s cubic-bezier(0.2,0.9,0.25,1), opacity .22s ease; }
+    .wd-detail > div { overflow: hidden; font-size: 12.5px; color: var(--sub); padding-top: 0; transition: padding-top .25s ease; }
+    .wd-item.is-open .wd-detail { grid-template-rows: 1fr; opacity: 1; }
+    .wd-item.is-open .wd-detail > div { padding-top: 6px; }
 
-    /* ---- Style 3: apple (Keynote Stage) ---- */
-    .st-apple[data-m="dark"]  { background: radial-gradient(circle at 72% 45%, rgba(56,189,248,0.22), transparent 55%), #090C12; color: #F5F6F8; --aa: #38BDF8; --ac: rgba(255,255,255,0.06); --al: rgba(255,255,255,0.14); --asub: #94A3B8; }
-    .st-apple[data-m="light"] { background: radial-gradient(circle at 72% 45%, rgba(14,165,233,0.14), transparent 55%), #F8FAFC; color: #0F172A; --aa: #0284C7; --ac: #FFFFFF; --al: rgba(15,23,42,0.12); --asub: #475569; }
-    .ap-body { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; align-items: center; flex: 1; }
-    .ap-hero { font-size: 32px; font-weight: 900; line-height: 1.15; letter-spacing: -0.02em; }
-    .ap-grad { background: linear-gradient(90deg, var(--aa), #34D399); -webkit-background-clip: text; background-clip: text; color: transparent; }
-    .ap-orb { width: 126px; height: 126px; margin: 0 auto; border-radius: 28px; border: 1px solid var(--al); background: var(--ac); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 20px 44px rgba(56,189,248,0.22); }
+    /* ============================================================
+       STYLE 2: COUNSEL (Editorial Weight — Rank Race + Odometer + Rack Focus)
+       ============================================================ */
+    .st-counsel[data-m="light"] {
+      background: #F7F5EE; color: #191C22;
+      --accent: #1D4ED8; --card: #FFFFFF; --line-s: rgba(25,28,34,0.13); --sub: #5E6778;
+    }
+    .st-counsel[data-m="dark"] {
+      background: #12151D; color: #F3F1EC;
+      --accent: #60A5FA; --card: #1A202C; --line-s: rgba(243,241,236,0.16); --sub: #94A3B8;
+    }
+    .cs-split { display: grid; grid-template-columns: 0.42fr 0.58fr; gap: 14px; align-items: center; }
+    .odo-wrap { display: inline-flex; align-items: baseline; font-size: 54px; font-weight: 900; color: var(--accent); letter-spacing: -0.03em; line-height: 1.05; }
+    .odo-d { display: inline-block; height: 1.05em; overflow: hidden; vertical-align: bottom; }
+    .odo-s { display: flex; flex-direction: column; will-change: transform; }
+    .odo-s span { display: block; height: 1.05em; line-height: 1.05em; text-align: center; }
+    .rr-list { display: flex; flex-direction: column; gap: 7px; }
+    .rr-row {
+      display: grid; grid-template-columns: 24px 74px 1fr 40px; align-items: center; gap: 8px;
+      padding: 7px 10px; border-radius: 9px; background: var(--card); border: 1px solid var(--line-s);
+      will-change: transform;
+    }
+    .rr-row.is-top { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, var(--card)); }
+    .rr-pos { font-size: 12px; font-weight: 900; color: var(--sub); }
+    .rr-row.is-top .rr-pos { color: var(--accent); }
+    .rr-nm { font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+    .rr-track { height: 9px; border-radius: 999px; background: rgba(128,128,128,0.15); overflow: hidden; }
+    .rr-fill { height: 100%; border-radius: 999px; background: rgba(128,128,128,0.42); width: var(--w, 40%); transition: width .7s cubic-bezier(0.16,1,0.3,1), background-color .3s ease; }
+    .rr-row.is-top .rr-fill { background: var(--accent); }
+    .rr-sc { font-size: 12.5px; font-weight: 900; text-align: right; font-variant-numeric: tabular-nums; }
 
-    /* ---- Style 4: illustration (Warm Tactile Story) ---- */
-    .st-illus[data-m="light"] { background: #FAF4E8; color: #2B2118; --ia: #C85A32; --ic: #FFFDF8; --il: rgba(43,33,24,0.14); --isub: #6B5B4B; }
-    .st-illus[data-m="dark"]  { background: #1B1815; color: #F7EFE4; --ia: #F59E6C; --ic: #27221D; --il: rgba(247,239,228,0.16); --isub: #C2B5A5; }
-    .il-stage { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: center; margin-top: 10px; }
-    .il-node { background: var(--ic); border: 1.5px solid var(--il); border-radius: 18px; padding: 12px; text-align: center; box-shadow: 0 8px 18px rgba(43,33,24,0.08); }
-    .il-blob { width: 42px; height: 42px; border-radius: 14px; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; }
+    .rf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .rf-card {
+      background: var(--card); border: 1px solid var(--line-s); border-radius: 12px; padding: 14px 12px;
+      cursor: pointer; transition: transform .48s cubic-bezier(0.16,1,0.3,1), filter .42s ease, opacity .4s ease, border-color .3s ease, box-shadow .4s ease;
+    }
+    .rf-grid.has-focus .rf-card:not(.is-on) { opacity: 0.42; filter: blur(2.4px); transform: scale(0.95); }
+    .rf-card.is-on { border-color: var(--accent); transform: scale(1.04); box-shadow: 0 14px 32px color-mix(in srgb, var(--accent) 22%, transparent); z-index: 3; }
 
-    /* Motion replay animations */
-    .is-playing .anim-up { animation: m-up .65s cubic-bezier(0.22,1,0.36,1) both; }
-    .is-playing .anim-grow { animation: m-grow .72s cubic-bezier(0.16,1,0.3,1) both; }
-    .is-playing .anim-scale { animation: m-scale .75s cubic-bezier(0.22,1,0.36,1) both; }
-    .is-playing .anim-d1 { animation-delay: .05s; }
-    .is-playing .anim-d2 { animation-delay: .18s; }
-    .is-playing .anim-d3 { animation-delay: .32s; }
-    @keyframes m-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-    @keyframes m-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-    @keyframes m-scale { from { opacity: 0; transform: scale(0.86) translateY(10px); } to { opacity: 1; transform: none; } }
+    /* ============================================================
+       STYLE 3: APPLE (Cinema Spring — Spotlight+SplitMask, Depth Deck, Colorize)
+       ============================================================ */
+    .st-apple[data-m="dark"] {
+      background: radial-gradient(circle at 75% 40%, rgba(56,189,248,0.18), transparent 55%), #07090F;
+      color: #F5F7FA; --accent: #38BDF8; --accent-2: #34D399; --card: #121826; --line-s: rgba(255,255,255,0.15); --sub: #94A3B8;
+    }
+    .st-apple[data-m="light"] {
+      background: radial-gradient(circle at 75% 40%, rgba(14,165,233,0.14), transparent 55%), #F8FAFC;
+      color: #0F172A; --accent: #0284C7; --accent-2: #059669; --card: #FFFFFF; --line-s: rgba(15,23,42,0.12); --sub: #475569;
+    }
+    .sp-stage { position: relative; padding: 18px 8px; text-align: center; cursor: crosshair; isolation: isolate; }
+    .sp-cone {
+      position: absolute; inset: -16px; pointer-events: none; z-index: -1;
+      background: radial-gradient(circle 210px at var(--sx, 50%) var(--sy, 50%), color-mix(in srgb, var(--accent) 34%, transparent), transparent 72%);
+    }
+    .sp-base { opacity: 0.34; }
+    .sp-lit {
+      position: absolute; inset: 18px 8px; pointer-events: none;
+      filter: drop-shadow(0 0 18px color-mix(in srgb, var(--accent) 45%, transparent));
+      -webkit-mask-image: radial-gradient(circle 195px at var(--sx, 50%) var(--sy, 50%), #000 0%, rgba(0,0,0,0.88) 58%, transparent 100%);
+      mask-image: radial-gradient(circle 195px at var(--sx, 50%) var(--sy, 50%), #000 0%, rgba(0,0,0,0.88) 58%, transparent 100%);
+    }
+    .ap-hero { font-size: 38px; font-weight: 900; line-height: 1.12; letter-spacing: -0.025em; }
+    .ap-grad { background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .sm-line { display: block; overflow: hidden; padding-bottom: 4px; }
+    .sm-in { display: inline-block; transition: transform .78s cubic-bezier(0.22,1.08,0.36,1), opacity .5s ease; }
+    .sp-stage.is-primed .sm-in { transform: translateY(118%) rotate(1.6deg); opacity: 0; transition: none !important; }
+
+    /* 3D Depth Deck */
+    .dd-stage { position: relative; height: 186px; width: 84%; margin: 14px auto 0; perspective: 1000px; user-select: none; }
+    .dd-card {
+      position: absolute; inset: 0; border-radius: 16px; padding: 18px 20px;
+      background: var(--card); border: 1px solid var(--line-s);
+      display: flex; flex-direction: column; justify-content: space-between;
+      cursor: grab; box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+      transition: transform .56s cubic-bezier(0.22,1.08,0.36,1), opacity .42s ease, filter .42s ease;
+    }
+    .dd-card.is-drag { cursor: grabbing; transition: none !important; }
+    .dd-card.is-toss { transition: transform .3s cubic-bezier(0.4,0,0.2,1), opacity .28s ease; }
+
+    /* Colorize Light-Sweep */
+    .cw-box { position: relative; height: 182px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line-s); cursor: pointer; }
+    .cw-art {
+      height: 100%; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(125deg, #0EA5E9 0%, #0F766E 52%, #F59E0B 100%);
+      color: #FFFFFF;
+    }
+    .cw-mono { position: relative; height: 100%; filter: grayscale(1) contrast(1.08) blur(1.4px); opacity: 0.72; }
+    .cw-col { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--cp, 100%)) 0 0); transition: clip-path 1.1s cubic-bezier(0.22,1,0.36,1); }
+    .cw-beam {
+      position: absolute; top: -10%; bottom: -10%; left: var(--cp, 100%); width: 46px;
+      transform: translateX(-50%) skewX(-12deg);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+      opacity: 0; pointer-events: none; transition: left 1.1s cubic-bezier(0.22,1,0.36,1), opacity .3s ease;
+    }
+    .cw-box.is-sweep .cw-beam { opacity: 0.95; }
+
+    /* ============================================================
+       STYLE 4: ILLUSTRATION (Tactile Bounce — 3D Pop-up Book + Chat Theater)
+       ============================================================ */
+    .st-illus[data-m="light"] {
+      background: radial-gradient(circle at 80% 20%, rgba(200,90,50,0.10), transparent 55%), #FAF3E6;
+      color: #2B2118; --accent: #C85A32; --accent-2: #0F766E; --card: #FFFDF8; --line-s: rgba(43,33,24,0.16); --sub: #6B5B4B;
+    }
+    .st-illus[data-m="dark"] {
+      background: radial-gradient(circle at 80% 20%, rgba(245,158,108,0.12), transparent 55%), #1B1714;
+      color: #F7EFE4; --accent: #F59E6C; --accent-2: #34D399; --card: #28221D; --line-s: rgba(247,239,228,0.16); --sub: #C2B5A5;
+    }
+    .pf-book {
+      perspective: 900px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      padding: 10px 4px 6px;
+      border-bottom: 3px dashed var(--line-s);
+    }
+    .pf-card {
+      position: relative; background: var(--card); border: 1.5px solid var(--line-s);
+      border-radius: 16px; padding: 14px 12px; text-align: center;
+      transform-origin: center bottom;
+      box-shadow: 0 12px 24px rgba(43,33,24,0.12);
+      transition: transform .82s cubic-bezier(0.34, 1.42, 0.64, 1), opacity .42s ease;
+    }
+    .pf-card:nth-child(2) { transition-delay: 110ms; }
+    .pf-card:nth-child(3) { transition-delay: 220ms; }
+    .pf-tag {
+      display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 800;
+      padding: 3px 9px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent);
+      transition: transform .62s cubic-bezier(0.34, 1.5, 0.64, 1) .28s, opacity .35s ease .28s;
+    }
+    .pf-book.is-folded .pf-card { transform: rotateX(-80deg) translateY(18px) scale(0.9); opacity: 0; }
+    .pf-book.is-folded .pf-tag { transform: translateY(10px) scale(0.78); opacity: 0; transition-delay: 0s; }
+
+    .chat-box { display: flex; flex-direction: column; gap: 8px; padding: 4px 6px; }
+    .chat-b {
+      max-width: 82%; padding: 9px 13px; border-radius: 16px; font-size: 13px; font-weight: 600;
+      transition: transform .48s cubic-bezier(0.34,1.42,0.64,1), opacity .3s ease;
+    }
+    .chat-b.other { align-self: flex-start; background: var(--card); border: 1px solid var(--line-s); border-bottom-left-radius: 4px; transform-origin: left bottom; }
+    .chat-b.me { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; transform-origin: right bottom; }
+    .chat-b.is-hide { opacity: 0; transform: scale(0.8) translateY(10px); }
+    .chat-dots {
+      align-self: flex-start; display: inline-flex; gap: 4px; padding: 8px 12px; border-radius: 999px;
+      background: var(--card); border: 1px solid var(--line-s); opacity: 0; transition: opacity .2s ease;
+    }
+    .chat-dots.on { opacity: 1; }
+    .chat-dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: cdot .85s infinite ease-in-out; }
+    .chat-dots i:nth-child(2) { animation-delay: .15s; }
+    .chat-dots i:nth-child(3) { animation-delay: .3s; }
+    @keyframes cdot { 0%,80%,100% { transform: translateY(0); opacity: .35; } 40% { transform: translateY(-4px); opacity: 1; } }
 
     footer {
-      margin-top: 32px;
-      padding-top: 18px;
-      border-top: 1px solid var(--line);
-      font-size: 14px;
-      color: var(--ink-3);
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
+      margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line);
+      font-size: 13px; color: var(--ink-3);
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
     }
   </style>
 </head>
 <body>
   <header>
     <div>
-      <div class="kicker">DECK ARCHITECT · STEP 3A STYLE &amp; MOTION LIBRARY</div>
-      <h1>風格與動效圖鑑（4 款完整就緒）</h1>
-      <p class="sub">先依場合挑中 1 款風格（可切換淺／深底、試播動效個性），我們再集中火力為你畫出該風格的 2–3 張真實內容樣張。</p>
+      <div class="kicker">DECK ARCHITECT v4.7 · UNIFIED STYLE × MOTION DNA LIBRARY</div>
+      <h1>風格 × 動態 DNA 圖鑑（4 款完整就緒）</h1>
+      <p class="sub">視覺風格與專屬動態不是分開的——每款風格都綁定對應簡報主題的動態物理與按需模組（<code>styles/index.json</code>）。直接點擊、拖曳或滑過每張舞台親手感受。</p>
     </div>
     <div class="filters" role="tablist" aria-label="依場合篩選推薦風格">
       <button class="flt-btn on" type="button" data-flt="all">全部 4 款</button>
@@ -253,185 +444,357 @@
   </header>
 
   <main class="grid">
-    <!-- 1. workday -->
+    <!-- ==================== 1. WORKDAY ==================== -->
     <article class="style-card" data-id="workday" data-fit="briefing pitch">
-      <div class="stage-box st-workday" data-m="light">
-        <div class="stage-tools">
-          <button class="mini-btn" type="button" data-act="mode">淺／深</button>
-          <button class="mini-btn" type="button" data-act="play">▶ 試播動效</button>
+      <div class="stage-wrap st-workday" data-m="light">
+        <div class="stage-top">
+          <span class="stage-kicker" style="color:var(--accent)">WORKDAY · CRISP SNAP</span>
+          <div class="stage-tools">
+            <button class="mini-btn" type="button" data-act="mode">淺／深</button>
+            <button class="mini-btn" type="button" data-act="replay">↻ 重播</button>
+          </div>
         </div>
-        <div>
-          <div style="font-size:11px;font-weight:700;color:var(--wa);letter-spacing:.1em">Q3 OPERATIONS</div>
-          <div style="font-size:21px;font-weight:900">關鍵進度與拍板看板</div>
-        </div>
-        <div class="wd-grid">
-          <div class="wd-col">
-            <div class="wd-card wd-risk anim-up anim-d1">
-              <div style="font-size:11px;font-weight:700;color:#E11D48">唯一風險</div>
-              <div style="font-size:14px;font-weight:800">北區倉儲延遲 4 天</div>
-            </div>
-            <div class="wd-card wd-act anim-up anim-d2">
-              <div style="font-size:11px;font-weight:700;color:var(--wa)">建議拍板</div>
-              <div style="font-size:14px;font-weight:800">調撥 2 條備援線</div>
+
+        <!-- Scene A: Ruler Progress -->
+        <div class="scene is-active" data-scene="ruler">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <div style="font-size:17px;font-weight:900">北區產線移轉里程碑</div>
+            <div class="wd-seg">
+              <button class="wd-pill" type="button" data-rp-val="54">W1</button>
+              <button class="wd-pill" type="button" data-rp-val="74">W2</button>
+              <button class="wd-pill on" type="button" data-rp-val="88">W3 達標</button>
             </div>
           </div>
-          <div class="wd-card anim-up anim-d3">
-            <div style="font-size:12px;font-weight:700;color:var(--wsub)">健康項目進度</div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>核心排程</span><span>94%</span></div>
-              <div class="wd-bar-bg"><div class="wd-bar-fill" style="width:94%"></div></div>
+          <div class="rp-box is-passed" id="wd-rp">
+            <div class="rp-head">
+              <span style="font-size:12.5px;font-weight:700;color:var(--sub)">點上方週次或直接點刻度尺位置</span>
+              <span class="rp-val" id="wd-rp-val">88%</span>
             </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>客服移轉</span><span>82%</span></div>
-              <div class="wd-bar-bg"><div class="wd-bar-fill" style="width:82%"></div></div>
-            </div>
-            <div>
-              <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>自動化驗證</span><span>76%</span></div>
-              <div class="wd-bar-bg"><div class="wd-bar-fill" style="width:76%"></div></div>
+            <div class="rp-track" id="wd-rp-track">
+              <div class="rp-fill"></div>
+              <div class="rp-ticks"></div>
+              <div class="rp-goal"><span>目標線 80%</span></div>
             </div>
           </div>
+        </div>
+
+        <!-- Scene B: Bento Expand -->
+        <div class="scene" data-scene="bento">
+          <div class="wd-bento" id="wd-bento">
+            <div class="wd-item risk is-open">
+              <div class="wd-item-head"><span>🔴 唯一紅燈：北區倉儲延遲 4 天</span><span style="font-size:11px;color:var(--danger)">點擊收合／展開</span></div>
+              <div class="wd-detail"><div>建議拍板：調撥 2 條備援物流線（增加成本 1.8%），本週五前即可追平出貨排程。</div></div>
+            </div>
+            <div class="wd-item">
+              <div class="wd-item-head"><span>🟢 核心系統排程（94%）</span><span style="font-size:11px;color:var(--accent)">正常推進</span></div>
+              <div class="wd-detail"><div>全數 API 壓測通過，下週二進入灰度上線，無阻塞項目。</div></div>
+            </div>
+            <div class="wd-item">
+              <div class="wd-item-head"><span>🟢 客服流程移轉（82%）</span><span style="font-size:11px;color:var(--accent)">正常推進</span></div>
+              <div class="wd-detail"><div>第一批 40 位專員已完成演練，平均回應時間縮短 31%。</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="move-dock">
+          <div class="move-tabs">
+            <button class="mv-tab on" type="button" data-mv="ruler">刻度尺推進</button>
+            <button class="mv-tab" type="button" data-mv="bento">看板聚焦展開</button>
+          </div>
+          <span class="hint-pill">點刻度／點卡片互動</span>
         </div>
       </div>
+
       <div class="meta">
         <div class="meta-head">
           <div class="meta-title"><h2>日常工作款</h2><code>workday</code></div>
           <span class="rec-badge">★ 此場合推薦</span>
         </div>
-        <p class="desc">現代 Bento 狀態看板、紅／綠雙語意風險階層與「風險 ↓ 拍板」因果動線，主管三秒掃完。</p>
-        <div class="tags">
-          <span class="motion-pill">動效：俐落聚焦（crisp）</span>
-          <span class="tag">週進度回報</span><span class="tag">專案群總覽</span><span class="tag">例會拍板</span>
+        <p class="desc">適用週報、專案總覽與例會拍板。零過衝俐落煞停，一掃鎖定紅燈風險與拍板對策。</p>
+        <div class="dna-row">
+          <span class="phys-pill">物理：Crisp Snap 零過衝</span>
+          <span class="kit-code">data-ruler-progress</span>
+          <span class="kit-code">data-bento-expand</span>
+          <span class="kit-code">linked-highlight</span>
         </div>
       </div>
     </article>
 
-    <!-- 2. counsel -->
+    <!-- ==================== 2. COUNSEL ==================== -->
     <article class="style-card" data-id="counsel" data-fit="briefing pitch">
-      <div class="stage-box st-counsel" data-m="light">
-        <div class="stage-tools">
-          <button class="mini-btn" type="button" data-act="mode">淺／深</button>
-          <button class="mini-btn" type="button" data-act="play">▶ 試播動效</button>
-        </div>
-        <div>
-          <div style="font-size:11px;font-weight:700;color:var(--cm);letter-spacing:.1em">EXECUTIVE EVIDENCE</div>
-          <div style="font-size:21px;font-weight:900">導入週期壓縮 73%</div>
-        </div>
-        <div class="cs-body">
-          <div class="anim-up anim-d1">
-            <div class="cs-big">12 天</div>
-            <div style="font-size:13px;color:var(--cm);margin-top:6px">原 45 天 → 單一焦點色＋虛線目標基準</div>
+      <div class="stage-wrap st-counsel" data-m="light">
+        <div class="stage-top">
+          <span class="stage-kicker" style="color:var(--sub)">COUNSEL · EDITORIAL WEIGHT</span>
+          <div class="stage-tools">
+            <button class="mini-btn" type="button" data-act="mode">淺／深</button>
+            <button class="mini-btn" type="button" data-act="replay">↻ 重播</button>
           </div>
-          <div class="cs-bars">
-            <div class="cs-target">目標線 15 天</div>
-            <div class="cs-b anim-grow anim-d1" style="height:96%;background:var(--cl)"></div>
-            <div class="cs-b anim-grow anim-d2" style="height:68%;background:var(--cl)"></div>
-            <div class="cs-b anim-grow anim-d3" style="height:32%;background:var(--ca)"></div>
+        </div>
+
+        <!-- Scene A: FLIP Rank Race + Odometer -->
+        <div class="scene is-active" data-scene="race">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:17px;font-weight:900">方案效能反超對照</div>
+            <div class="wd-seg">
+              <button class="wd-pill" type="button" data-cs-stage="before">導入前</button>
+              <button class="wd-pill on" type="button" data-cs-stage="after">Q3 導入後</button>
+            </div>
           </div>
+          <div class="cs-split">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--sub)">導入週期</div>
+              <div class="odo-wrap" id="cs-odo">12天</div>
+              <div style="font-size:12px;color:var(--sub);margin-top:4px">機械滾輪煞停 · 壓縮 73%</div>
+            </div>
+            <div class="rr-list" id="cs-race">
+              <div class="rr-row" data-before="54" data-after="94">
+                <span class="rr-pos">#1</span><span class="rr-nm">新模組架構</span>
+                <div class="rr-track"><div class="rr-fill"></div></div><span class="rr-sc">94</span>
+              </div>
+              <div class="rr-row" data-before="82" data-after="79">
+                <span class="rr-pos">#2</span><span class="rr-nm">既有外包</span>
+                <div class="rr-track"><div class="rr-fill"></div></div><span class="rr-sc">79</span>
+              </div>
+              <div class="rr-row" data-before="71" data-after="68">
+                <span class="rr-pos">#3</span><span class="rr-nm">人工流程</span>
+                <div class="rr-track"><div class="rr-fill"></div></div><span class="rr-sc">68</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scene B: Rack Focus -->
+        <div class="scene" data-scene="rack">
+          <div style="font-size:15px;font-weight:800">點擊任意論證卡，鏡頭景深鎖定焦點：</div>
+          <div class="rf-grid has-focus" id="cs-rack">
+            <div class="rf-card">
+              <div style="font-size:11px;font-weight:800;color:var(--sub)">論證 01</div>
+              <div style="font-size:24px;font-weight:900;color:var(--accent);margin:4px 0">-42%</div>
+              <div style="font-size:12px;color:var(--sub)">維護人力投入</div>
+            </div>
+            <div class="rf-card is-on">
+              <div style="font-size:11px;font-weight:800;color:var(--accent)">關鍵論證 02</div>
+              <div style="font-size:24px;font-weight:900;color:var(--accent);margin:4px 0">3.4×</div>
+              <div style="font-size:12px;color:var(--sub)">跨團隊複用率</div>
+            </div>
+            <div class="rf-card">
+              <div style="font-size:11px;font-weight:800;color:var(--sub)">論證 03</div>
+              <div style="font-size:24px;font-weight:900;color:var(--accent);margin:4px 0">6 月</div>
+              <div style="font-size:12px;color:var(--sub)">完整回本週期</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="move-dock">
+          <div class="move-tabs">
+            <button class="mv-tab on" type="button" data-mv="race">排名超車×滾輪</button>
+            <button class="mv-tab" type="button" data-mv="rack">推鏡景深聚焦</button>
+          </div>
+          <span class="hint-pill">切換前後看超車</span>
         </div>
       </div>
+
       <div class="meta">
         <div class="meta-head">
           <div class="meta-title"><h2>顧問報告</h2><code>counsel</code></div>
           <span class="rec-badge">★ 此場合推薦</span>
         </div>
-        <p class="desc">色塊即圖表、極簡高權威編輯排版、單一焦點色＋中性灰，最適合商業論證與高階決策。</p>
-        <div class="tags">
-          <span class="motion-pill">動效：數據生長（snappy）</span>
-          <span class="tag">策略提案</span><span class="tag">高階決策</span><span class="tag">成效對照</span>
+        <p class="desc">適用策略提案、高階決策與成效論證。單焦點權威數據動線，讓排名反超與數字自己說話。</p>
+        <div class="dna-row">
+          <span class="phys-pill">物理：Editorial Weight 精準煞停</span>
+          <span class="kit-code">data-rank-race</span>
+          <span class="kit-code">data-odometer</span>
+          <span class="kit-code">data-rack-focus</span>
         </div>
       </div>
     </article>
 
-    <!-- 3. apple -->
+    <!-- ==================== 3. APPLE ==================== -->
     <article class="style-card" data-id="apple" data-fit="pitch keynote">
-      <div class="stage-box st-apple" data-m="dark">
-        <div class="stage-tools">
-          <button class="mini-btn" type="button" data-act="mode">淺／深</button>
-          <button class="mini-btn" type="button" data-act="play">▶ 試播動效</button>
+      <div class="stage-wrap st-apple" data-m="dark">
+        <div class="stage-top">
+          <span class="stage-kicker" style="color:var(--accent)">APPLE · CINEMA SPRING</span>
+          <div class="stage-tools">
+            <button class="mini-btn" type="button" data-act="mode">淺／深</button>
+            <button class="mini-btn" type="button" data-act="replay">↻ 重播</button>
+          </div>
         </div>
-        <div style="font-size:11px;font-weight:700;color:var(--aa);letter-spacing:.12em">KEYNOTE STAGE</div>
-        <div class="ap-body">
-          <div class="anim-up anim-d1">
-            <div class="ap-hero">毫秒級<br><span class="ap-grad">邊緣推論引擎</span></div>
-            <div style="font-size:13px;color:var(--asub);margin-top:8px">光暗雙極呼吸 · 大留白去框舞台</div>
+
+        <!-- Scene A: Spotlight Sweep + Split Mask -->
+        <div class="scene is-active" data-scene="spot">
+          <div class="sp-stage" id="ap-spot">
+            <div class="sp-cone"></div>
+            <div class="sp-base">
+              <div class="ap-hero"><span class="sm-line"><span class="sm-in">毫秒級</span></span><span class="sm-line"><span class="sm-in ap-grad">邊緣推論引擎</span></span></div>
+              <div style="font-size:13px;color:var(--sub);margin-top:8px">滑鼠移入即可握住聚光燈掃亮字句 · 按重播看裁切斬字</div>
+            </div>
+            <div class="sp-lit" aria-hidden="true">
+              <div class="ap-hero"><span class="sm-line"><span class="sm-in">毫秒級</span></span><span class="sm-line"><span class="sm-in ap-grad">邊緣推論引擎</span></span></div>
+              <div style="font-size:13px;color:var(--sub);margin-top:8px">滑鼠移入即可握住聚光燈掃亮字句 · 按重播看裁切斬字</div>
+            </div>
           </div>
-          <div class="ap-orb anim-scale anim-d2">
-            <div style="font-size:28px;font-weight:900;color:var(--aa)">8.4 ms</div>
-            <div style="font-size:11px;color:var(--asub)">15W 無風扇基準</div>
+        </div>
+
+        <!-- Scene B: 3D Depth Deck -->
+        <div class="scene" data-scene="deck">
+          <div class="dd-stage" id="ap-deck">
+            <div class="dd-card">
+              <div style="font-size:11px;font-weight:800;color:var(--accent)">01 / 03 · 拖曳或點擊甩到後方</div>
+              <div style="font-size:26px;font-weight:900">8.4 ms 零雲端延遲</div>
+              <div style="font-size:13px;color:var(--sub)">15W 無風扇架構下達成即時本地推論</div>
+            </div>
+            <div class="dd-card">
+              <div style="font-size:11px;font-weight:800;color:var(--accent-2)">02 / 03 · 拖曳或點擊甩到後方</div>
+              <div style="font-size:26px;font-weight:900">100% 離線隱私保護</div>
+              <div style="font-size:13px;color:var(--sub)">原始資料永不離開終端晶片安全區</div>
+            </div>
+            <div class="dd-card">
+              <div style="font-size:11px;font-weight:800;color:#F59E0B">03 / 03 · 拖曳或點擊甩到後方</div>
+              <div style="font-size:26px;font-weight:900">3 分鐘無縫替換既有 API</div>
+              <div style="font-size:13px;color:var(--sub)">相容現有 SDK，零重構成本直接升級</div>
+            </div>
           </div>
+        </div>
+
+        <!-- Scene C: Colorize Sweep -->
+        <div class="scene" data-scene="colorize">
+          <div class="cw-box" id="ap-cw" title="點擊重新觸發光掃上色">
+            <div class="cw-mono">
+              <div class="cw-art">
+                <div>
+                  <div style="font-size:11px;font-weight:800;letter-spacing:.12em;opacity:.85">NEXT-GEN OPTICS</div>
+                  <div style="font-size:28px;font-weight:900;line-height:1.15;margin-top:4px">從灰階原型<br>瞬間進入全彩實景</div>
+                </div>
+                <div style="font-size:44px;font-weight:900;opacity:.92">4K HDR</div>
+              </div>
+            </div>
+            <div class="cw-col" aria-hidden="true">
+              <div class="cw-art">
+                <div>
+                  <div style="font-size:11px;font-weight:800;letter-spacing:.12em;opacity:.85">NEXT-GEN OPTICS</div>
+                  <div style="font-size:28px;font-weight:900;line-height:1.15;margin-top:4px">從灰階原型<br>瞬間進入全彩實景</div>
+                </div>
+                <div style="font-size:44px;font-weight:900;opacity:.92">4K HDR</div>
+              </div>
+            </div>
+            <div class="cw-beam"></div>
+          </div>
+        </div>
+
+        <div class="move-dock">
+          <div class="move-tabs">
+            <button class="mv-tab on" type="button" data-mv="spot">聚光燈×斬字</button>
+            <button class="mv-tab" type="button" data-mv="deck">3D 景深疊卡</button>
+            <button class="mv-tab" type="button" data-mv="colorize">黑白光掃上色</button>
+          </div>
+          <span class="hint-pill">滑鼠掃光／拖曳甩牌</span>
         </div>
       </div>
+
       <div class="meta">
         <div class="meta-head">
           <div class="meta-title"><h2>Apple 發表</h2><code>apple</code></div>
           <span class="rec-badge">★ 此場合推薦</span>
         </div>
-        <p class="desc">暗／亮雙極大留白舞台、發光主角視覺、去框巨數與點擊懸念步進，張力最強。</p>
-        <div class="tags">
-          <span class="motion-pill">動效：電影緩升（cinema-spring）</span>
-          <span class="tag">產品發表</span><span class="tag">年度峰會</span><span class="tag">技術揭曉</span>
+        <p class="desc">適用產品發表、技術揭曉與年度峰會。高張力光影舞台、3D 景深翻牌與電影級彈簧煞停。</p>
+        <div class="dna-row">
+          <span class="phys-pill">物理：Cinema Spring 電影彈簧</span>
+          <span class="kit-code">data-split-mask</span>
+          <span class="kit-code">data-spotlight-sweep</span>
+          <span class="kit-code">data-depth-deck</span>
+          <span class="kit-code">data-colorize-wipe</span>
         </div>
       </div>
     </article>
 
-    <!-- 4. illustration -->
+    <!-- ==================== 4. ILLUSTRATION ==================== -->
     <article class="style-card" data-id="illustration" data-fit="pitch keynote">
-      <div class="stage-box st-illus" data-m="light">
-        <div class="stage-tools">
-          <button class="mini-btn" type="button" data-act="mode">淺／深</button>
-          <button class="mini-btn" type="button" data-act="play">▶ 試播動效</button>
+      <div class="stage-wrap st-illus" data-m="light">
+        <div class="stage-top">
+          <span class="stage-kicker" style="color:var(--accent)">ILLUSTRATION · TACTILE BOUNCE</span>
+          <div class="stage-tools">
+            <button class="mini-btn" type="button" data-act="mode">淺／深</button>
+            <button class="mini-btn" type="button" data-act="replay">↻ 重播</button>
+          </div>
         </div>
-        <div>
-          <div style="font-size:11px;font-weight:700;color:var(--ia);letter-spacing:.1em">STORY WORLD · 15 種畫風</div>
-          <div style="font-size:21px;font-weight:900">讓物件自己說完三段故事</div>
+
+        <!-- Scene A: 3D Pop-up Book Fold -->
+        <div class="scene is-active" data-scene="popup">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:17px;font-weight:900">立體書三幕故事舞台</div>
+            <button class="wd-pill on" type="button" id="il-fold-btn">合上／翻起立體書</button>
+          </div>
+          <div class="pf-book" id="il-book">
+            <div class="pf-card">
+              <div style="font-size:26px">🧭</div>
+              <div style="font-size:14px;font-weight:900;margin-top:4px">01 真實困惑</div>
+              <div style="font-size:11.5px;color:var(--sub)">紙黏土／手繪 15 畫風</div>
+              <span class="pf-tag">主角先立起</span>
+            </div>
+            <div class="pf-card">
+              <div style="font-size:26px">✨</div>
+              <div style="font-size:14px;font-weight:900;margin-top:4px">02 關鍵轉折</div>
+              <div style="font-size:11.5px;color:var(--sub)">過衝彈性落位</div>
+              <span class="pf-tag">標籤慢半拍跟上</span>
+            </div>
+            <div class="pf-card">
+              <div style="font-size:26px">🌱</div>
+              <div style="font-size:14px;font-weight:900;margin-top:4px">03 共鳴收尾</div>
+              <div style="font-size:11.5px;color:var(--sub)">讓畫面留在腦海</div>
+              <span class="pf-tag">主從節奏</span>
+            </div>
+          </div>
         </div>
-        <div class="il-stage">
-          <div class="il-node anim-up anim-d1">
-            <div class="il-blob" style="background:rgba(200,90,50,0.16);color:var(--ia)">01</div>
-            <div style="font-size:13px;font-weight:800">溫感手感</div>
-            <div style="font-size:11px;color:var(--isub)">紙黏土／手繪</div>
+
+        <!-- Scene B: Chat Scenario Theater -->
+        <div class="scene" data-scene="chat">
+          <div class="chat-box" id="il-chat">
+            <div class="chat-b other">每次週五彙整都要追 5 個部門表單，簡報永遠做成文字牆…</div>
+            <div class="chat-b me">如果把「真實故事」放進場景，數據自動活起來呢？</div>
+            <div class="chat-b other">這頁一看就懂，主管終於不再低頭滑手機了！</div>
+            <div class="chat-dots" id="il-dots"><i></i><i></i><i></i></div>
           </div>
-          <div class="il-node anim-up anim-d2">
-            <div class="il-blob" style="background:rgba(15,118,110,0.16);color:#0F766E">02</div>
-            <div style="font-size:13px;font-weight:800">全景融圖</div>
-            <div style="font-size:11px;color:var(--isub)">無字底圖＋真字</div>
+        </div>
+
+        <div class="move-dock">
+          <div class="move-tabs">
+            <button class="mv-tab on" type="button" data-mv="popup">立體書 3D 翻折</button>
+            <button class="mv-tab" type="button" data-mv="chat">對話小劇場</button>
           </div>
-          <div class="il-node anim-up anim-d3">
-            <div class="il-blob" style="background:rgba(217,119,6,0.16);color:#B45309">03</div>
-            <div style="font-size:13px;font-weight:800">高記憶點</div>
-            <div style="font-size:11px;color:var(--isub)">科普／文化分享</div>
-          </div>
+          <span class="hint-pill">點翻折／重播看主從回彈</span>
         </div>
       </div>
+
       <div class="meta">
         <div class="meta-head">
           <div class="meta-title"><h2>插畫場景</h2><code>illustration</code></div>
           <span class="rec-badge">★ 此場合推薦</span>
         </div>
-        <p class="desc">全頁同源底材、內容住進場景，內含紙黏土／手繪／素描／浮世繪／皮影戲等 15 種畫風淺深雙底。</p>
-        <div class="tags">
-          <span class="motion-pill">動效：溫潤分段（story-spring）</span>
-          <span class="tag">知識分享</span><span class="tag">品牌故事</span><span class="tag">新人引導</span>
+        <p class="desc">適用知識分享、科普、品牌故事與新人引導（含 15 種畫風）。立體手感彈性與主從延遲最有記憶點。</p>
+        <div class="dna-row">
+          <span class="phys-pill">物理：Tactile Bounce 主從回彈</span>
+          <span class="kit-code">data-popup-fold</span>
+          <span class="kit-code">data-chat-replay</span>
+          <span class="kit-code">flow-carousel</span>
         </div>
       </div>
     </article>
   </main>
 
   <footer>
-    <span>目前收錄 4 款已完整驗證 Style DNA 之風格（皆支援淺／深雙底與 OKLCH 動態配色）。</span>
-    <span>其餘 8 款風格將於 Phase D 逐款補齊後上架圖鑑。</span>
+    <span>單一資料庫驅動：<code>styles/index.json</code> 綁定風格 DNA、專屬動態原語與外接圖書館擴充槽；組裝時僅注入用到的模組（未用到 0 KB）。</span>
+    <span>其餘 8 款風格將於 Phase D 依同一套「風格 × 動態一體」規格上架。</span>
   </footer>
 
   <script>
+    // ---- Stage-mode occasion filter ----
     const cards = [...document.querySelectorAll('.style-card')];
     const flts = [...document.querySelectorAll('.flt-btn')];
-
     function applyFilter(mode) {
       flts.forEach(b => b.classList.toggle('on', b.dataset.flt === mode));
       cards.forEach(c => {
-        if (mode === 'all') {
-          c.classList.remove('is-rec', 'is-muted');
-        } else {
+        if (mode === 'all') { c.classList.remove('is-rec', 'is-muted'); }
+        else {
           const fits = (c.dataset.fit || '').split(/\s+/).includes(mode);
           c.classList.toggle('is-rec', fits);
           c.classList.toggle('is-muted', !fits);
@@ -440,19 +803,318 @@
     }
     flts.forEach(b => b.addEventListener('click', () => applyFilter(b.dataset.flt)));
 
+    // ---- Shared Light/Dark & Scene Switcher per Style Card ----
+    const replayMap = {};
     cards.forEach(c => {
-      const box = c.querySelector('.stage-box');
+      const id = c.dataset.id;
+      const stage = c.querySelector('.stage-wrap');
       c.querySelector('[data-act="mode"]').addEventListener('click', () => {
-        box.dataset.m = box.dataset.m === 'dark' ? 'light' : 'dark';
+        stage.dataset.m = stage.dataset.m === 'dark' ? 'light' : 'dark';
       });
-      c.querySelector('[data-act="play"]').addEventListener('click', () => {
-        box.classList.remove('is-playing');
-        void box.offsetWidth;
-        box.classList.add('is-playing');
+      const tabs = [...c.querySelectorAll('.mv-tab')];
+      const scenes = [...c.querySelectorAll('.scene')];
+      function showScene(key) {
+        tabs.forEach(t => t.classList.toggle('on', t.dataset.mv === key));
+        scenes.forEach(s => s.classList.toggle('is-active', s.dataset.scene === key));
+        if (replayMap[id]) replayMap[id](key);
+      }
+      tabs.forEach(t => t.addEventListener('click', () => showScene(t.dataset.mv)));
+      c.querySelector('[data-act="replay"]').addEventListener('click', () => {
+        const cur = c.querySelector('.mv-tab.on')?.dataset.mv;
+        if (replayMap[id]) replayMap[id](cur);
       });
     });
 
-    // Optional URL parameter ?stage=briefing|pitch|keynote auto-highlights recommended styles
+    // ---- 1. WORKDAY: Ruler Progress + Bento Expand ----
+    (() => {
+      const box = document.getElementById('wd-rp');
+      const valEl = document.getElementById('wd-rp-val');
+      const track = document.getElementById('wd-rp-track');
+      const pills = [...document.querySelectorAll('[data-rp-val]')];
+      let cur = 88, raf = 0;
+
+      function animRuler(target) {
+        cancelAnimationFrame(raf);
+        const start = cur, diff = target - start, t0 = performance.now(), dur = 720;
+        box.style.setProperty('--rp-pct', target + '%');
+        function step(now) {
+          const p = Math.min(1, (now - t0) / dur);
+          const e = 1 - Math.pow(1 - p, 3.4);
+          cur = start + diff * e;
+          valEl.textContent = Math.round(cur) + '%';
+          if (p < 1) raf = requestAnimationFrame(step);
+          else {
+            cur = target;
+            valEl.textContent = target + '%';
+            valEl.classList.add('is-hit');
+            setTimeout(() => valEl.classList.remove('is-hit'), 260);
+            box.classList.toggle('is-passed', target >= 80);
+          }
+        }
+        raf = requestAnimationFrame(step);
+      }
+      pills.forEach(p => p.addEventListener('click', () => {
+        pills.forEach(x => x.classList.remove('on'));
+        p.classList.add('on');
+        animRuler(Number(p.dataset.rpVal));
+      }));
+      track.addEventListener('click', e => {
+        const r = track.getBoundingClientRect();
+        const pct = Math.max(5, Math.min(98, Math.round(((e.clientX - r.left) / r.width) * 100)));
+        pills.forEach(x => x.classList.remove('on'));
+        animRuler(pct);
+      });
+      box.style.setProperty('--rp-pct', '88%');
+
+      const bento = document.getElementById('wd-bento');
+      const items = [...bento.querySelectorAll('.wd-item')];
+      bento.classList.add('has-open');
+      items.forEach(it => it.addEventListener('click', () => {
+        const was = it.classList.contains('is-open');
+        items.forEach(x => x.classList.remove('is-open'));
+        if (!was) { it.classList.add('is-open'); bento.classList.add('has-open'); }
+        else bento.classList.remove('has-open');
+      }));
+
+      replayMap.workday = (scene) => {
+        if (scene === 'ruler') {
+          cur = 0; box.style.setProperty('--rp-pct', '0%'); box.classList.remove('is-passed');
+          const active = document.querySelector('[data-rp-val].on');
+          const v = active ? Number(active.dataset.rpVal) : 88;
+          requestAnimationFrame(() => requestAnimationFrame(() => animRuler(v)));
+        } else {
+          items.forEach(x => x.classList.remove('is-open'));
+          items[0].classList.add('is-open');
+          bento.classList.add('has-open');
+        }
+      };
+    })();
+
+    // ---- 2. COUNSEL: FLIP Rank Race + Rolling Odometer + Rack Focus ----
+    (() => {
+      const odo = document.getElementById('cs-odo');
+      const race = document.getElementById('cs-race');
+      const rows = [...race.querySelectorAll('.rr-row')];
+      const stageBtns = [...document.querySelectorAll('[data-cs-stage]')];
+
+      function rollOdo(str, animate) {
+        odo.innerHTML = '';
+        const strips = [];
+        for (let i = 0; i < str.length; i++) {
+          const ch = str[i];
+          if ('0123456789'.includes(ch)) {
+            const d = document.createElement('span'); d.className = 'odo-d';
+            const s = document.createElement('span'); s.className = 'odo-s';
+            for (let k = 0; k < 20; k++) { const n = document.createElement('span'); n.textContent = String(k % 10); s.appendChild(n); }
+            d.appendChild(s); odo.appendChild(d);
+            strips.push({ s, idx: animate ? (10 + Number(ch)) : Number(ch), delay: i * 70 });
+          } else {
+            const t = document.createElement('span'); t.textContent = ch; t.style.fontSize = '0.52em'; t.style.marginLeft = '2px'; odo.appendChild(t);
+          }
+        }
+        strips.forEach(({ s, idx, delay }) => {
+          s.style.transition = 'none';
+          s.style.transform = animate ? 'translateY(0)' : `translateY(-${idx * 1.05}em)`;
+          if (animate) {
+            s.getBoundingClientRect();
+            s.style.transition = `transform ${820 + delay}ms cubic-bezier(0.16, 1.05, 0.28, 1) ${delay}ms`;
+            s.style.transform = `translateY(-${idx * 1.05}em)`;
+          }
+        });
+      }
+
+      function setRace(stage, animate) {
+        const rects = new Map();
+        if (animate) rows.forEach(r => rects.set(r, r.getBoundingClientRect()));
+        const list = rows.map(r => ({ r, v: Number(r.dataset[stage]) })).sort((a, b) => b.v - a.v);
+        list.forEach(({ r, v }, i) => {
+          race.appendChild(r);
+          r.classList.toggle('is-top', i === 0);
+          r.querySelector('.rr-pos').textContent = '#' + (i + 1);
+          r.querySelector('.rr-sc').textContent = String(v);
+          r.querySelector('.rr-fill').style.setProperty('--w', v + '%');
+        });
+        if (animate) {
+          list.forEach(({ r }, i) => {
+            const p = rects.get(r), n = r.getBoundingClientRect();
+            const dy = p.top - n.top;
+            if (Math.abs(dy) > 1) {
+              r.style.transition = 'none'; r.style.transform = `translateY(${dy}px)`;
+              r.getBoundingClientRect();
+              r.style.transition = `transform 680ms cubic-bezier(0.16,1,0.3,1) ${i * 45}ms`;
+              r.style.transform = 'translateY(0)';
+            }
+          });
+        }
+        rollOdo(stage === 'after' ? '12天' : '45天', animate);
+      }
+
+      stageBtns.forEach(b => b.addEventListener('click', () => {
+        stageBtns.forEach(x => x.classList.remove('on'));
+        b.classList.add('on');
+        setRace(b.dataset.csStage, true);
+      }));
+      setRace('after', false);
+
+      const rack = document.getElementById('cs-rack');
+      const rCards = [...rack.querySelectorAll('.rf-card')];
+      rCards.forEach(rc => rc.addEventListener('click', () => {
+        const was = rc.classList.contains('is-on');
+        rCards.forEach(x => x.classList.remove('is-on'));
+        if (!was) { rc.classList.add('is-on'); rack.classList.add('has-focus'); }
+        else rack.classList.remove('has-focus');
+      }));
+
+      replayMap.counsel = (scene) => {
+        if (scene === 'race') {
+          stageBtns.forEach(x => x.classList.toggle('on', x.dataset.csStage === 'after'));
+          setRace('before', false);
+          setTimeout(() => setRace('after', true), 260);
+        } else {
+          rCards.forEach(x => x.classList.remove('is-on'));
+          rCards[1].classList.add('is-on');
+          rack.classList.add('has-focus');
+        }
+      };
+    })();
+
+    // ---- 3. APPLE: Swinging Spotlight + Split Mask + 3D Depth Deck + Colorize ----
+    (() => {
+      const sp = document.getElementById('ap-spot');
+      let phase = 0, manual = false;
+      function setSp(x, y) { sp.style.setProperty('--sx', x.toFixed(1) + '%'); sp.style.setProperty('--sy', y.toFixed(1) + '%'); }
+      function tick() {
+        if (!manual) {
+          phase += 0.025;
+          setSp(50 + Math.sin(phase) * 38, 46 + Math.cos(phase * 1.4) * 14);
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+      sp.addEventListener('pointermove', e => {
+        manual = true;
+        const r = sp.getBoundingClientRect();
+        setSp(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
+      });
+      sp.addEventListener('pointerleave', () => { manual = false; });
+
+      function playSplit() {
+        sp.classList.add('is-primed');
+        sp.getBoundingClientRect();
+        requestAnimationFrame(() => sp.classList.remove('is-primed'));
+      }
+
+      // 3D Depth Deck
+      const deckEl = document.getElementById('ap-deck');
+      const dCards = [...deckEl.querySelectorAll('.dd-card')];
+      let order = dCards.map((_, i) => i);
+      function layoutDeck() {
+        order.forEach((ci, depth) => {
+          const c = dCards[ci];
+          c.style.zIndex = String(order.length - depth);
+          c.style.transform = `translate3d(0, ${-depth * 13}px, ${-depth * 52}px) scale(${1 - depth * 0.065})`;
+          c.style.opacity = String(1 - depth * 0.24);
+          c.style.filter = depth ? `blur(${depth * 1.2}px)` : 'none';
+          c.style.pointerEvents = depth === 0 ? 'auto' : 'none';
+          c.dataset.depth = String(depth);
+        });
+      }
+      function toss(dir) {
+        const front = dCards[order[0]];
+        front.classList.add('is-toss');
+        front.style.transform = `translate3d(${dir * 165}px, -10px, 28px) rotate(${dir * 9}deg) scale(0.95)`;
+        front.style.opacity = '0.2';
+        setTimeout(() => {
+          front.classList.remove('is-toss');
+          order.push(order.shift());
+          layoutDeck();
+        }, 230);
+      }
+      dCards.forEach(card => {
+        let sx = 0, dx = 0, drag = false;
+        card.addEventListener('pointerdown', e => {
+          if (card.dataset.depth !== '0') return;
+          drag = true; sx = e.clientX; dx = 0;
+          card.classList.add('is-drag'); card.setPointerCapture(e.pointerId);
+        });
+        card.addEventListener('pointermove', e => {
+          if (!drag) return;
+          dx = e.clientX - sx;
+          card.style.transform = `translate3d(${dx}px, ${Math.abs(dx) * -0.05}px, 16px) rotate(${dx * 0.045}deg)`;
+        });
+        const end = e => {
+          if (!drag) return;
+          drag = false; card.classList.remove('is-drag');
+          try { card.releasePointerCapture(e.pointerId); } catch (_) {}
+          if (Math.abs(dx) > 48) toss(dx > 0 ? 1 : -1);
+          else if (Math.abs(dx) < 8) toss(1);
+          else layoutDeck();
+        };
+        card.addEventListener('pointerup', end);
+        card.addEventListener('pointercancel', end);
+      });
+      layoutDeck();
+
+      // Colorize Wipe
+      const cw = document.getElementById('ap-cw');
+      let cwT = 0;
+      function playColorize() {
+        clearTimeout(cwT);
+        const col = cw.querySelector('.cw-col'), bm = cw.querySelector('.cw-beam');
+        col.style.transition = 'none'; bm.style.transition = 'none';
+        cw.style.setProperty('--cp', '0%');
+        cw.getBoundingClientRect();
+        col.style.transition = ''; bm.style.transition = '';
+        cw.classList.add('is-sweep');
+        requestAnimationFrame(() => cw.style.setProperty('--cp', '100%'));
+        cwT = setTimeout(() => cw.classList.remove('is-sweep'), 1180);
+      }
+      cw.addEventListener('click', playColorize);
+
+      replayMap.apple = (scene) => {
+        if (scene === 'spot') playSplit();
+        else if (scene === 'deck') toss(1);
+        else if (scene === 'colorize') playColorize();
+      };
+    })();
+
+    // ---- 4. ILLUSTRATION: 3D Pop-up Book Fold + Chat Theater ----
+    (() => {
+      const book = document.getElementById('il-book');
+      const foldBtn = document.getElementById('il-fold-btn');
+      foldBtn.addEventListener('click', () => book.classList.toggle('is-folded'));
+
+      const chat = document.getElementById('il-chat');
+      const bubbles = [...chat.querySelectorAll('.chat-b')];
+      const dots = document.getElementById('il-dots');
+      let timers = [];
+      function playChat() {
+        timers.forEach(clearTimeout); timers = [];
+        bubbles.forEach(b => b.classList.add('is-hide'));
+        let t = 140;
+        bubbles.forEach(b => {
+          timers.push(setTimeout(() => {
+            dots.style.alignSelf = b.classList.contains('me') ? 'flex-end' : 'flex-start';
+            dots.classList.add('on');
+          }, t));
+          t += 480;
+          timers.push(setTimeout(() => { dots.classList.remove('on'); b.classList.remove('is-hide'); }, t));
+          t += 320;
+        });
+      }
+
+      replayMap.illustration = (scene) => {
+        if (scene === 'popup') {
+          book.classList.add('is-folded');
+          book.getBoundingClientRect();
+          setTimeout(() => book.classList.remove('is-folded'), 140);
+        } else {
+          playChat();
+        }
+      };
+    })();
+
+    // Auto-highlight recommended styles from ?stage=
     const st = new URLSearchParams(location.search).get('stage');
     if (st && ['briefing', 'pitch', 'keynote'].includes(st)) applyFilter(st);
   </script>

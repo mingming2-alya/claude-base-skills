@@ -1,7 +1,86 @@
 {
-  "version": "4.1",
-  "note": "全部 12 款風格皆支援淺、深兩種底（明暗依場合選，用色鎖規則不鎖色碼）。目前已就緒 4 款完整 Style DNA（counsel／apple／illustration／workday）；其餘 8 款已列調性與適用場景，將於 Phase D 補齊完整憲法。",
+  "version": "4.7",
+  "note": "風格 × 動態 × 主題一體化資料庫。全部 12 款風格皆支援淺／深雙底（用色鎖規則不鎖色碼）並各自綁定專屬動態 DNA（Motion DNA）；目前已就緒 4 款完整 Style & Motion DNA（counsel／apple／illustration／workday），其餘 8 款已預定動態個性，將於 Phase D 補齊完整憲法。assemble.py 會依簡報主題與實際用到的動態原語，按需細粒度注入對應模組（未用到 0 KB）。",
+  "motion_library": {
+    "kits": {
+      "motion-workday": {
+        "style": "workday",
+        "css": "modules/motion/workday-kit.css",
+        "js": "modules/motion/workday-kit.js",
+        "physics": "crisp-snap (zero overshoot, fast settle, clear focus hierarchy)",
+        "primitives": [
+          { "id": "ruler-progress", "attr": "data-ruler-progress", "label": "刻度尺阻尼推進＋目標達標亮燈" },
+          { "id": "bento-expand", "attr": "data-bento-expand", "label": "看板卡片點擊展開＋同排壓暗聚焦" }
+        ]
+      },
+      "motion-counsel": {
+        "style": "counsel",
+        "css": "modules/motion/counsel-kit.css",
+        "js": "modules/motion/counsel-kit.js",
+        "physics": "editorial-weight (authoritative acceleration, crisp brake, evidence first)",
+        "primitives": [
+          { "id": "rank-race", "attr": "data-rank-race", "label": "FLIP 排名攀升超車交換" },
+          { "id": "odometer", "attr": "data-odometer", "label": "機械滾輪數字逐位精準煞停" },
+          { "id": "rack-focus", "attr": "data-rack-focus", "label": "推鏡景深聚焦（非焦點微柔焦退後）" }
+        ]
+      },
+      "motion-apple": {
+        "style": "apple",
+        "css": "modules/motion/apple-kit.css",
+        "js": "modules/motion/apple-kit.js",
+        "physics": "cinema-spring (dramatic anticipation, elastic settle, optical light follow-through)",
+        "primitives": [
+          { "id": "split-mask", "attr": "data-split-mask", "label": "文字裁切遮罩逐行拉起" },
+          { "id": "spotlight-sweep", "attr": "data-spotlight-sweep", "label": "擺動／滑鼠追隨聚光燈掃字顯影" },
+          { "id": "depth-deck", "attr": "data-depth-deck", "label": "3D 景深疊卡甩牌翻面" },
+          { "id": "colorize-wipe", "attr": "data-colorize-wipe", "label": "黑白柔焦→彩色光幕掃入揭曉" }
+        ]
+      },
+      "motion-story": {
+        "style": "illustration",
+        "css": "modules/motion/story-kit.css",
+        "js": "modules/motion/story-kit.js",
+        "physics": "tactile-bounce (warm overshoot & settle, primary-to-secondary follow-through)",
+        "primitives": [
+          { "id": "popup-fold", "attr": "data-popup-fold", "label": "立體書 3D 翻折立起＋主從彈性落位" },
+          { "id": "chat-replay", "attr": "data-chat-replay", "label": "對話氣泡實況劇院（含輸入脈動）" }
+        ]
+      }
+    },
+    "external_adapters": {
+      "contract": "references/motion-system.md#7",
+      "policy": "預設 0 外部依賴、100% 離線可播；僅當旗艦專案明確需要異形變形、WebGL 3D 或外部動效片段 Remix 時，徵得使用者同意後掛接並遵守 deck:slideenter / deck:slideleave / staticMode 生命週期契約。",
+      "supported_sources": [
+        { "id": "motion-dev", "url": "https://motion.dev/examples", "role": "進階物理彈簧、手勢拖曳與 WebGL 互動參考／外接庫" },
+        { "id": "motionface", "url": "https://motionface.cc/", "role": "場景敘事與 Remotion／HTML 動效片段參考與主題 Remix 來源" },
+        { "id": "disney-12", "role": "內化至 references/motion-system.md 之動作分層、過衝回正與非對稱節奏心法" }
+      ]
+    }
+  },
   "styles": [
+    {
+      "id": "workday",
+      "name": "日常工作款",
+      "status": "ready",
+      "spec": "styles/workday.md",
+      "mood": ["清晰", "省心", "高效率"],
+      "formality": "medium",
+      "default_mode": "light",
+      "modes": ["light", "dark"],
+      "stage_fit": ["briefing", "pitch"],
+      "best_for": ["週進度回報", "專案群總覽", "例會同步", "待決事項追蹤"],
+      "avoid_for": ["大型活動開場", "品牌形象影片"],
+      "signature": "現代便當格狀態卡＋雙語意色甘特與圓環進度＋掃讀式 A/B 拍板卡",
+      "motion_dna": {
+        "kit": "motion-workday",
+        "personality": "俐落精準（Crisp Snap）",
+        "easing": "cubic-bezier(0.2, 0.9, 0.25, 1)",
+        "disney_focus": ["staging", "timing-asymmetry"],
+        "signature_motions": ["ruler-progress", "bento-expand"],
+        "recommended_modules": ["components", "linked-highlight", "compare-slider", "visual-flair(zoomable)"],
+        "avoid_motions": ["spotlight-sweep", "depth-deck", "colorize-wipe", "ambient-fx", "coverflow"]
+      }
+    },
     {
       "id": "counsel",
       "name": "顧問報告",
@@ -11,9 +90,19 @@
       "formality": "high",
       "default_mode": "light",
       "modes": ["light", "dark"],
+      "stage_fit": ["briefing", "pitch"],
       "best_for": ["策略提案", "決策會議", "高階報告", "專案評估", "商業比較", "前後成效對照"],
       "avoid_for": ["慶典活動", "感性故事分享", "兒童或家庭日"],
-      "signature": "色塊就是圖表、巨大數字、單一焦點色＋中性灰、虛線目標線與斜線差距標註"
+      "signature": "色塊就是圖表、巨大數字、單一焦點色＋中性灰、虛線目標線與斜線差距標註",
+      "motion_dna": {
+        "kit": "motion-counsel",
+        "personality": "權威定焦（Editorial Weight）",
+        "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "disney_focus": ["staging", "slow-in-slow-out", "secondary-action"],
+        "signature_motions": ["rank-race", "odometer", "rack-focus"],
+        "recommended_modules": ["live-controls", "linked-highlight", "compare-slider", "components"],
+        "avoid_motions": ["popup-fold", "confetti-burst", "data-tilt"]
+      }
     },
     {
       "id": "apple",
@@ -24,9 +113,19 @@
       "formality": "medium-high",
       "default_mode": "dark",
       "modes": ["dark", "light"],
+      "stage_fit": ["pitch", "keynote"],
       "best_for": ["產品與工具發表", "大會開場", "主題演講", "功能總覽", "成果揭曉"],
       "avoid_for": ["密集多欄報表", "長篇細項表格", "多專案週進度表"],
-      "signature": "暗／亮舞台大留白、一頁一發光主視覺、漸層關鍵字、細線標註與便當格功能卡"
+      "signature": "暗／亮舞台大留白、一頁一發光主視覺、漸層關鍵字、細線標註與便當格功能卡",
+      "motion_dna": {
+        "kit": "motion-apple",
+        "personality": "電影舞台（Cinema Spring）",
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "disney_focus": ["anticipation", "overshoot-settle", "follow-through"],
+        "signature_motions": ["split-mask", "spotlight-sweep", "depth-deck", "colorize-wipe"],
+        "recommended_modules": ["media", "flow-carousel", "coverflow", "ambient-fx", "compare-slider"],
+        "avoid_motions": ["status-table", "chat-replay"]
+      }
     },
     {
       "id": "illustration",
@@ -37,6 +136,7 @@
       "formality": "low-medium",
       "default_mode": "light",
       "modes": ["light", "dark"],
+      "stage_fit": ["pitch", "keynote"],
       "substyles": [
         "紙黏土", "手繪", "霓虹", "復古卡通", "兒童手繪", "素描",
         "山洞岩畫", "埃及壁畫", "漢畫像石拓片", "瑪雅抄本",
@@ -44,7 +144,16 @@
       ],
       "best_for": ["知識分享", "新人引導", "內部宣導", "科普", "活動流程", "故事型演講"],
       "avoid_for": ["密集財務報表", "嚴肅合規稽核"],
-      "signature": "全頁同源底材、物件說故事、A 全景環繞／B 內生題箋／C 內容住進場景，預設程式版＋可選 AI 升級插槽"
+      "signature": "全頁同源底材、物件說故事、A 全景環繞／B 內生題箋／C 內容住進場景，預設程式版＋可選 AI 升級插槽",
+      "motion_dna": {
+        "kit": "motion-story",
+        "personality": "手感敘事（Tactile Bounce）",
+        "easing": "cubic-bezier(0.34, 1.38, 0.64, 1)",
+        "disney_focus": ["follow-through", "overshoot-settle", "arcs"],
+        "signature_motions": ["popup-fold", "chat-replay"],
+        "recommended_modules": ["flow-carousel", "linked-highlight", "coverflow"],
+        "avoid_motions": ["code-stage", "data-stream"]
+      }
     },
     {
       "id": "blocks",
@@ -54,10 +163,16 @@
       "formality": "medium",
       "default_mode": "light",
       "modes": ["light", "dark"],
+      "stage_fit": ["briefing", "pitch"],
       "variants": ["2D 幾何", "3D 霧面木", "3D 亮面塑膠"],
       "best_for": ["系統架構", "平台分工", "設計思考工作坊", "模組拆解"],
       "avoid_for": ["感性致詞", "古典文化"],
-      "signature": "包浩斯色格咬合＋積木立體層次"
+      "signature": "包浩斯色格咬合＋積木立體層次",
+      "motion_dna": {
+        "kit": "planned(motion-workday)",
+        "personality": "磁吸拼裝（Magnetic Snap）",
+        "signature_motions": ["bento-expand", "ruler-progress"]
+      }
     },
     {
       "id": "watercolor",
@@ -67,10 +182,16 @@
       "formality": "low-medium",
       "default_mode": "light",
       "modes": ["light", "dark"],
+      "stage_fit": ["keynote", "pitch"],
       "variants": ["彩色水彩", "黑白水墨", "厚油彩"],
       "best_for": ["文化旅遊", "品牌故事", "年度心境回顧", "永續與自然"],
       "avoid_for": ["密集 KPI 報表", "技術部署 SOP"],
-      "signature": "紙面水性暈染或厚塗筆觸＋留白呼吸"
+      "signature": "紙面水性暈染或厚塗筆觸＋留白呼吸",
+      "motion_dna": {
+        "kit": "planned(motion-story)",
+        "personality": "暈染緩開（Organic Wash）",
+        "signature_motions": ["colorize-wipe", "split-mask"]
+      }
     },
     {
       "id": "scroll",
@@ -80,9 +201,15 @@
       "formality": "high",
       "default_mode": "light",
       "modes": ["light", "dark"],
+      "stage_fit": ["keynote", "pitch"],
       "best_for": ["文化講座", "讀書會", "經典導讀", "繁體中文專屬人文主題"],
       "avoid_for": ["新創科技產品發表", "潮流社群招募"],
-      "signature": "古籍版框界欄、直排題名、朱印點睛"
+      "signature": "古籍版框界欄、直排題名、朱印點睛",
+      "motion_dna": {
+        "kit": "planned(motion-counsel)",
+        "personality": "展卷印落（Scroll Unfurl）",
+        "signature_motions": ["split-mask", "rack-focus"]
+      }
     },
     {
       "id": "riso",
@@ -92,9 +219,15 @@
       "formality": "low",
       "default_mode": "light",
       "modes": ["light", "dark"],
+      "stage_fit": ["pitch", "keynote"],
       "best_for": ["社群活動", "市集策展", "創意分享", "內部社團"],
       "avoid_for": ["董事會財報", "正式客戶標書"],
-      "signature": "兩色疊印、半色調網點與刻意錯位套印"
+      "signature": "兩色疊印、半色調網點與刻意錯位套印",
+      "motion_dna": {
+        "kit": "planned(motion-story)",
+        "personality": "錯位套印（Print Stomp）",
+        "signature_motions": ["popup-fold", "depth-deck"]
+      }
     },
     {
       "id": "deco-gold",
@@ -104,22 +237,15 @@
       "formality": "high",
       "default_mode": "dark",
       "modes": ["dark", "light"],
+      "stage_fit": ["keynote"],
       "best_for": ["頒獎典禮", "尾牙表揚", "週年慶典", "年會開場"],
       "avoid_for": ["日常週報", "技術除錯複盤"],
-      "signature": "Art Deco 對稱幾何金線、莊重典禮構圖"
-    },
-    {
-      "id": "workday",
-      "name": "日常工作款",
-      "status": "ready",
-      "spec": "styles/workday.md",
-      "mood": ["清晰", "省心", "高效率"],
-      "formality": "medium",
-      "default_mode": "light",
-      "modes": ["light", "dark"],
-      "best_for": ["週進度回報", "專案群總覽", "例會同步", "待決事項追蹤"],
-      "avoid_for": ["大型活動開場", "品牌形象影片"],
-      "signature": "現代便當格狀態卡＋雙語意色甘特與圓環進度＋掃讀式 A/B 拍板卡"
+      "signature": "Art Deco 對稱幾何金線、莊重典禮構圖",
+      "motion_dna": {
+        "kit": "planned(motion-apple)",
+        "personality": "典禮金光（Gala Curtain）",
+        "signature_motions": ["spotlight-sweep", "split-mask"]
+      }
     },
     {
       "id": "cinema",
@@ -129,9 +255,15 @@
       "formality": "medium-high",
       "default_mode": "dark",
       "modes": ["dark", "light"],
+      "stage_fit": ["keynote", "pitch"],
       "best_for": ["年度回顧", "紀實分享", "人物故事", "場域與實景展示"],
       "avoid_for": ["沒有真實照片素材的純流程報告"],
-      "signature": "寬銀幕電影劇照構圖、片名卡與字幕式重點（實戰由使用者提供照片或升級插槽）"
+      "signature": "寬銀幕電影劇照構圖、片名卡與字幕式重點（實戰由使用者提供照片或升級插槽）",
+      "motion_dna": {
+        "kit": "planned(motion-apple)",
+        "personality": "銀幕顯影（Cinema Reel）",
+        "signature_motions": ["colorize-wipe", "rack-focus", "split-mask"]
+      }
     },
     {
       "id": "pop-youth",
@@ -141,9 +273,15 @@
       "formality": "low",
       "default_mode": "light",
       "modes": ["light", "dark"],
+      "stage_fit": ["pitch", "keynote"],
       "best_for": ["校園招募", "實習計畫", "行銷企劃", "社群宣傳"],
       "avoid_for": ["高管財報", "嚴肅政策宣導"],
-      "signature": "螢幕高彩平塗、多色撞色、粗黑框與硬邊陰影"
+      "signature": "螢幕高彩平塗、多色撞色、粗黑框與硬邊陰影",
+      "motion_dna": {
+        "kit": "planned(motion-story)",
+        "personality": "硬彈撞色（Pop Punch）",
+        "signature_motions": ["depth-deck", "rank-race"]
+      }
     },
     {
       "id": "heritage",
@@ -153,9 +291,15 @@
       "formality": "medium",
       "default_mode": "light",
       "modes": ["light", "dark"],
+      "stage_fit": ["keynote", "pitch"],
       "best_for": ["企業週年回顧", "品牌歷史", "在地文化與地方創生"],
       "avoid_for": ["前沿 AI 模型技術發表"],
-      "signature": "鐵窗花／花磚圖騰、日曆牌與老招牌排版語言"
+      "signature": "鐵窗花／花磚圖騰、日曆牌與老招牌排版語言",
+      "motion_dna": {
+        "kit": "planned(motion-story)",
+        "personality": "翻頁日曆（Calendar Flip）",
+        "signature_motions": ["popup-fold", "colorize-wipe"]
+      }
     }
   ]
 }

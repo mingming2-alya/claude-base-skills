@@ -28,6 +28,10 @@
 | 新舊 UI、降噪前後、效能優化前後拉桿對比 | `compare-slider` | `[data-compare-slider]`（內含 `[data-cs-before]` + `[data-cs-after]`） | 指標／鍵盤拖曳，靜態停 50% | `references/modules/interactive-explainers.md` |
 | 技術簡報程式碼語法上色＋步進行聚焦＋終端打字 | `code-stage` | `[data-code-stage]`、`data-step-lines`、`[data-typewriter]` | 零依賴 Tokenizer，連動 `data-step` | `references/modules/interactive-explainers.md` |
 | 高密圖表點擊放大燈箱、輕微 3D 傾角、游標光暈 | `visual-flair` | `[data-zoomable]`、`[data-tilt]`、`[data-spotlight-hover]` | 傾角鎖定 ≤5°，燈箱吃 Overlay 棧 | `references/modules/presenter-and-fx.md` |
+| 日常看板刻度尺推進、風險卡展開聚焦 | `motion-workday` | `[data-ruler-progress]`、`[data-bento-expand]` | 綁定 `workday` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
+| 排名超車攀升、機械滾輪數字、推鏡景深聚焦 | `motion-counsel` | `[data-rank-race]`、`[data-odometer]`、`[data-rack-focus]` | 綁定 `counsel` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
+| 遮罩斬切文字、聚光燈掃字、3D 景深疊卡、黑白光掃上色 | `motion-apple` | `[data-split-mask]`、`[data-spotlight-sweep]`、`[data-depth-deck]`、`[data-colorize-wipe]` | 綁定 `apple` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
+| 立體書 3D 翻折舞台、對話氣泡劇院 | `motion-story` | `[data-popup-fold]`、`[data-chat-replay]` | 綁定 `illustration` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
 
 ## 3. 場合預算上限（`stage_mode` Budgets）
 

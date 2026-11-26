@@ -796,6 +796,30 @@ CONTENT_MODULES = [
         "modules/visual-flair.css",
         "modules/visual-flair.js",
     ),
+    (
+        "motion-workday",
+        lambda ctx: bool(re.search(r'\bdata-(?:ruler-progress|bento-expand)\b', ctx["html"])),
+        "modules/motion/workday-kit.css",
+        "modules/motion/workday-kit.js",
+    ),
+    (
+        "motion-counsel",
+        lambda ctx: bool(re.search(r'\bdata-(?:rank-race|odometer|rack-focus)\b', ctx["html"])),
+        "modules/motion/counsel-kit.css",
+        "modules/motion/counsel-kit.js",
+    ),
+    (
+        "motion-apple",
+        lambda ctx: bool(re.search(r'\bdata-(?:split-mask|spotlight-sweep|depth-deck|colorize-wipe)\b', ctx["html"])),
+        "modules/motion/apple-kit.css",
+        "modules/motion/apple-kit.js",
+    ),
+    (
+        "motion-story",
+        lambda ctx: bool(re.search(r'\bdata-(?:popup-fold|chat-replay)\b', ctx["html"])),
+        "modules/motion/story-kit.css",
+        "modules/motion/story-kit.js",
+    ),
 ]
 
 HERO_MODULE_DETECTORS = [
@@ -804,6 +828,8 @@ HERO_MODULE_DETECTORS = [
     ("compare-slider", re.compile(r'\bdata-compare-slider\b')),
     ("slide-video", re.compile(r'\bdata-slide-video\b')),
     ("code-stage", re.compile(r'\bdata-code-stage\b')),
+    ("depth-deck", re.compile(r'\bdata-depth-deck\b')),
+    ("rank-race", re.compile(r'\bdata-rank-race\b')),
 ]
 
 DATA_FX_RE = re.compile(r'\bdata-fx="([^"]+)"')
@@ -929,9 +955,16 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
                 b_viol.append("coverflow")
             if "data-tilt" in sl_html:
                 b_viol.append("data-tilt")
+            for k_attr, k_name in (
+                ("data-spotlight-sweep", "spotlight-sweep"),
+                ("data-depth-deck", "depth-deck"),
+                ("data-colorize-wipe", "colorize-wipe"),
+            ):
+                if k_attr in sl_html:
+                    b_viol.append(k_name)
             if b_viol:
                 gov_warnings.append(
-                    f"[WARN]  s-{idx}: stage_mode=briefing 不建議使用高氛圍裝飾模組（{', '.join(b_viol)}）。"
+                    f"[WARN]  s-{idx}: stage_mode=briefing 不建議使用高舞台裝飾模組（{', '.join(b_viol)}）。"
                 )
     if stage_mode == "pitch" and fx_slide_count > 1:
         gov_warnings.append(

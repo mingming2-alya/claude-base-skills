@@ -1261,6 +1261,7 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
       ['data-count', sl => Boolean(sl.querySelector('[data-count]'))],
       ['data-step', sl => Boolean(sl.querySelector('[data-step], [data-step-only]'))],
       ['data-transform-at', sl => Boolean(sl.querySelector('[data-transform-at]'))],
+      ['style-motion-kit', sl => Boolean(sl.querySelector('[data-ruler-progress], [data-bento-expand], [data-rank-race], [data-odometer], [data-rack-focus], [data-split-mask], [data-spotlight-sweep], [data-depth-deck], [data-colorize-wipe], [data-popup-fold], [data-chat-replay]'))],
       ['interactive-module', sl => Boolean(sl.querySelector('[data-flow-carousel], [data-coverflow], [data-marquee], [data-compare-slider], [data-code-stage], [data-ref], [data-sound-ab], [data-sound-demo], [data-slide-video], .live-ctrl input[type="range"], [data-segmented]'))],
     ];
     let visualCount = 0;
@@ -1276,7 +1277,7 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
         const w = parseFloat(g.getAttribute('width') || '0') || (vb[2] || 0);
         return w >= 120;
       });
-      const hasMediaOrWidget = Boolean(sl.querySelector('img, .asset-slot, video, audio, table, [data-flow-carousel], [data-coverflow], [data-compare-slider], [data-code-stage], [data-ref], [data-marquee], .pillars, .device-browser, .device-frame, .live-ctrl input[type="range"]'));
+      const hasMediaOrWidget = Boolean(sl.querySelector('img, .asset-slot, video, audio, table, [data-flow-carousel], [data-coverflow], [data-compare-slider], [data-code-stage], [data-ref], [data-marquee], [data-ruler-progress], [data-bento-expand], [data-rank-race], [data-depth-deck], [data-colorize-wipe], [data-popup-fold], [data-chat-replay], .pillars, .device-browser, .device-frame, .live-ctrl input[type="range"]'));
       const isVisual = hasBigSvg || hasMediaOrWidget;
       const hasMotion = primChecks.some(([, fn]) => fn(sl));
       contentSlides.push({ slideNum: idx + 1, isVisual, hasMotion });

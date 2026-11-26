@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-25｜`deck-architect` v4.6 導演驅動閉環＋依場合三段調檔＋風格圖鑑快選＋分批精雕＋生動度體檢完成 ✅）**：針對「Demo 很生動 vs 真實需求簡報偏平淡」落差完成全流程五處補洞：Step 1 依 `briefing`/`pitch`/`keynote` 三段調檔（減法清單／反差挖礦／白話招牌頁提案）→ Step 2 每頁 4 行 `director:` 分鏡 → Step 3 兩階段視覺關卡（3a 互動式 `assets/style-library.html` 4 款就緒風格圖鑑快選 → 3b 集中火力畫該風格 2–3 張真實高工藝樣張並沿用為活範本）→ Step 4 >6 頁每 3–4 頁乾淨分身精雕＋5 支 `references/recipes/` 黃金配方 → Step 5 `check.mjs` 新增依場合調檔之 Liveliness Audit 生動度體檢；全範例通過並重打包 `outputs/deck-architect.skill`（73 檔，237.4 KB）。待使用者決定進行真實簡報 PK 複驗或推進 Phase D。
+> **最新接手點（2026-11-25｜`deck-architect` v4.7 風格 × 動態 DNA 一體資料庫＋4 套按需高質感動態套件＋互動圖鑑重製完成 ✅）**：吸收 `motion.dev/examples`、`motionface.cc` 與迪士尼動畫物理守則，將動態直接綁定回單一風格資料庫（`styles/index.json` v4.7＋4 份 `styles/*.md`＋外接圖書館擴充槽），實作 4 套風格專屬按需原語（`motion-workday`/`motion-counsel`/`motion-apple`/`motion-story`，共 11 支原語，未用到 0 KB），並原地重製 `assets/style-library.html` 讓 4 款就緒風格皆能親手拖曳、點擊、掃光體驗真動效；全驗證通過並重打包 `outputs/deck-architect.skill`（82 檔，265.9 KB）。待使用者體驗滿意後進行真實簡報 PK 或推進 Phase D。
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。

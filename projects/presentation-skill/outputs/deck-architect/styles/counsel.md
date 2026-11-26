@@ -70,3 +70,13 @@
 
 - ✅ 主標題永遠大於總結；每個主張有數字或證據；每頁只有一個焦點色；每頁有資料來源；不用圖例；`delivery: talk` 下每個佐證格限兩層文字（不塞解釋小字）。
 - ❌ 禁用第二個焦點色、裝飾性圓角浮誇特效、陰影、漸層、3D 圖表、無關裝飾插圖、無出處數字。
+
+## 7. 專屬動態模組（`motion-counsel` · 按需注入，未用到 0 KB）
+
+- **動態個性**：**權威定焦（Editorial Weight）**——沉穩加速、精準煞停、數據與結論優先。
+- **綁定原語**（用法見 `references/modules/style-motion-kits.md`）：
+  - `[data-rank-race]`：FLIP 排名攀升超車交換（適合前後季排名變化、方案評比超車）。
+  - `[data-odometer]`：機械滾輪數字逐位精準煞停（適合核心 KPI 結論與成本節省）。
+  - `[data-rack-focus]`：鏡頭景深聚焦某張證據卡，其餘柔和退焦（適合多論點逐一檢視）。
+- **搭配模組**：`live-controls`、`linked-highlight`、`compare-slider`、`components`。
+- **禁忌動態**：禁用 `popup-fold`、`confetti-burst`、`data-tilt`。

@@ -69,3 +69,14 @@
 
 - ✅ 主標題必須大於總結；左右標註嚴守**兩層文字**（大數字／短詞＋短標籤，講者解釋進 `notes`）；漸層字每段色標對舞台 `≥ 3:1`；一般字 `≥ 4.5:1`。
 - ❌ 禁用紫色主調漸層（H 280–335）、科幻霓虹格線、標註區塞滿 3 層說明段落、一頁多個主視覺、彩色滿版底、重陰影堆疊卡片、Apple 商標或原產品圖。
+
+## 7. 專屬動態模組（`motion-apple` · 按需注入，未用到 0 KB）
+
+- **動態個性**：**電影舞台（Cinema Spring）**——大張力預備、微彈簧回正、光影主從跟隨。
+- **綁定原語**（用法見 `references/modules/style-motion-kits.md`）：
+  - `[data-split-mask]`：文字裁切遮罩逐行拉起（適合章節宣言與震撼主標題）。
+  - `[data-spotlight-sweep]`：擺動或滑鼠追隨聚光燈掃字顯影（適合暗底揭曉核心主張）。
+  - `[data-depth-deck]`：3D 景深疊卡甩牌翻面（適合逐項揭曉亮點或方案演進）。
+  - `[data-colorize-wipe]`：黑白柔焦→彩色光幕掃入（適合新舊世代、前後升級對照）。
+- **搭配模組**：`media`、`flow-carousel`、`coverflow`、`ambient-fx`、`compare-slider`。
+- **禁忌動態**：禁用密集 `status-table` 與 `chat-replay`。

@@ -1484,3 +1484,23 @@
   - 重新打包 `outputs/deck-architect.skill`（**73 檔，237.4 KB**，零 `__pycache__`）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/style-library.html,references/{grill.md,samples.md,recipes/*},scripts/{deck_model.py,lint.py,check.mjs},templates/{brief.md,storyboard.yaml}}`、`outputs/deck-architect.skill`、`outputs/examples/{v45-modular-demo/check/report.md,v44-keynote-demo/check/report.md}`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：交由使用者審閱 v4.6 與風格圖鑑原型，擇期以真實簡報跑一次端到端實戰 PK 複驗，或推進 Phase D 補齊其餘 8 款 Style DNA。
+
+## 2026-11-25｜`deck-architect` v4.7：研究 `motion.dev` / `motionface.cc` → 風格 × 動態 DNA 一體資料庫、4 套高質感按需動態套件與互動圖鑑重製
+
+- **使用者回饋與回歸初衷**：
+  - 使用者檢視 v4.6 `style-library.html` 後回饋「看了沒感覺」，點名研究 `https://motion.dev/examples` 與 `https://motionface.cc/`，並明確校準架構初衷：**不要重複做也不要把風格與動態拆開**；風格與動態必須跟簡報主題一體掛勾，建好單一資料庫與外接圖書館擴充介面，基於主題按需動態注入對應模組。
+- **本輪核心實作（v4.7）**：
+  1. **單一「風格 × 動態」資料庫（`styles/index.json` v4.7 ＋ 4 份 `styles/*.md`）**：不另開獨立系統，直接在既有 12 款風格資料庫中補齊每款風格的 `motion_dna`（物理個性、迪士尼節奏重點、綁定原語、禁忌動態），並新增 `motion_library.kits` 與 `external_adapters` 外接圖書館介面槽。
+  2. **4 套風格綁定高質感按需原語（`assets/modules/motion/*`，共 11 支原語，未用到 0 KB）**：
+     - `workday-kit`（Crisp Snap）：`[data-ruler-progress]` 物理阻尼刻度尺推進＋達標亮燈、`[data-bento-expand]` 看板點擊展開聚焦。
+     - `counsel-kit`（Editorial Weight）：`[data-rank-race]` FLIP 排名超車交換、`[data-odometer]` 機械滾輪數字煞停、`[data-rack-focus]` 推鏡景深聚焦。
+     - `apple-kit`（Cinema Spring）：`[data-split-mask]` 遮罩斬切拉起文字、`[data-spotlight-sweep]` 擺動／游標追隨聚光燈掃字、`[data-depth-deck]` 3D 景深疊卡甩牌、`[data-colorize-wipe]` 黑白柔焦→彩色光掃。
+     - `story-kit`（Tactile Bounce）：`[data-popup-fold]` 立體書 3D 翻折＋主從標籤延遲、`[data-chat-replay]` 對話氣泡實況劇院。
+  3. **原地重製 `assets/style-library.html`**：徹底淘汰 14px 淡入假縮圖，將 4 款就緒風格卡片升級為可親手點擊刻度、切換排名超車、滑鼠握光掃字、拖曳甩牌、翻折立體書的活體舞台，並顯示該風格綁定自動注入的原語清單。
+  4. **組裝引擎、品管與手冊同步**：`scripts/assemble.py` 支援 4 套風格動態細粒度按需注入與 `briefing` 高舞台原語軟性防呆；`scripts/check.mjs` Liveliness Audit 納管 11 支新原語；新增 `references/modules/style-motion-kits.md` 並在 `references/motion-system.md` 納入迪士尼 4 條簡報物理守則。
+- **驗證與重打包**：
+  - 煙霧測試確認 4 套套件可依 HTML 屬性精準注入（未用模組全略過省 123.0 KB）；既有 `v45-modular-demo` 零回歸（4 套新套件 0 KB 略過、`check.mjs --jpg --motion` 0 錯、最低 `4.84:1`、Liveliness Audit 100% ✅）。
+  - 無頭 Chrome 截圖目視檢核並微調 Apple 聚光燈置中與光暈後通過。
+  - 重新打包 `outputs/deck-architect.skill`（**82 檔，265.9 KB**，零 `__pycache__`）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,styles/{index.json,workday.md,counsel.md,apple.md,illustration.md},assets/style-library.html,assets/modules/motion/*,references/{motion-system.md,modules-catalog.md,modules/style-motion-kits.md},scripts/{assemble.py,check.mjs}}`、`outputs/deck-architect.skill`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+- **下一步**：交由使用者親手試玩新版風格 × 動態圖鑑，確認體感後推進實戰 PK 或 Phase D。

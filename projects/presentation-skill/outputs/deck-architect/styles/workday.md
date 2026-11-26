@@ -72,3 +72,12 @@
 
 - ✅ 標題區與卡片內容邏輯一致（標題寫「五店進度」，下方就有五店整體完成度與各店分布）；雙語意色克制；每卡最多兩層文字；所有標籤 ≥ 18px。
 - ❌ 禁用彩虹多色徽章、黑白純線框 Excel 表樣式、卡片內寫超過 2 行的長段落說明、重黑投影或玻璃霓虹特效。
+
+## 7. 專屬動態模組（`motion-workday` · 按需注入，未用到 0 KB）
+
+- **動態個性**：**俐落精準（Crisp Snap）**——零過衝、快切穩停、強調主焦點收斂。
+- **綁定原語**（用法見 `references/modules/style-motion-kits.md`）：
+  - `[data-ruler-progress]`：物理阻尼刻度尺推進＋達標目標線亮燈（適合里程碑／KPI 完成度）。
+  - `[data-bento-expand]`：點擊風險或決策卡滑順展開詳情，同排自動壓暗退讓（適合週報／例會現場展開追問）。
+- **搭配模組**：`components`、`linked-highlight`、`compare-slider`、`visual-flair(zoomable)`。
+- **禁忌動態**：禁用 `spotlight-sweep`、`depth-deck`、`colorize-wipe`、`ambient-fx`、`coverflow` 等舞台裝飾動效。

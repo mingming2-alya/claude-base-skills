@@ -89,8 +89,20 @@ v4.5 輕底盤引擎將**核心基礎設施**、**講者臨場工具**與**內�
   - `media`（影片 `data-start`/`data-end`/`data-rate`/全螢幕 ＋ 音檔/`[data-sound-ab]` 同步 A/B 切換）
   - `flow-carousel`（`vertical|horizontal|stepper|chat` 4 模式）、`coverflow`（3D 輪播＋燈箱＋`[data-marquee]`）
   - `linked-highlight`（`[data-ref]` 文圖雙向聯動）、`compare-slider`（`[data-compare-slider]` 前後拉桿）、`code-stage`（`[data-code-stage]` 步進程式碼聚焦＋`[data-typewriter]`）、`visual-flair`（`[data-zoomable]` 燈箱＋`[data-tilt]`≤5°＋`[data-spotlight-hover]`）。
+  - **風格綁定動態原語（`assets/modules/motion/*`，v4.7 與 `styles/index.json` 一體掛勾）**：
+    - `motion-workday`：`[data-ruler-progress]`、`[data-bento-expand]`
+    - `motion-counsel`：`[data-rank-race]`、`[data-odometer]`、`[data-rack-focus]`
+    - `motion-apple`：`[data-split-mask]`、`[data-spotlight-sweep]`、`[data-depth-deck]`、`[data-colorize-wipe]`
+    - `motion-story`：`[data-popup-fold]`、`[data-chat-replay]`
 
-> 撰寫各模組詳細 HTML 語法與場合預算上限時，請按需查閱 `references/modules-catalog.md` 與 `references/modules/` 子手冊。
+### 5.3 迪士尼動效物理 4 條簡報實戰守則（消除塑膠感、嚴禁每頁全開）
+
+1. **主從延遲（Follow-Through）**：主標題／主視覺先到，細節標籤、目標線與陰影慢 120–220ms 跟上，絕不齊步同時淡入。
+2. **節奏不對稱（Timing Asymmetry）**：進場快切慢煞（強調抵達感）、退場乾脆迅速；不同通道（位移 vs 透明 vs 縮放）錯開曲線。
+3. **依風格決定過衝（Overshoot & Settle）**：`workday` 零過衝俐落煞停；`counsel` 僅數字滾輪帶極微煞停感；`apple` 與 `illustration` 適度加入物理彈性回正。
+4. **風格綁定、絕不混搭失控**：永遠從 `styles/index.json` 查詢該風格的 `motion_dna`（推薦原語與禁忌清單），讓動態服務主題與風格而非炫技。
+
+> 撰寫各模組詳細 HTML 語法與場合預算上限時，請按需查閱 `references/modules-catalog.md` 與 `references/modules/` 子手冊（含 `style-motion-kits.md`）。
 
 ---
 

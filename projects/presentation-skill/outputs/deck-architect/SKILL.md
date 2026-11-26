@@ -1,9 +1,9 @@
 ---
 name: deck-architect
-description: 架構先行的簡報製作技能（v4.6）：先以設計樹前沿（Design Tree + Frontier）互動表單 Grill 依場合光譜（briefing/pitch/keynote）三段自動調檔——日常匯報重減法與三秒掃讀、提案與發表會主動挖故事反差並以白話提案招牌亮點頁；再展開每頁 4 行視覺分鏡；Step 3 採 Motion Library 式「風格圖鑑快選（3a）→ 單風格集中精雕 2–3 張真實樣張＋3 組 OKLCH 配色（3b）」且樣張直接沿用為活範本；Step 4 超過 6 頁自動每 3–4 頁派乾淨分身並行精雕，掛載三層細粒度按需引擎（Layer 0 輕底盤＋Layer 1 G/A/L/S 講者工具＋Layer 2 11 項內容模組）；Step 5 執行真實像素 WCAG＋13 項動態＋生動度與反單調稽核（Liveliness Audit）。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
+description: 架構先行的簡報製作技能（v4.7）：先以設計樹前沿（Design Tree + Frontier）互動表單 Grill 依場合光譜（briefing/pitch/keynote）三段自動調檔——日常匯報重減法與三秒掃讀、提案與發表會主動挖故事反差並以白話提案招牌亮點頁；再展開每頁 4 行視覺分鏡；Step 3 採「風格 × 動態一體」Style & Motion Library（3a 親手體驗各風格專屬真動效並挑中 1 款風格 → 3b 集中精雕該風格 2–3 張真實樣張＋3 組 OKLCH 配色，樣張直接沿用為活範本）；Step 4 超過 6 頁自動每 3–4 頁派乾淨分身並行精雕，基於主題與 styles/index.json 風格動態 DNA 按需細粒度注入三層引擎（Layer 0 輕底盤＋Layer 1 G/A/L/S 講者工具＋Layer 2 內容模組與 4 套風格動態原語套件，未用到 0 KB）；Step 5 執行真實像素 WCAG＋13 項動態＋生動度稽核（Liveliness Audit）。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
 ---
 
-# Deck Architect v4.6：場合調檔 × 風格圖鑑 × 分批精雕舞台
+# Deck Architect v4.7：主題導向 × 風格動態一體 × 按需注入舞台
 
 信念：**簡報的成敗在架構與說服載體，生動度必須依場合開合、並靠「先分鏡、看圖鑑、乾淨分身精雕、雙門檻體檢」守住上下限**。日常匯報絕不浮誇、守住三秒掃讀；提案與發表會則從第一步就種下故事反差與招牌亮點頁，讓真實簡報跟 Demo 一樣鮮活。
 
@@ -132,16 +132,16 @@ node <skill>/scripts/check.mjs decks/<name>/deck.html --jpg --motion
 | `references/grill.md` | Step 1 開始時（依場合調檔之設計樹前沿、挖故事反差、白話亮點頁提案與減法清單） |
 | `references/contexts.md` | Step 1 判斷 `stage_mode` 三段舞台光譜、播放密度、計畫轉成果、快速模式時 |
 | `references/modules-catalog.md` | **Step 1 ＆ Step 4 一頁決策表**（Layer 0/1/2 模組總覽、場合預算上限與禁止規則） |
-| `references/modules/{media-and-gallery,interactive-explainers,presenter-and-fx}.md` | 按需：僅打開實際會用到的模組子手冊 |
+| `references/modules/{media-and-gallery,interactive-explainers,presenter-and-fx,style-motion-kits}.md` | 按需：僅打開實際會用到的模組與風格綁定動態原語子手冊 |
 | `references/recipes/{bento-causal,linked-diagram,interactive-proof,product-story,editorial-drama}.md` | **Step 3b ＆ Step 4 按需載入**：5 支精選高工藝 HTML/SVG/Motion 黃金配方 |
-| `assets/style-library.html`、`references/samples.md` | Step 3a 風格與動效圖鑑快選 → Step 3b 單風格高工藝樣張與活範本交接 |
+| `assets/style-library.html`、`references/samples.md` | Step 3a 風格×動態一體圖鑑快選 → Step 3b 單風格高工藝樣張與活範本交接 |
 | `references/structure.md` | Step 1 推導單軸架構、Grounding 檢查、Design It Twice 破框提案與 Keynote 戲劇層時 |
 | `references/presentation-rules.md` | Step 2 展開內容、原則 #26 與豁免、導航分級、繁體在地化、Step 5 品管時 |
 | `references/content-shapes.md` | Step 2–4 判斷內容形狀（14 結構＋5 圖表）與容量上限時 |
 | `references/visual-guidance.md` | Step 4–5 規劃場合光暗節奏、去框五大原型、靜態動線、聚光壓暗與雙軌節拍時 |
-| `references/motion-system.md` | Step 4 撰寫自由畫布 60fps 切頁／Magic Move／數據動畫／互動控件時 |
+| `references/motion-system.md` | Step 4 撰寫自由畫布 60fps 切頁／Magic Move／風格動態原語／迪士尼物理守則時 |
 | `references/progress-report.md` | 定期進度回報、多單位 PPTX 檢核（`check_reports.py`）時 |
-| `styles/index.json`、`styles/color-system.md`、`styles/<id>.md` | Step 3–4 撰寫樣張、推薦三組 OKLCH 配色與編排每一頁時 |
+| `styles/index.json`、`styles/color-system.md`、`styles/<id>.md` | **單一「主題→風格→動態 DNA」資料庫**：Step 3–4 匹配風格與動態原語、推薦三組 OKLCH 配色時 |
 | `templates/brief.md`、`templates/storyboard.yaml`、`templates/image-upgrade.md` | 建立對應產出物與撰寫反左右割裂生圖提示詞時 |
 
 

@@ -1,0 +1,114 @@
+/* deck-architect v4.7 Style Motion Kit: apple (Cinema Spring)
+ * Primitives: [data-split-mask], [data-spotlight-sweep], [data-depth-deck], [data-colorize-wipe]
+ */
+/* 1. Split Text Mask Reveal */
+[data-split-mask] .sm-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+[data-split-mask] .sm-inner {
+  display: inline-block;
+  transform: translateY(0) rotate(0deg);
+  transition: transform 0.78s cubic-bezier(0.22, 1.06, 0.36, 1), opacity 0.55s ease;
+  will-change: transform;
+}
+[data-split-mask].is-primed .sm-inner {
+  transform: translateY(115%) rotate(1.6deg);
+  opacity: 0;
+  transition: none !important;
+}
+
+/* 2. Swinging / Pointer-Tracking Spotlight Sweep */
+[data-spotlight-sweep] {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+[data-spotlight-sweep] .sp-base {
+  opacity: 0.24;
+  transition: opacity .3s ease;
+}
+[data-spotlight-sweep] .sp-lit {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: inherit;
+  -webkit-mask-image: radial-gradient(circle var(--sp-r, 150px) at var(--sp-x, 50%) var(--sp-y, 50%), #000 0%, rgba(0,0,0,0.82) 55%, transparent 100%);
+  mask-image: radial-gradient(circle var(--sp-r, 150px) at var(--sp-x, 50%) var(--sp-y, 50%), #000 0%, rgba(0,0,0,0.82) 55%, transparent 100%);
+}
+[data-spotlight-sweep] .sp-cone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle var(--sp-r, 170px) at var(--sp-x, 50%) var(--sp-y, 50%), color-mix(in srgb, var(--accent, #38BDF8) 28%, transparent), transparent 72%);
+  mix-blend-mode: screen;
+  z-index: -1;
+}
+
+/* 3. 3D Depth Deck (Tactile Card Stack with Depth Blur & Spring Toss) */
+[data-depth-deck] {
+  position: relative;
+  perspective: 1100px;
+  user-select: none;
+  touch-action: pan-y;
+}
+[data-depth-deck] [data-deck-card] {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  cursor: grab;
+  transform-origin: center bottom;
+  transition:
+    transform 0.56s cubic-bezier(0.22, 1.08, 0.36, 1),
+    opacity 0.44s ease,
+    filter 0.44s ease,
+    box-shadow 0.44s ease;
+  will-change: transform, opacity;
+}
+[data-depth-deck] [data-deck-card].is-dragging {
+  cursor: grabbing;
+  transition: none !important;
+}
+[data-depth-deck] [data-deck-card].is-tossing {
+  transition: transform 0.36s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.32s ease;
+}
+
+/* 4. Colorize Light-Sweep Reveal (B&W Soft-Focus -> Vibrant Color) */
+[data-colorize-wipe] {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+}
+[data-colorize-wipe] .cw-mono {
+  position: relative;
+  filter: grayscale(1) contrast(1.08) blur(1.2px);
+  opacity: 0.72;
+}
+[data-colorize-wipe] .cw-color {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 calc(100% - var(--cw-pct, 100%)) 0 0);
+  transition: clip-path 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-colorize-wipe] .cw-beam {
+  position: absolute;
+  top: -10%; bottom: -10%;
+  left: var(--cw-pct, 100%);
+  width: 44px;
+  transform: translateX(-50%) skewX(-10deg);
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent, #38BDF8) 72%, #fff), transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: left 1.15s cubic-bezier(0.22, 1, 0.36, 1), opacity .35s ease;
+}
+[data-colorize-wipe].is-sweeping .cw-beam { opacity: 0.92; }
+
+@media (prefers-reduced-motion: reduce), print {
+  [data-split-mask] .sm-inner,
+  [data-depth-deck] [data-deck-card],
+  [data-colorize-wipe] .cw-color { transition: none !important; }
+  [data-spotlight-sweep] .sp-base { opacity: 1 !important; }
+  [data-spotlight-sweep] .sp-lit, [data-spotlight-sweep] .sp-cone { display: none !important; }
+  [data-colorize-wipe] .cw-color { clip-path: inset(0 0 0 0) !important; }
+}

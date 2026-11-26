@@ -1,0 +1,118 @@
+/* deck-architect v4.7 Style Motion Kit: workday (Crisp Snap)
+ * Primitives: [data-ruler-progress], [data-bento-expand]
+ */
+[data-ruler-progress] {
+  position: relative;
+  padding: 16px 18px 14px;
+  border-radius: 14px;
+  background: var(--card, rgba(255,255,255,0.85));
+  border: 1px solid var(--line, rgba(22,25,34,0.12));
+  user-select: none;
+}
+.rp-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.rp-label { font-size: 0.85em; font-weight: 700; color: var(--ink-2, currentColor); opacity: 0.82; }
+.rp-val {
+  font-size: 1.55em;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent, #0F766E);
+  transition: transform .28s cubic-bezier(0.2, 0.9, 0.25, 1), color .25s ease;
+}
+.rp-val.is-hit { transform: scale(1.06); }
+.rp-track {
+  position: relative;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--surface-2, rgba(128,128,128,0.10));
+  overflow: hidden;
+}
+.rp-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--rp-pct, 0%);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent, #0F766E) 22%, transparent), color-mix(in srgb, var(--accent, #0F766E) 45%, transparent));
+  border-right: 3px solid var(--accent, #0F766E);
+  transition: width .78s cubic-bezier(0.2, 0.9, 0.25, 1);
+  will-change: width;
+}
+.rp-ticks {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(5% - 1px),
+    color-mix(in srgb, currentColor 22%, transparent) calc(5% - 1px),
+    color-mix(in srgb, currentColor 22%, transparent) 5%
+  );
+  pointer-events: none;
+}
+.rp-target {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: var(--rp-target, 80%);
+  width: 2px;
+  background: var(--danger, #E11D48);
+  pointer-events: none;
+  z-index: 2;
+}
+.rp-target::after {
+  content: attr(data-target-label);
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--danger, #E11D48);
+  white-space: nowrap;
+}
+[data-ruler-progress].is-passed .rp-target { background: var(--accent, #0F766E); }
+[data-ruler-progress].is-passed .rp-target::after { color: var(--accent, #0F766E); }
+
+/* Bento Expand (Click to focus & expand details, dim siblings) */
+[data-bento-expand] {
+  display: grid;
+  gap: 12px;
+}
+[data-bento-expand] [data-bento-item] {
+  position: relative;
+  cursor: pointer;
+  transition:
+    transform .36s cubic-bezier(0.2, 0.9, 0.25, 1),
+    opacity .28s ease,
+    border-color .24s ease,
+    box-shadow .32s ease;
+}
+[data-bento-expand] [data-bento-detail] {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows .36s cubic-bezier(0.2, 0.9, 0.25, 1), opacity .24s ease;
+}
+[data-bento-expand] [data-bento-detail] > * { overflow: hidden; }
+[data-bento-expand].has-open [data-bento-item]:not(.is-open) {
+  opacity: 0.42;
+  transform: scale(0.985);
+}
+[data-bento-expand] [data-bento-item].is-open {
+  border-color: var(--accent, #0F766E);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--accent, #0F766E) 18%, transparent);
+  transform: translateY(-2px);
+  z-index: 2;
+}
+[data-bento-expand] [data-bento-item].is-open [data-bento-detail] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce), print {
+  .rp-fill, [data-bento-expand] [data-bento-item], [data-bento-expand] [data-bento-detail] {
+    transition: none !important;
+  }
+}

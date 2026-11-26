@@ -1,0 +1,104 @@
+/* deck-architect v4.7 Style Motion Kit: counsel (Editorial Weight)
+ * Primitives: [data-rank-race], [data-odometer], [data-rack-focus]
+ */
+/* 1. FLIP Rank Race */
+[data-rank-race] {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+[data-rank-race] [data-rank-item] {
+  display: grid;
+  grid-template-columns: 28px minmax(88px, 0.34fr) 1fr 56px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--card, rgba(255,255,255,0.72));
+  border: 1px solid var(--line, rgba(27,29,33,0.12));
+  will-change: transform;
+}
+[data-rank-race] [data-rank-item].is-leader {
+  border-color: var(--accent, #1D4ED8);
+  background: color-mix(in srgb, var(--accent, #1D4ED8) 8%, var(--card, #fff));
+}
+.rr-pos {
+  font-size: 0.8em;
+  font-weight: 900;
+  color: var(--ink-3, #64748B);
+  font-variant-numeric: tabular-nums;
+}
+[data-rank-item].is-leader .rr-pos { color: var(--accent, #1D4ED8); }
+.rr-name { font-size: 0.85em; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rr-bar-wrap { height: 10px; border-radius: 999px; background: color-mix(in srgb, currentColor 12%, transparent); overflow: hidden; }
+.rr-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 36%, transparent);
+  width: var(--rr-w, 50%);
+  transition: width .72s cubic-bezier(0.16, 1, 0.3, 1), background-color .35s ease;
+}
+[data-rank-item].is-leader .rr-bar { background: var(--accent, #1D4ED8); }
+.rr-score {
+  font-size: 0.88em;
+  font-weight: 900;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 2. Mechanical Rolling Odometer */
+[data-odometer] {
+  display: inline-flex;
+  align-items: baseline;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+.odo-digit {
+  display: inline-block;
+  height: 1.05em;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.odo-strip {
+  display: flex;
+  flex-direction: column;
+  transform: translateY(0);
+  transition: transform 0.92s cubic-bezier(0.16, 1.04, 0.28, 1);
+  will-change: transform;
+}
+.odo-strip span {
+  display: block;
+  height: 1.05em;
+  line-height: 1.05em;
+  text-align: center;
+}
+.odo-static { display: inline-block; }
+
+/* 3. Rack Focus (Optical Depth of Field Shift) */
+[data-rack-focus] [data-rf-item] {
+  cursor: pointer;
+  transition:
+    transform .48s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity .42s ease,
+    filter .45s ease,
+    border-color .3s ease,
+    box-shadow .4s ease;
+}
+[data-rack-focus].has-focus [data-rf-item]:not(.is-focused) {
+  opacity: 0.42;
+  filter: blur(2.2px);
+  transform: scale(0.96);
+}
+[data-rack-focus] [data-rf-item].is-focused {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.03);
+  border-color: var(--accent, #1D4ED8);
+  box-shadow: 0 18px 38px color-mix(in srgb, var(--accent, #1D4ED8) 20%, transparent);
+  z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce), print {
+  .rr-bar, .odo-strip, [data-rack-focus] [data-rf-item] { transition: none !important; }
+  [data-rack-focus].has-focus [data-rf-item]:not(.is-focused) { filter: none !important; opacity: 0.85 !important; transform: none !important; }
+}

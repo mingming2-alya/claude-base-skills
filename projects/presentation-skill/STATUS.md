@@ -1,18 +1,21 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-25｜`deck-architect` v4.6 導演驅動閉環＋依場合三段調檔＋風格圖鑑快選＋分批精雕＋生動度體檢完成 ✅）**：
+> **最新接手點（2026-11-25｜`deck-architect` v4.7「風格 × 動態 × 主題一體」資料庫＋4 套風格綁定高質感動態原語＋互動圖鑑重製完成 ✅）**：
 >
-> 1. **根治「Demo 很生動 vs 真實需求簡報偏平淡」五大結構落差（全面依 `stage_mode` 三段自動調檔，日常匯報不浮誇、提案／發表會不平淡）**：
->    - **Step 1 依場合自動調檔（`references/grill.md`、`templates/brief.md`）**：`briefing` 不硬挖煽情故事、主打「內容減法提案」（長文歸 `notes` 守三秒掃讀）；`pitch` 抓 1 個痛點反差＋以白話提案 1–2 個實用互動頁（不丟模組術語）；`keynote` 完整挖故事張力與原話＋提案 2–3 個吸睛招牌亮點頁，由 Agent 幕後映射按需模組。
->    - **Step 2 逐頁 4 行視覺分鏡（`templates/storyboard.yaml`、`scripts/deck_model.py`、`scripts/lint.py`）**：新增輕量 `director:`（`hero`／`archetype`／`module`／`choreo`），`briefing` 僅標關鍵頁、`pitch`/`keynote` 逐頁防退化成純文字卡片。
->    - **Step 3 兩階段精準視覺關卡（`assets/style-library.html`、`references/samples.md`）**：Step 3a 先以 Motion Library 式「風格與動效圖鑑」（收錄目前 4 款完整就緒風格：`workday`／`counsel`／`apple`／`illustration`，內建淺／深切換、試播動效與 `?stage=` 場合高亮）秒選 1 款風格 → Step 3b 集中 100% 火力畫該風格的 2–3 張真實高工藝樣張＋3 組 OKLCH 配色；確認後直接沿用進成品並作為 Step 4 活範本（Live Style Anchor）。
->    - **Step 4 分批乾淨分身精雕＋5 支黃金工藝配方（`SKILL.md`、`references/recipes/*.md`）**：內建 5 支精選語意變數版高工藝配方（`bento-causal`、`linked-diagram`、`interactive-proof`、`product-story`、`editorial-drama`）；超過 6 頁自動拆成每 3–4 頁一小批派乾淨上下文子代理並行精雕（吃 `deck.css`＋Step 3b 活範本＋該批 `director:`＋對應配方），消除長對話後面滑坡。
->    - **Step 5 雙門檻品管（`scripts/check.mjs`）**：保留下限像素 WCAG＋13 項動態實測，新增依 `stage_mode` 調檔之 **Liveliness Audit（生動度與反單調體檢）**，自動量測視覺頁佔比、原語多樣性與連續純文字單調頁，點名最平淡頁面進入 Polish Pass。
+> 1. **吸收 `motion.dev/examples`、`motionface.cc` 與迪士尼 12 原則心法，不另起爐灶、回歸「主題 → 風格 DNA → 專屬動態」一體設計**：
+>    - **單一風格動態資料庫（`styles/index.json` v4.7＋4 份 `styles/*.md`）**：全部 12 款風格統一掛載 `motion_dna`（物理個性、迪士尼節奏重點、綁定原語、禁忌動態）並預留 `external_adapters` 外接圖書館掛接槽。
+>    - **4 套風格綁定高質感按需原語（`assets/modules/motion/*`，未用到 0 KB）**：
+>      - `motion-workday`（Crisp Snap）：`[data-ruler-progress]` 阻尼刻度尺推進＋達標亮燈、`[data-bento-expand]` 看板聚焦展開。
+>      - `motion-counsel`（Editorial Weight）：`[data-rank-race]` FLIP 排名超車、`[data-odometer]` 機械滾輪數字、`[data-rack-focus]` 推鏡景深聚焦。
+>      - `motion-apple`（Cinema Spring）：`[data-split-mask]` 遮罩斬切文字、`[data-spotlight-sweep]` 擺動／追隨聚光燈掃字、`[data-depth-deck]` 3D 景深疊卡甩牌、`[data-colorize-wipe]` 黑白柔焦→彩色光掃。
+>      - `motion-story`（Tactile Bounce）：`[data-popup-fold]` 立體書 3D 翻折＋主從標籤延遲、`[data-chat-replay]` 對話氣泡實況劇院。
+>    - **原地升級 `assets/style-library.html`**：徹底告別千篇一律 14px 淡入；4 款風格卡片全部變成可親手點擊、拖曳、掃光、切換招式與淺深底的活體舞台，並清楚標示每款風格綁定注入的模組清單。
+>    - **引擎與手冊閉環**：`assemble.py` 新增 4 套風格動態細粒度按需注入＋`briefing` 高舞台原語防呆；`check.mjs` Liveliness Audit 納管 11 支新原語；新增 `references/modules/style-motion-kits.md` 並在 `references/motion-system.md` 納入迪士尼 4 條簡報物理守則。
 > 2. **驗證與重打包**：
->    - `lint.py` 通過 `templates/storyboard.yaml`（含 `director:`）與全數 4 個範例（0 錯）；`check.mjs --jpg --motion` 於 `v45-modular-demo`（視覺 100%、4 種原語 ✅）與 `v44-keynote-demo`（視覺 100%、5 種原語 ✅）Liveliness Audit 全數達標；`assets/style-library.html` 已透過無頭 Chrome 截圖目視驗收通過。
->    - 重新打包 `outputs/deck-architect.skill`（**73 檔，237.4 KB**，零 `__pycache__`）。
+>    - 4 套風格動態套件注入煙霧測試通過（按需注入 4 套、未用模組全略過省 123.0 KB）；既有 `v45-modular-demo` 零回歸（4 套新套件全略過 0 KB、`check.mjs --jpg --motion` 0 錯、最低 `4.84:1`、Liveliness Audit 100% ✅）；無頭 Chrome 截圖目視檢核新版 `style-library.html` 通過。
+>    - 重新打包 `outputs/deck-architect.skill`（**82 檔，265.9 KB**，零 `__pycache__`）。
 >
-> **下一步（Phase C.2 收官驗收 → Phase D）**：以升級後完整的 `deck-architect` v4.6 進行真實簡報 PK 複驗，確認滿意後推進 **Phase D｜補齊其餘 8 款 Style DNA 並逐款上架 Style & Motion Library**。
+> **下一步（Phase C.2 收官驗收 → Phase D）**：由使用者親手試玩新版 `style-library.html`，滿意後可擇期以真實簡報跑一次 v4.7 實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「風格 × 動態一體」Style DNA 並逐款上架圖鑑**。
 >
 > 主軸文件是 `ROADMAP.md`，執行紀錄在 `LOG.md`，專案規則在根目錄 `CLAUDE.md`。
 
