@@ -1219,6 +1219,24 @@ async function runMotionAudit(driver, filePath) {
     results.push('閱讀期靜止檢核（反永動干擾／畫完就安靜）：通過');
   }
 
+  // 15. Mobile 390px viewport sanity check (Takeaway #6: zero horizontal overflow & stage scaled cleanly)
+  await driver.setViewport(390, 844);
+  await driver.wait(160);
+  const mobileRes = await driver.evaluate(() => {
+    const overflow = Math.max(0, document.documentElement.scrollWidth - window.innerWidth);
+    const st = document.getElementById('stage');
+    const r = st ? st.getBoundingClientRect() : null;
+    const okBox = Boolean(r && r.width > 200 && r.width <= window.innerWidth + 2 && r.height > 100);
+    return { overflow, okBox, w: r ? Math.round(r.width) : 0 };
+  });
+  await driver.setViewport(1920, 1080);
+  await driver.wait(120);
+  if (mobileRes.overflow <= 1 && mobileRes.okBox) {
+    results.push(`390px 手機縮放實測（橫向溢出 0px、舞台實寬 ${mobileRes.w}px）：通過`);
+  } else {
+    failures.push(`390px 手機實測異常（橫向溢出 ${mobileRes.overflow}px、舞台實寬 ${mobileRes.w}px）`);
+  }
+
   const jsErrs = driver.getErrors();
   for (const e of jsErrs) failures.push(`動態測試期間腳本錯誤：${e}`);
   return { results, failures };

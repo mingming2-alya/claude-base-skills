@@ -66,3 +66,7 @@
   </script>
 </section>
 ```
+
+## v4.7 風格動態融合升級（`motion-counsel`）
+- 嚴守「左輸入條件 → 箭頭 → 右試算結果」單向語意順序與雙欄底部基線齊平；使用者提早操作滑桿或切換鈕時，立即取消進場排程並解除壓暗。
+- 前後方案反超對照可寄生 `[data-rank-race]`（FLIP 超車換位）搭配核心指標 `[data-odometer]` 機械滾輪煞停，詳見 `references/modules/style-motion-kits.md`。

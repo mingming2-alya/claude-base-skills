@@ -36,3 +36,7 @@
 ```
 
 > **變體切換**：若要展示 3–4 步軟體操作畫面，將右側改為 `data-flow-carousel="vertical"`（左頁籤＋右畫面卡）；若要搭配流程圖節點同步發光，改用 `data-flow-carousel="stepper"` 並在卡片標 `data-step-target="nodeId"`。
+
+## v4.7 風格動態融合升級（`motion-apple` / `motion-story`）
+- **先立靜態上限，禁降級成 Emoji 卡片**：產品頁以雙層微光裝置＋真描線曲線＋極細引線為骨，故事頁以真實無字插畫／黏土全景底圖融真文字為骨。
+- 依選定風格按需寄生：`apple` 選 `[data-depth-deck]`（3D 景深疊卡）或 `[data-colorize-wipe]`（黑白柔焦→彩色光掃）；`illustration` 選 `[data-popup-fold]`（立體書 3D 翻折）或 `[data-chat-replay]`（對話小劇場），詳見 `references/modules/style-motion-kits.md`。

@@ -35,15 +35,16 @@
 
 ## 3. 場合預算上限（`stage_mode` Budgets）
 
-| 場合 `stage_mode` | `ambient-fx` 上限 | 允許高氛圍模組 | 推薦主力說服模組 |
+| 場合 `stage_mode` | `ambient-fx` 上限 | 允許高氛圍模組 | 推薦主力說服模組（含風格綁定動態） |
 |---|---|---|---|
-| `briefing`（決策匯報） | **0 頁（禁止）** | ❌ 禁 `ambient-fx`、`coverflow`、`data-tilt` | `components`、`linked-highlight`、`compare-slider`、`code-stage`、`visual-flair`（僅 `data-zoomable`） |
-| `pitch`（對外提案） | **最多 1 頁**（通常僅封面） | 視說服需求節制使用 | `live-controls`、`flow-carousel`、`compare-slider`、`linked-highlight`、`media`、`device-frame`、`marquee` |
-| `keynote`（發表會／大幕） | **最多 2 頁**（封面／震撼／收尾） | 全模組開放（守單頁單主角） | `data-step`、`media`、`flow-carousel`、`coverflow`、`ambient-fx`、`compare-slider` |
+| `briefing`（決策匯報） | **0 頁（禁止）** | ❌ 禁 `ambient-fx`、`coverflow`、`data-tilt`、`motion-apple`（`spotlight-sweep`/`depth-deck`/`colorize-wipe`） | `components`、`motion-workday`、`motion-counsel`、`linked-highlight`、`compare-slider`、`code-stage`、`visual-flair`（僅 `data-zoomable`） |
+| `pitch`（對外提案） | **最多 1 頁**（通常僅封面） | 視說服需求節制使用 | `motion-*`（依風格 DNA 注入）、`live-controls`、`flow-carousel`、`compare-slider`、`linked-highlight`、`media`、`device-frame`、`marquee` |
+| `keynote`（發表會／大幕） | **最多 2 頁**（封面／震撼／收尾） | 全模組開放（守單頁單主角與風格 `avoid_motions`） | `motion-apple`/`motion-story`、`data-step`、`media`、`flow-carousel`、`coverflow`、`ambient-fx`、`compare-slider` |
 
-## 4. ❌ 四條硬紀律（違反會由 `assemble.py` 發出 `[WARN]`）
+## 4. ❌ 五條硬紀律（違反會由 `assemble.py` 發出 `[WARN]`）
 
-1. **單頁單主角**：同一頁絕不同時放兩個主角級互動模組（`flow-carousel` / `coverflow` / `compare-slider` / `slide-video` / `code-stage`）。
-2. **三條通用契約不可破**：所有客製元件都必須讀語意色票變數（適配 `data-surface`）、帶 `.live-ctrl` 或 `registerOverlay()`（不誤翻頁）、監聽 `deck:slideleave`/`deck:still`/`deck:lowpower`（靜態／列印乾淨定格）。
-3. **影音一律外連**：`<video>` 與 `<audio>` 永遠放 `media/` 相對路徑（只內嵌 `poster` 海報圖），禁止把大影音轉 Base64。
-4. **選用白名單（可選）**：可在 `storyboard.yaml` 寫 `meta.modules: [...]` 鎖定本份簡報預期用到的模組；若投影片不小心用出白名單以外的模組，`assemble.py` 仍會注入（不中斷），但會印出 `[WARN]` 提醒同步設計決策。
+1. **單頁單主角**：同一頁絕不同時放兩個主角級互動模組（`flow-carousel` / `coverflow` / `compare-slider` / `slide-video` / `code-stage` / `depth-deck` / `rank-race`）。
+2. **三條通用契約不可破**：所有客製元件都必須讀語意色票變數（適配 `data-surface`）、帶 `.live-ctrl` 或 `registerOverlay()`（不誤翻頁）、監聽 `deck:slideleave`/`deck:still`/`deck:lowpower`（靜態／列印／低耗電乾淨定格）且不得殘留正文區永動干擾動畫。
+3. **風格 × 動態不可違背 `avoid_motions`**：`assemble.py` 會自動讀 `styles/index.json` 中 `meta.style` 的 `motion_dna.avoid_motions`；跨界混用（如 `workday` 用 `spotlight-sweep`、`counsel` 用 `popup-fold`、`illustration` 用 `code-stage`）將發出 `[WARN]`。
+4. **影音一律外連**：`<video>` 與 `<audio>` 永遠放 `media/` 相對路徑（只內嵌 `poster` 海報圖），禁止把大影音轉 Base64。
+5. **選用白名單（可選）**：可在 `storyboard.yaml` 寫 `meta.modules: [...]` 鎖定本份簡報預期用到的模組；若投影片不小心用出白名單以外的模組，`assemble.py` 仍會注入（不中斷），但會印出 `[WARN]` 提醒同步設計決策。

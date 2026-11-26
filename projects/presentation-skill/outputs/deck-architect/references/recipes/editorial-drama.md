@@ -32,3 +32,7 @@
 
 ### 型態 B｜全黑暗房原話見證（Verbatim Theater）
 - 左 60% 暗底放完整客戶／使用者逐字原話（`font-size: 36–42px`，不縮寫、零卡片框），右 40% 高反差亮色條列提煉 2–3 條啟發（可用 `data-step="1"` 在講者讀完原話後再亮出右側啟發）。
+
+## v4.7 風格動態融合升級（`motion-counsel` / `motion-apple`）
+- 巨幅宣言主標題可掛 `[data-split-mask]`（文字遮罩斬切拉起）或暗底單次 `[data-spotlight-sweep]`（掃完即完全靜止，絕不永動搖晃）；核心關鍵數字可掛 `[data-odometer]` 機械滾輪精準煞停。
+- 若為顧問型數據對照，保持「左三指標＋右巨型全高色塊柱＋虛線目標線＋斜線差距塊」靜態上限與底部基線齊平，詳見 `references/modules/style-motion-kits.md`。

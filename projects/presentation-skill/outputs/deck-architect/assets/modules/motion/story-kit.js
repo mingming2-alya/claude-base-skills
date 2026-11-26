@@ -77,6 +77,11 @@
   const folds = [...document.querySelectorAll('[data-popup-fold]')].map(initPopupFold);
   const chats = [...document.querySelectorAll('[data-chat-replay]')].map(initChatReplay);
 
+  function settleAll() {
+    folds.forEach(f => f.unfold());
+    chats.forEach(c => c.showAll());
+  }
+
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
       const sl = detail.slide;
@@ -89,12 +94,8 @@
       if (!sl) return;
       sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.stop());
     });
-    deck.stage.addEventListener('deck:still', ({ detail }) => {
-      if (detail.still) {
-        folds.forEach(f => f.unfold());
-        chats.forEach(c => c.showAll());
-      }
-    });
+    deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
+    deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });
   }
   window.__motionKits = window.__motionKits || {};
   window.__motionKits.story = { initPopupFold, initChatReplay, folds, chats };

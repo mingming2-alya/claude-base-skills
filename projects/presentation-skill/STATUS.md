@@ -1,18 +1,16 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.7.2 六大血淚 Takeaway 全項回補＋靜態上限 × 動態上限深度融合＋14 項動態品管完成 ✅）**：
+> **最新接手點（2026-11-26｜`deck-architect` v4.7.3 六維度全盤體檢收官：9 處真實遺漏全數補齊＋15 項動態與行動實測＋風格跨界防呆完成 ✅）**：
 >
-> 1. **逐條對照 Phase B.3 六大 Takeaway 完成根治修補（零退步、零永動干擾）**：
->    - **Takeaway #1 語意順序優先**：4 款圖鑑重播全面改為嚴格單向 3 拍語意順序（`workday` 風險→拍板→健康；`counsel` 目標基準線→達標柱→超標紅差距；`apple` 主張→條件走勢→產出成效；`illustration` 左→中→右三站時間接力）。
->    - **Takeaway #2 閱讀期完全靜止（反永動劫持）**：`assets/modules/motion/apple-kit.js` `[data-spotlight-sweep]` 移除無限鐘擺循環，改為單次光掃後**完全靜止**；`assets/style-library.html` 移除 3 個無限循環波紋，改為抵達端點單次綻放；**`scripts/check.mjs --motion` 新增第 14 項「閱讀期靜止檢核」**，自動攔截正文區干擾型 `infinite` 永動動畫。
->    - **Takeaway #3 從容節奏＋零鎖死隨時接管**：4 款皆為每拍 ~1.4s（含閱讀靜止窗），中途點擊任何互動元件立即取消剩餘排程並解除壓暗。
->    - **Takeaway #4 空間先分群** & **#5 雙欄底部基線齊平**：`workday` 升級回 Phase B.3 進化版「左欄行動主軸（風險 ↓ 因果紅箭頭 ↓ 拍板）＋右欄健康總覽由高到低」；`counsel` 與 `workday` 雙欄底部基線精準對齊。
->    - **Takeaway #6 中場影格實拍＋390px 手機實測**：實際以 Chromium CDP 抓完稿、Beat 1 中場實拍與 390px 手機畫面，發現手機上控制鈕壓到圖面右上角並立即將控制列移出 16:9 畫布外（桌面與 390px 手機均 0% 遮擋、0px 橫向溢出）。
+> 1. **六大維度（靜態上限／動態上限／風格動態融合與 Library／核心元件與模組化注入／流程架構／整合秩序）全數閉環，9 處實查遺漏全數清零**：
+>    - **靜態×動態融合鐵律貫穿全檔**：同步寫入 `references/visual-guidance.md`、`motion-system.md`、`style-motion-kits.md`、`samples.md` 與全數 5 支 `references/recipes/*.md` 黃金工藝配方（5/5 皆已對接 v4.7 風格動態原語與 3 拍語意順序）。
+>    - **4 套風格動態套件補齊硬契約 #2**：`workday-kit`／`counsel-kit`／`apple-kit`／`story-kit` 全部補齊 `deck:lowpower`（`B` 鍵瞬凍）與 `deck:slideleave`（清理 rAF/計時器），且 `spotlight-sweep` 改單次掃完即靜止（零永動干擾）。
+>    - **自動化防呆與品管升至 15 項**：`scripts/assemble.py` 新增讀取 `styles/index.json` `avoid_motions` 對 `meta.style` 做風格×動態跨界軟性 `[WARN]` 防呆；`scripts/check.mjs --motion` 新增第 14 項「閱讀期靜止檢核（反永動）」與第 15 項「390px 手機橫向溢出實測」；`SKILL.md`、`modules-catalog.md`、`grill.md` 與 `samples.md` 全數同步無斷層。
 > 2. **驗證與重打包**：
->    - `check.mjs --jpg --motion` 於 `v45-modular-demo`（4.84:1、100% 視覺）與 `v4-alive-demo`（4.70:1、80% 視覺、8 種原語）全數通過含新第 14 項「閱讀期靜止檢核」✅；`style-library.html` 實測 0 個永動 CSS 動畫、Beat 1 中場聚光與中途點擊接管全通過。
->    - 重新打包 `outputs/deck-architect.skill`（**82 檔，335.4 KB**，零 `__pycache__`）。
+>    - 9 項補洞斷言、風格跨界防呆煙霧測試（`counsel` 誤用 `popup-fold` 精準觸發 `[WARN]`）、`v45-modular-demo` 與 `v4-alive-demo` 全套 15 項 `--motion`＋Liveliness Audit 全部通過 ✅。
+>    - 重新打包 `outputs/deck-architect.skill`（**82 檔，零 `__pycache__`**）。
 >
-> **下一步（Phase C.2 收官驗收 → Phase D）**：由使用者親手試玩新版 `style-library.html`（點 `↻ 3拍重播` 與畫布互動），滿意後可擇期以真實簡報跑一次端到端實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「靜態上限 × 動態上限一體」Style DNA**。
+> **下一步（Phase C.2 收官驗收 → Phase D）**：`deck-architect` v4.7.3 已達無斷層就緒狀態，隨時可以真實簡報進行端到端實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「靜態上限 × 動態上限一體」Style DNA**。
 >
 > 主軸文件是 `ROADMAP.md`，執行紀錄在 `LOG.md`，專案規則在根目錄 `CLAUDE.md`。
 

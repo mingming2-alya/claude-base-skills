@@ -1,6 +1,6 @@
 ---
 name: deck-architect
-description: 架構先行的簡報製作技能（v4.7）：先以設計樹前沿（Design Tree + Frontier）互動表單 Grill 依場合光譜（briefing/pitch/keynote）三段自動調檔——日常匯報重減法與三秒掃讀、提案與發表會主動挖故事反差並以白話提案招牌亮點頁；再展開每頁 4 行視覺分鏡；Step 3 採「風格 × 動態一體」Style & Motion Library（3a 親手體驗各風格專屬真動效並挑中 1 款風格 → 3b 集中精雕該風格 2–3 張真實樣張＋3 組 OKLCH 配色，樣張直接沿用為活範本）；Step 4 超過 6 頁自動每 3–4 頁派乾淨分身並行精雕，基於主題與 styles/index.json 風格動態 DNA 按需細粒度注入三層引擎（Layer 0 輕底盤＋Layer 1 G/A/L/S 講者工具＋Layer 2 內容模組與 4 套風格動態原語套件，未用到 0 KB）；Step 5 執行真實像素 WCAG＋13 項動態＋生動度稽核（Liveliness Audit）。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
+description: 架構先行的簡報製作技能（v4.7）：先以設計樹前沿（Design Tree + Frontier）互動表單 Grill 依場合光譜（briefing/pitch/keynote）三段自動調檔——日常匯報重減法與三秒掃讀、提案與發表會主動挖故事反差並以白話提案招牌亮點頁；再展開每頁 4 行視覺分鏡；Step 3 採「靜態上限 × 動態上限融合」Style & Motion Library（3a 親手體驗各風格 1920×1080 活體舞台並挑中 1 款風格 → 3b 集中精雕該風格 2–3 張真實樣張＋3 組 OKLCH 配色，樣張直接沿用為活範本）；Step 4 超過 6 頁自動每 3–4 頁派乾淨分身並行精雕，基於主題與 styles/index.json 風格動態 DNA 按需細粒度注入三層引擎（Layer 0 輕底盤＋Layer 1 G/A/L/S 講者工具＋Layer 2 內容模組與 4 套風格動態原語套件，未用到 0 KB、自動跨界防呆）；Step 5 執行真實像素 WCAG＋15 項動態與行動實測（含閱讀期靜止檢核與 390px 手機檢核）＋生動度稽核（Liveliness Audit）。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
 ---
 
 # Deck Architect v4.7：主題導向 × 風格動態一體 × 按需注入舞台
@@ -30,7 +30,7 @@ decks/<name>/
 ├── media/                   # 可選：外連影片／實測音檔（保持相對路徑，不轉 Base64）
 ├── IMAGE_UPGRADE.md         # 可選：AI 升級生圖清單（零等待程式版同步附上）
 ├── deck.html                # Step 4：assemble.py 掛載三層輕底盤與按需模組產出的成品
-└── check/                   # Step 5：check.mjs 逐頁截圖、像素 WCAG＋13 項動態＋生動度體檢報告
+└── check/                   # Step 5：check.mjs 逐頁截圖、像素 WCAG＋15 項動態與行動實測＋生動度體檢報告
 ```
 
 ## 架構模式：三層按需架構（亂中有序治理，未用到 0 KB）
@@ -105,7 +105,7 @@ python3 <skill>/scripts/assemble.py decks/<name>/storyboard.yaml --write-upgrade
 node <skill>/scripts/check.mjs decks/<name>/deck.html --jpg --motion
 ```
 
-- **下限品管（必過）**：`?still=1` 真實背景像素 WCAG 對比（含漸層字）、主標題≥總結、溢出與邊界、最小字級、SVG 重複 ID、圖片／腳本錯誤，加上 `--motion` 最多 **13 項**動態與引擎實測（含 Layer 1 `G`/`A`/`L`/`S` 與 Layer 2 說服模組）。
+- **下限品管（必過）**：`?still=1` 真實背景像素 WCAG 對比（含漸層字）、主標題≥總結、溢出與邊界、最小字級、SVG 重複 ID、圖片／腳本錯誤，加上 `--motion` 最多 **15 項**動態與行動實測（含 Layer 1 `G`/`A`/`L`/`S`、Layer 2 說服模組、閱讀期靜止檢核反永動、390px 手機橫向溢出實測）。
 - **上限生動度稽核（Liveliness Audit，依 `stage_mode` 自動調檔）**：自動量測視覺頁佔比、去框化比例、動態原語多樣性與連續純文字單調頁，點名全場最平淡的 1–3 頁。
 - **視覺精修輪（Polish Pass）**：親自看過 `check/slide-*.jpg`，若下限有錯、或 `pitch`/`keynote` 生動度未達標，針對點名頁面升級圖解／互動並重建，**最多修 2 輪**；未解項如實回報。
 

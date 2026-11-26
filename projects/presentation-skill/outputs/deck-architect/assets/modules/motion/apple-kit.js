@@ -210,6 +210,13 @@
   const decks = [...document.querySelectorAll('[data-depth-deck]')].map(initDepthDeck).filter(Boolean);
   const colors = [...document.querySelectorAll('[data-colorize-wipe]')].map(initColorize);
 
+  function settleAll() {
+    splits.forEach(s => s.setFinal());
+    spots.forEach(s => s.stop());
+    colors.forEach(c => c.setFinal());
+    decks.forEach(d => d.reset());
+  }
+
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
       const sl = detail.slide;
@@ -222,15 +229,10 @@
       const sl = detail.slide;
       if (!sl) return;
       sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => el._spInit && el._spInit.stop());
+      sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
     });
-    deck.stage.addEventListener('deck:still', ({ detail }) => {
-      if (detail.still) {
-        splits.forEach(s => s.setFinal());
-        spots.forEach(s => s.stop());
-        colors.forEach(c => c.setFinal());
-        decks.forEach(d => d.reset());
-      }
-    });
+    deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
+    deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });
   }
   window.__motionKits = window.__motionKits || {};
   window.__motionKits.apple = { initSplitMask, initSpotlight, initDepthDeck, initColorize, splits, spots, decks, colors };

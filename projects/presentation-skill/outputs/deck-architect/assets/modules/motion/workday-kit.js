@@ -80,7 +80,7 @@
 
     root.addEventListener('click', e => e.stopPropagation());
     setImmediate(targetVal);
-    const api = { play, animateTo, setImmediate };
+    const api = { play, animateTo, setImmediate, stop: () => { cancelAnimationFrame(rafId); setImmediate(targetVal); } };
     root._rpInit = api;
     return api;
   }
@@ -123,8 +123,16 @@
       if (!sl) return;
       sl.querySelectorAll('[data-ruler-progress]').forEach(el => el._rpInit && el._rpInit.play());
     });
+    deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
+      const sl = detail.slide;
+      if (!sl) return;
+      sl.querySelectorAll('[data-ruler-progress]').forEach(el => el._rpInit && el._rpInit.stop());
+    });
     deck.stage.addEventListener('deck:still', ({ detail }) => {
-      if (detail.still) rulers.forEach(r => r.play());
+      if (detail.still) rulers.forEach(r => r.stop());
+    });
+    deck.stage.addEventListener('deck:lowpower', ({ detail }) => {
+      if (detail.lowPower) rulers.forEach(r => r.stop());
     });
   }
   window.__motionKits = window.__motionKits || {};

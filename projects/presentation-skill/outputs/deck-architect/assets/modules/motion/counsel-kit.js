@@ -114,13 +114,16 @@
       root.dataset.currentStage = stageKey;
     }
 
+    let timer = 0;
     setStage('after', false);
     const api = {
-      show: (stageKey) => setStage(stageKey, true),
+      show: (stageKey) => { clearTimeout(timer); setStage(stageKey, true); },
+      stop: () => { clearTimeout(timer); setStage('after', false); },
       play: () => {
+        clearTimeout(timer);
         if (isStatic()) { setStage('after', false); return; }
         setStage('before', false);
-        setTimeout(() => setStage('after', true), 420);
+        timer = setTimeout(() => setStage('after', true), 420);
       }
     };
     root._rrInit = api;
@@ -164,6 +167,12 @@
   const races = [...document.querySelectorAll('[data-rank-race]')].map(initRankRace);
   const racks = [...document.querySelectorAll('[data-rack-focus]')].map(initRackFocus);
 
+  function settleAll() {
+    odos.forEach(o => o.set());
+    races.forEach(r => r.stop());
+    racks.forEach(r => r.clear());
+  }
+
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
       const sl = detail.slide;
@@ -171,13 +180,13 @@
       sl.querySelectorAll('[data-odometer]').forEach(el => el._odoInit && el._odoInit.play());
       sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.play());
     });
-    deck.stage.addEventListener('deck:still', ({ detail }) => {
-      if (detail.still) {
-        odos.forEach(o => o.set());
-        races.forEach(r => r.show('after'));
-        racks.forEach(r => r.clear());
-      }
+    deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
+      const sl = detail.slide;
+      if (!sl) return;
+      sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.stop());
     });
+    deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
+    deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });
   }
   window.__motionKits = window.__motionKits || {};
   window.__motionKits.counsel = { initOdometer, initRankRace, initRackFocus, odos, races, racks };

@@ -88,7 +88,7 @@
 8. **視覺與影音資產盤點 ＋ 缺口點破（Gap-Naming）＋ 幕後映射按需模組**
    - 綜合 Pre-Flight 偵察結果，一次盤點：使用者手邊已有哪些真實資產（產品照、CAD 爆炸圖、團隊／現場照片、錄屏、影片、音檔、客戶逐字原話）？
    - **點破缺口（Gap-Naming）**：若某核心頁需要實物視覺、現場照或案例卻無現成檔案，明確與使用者議定補救路徑——①使用者補供、②授權 AI 生無字實物／隱喻底圖、③改以 HTML5 原生互動流程模擬、或 ④果斷精簡該段。
-   - **幕後自動映射（不把工程代號丟給使用者猜）**：把使用者在 #7 勾選的**白話招牌亮點頁點子**，由 Agent 自行查 `references/modules-catalog.md` 轉成 `brief.md` 裡的 Layer 2 按需模組清單（例如：現場試算→`live-controls`、A/B 音檔或影片→`media`、活步驟／AI 對話流→`flow-carousel`、架構文圖對照／放大→`linked-highlight`+`visual-flair`、前後拉桿→`compare-slider`、程式碼聚焦→`code-stage`、3D 照片／Logo 牆→`coverflow`、商務表／裝置框→`components`、`pitch`/`keynote` 氛圍→`ambient-fx`）。
+   - **幕後自動映射（不把工程代號丟給使用者猜）**：把使用者在 #7 勾選的**白話招牌亮點頁點子**，由 Agent 自行查 `references/modules-catalog.md` 與 `styles/index.json` 的風格 `motion_dna` 轉成 `brief.md` 裡的按需模組清單（例如：現場試算→`live-controls`、A/B 音檔或影片→`media`、活步驟／AI 對話流→`flow-carousel`、架構文圖對照／放大→`linked-highlight`+`visual-flair`、前後拉桿→`compare-slider`、程式碼聚焦→`code-stage`、3D 照片／Logo 牆→`coverflow`、商務表／裝置框→`components`、`pitch`/`keynote` 氛圍→`ambient-fx`；以及對應風格專屬動態：進度刻度／展開看板→`motion-workday`、排名超車／機械滾輪／推鏡景深→`motion-counsel`、斬字聚光／3D 疊卡／黑白光掃→`motion-apple`、立體書翻折／對話劇院→`motion-story`）。
 
 ---
 

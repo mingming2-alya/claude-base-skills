@@ -971,6 +971,43 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
             f"[WARN]  stage_mode=pitch: 全份簡報有 {fx_slide_count} 頁使用 ambient-fx（建議最多 1 頁，通常僅封面）。"
         )
 
+    # ---- Style-specific avoid_motions soft governance from styles/index.json (v4.7.3)
+    style_id = str(meta.get("style") or "").strip().lower()
+    if style_id:
+        idx_path = SKILL_ROOT / "styles" / "index.json"
+        if idx_path.is_file():
+            try:
+                s_idx = json.loads(idx_path.read_text(encoding="utf-8"))
+                s_rec = next((s for s in s_idx.get("styles", []) if str(s.get("id", "")).lower() == style_id), None)
+                avoid_list = (s_rec or {}).get("motion_dna", {}).get("avoid_motions") or []
+                avoid_detectors = {
+                    "spotlight-sweep": "data-spotlight-sweep",
+                    "depth-deck": "data-depth-deck",
+                    "colorize-wipe": "data-colorize-wipe",
+                    "popup-fold": "data-popup-fold",
+                    "chat-replay": "data-chat-replay",
+                    "coverflow": "data-coverflow",
+                    "code-stage": "data-code-stage",
+                    "data-tilt": "data-tilt",
+                    "status-table": "status-table",
+                    "confetti-burst": 'data-fx="confetti-burst"',
+                    "data-stream": 'data-fx="data-stream"',
+                }
+                for idx_s, sl_html in enumerate(slides_list, 1):
+                    hits = []
+                    for av in avoid_list:
+                        if av == "ambient-fx":
+                            if DATA_FX_RE.search(sl_html):
+                                hits.append("ambient-fx")
+                        elif av in avoid_detectors and avoid_detectors[av] in sl_html:
+                            hits.append(av)
+                    if hits:
+                        gov_warnings.append(
+                            f"[WARN]  s-{idx_s}: style={style_id} 風格 DNA 不建議混用（{', '.join(hits)}；見 styles/index.json avoid_motions）。"
+                        )
+            except Exception:
+                pass
+
     declared = meta.get("modules")
     if isinstance(declared, list):
         allow = {str(x).strip().lower() for x in declared}

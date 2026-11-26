@@ -1528,3 +1528,18 @@
   5. **中場影格＋390px 手機實測（Takeaway #6）**：實拍完稿、Beat 1 中場與 390px 手機畫面，當場抓到手機控制鈕壓住 16:9 畫布右上角並移出為獨立頁頂工具列（0% 遮擋、0px 溢出）。
 - **驗證與重打包**：`check.mjs --jpg --motion` 於 `v45-modular-demo` 與 `v4-alive-demo` 全數通過含新第 14 項檢核 ✅；重打包 `outputs/deck-architect.skill`（**82 檔，335.4 KB**）。
 - **同步的檔案**：`outputs/deck-architect/assets/{style-library.html,modules/motion/apple-kit.js}`、`outputs/deck-architect/references/modules/style-motion-kits.md`、`outputs/deck-architect/scripts/check.mjs`、`outputs/deck-architect.skill`、`outputs/examples/{v45-modular-demo,v4-alive-demo}/check/report.md`、`STATUS.md`、`LOG.md`。
+
+## 2026-11-26｜`deck-architect` v4.7.3：六維度全盤體檢收官（清零 9 處真實遺漏）
+
+- **全盤稽核補齊的 9 處缺口**：
+  1. `references/visual-guidance.md`：補入「靜態上限 × 動態上限融合第一鐵律」。
+  2. `assets/modules/motion/{workday,counsel,apple,story}-kit.js`：全部補齊 `deck:lowpower`（`B` 鍵凍結）與 `deck:slideleave`（清理 rAF／計時器）硬契約。
+  3. `scripts/check.mjs --motion`：新增第 15 項「390px 手機縮放實測（橫向溢出 0px 與舞台實寬驗證）」。
+  4. `SKILL.md`：檢核項數由 13 項更新為 15 項動態與行動實測，並同步風格跨界防呆說明。
+  5. `references/samples.md`：升級至 v4.7，要求 Step 3b 樣張讀入 `styles/index.json` `motion_dna` 並同步貫徹靜態上限融合與 3 拍語意順序。
+  6. `references/recipes/*.md`（全部 5 支黃金工藝配方）：全數補接對應 v4.7 風格動態原語（`motion-workday`/`counsel`/`apple`/`story`）與空間分群／底部基線鐵律。
+  7. `scripts/assemble.py`：接入 `styles/index.json` `avoid_motions` 做 `meta.style` 風格×動態跨界軟性 `[WARN]` 防呆。
+  8. `references/modules-catalog.md`：第 3 節場合預算表補列 `briefing` 禁 `motion-apple` 與 `pitch`/`keynote` 依風格注入對應 `motion-*`，第 4 節升級為 5 條硬紀律。
+  9. `references/grill.md`：Step 1 幕後模組映射補納 4 套風格動態套件，打通 Step 1→2→3→4 全鏈路。
+- **驗證與重打包**：9 項補洞斷言、風格跨界防呆煙霧測試、`v45-modular-demo` 與 `v4-alive-demo` 全套 15 項 `--motion`＋Liveliness Audit 全部通過 ✅；重打包 `outputs/deck-architect.skill`（82 檔，零 `__pycache__`）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/modules/motion/*.js,references/{visual-guidance.md,samples.md,modules-catalog.md,grill.md,recipes/*.md},scripts/{assemble.py,check.mjs}}`、`outputs/deck-architect.skill`、`outputs/examples/{v45-modular-demo,v4-alive-demo}/check/report.md`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。

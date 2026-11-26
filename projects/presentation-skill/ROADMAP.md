@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-25｜`deck-architect` v4.7 風格 × 動態 DNA 一體資料庫＋4 套按需高質感動態套件＋互動圖鑑重製完成 ✅）**：吸收 `motion.dev/examples`、`motionface.cc` 與迪士尼動畫物理守則，將動態直接綁定回單一風格資料庫（`styles/index.json` v4.7＋4 份 `styles/*.md`＋外接圖書館擴充槽），實作 4 套風格專屬按需原語（`motion-workday`/`motion-counsel`/`motion-apple`/`motion-story`，共 11 支原語，未用到 0 KB），並原地重製 `assets/style-library.html` 讓 4 款就緒風格皆能親手拖曳、點擊、掃光體驗真動效；全驗證通過並重打包 `outputs/deck-architect.skill`（82 檔，265.9 KB）。待使用者體驗滿意後進行真實簡報 PK 或推進 Phase D。
+> **最新接手點（2026-11-26｜`deck-architect` v4.7.3 六維度全盤體檢收官：靜態上限 × 動態上限融合＋風格跨界防呆＋15 項動態與行動實測完成 ✅）**：針對六大維度逐檔稽核並清零全部 9 處遺漏：4 套風格動態套件全數補齊 `deck:lowpower`/`deck:slideleave` 硬契約、`assemble.py` 接入 `styles/index.json` `avoid_motions` 風格跨界防呆、`check.mjs --motion` 升至 15 項（含閱讀期靜止反永動＋390px 手機實測）、5 支黃金工藝配方與 `grill.md`/`samples.md`/`visual-guidance.md`/`modules-catalog.md`/`SKILL.md` 全數對齊無斷層；全驗證通過並重打包 `outputs/deck-architect.skill`（82 檔）。待擇期真實簡報實戰 PK 或推進 Phase D。
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。
