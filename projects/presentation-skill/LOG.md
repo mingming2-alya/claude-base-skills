@@ -1401,3 +1401,25 @@
   - 同步重建互動預覽檔 `v4_alive_demo_b3.html`。
 - **同步的檔案**：`outputs/deck-architect/references/visual-guidance.md`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
 - **下一步**：請使用者於更新後的互動預覽實測第 3、4、6 頁閱讀動線，確認後進入 **Phase C｜第一份真實簡報端到端 PK 🎯**。
+
+## 2026-11-25｜Phase C.1 完成：旗艦標竿對照拆解 ＋ `mattpocock/skills` 始祖回溯 ＋ `deck-architect` v4.4-spec 規格層全面升級
+
+- **背景與輸入**：
+  - 使用者已進入 Phase C 真實簡報實戰，並提供一份 43 頁（445.1 MB，含 6 支 MP4 影片、1 支實測降噪音檔與 6 頁講者點擊懸念動畫）的旗艦級 PPTX 標竿，與 Phase C 端到端產出的 21 頁暗色 HTML 初版進行第一性原理對照拆解（原始檔含內部敏感資料，僅於本機暫存分析，未提交至公開 repo；去敏研究筆記整理於 `inputs/phase-c-teardown-learnings.md`）。
+  - 依使用者要求，動手改寫 `grill.md` 前同步透過 `gh api` 實讀 `github.com/mattpocock/skills`（`main` 分支）始祖實作：`skills/productivity/grilling/SKILL.md`、`skills/engineering/codebase-design/DESIGN-IT-TWICE.md`、`skills/in-progress/writing-fragments/SKILL.md`、`skills/in-progress/writing-beats/SKILL.md`、`skills/in-progress/writing-shape/SKILL.md` 與 `skills/productivity/writing-for-agents/SKILL.md`。
+- **使用者拍板之五大核心決策（互動表單確認）**：
+  1. **視場合動態決定「光暗雙極」與「去框化比例」**：建立三段式舞台光譜 `stage_mode`（`briefing`／`pitch`／`keynote`），絕不一刀切。
+  2. **Step 1 Grill v2 全面重構（完全照 Matt 原版設計樹前沿深挖，不設輪次上限直到前沿清空）**：先查事實只問決定（Pre-Flight 靜默偵察）、挖掘體感預期與承重母題（Leading Motif）、Grounding 概念著陸順序、逐章說服載體辯論（Proof Medium）與素材缺口點破（Gap-Naming），輸出直通 Step 2 與 Gate 2 的 `brief.md` v2 交接契約。
+  3. **破框架構候選觸發規則**：標準模式（非趕時間快速模式）全面固定必給至少 1 個跳脫思維破框候選（`DESIGN-IT-TWICE`＋主見推薦）。
+  4. **雙軌影音與活 Demo 策略**：真實影片與實證音檔採外連媒體控制原語（翻頁自動停播、靜態顯海報，不塞入 Base64）；產品流程展示與照片輪播改以輕量 HTML5/CSS/SVG 原生動畫實現。
+  5. **分兩輪執行**：本輪先完成規格與文件層升級（v4.4-spec）並同步 repo；底盤引擎（`runtime.js`／`shell.css`／`assemble.py`）排定下一輪（Phase C.2）實作。
+- **本輪完成之升級檔案**：
+  - `inputs/presentation-principles.md`：補充原則 #26 三類合法豁免（原話暗房證言、產品發表級情感短句、活流程步進微標），新增原則 **#27–#30**。
+  - `inputs/phase-c-teardown-learnings.md`（新增）：去敏版標竿拆解與 Matt 始祖回溯研究筆記。
+  - `outputs/deck-architect/`（9 份核心規格文件全面升級至 v4.4-spec）：`SKILL.md`、`references/grill.md`、`templates/brief.md`、`references/contexts.md`、`references/structure.md`、`references/samples.md`、`references/visual-guidance.md`、`references/presentation-rules.md`、`references/motion-system.md`。
+  - `outputs/deck-architect.skill`：重新打包（29 檔，143.0 KB，零 `__pycache__`）。
+- **驗證與檢查**：
+  - 以 `/usr/bin/python3` 對既有虛構範例 `v4-alive-demo` 與 `v4-demo` 執行 `lint.py`，皆 **0 錯 0 警通過**。
+  - 確認 `git diff` 零內部敏感字詞、零大型二進位檔。
+- **同步的檔案**：`inputs/presentation-principles.md`、`inputs/phase-c-teardown-learnings.md`、`outputs/deck-architect/{SKILL.md,templates/brief.md,references/{grill.md,contexts.md,structure.md,samples.md,visual-guidance.md,presentation-rules.md,motion-system.md}}`、`outputs/deck-architect.skill`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+- **下一步**：進入 **Phase C.2｜v4.4 底盤引擎升級**（實作單頁極性 `data-surface`、自動隱藏底控、`data-step` 點擊步進、外連 `<video>`/`<audio>` 控制器與 HTML5 原生活流程／3D 照片輪播）。
