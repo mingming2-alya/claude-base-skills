@@ -1553,3 +1553,14 @@
   4. **`references/visual-guidance.md` 補齊速查與協同規則**：補列 `data-grow`，增訂與 v4.7 風格動態套件協同三條規則（禁雙重壓暗衝突、底盤自動接管、`data-step` 雙軌聯動）。
 - **實測與重打包**：無頭 Chromium CDP 實測驗證提早互動即刻清除壓暗且過 Beat 2 不復發（`focusingBefore:true → focusingAfterClick:false → focusingAfterBeat2:false`）、`data-step="1"` 內 `[data-odometer]` 準時觸發（`stepOdoHasDigits:true`）；重打包 `outputs/deck-architect.skill`（**82 檔，340.6 KB**）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/runtime.js,assets/modules/motion/*.js,references/visual-guidance.md}`、`outputs/deck-architect.skill`、`STATUS.md`、`LOG.md`。
+
+## 2026-11-26｜`deck-architect` v4.7.5：Step 1 拆為兩階段腦力激盪（1a 架構腦力激盪 → 1b 細節腦力激盪）
+
+- **使用者決策**：將原本合併在同一階段的 Step 1 Grill 拆為兩個明確步驟——先做「架構腦力激盪」拍板骨架，再做「細節腦力激盪」深挖逐章內容與說服載體，避免在尚未定案的架構上浪費腦力討論細節。
+- **本輪修改內容**：
+  1. **`references/grill.md`**：正式重組為 **Step 1a｜架構腦力激盪（節點群 A ＋ B → ⛔ 關卡 1a）** 與 **Step 1b｜細節腦力激盪（節點群 C ＋ D → ⛔ 關卡 1b → `brief.md`）**；保留 Pre-Flight 靜默偵察、設計樹動態前沿、Design It Twice 破框 3 選 1、`stage_mode` 三段自動調檔、白話招牌亮點頁提案、內容減法清單、素材缺口與幕後模組映射；快速模式明確將 1a＋1b 合併壓縮為 1–2 輪（≤5 題）。
+  2. **`SKILL.md`**：升級為 v4.7.5，將流程拆為 Step 1a（⛔ 關卡 1a）與 Step 1b（⛔ 關卡 1b），並與 Step 3 的 3a／3b（⛔ 關卡 2a／2b）及 Step 6（⛔ 關卡 3）編號全面對齊；同步更新參考檔索引觸發時機。
+  3. **`templates/brief.md`**：明確標示第 1–4 節為 Step 1a 架構骨架產出、第 5–8 節為 Step 1b 細節產出，並於 Stage Spec Layer 2 補入 `motion-workday/counsel/apple/story` 核選框。
+  4. **`references/contexts.md`、`references/samples.md`**：同步更新所有 Step 1a／1b 與快速模式合併說明，清零舊單輪 Step 1 措辭。
+- **打包驗證**：重新打包 `outputs/deck-architect.skill`（**82 檔，341.9 KB**，零 `__pycache__`）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,references/{grill.md,contexts.md,samples.md},templates/brief.md}`、`outputs/deck-architect.skill`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。

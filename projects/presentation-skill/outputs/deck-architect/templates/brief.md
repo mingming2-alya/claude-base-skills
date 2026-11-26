@@ -1,6 +1,8 @@
 # Brief：<簡報標題>
 
-> 本檔案為 Step 1 Grill 設計樹前沿清空後的**唯一交接契約**，同時驅動 Step 2（`storyboard.yaml` 結構展開）與 Step 3（Gate 2 三款風格樣張與視覺實現）。
+> 本檔案為 **Step 1a（架構腦力激盪，第 1–4 節）＋ Step 1b（細節腦力激盪，第 5–8 節）** 兩階段設計樹前沿清空後的**唯一交接契約**，同時驅動 Step 2（`storyboard.yaml` 結構展開）與 Step 3（Gate 2a 融合圖鑑選風格 → Gate 2b 單風格高工藝樣張）。
+
+<!-- ==================== Step 1a：架構腦力激盪（⛔ 關卡 1a 拍板骨架） ==================== -->
 
 ## 1. 情境與雙重目標
 - **理性終點（目的）**：聽完之後，對方要相信什麼／做出什麼決定？
@@ -15,7 +17,7 @@
 - **既有框架／模板／前一版**：無 / 有：<已讀檔案清單與採用／改寫決策>
 - **製作模式與語言**：標準 / 快速 · 繁體中文（台灣習慣用語）
 
-## 2. 舞台規格（Stage Spec — 直通 Step 2 與 Gate 2）
+## 2. 舞台規格（Stage Spec — 1a 定基調，1b 補按需模組）
 - **舞台光譜（`stage_mode`）**：`briefing`（日常匯報）／ `pitch`（提案分享）／ `keynote`（旗艦發表）
 - **播放方式（`delivery`）**：`talk` ／ `discuss` ／ `read` ／ `auto`
 - **明暗極性策略**：`single`（單一 `light`/`dark` 鎖定）／ `accent-invert`（主調＋關鍵頁反轉）／ `bipolar`（光暗雙極呼吸節奏：`dark / light / split / photo` 交錯）
@@ -23,10 +25,10 @@
 - **導航殼層（`nav_mode`）**：`top-bar` ／ `minimal-side` ／ `divider-only`（大扉頁定位＋系列頁局部側邊錨點）
 - **節拍控制**：全自動視覺指引（`0-step`）／ 雙軌（自動指引 ＋ 關鍵懸念／多層換幕頁 `data-step`）
 - **Layer 1 講者臨場工具（`presenter_tools`）**：預設依 `delivery` 自動掛載（`talk`/`discuss`＝`grid`＋`annotator`＋`speaker`；`read`/`auto`＝僅 `grid`），需要覆寫請註明
-- **預期啟用 Layer 2 按需內容模組（見 `references/modules-catalog.md`，未用到 0 KB）**：`[ ] components`（進度表／總覽／目錄／裝置框）、`[ ] ambient-fx`（6 種氛圍特效）、`[ ] live-controls`（滑桿／分段膠囊／開關／預設／重設）、`[ ] media`（影片片段循環／實測音檔／A-B 音軌切換）、`[ ] flow-carousel`（`vertical|horizontal|stepper|chat`）、`[ ] coverflow`（3D 輪播／`marquee` 跑馬燈）、`[ ] linked-highlight`（文圖雙向聯動）、`[ ] compare-slider`（前後對比拉桿）、`[ ] code-stage`（程式碼聚焦＋打字機）、`[ ] visual-flair`（圖表點擊放大燈箱／微傾角）、`[ ] fit`（自動縮字）
+- **預期啟用 Layer 2 按需內容模組（1b 幕後映射，見 `references/modules-catalog.md`，未用到 0 KB）**：`[ ] components`（進度表／總覽／目錄／裝置框）、`[ ] ambient-fx`（6 種氛圍特效）、`[ ] live-controls`（滑桿／分段膠囊／開關／預設／重設）、`[ ] media`（影片片段循環／實測音檔／A-B 音軌切換）、`[ ] flow-carousel`（`vertical|horizontal|stepper|chat`）、`[ ] coverflow`（3D 輪播／`marquee` 跑馬燈）、`[ ] linked-highlight`（文圖雙向聯動）、`[ ] compare-slider`（前後對比拉桿）、`[ ] code-stage`（程式碼聚焦＋打字機）、`[ ] visual-flair`（圖表點擊放大燈箱／微傾角）、`[ ] fit`（自動縮字）、`[ ] motion-workday` / `[ ] motion-counsel` / `[ ] motion-apple` / `[ ] motion-story`（風格綁定動態原語）
 
 ## 3. 一句話核心訊息與承重母題
-- **一句話核心訊息**：<若聽眾只記得一句話>
+- **一句話核心訊息（1a 初稿 → 1b 定稿）**：<若聽眾只記得一句話>
 - **承重母題（Leading Motif）**：無 / <貫穿開場、轉折、關鍵版面與收尾的核心意象或隱喻>
 
 ## 4. 架構與情緒曲線
@@ -39,6 +41,8 @@
   3. <停靠點 3>（X 分）：…
 - **轉折點／藏牌驚喜幕（One More Thing）**：無 / 位置與反轉設計（標註是否 `unlisted` 不提前進總目錄）
 - **收束與尾聲**：<收斂方式（如 3-2-1 倒數）＋回扣序幕／母題的結語>
+
+<!-- ==================== Step 1b：細節腦力激盪（⛔ 關卡 1b 簽核完整契約） ==================== -->
 
 ## 5. 逐章說服載體與視覺／影音資產地圖（Proof Medium & Assets）
 > 供 Step 2 決定每頁形狀與極性，並供 Step 3 Gate 2 直接對準題材挑風格、作樣張。

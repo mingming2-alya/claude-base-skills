@@ -1,21 +1,20 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.7.4 視覺指引第二核心專項體檢與底盤加固完成 ✅）**：
+> **最新接手點（2026-11-26｜`deck-architect` v4.7.5 Step 1 拆為兩階段腦力激盪：1a 架構腦力激盪 → 1b 細節腦力激盪 ✅）**：
 >
-> 1. **將「視覺指引（`references/visual-guidance.md`）」正式落實為全流程與底盤引擎的第二核心，修補 4 處關鍵斷層**：
->    - **底盤自動搶先接管（`assets/runtime.js`）**：新增 `focusToken`、`window.__deck.clearFocus(sl)` 與捕獲層監聽——使用者提早點擊／操作頁內任一 `.live-ctrl`、`input`、`button`、`[data-interactive]`，底盤**自動清除 `data-focus-plan` 壓暗並取消所有剩餘排程計時器**（零鎖死、零樣板 JS）。
->    - **雙軌 `data-step` 聯動（4 套 `assets/modules/motion/*.js`）**：`workday-kit`/`counsel-kit`/`apple-kit`/`story-kit` 全數支援 `deck:stepchange`，置於 `<div data-step="N">` 內的風格動態原語會靜候講者點擊揭曉該步後才觸發進場。
->    - **拉升為 `SKILL.md` 全流程第二核心**：將 `references/visual-guidance.md` 明確寫入 Step 2 分鏡、Step 3 融合關卡、Step 4 分批子代理 6 樣必吃輸入清單與 Step 5 人工品管。
->    - **規格與協同補齊（`references/visual-guidance.md`）**：速查表補齊 `data-grow`，並增訂「與 v4.7 風格動態套件協同三條規則（禁雙重壓暗衝突、底盤自動接管、`data-step` 雙軌聯動）」。
-> 2. **驗證與重打包**：
->    - 真實無頭 Chromium CDP 實測驗證：`focusingBefore: true` → 提早點擊後 `focusingAfterClick: false` → 過 Beat 2 後仍 `focusingAfterBeat2: false`（剩餘計時器徹底取消），且 `<div data-step="1">` 內 `[data-odometer]` 步進觸發 `stepOdoHasDigits: true` ✅。
->    - 重新打包 `outputs/deck-architect.skill`（**82 檔，340.6 KB**，零 `__pycache__`）。
+> 1. **依使用者指示將 Step 1 明確拆為兩階段並各自設關卡**（與 Step 3 的 3a 圖鑑 → 3b 單風格樣張前後對稱）：
+>    - **Step 1a｜架構腦力激盪（⛔ 關卡 1a）**：先完成 Pre-Flight 靜默偵察 → 收斂節點群 A（理性終點 × 體感預期、對象基線、`stage_mode`、頁數算術、人際顧慮、既有框架）＋節點群 B（承重母題＋3 選 1 破框架構候選）→ **拍板骨架才往下走，絕不在錯架構上浪費腦力挖細節**。
+>    - **Step 1b｜細節腦力激盪（⛔ 關卡 1b → `brief.md`）**：沿鎖定骨架展開節點群 C（依 `stage_mode` 三段自動調檔：逐章唯一記憶點、Grounding、白話招牌亮點頁提案、內容減法清單、說服載體與素材缺口、幕後映射按需模組與 `motion_dna`）＋節點群 D（數字查核、`constraints` 地雷、`shock`/`data-step` 控場、一句話核心訊息）→ 產出完整 `brief.md` 簽核後才進 Step 2。
+>    - **快速模式捷徑**：趕時間或例行週會時，自動將 1a＋1b 合併壓縮為 1–2 輪快篩（≤5 題）。
+> 2. **全鏈路同步與重打包**：
+>    - 同步更新 `SKILL.md`、`references/grill.md`、`templates/brief.md`（標明第 1–4 節屬 1a、第 5–8 節屬 1b，並補上 4 套 `motion-*` 核選框）、`references/contexts.md` 與 `references/samples.md`，清零舊「單輪 Step 1／關卡一」殘留。
+>    - 重新打包 `outputs/deck-architect.skill`（**82 檔，341.9 KB**，零 `__pycache__`）。
 >
-> **下一步（Phase C.2 收官驗收 → Phase D）**：`deck-architect` v4.7.4 已達無斷層就緒狀態，隨時可以真實簡報進行端到端實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「靜態上限 × 動態上限一體」Style DNA**。
+> **下一步（Phase C.2 收官驗收 → Phase D）**：`deck-architect` v4.7.5 已達無斷層就緒狀態，隨時可以真實簡報進行端到端實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「靜態上限 × 動態上限一體」Style DNA**。
 >
 > 主軸文件是 `ROADMAP.md`，執行紀錄在 `LOG.md`，專案規則在根目錄 `CLAUDE.md`。
 
-_最後更新：2026-11-25_
+_最後更新：2026-11-26_
 
 ## 新對話先做的事
 
@@ -63,8 +62,8 @@ _最後更新：2026-11-25_
 
 | 路徑 | 內容 |
 |---|---|
-| `outputs/deck-architect/` | **v4.6 完整版 Skill 原始碼（73 檔：三層按需引擎＋`style-library.html` 4 款風格圖鑑＋5 支 `references/recipes/` 黃金配方＋Liveliness Audit）** |
-| `outputs/deck-architect.skill` | v4.6 打包檔（237.4 KB，73 檔，零 `__pycache__`） |
+| `outputs/deck-architect/` | **v4.7.5 完整版 Skill 原始碼（82 檔：Step 1a/1b 兩階段腦力激盪＋三層按需引擎＋4 套風格動態套件＋1920×1080 融合圖鑑＋5 支黃金配方＋視覺指引第二核心＋15 項動態行動實測＋Liveliness Audit）** |
+| `outputs/deck-architect.skill` | v4.7.5 打包檔（341.9 KB，82 檔，零 `__pycache__`） |
 | `outputs/examples/v45-modular-demo/` | v4.5/v4.6 三層引擎與全部新／升級模組虛構技術示範（6 頁，最低對比 `4.84:1`，Liveliness Audit 視覺 100% ✅） |
 | `outputs/examples/v44-keynote-demo/` | Phase C.2 v4.4 旗艦五大新能力虛構示範（7 頁，最低對比 `4.53:1`，Liveliness Audit 視覺 100% ✅） |
 | `inputs/modular-capabilities-audit.md` | 10 個 GitHub 簡報 Skill 二次盤點：按需模組深化與漏網 Nice-to-Have 報告 |

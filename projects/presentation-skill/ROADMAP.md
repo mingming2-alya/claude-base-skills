@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.7.3 六維度全盤體檢收官：靜態上限 × 動態上限融合＋風格跨界防呆＋15 項動態與行動實測完成 ✅）**：針對六大維度逐檔稽核並清零全部 9 處遺漏：4 套風格動態套件全數補齊 `deck:lowpower`/`deck:slideleave` 硬契約、`assemble.py` 接入 `styles/index.json` `avoid_motions` 風格跨界防呆、`check.mjs --motion` 升至 15 項（含閱讀期靜止反永動＋390px 手機實測）、5 支黃金工藝配方與 `grill.md`/`samples.md`/`visual-guidance.md`/`modules-catalog.md`/`SKILL.md` 全數對齊無斷層；全驗證通過並重打包 `outputs/deck-architect.skill`（82 檔）。待擇期真實簡報實戰 PK 或推進 Phase D。
+> **最新接手點（2026-11-26｜`deck-architect` v4.7.5 Step 1 拆為兩階段腦力激盪＋視覺指引第二核心加固＋六維度全盤收官 ✅）**：將 Step 1 拆為 **Step 1a 架構腦力激盪（⛔ 關卡 1a 拍板骨架）→ Step 1b 細節腦力激盪（⛔ 關卡 1b 簽核 `brief.md`）**，快速模式自動合併壓縮；同步完成 v4.7.4 視覺指引第二核心（`runtime.js` 自動搶先接管＋4 套風格套件 `data-step` 雙軌聯動）與 v4.7.3 15 項動態與行動實測；重打包 `outputs/deck-architect.skill`（82 檔，341.9 KB，零 `__pycache__`）。待擇期真實簡報實戰 PK 或推進 Phase D。
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。
@@ -17,7 +17,7 @@
 ### ① 方法論（骨架）：來自使用者
 見 `inputs/presentation-principles.md`（原則 #1–#30）。已用 4 份真實簡報驗證（`inputs/v1-iteration-*.md`）並於 Phase C.1 依旗艦標竿實測與 `mattpocock/skills` 始祖回溯升級。
 
-- [x] Grill v2（v4.6 依場合三段調檔）：設計樹前沿、先查事實只問決定、雙重目標、Grounding 基線、三段式舞台光譜、承重母題、破框 3 選 1、白話招牌亮點頁提案與內容減法清單
+- [x] Grill v2（v4.7.5 兩階段腦力激盪）：**Step 1a 架構腦力激盪（⛔ 關卡 1a：Pre-Flight、雙重目標、對象基線、三段舞台光譜、承重母題與破框 3 選 1）→ Step 1b 細節腦力激盪（⛔ 關卡 1b：依場合調檔挖反差、白話招牌亮點頁提案、內容減法清單、素材缺口、數字查核與地雷收斂）**
 - [x] 架構：一條軸、單一方向；最上層不可並列；Design It Twice 破框提案；序幕、轉折點、可選 One More Thing 驚喜幕、3-2-1 收斂與尾聲
 - [x] 呈現：標題是路標（總結永遠不當主標題）、原則 #26 去小字（含三項合法豁免）、依 `stage_mode` 動態決定光暗雙極與去框化比例、重點放大加突出色（不畫底線）、導航三級分層、震撼頁
 - [x] 內容可信度：證據、限制、數字查核與出處（v4 已將 `constraints` 納入 `lint.py` 自動檢查）
@@ -31,12 +31,12 @@
 - [x] **三層細粒度按需架構＋亂中有序治理（Phase A / C.2 / v4.5）**：Layer 0 輕底盤＋Layer 1 3 項講者工具（`G`/`A`/`L`/`S`）＋Layer 2 11 項細粒度內容模組（未用到 0 KB）＋軟性 `[WARN]` 場合防呆
 - [~] **多元風格憲法庫 Style DNA**：已就緒 4 款並上架 `style-library.html`；其餘 8 款＋主題智能配對與外觀帳本於 Phase D 補齊
 - [x] **圖像層真實無字 AI 融合＋自動單檔內嵌**：支援真實無字 AI 底圖 × HTML 真文字融合（含反左右割裂生圖規範）、`.asset-slot[data-slot]` 自動換圖、`assemble.py` 本機靜態圖與影片海報自動 Base64 內嵌與 `IMAGE_UPGRADE.md` 清單
-- [x] **HTML 核心動態、視覺指引與 v4.6 導演閉環**：60fps 原生核心＋單頁極性＋`nav_mode`＋`data-step`＋三層按需模組＋5 支黃金工藝配方（`references/recipes/`）＋`check.mjs --motion` 13 項實測＋Liveliness Audit 全部落地驗證
-- [x] **排版細節與雙門檻品管**：下限（像素 WCAG 對比、漸層字、主標題≥總結、SVG 重複 ID、13 項動態）＋ 上限（依 `stage_mode` 調檔之 Liveliness Audit 生動度與反單調稽核）
+- [x] **HTML 核心動態、視覺指引（第二核心）與導演閉環**：60fps 原生核心＋單頁極性＋`nav_mode`＋`data-step`＋三層按需模組＋4 套風格動態套件＋5 支黃金工藝配方＋底盤自動搶先接管＋`check.mjs --motion` 15 項實測＋Liveliness Audit 全部落地驗證
+- [x] **排版細節與雙門檻品管**：下限（像素 WCAG 對比、漸層字、主標題≥總結、SVG 重複 ID、15 項動態與行動實測）＋ 上限（依 `stage_mode` 調檔之 Liveliness Audit 生動度與反單調稽核）
 
 ### ③ 全流程（從頭到尾）
 
-- [x] Grill v2（v4.6 三段調檔）→ `brief.md`（含招牌亮點頁提案與減法清單）
+- [x] Step 1a 架構腦力激盪（⛔ 關卡 1a）→ Step 1b 細節腦力激盪（⛔ 關卡 1b）→ `brief.md`（含招牌亮點頁提案與減法清單；快速模式自動合併）
 - [x] 架構展開＋逐頁 4 行 `director:` 分鏡 → storyboard → lint
 - [x] 兩階段視覺關卡 Gate 2（v4.6）：Step 3a `style-library.html` 風格圖鑑快選 → Step 3b 單風格 2–3 張高工藝樣張＋3 組 OKLCH 配色（確認後直接沿用為 Step 4 活範本）
 - [x] 製作 → `deck.html`（>6 頁每 3–4 頁乾淨分身精雕＋v4.5 三層細粒度按需注入＋軟性防呆）
