@@ -18,8 +18,9 @@ from deck_model import (  # noqa: E402
     DENSE_LAYOUTS, EMPH_RE, LAYOUT_FIELDS, LAYOUTS, NAV_MODES,
     PRESENTER_TOOLS, RISK_LEVELS, SIMPLIFIED_CHARS, SLIDE_TYPES, STAGE_MODES,
     SURFACES, TRANSITION_PHRASES, StoryboardError, all_slide_texts_with_notes,
-    appendix_slides, capacity_problems, char_limit_for, emphasis_count, load,
-    main_slides, page_breakdown, slide_texts, toc_mode, visible_len,
+    appendix_slides, capacity_problems, char_limit_for, emphasis_count,
+    listed_chapters, load, main_slides, page_breakdown, slide_texts, toc_mode,
+    visible_len,
 )
 
 CJK = re.compile(r"[\u3400-\u9fff]")
@@ -102,9 +103,9 @@ def lint(data):
             if bad_m:
                 W("meta.modules", f"包含未登錄模組名稱：{', '.join(bad_m)}（可用：{', '.join(sorted(CONTENT_MODULES))}）。")
             if stage_mode == "briefing":
-                over = [str(x) for x in declared_mods if str(x).lower() in ("ambient-fx", "coverflow")]
+                over = [str(x) for x in declared_mods if str(x).lower() in ("ambient-fx", "coverflow", "motion-apple")]
                 if over:
-                    W("meta.modules", f"stage_mode 為 briefing（決策簡報），不建議啟用氛圍／娛樂模組：{', '.join(over)}。")
+                    W("meta.modules", f"stage_mode 為 briefing（決策簡報），不建議啟用氛圍／高舞台裝飾模組：{', '.join(over)}。")
 
     # ---- structure: the core of this skill
     for k, hint in (("start", "聽眾現在知道什麼、在意什麼"), ("destination", "聽完要相信或做什麼")):
@@ -121,30 +122,39 @@ def lint(data):
     if not st.get("direction"):
         W("structure.direction", "沒寫方向（例：過去 → 未來）。方向應從聽眾的起點出發。")
 
-    # ---- chapters
+    # ---- chapters (listed chapters appear in TOC & nav; optional unlisted: true chapter is a surprise act)
+    listed = listed_chapters(data)
+    unlisted_ch = [c for c in chapters if isinstance(c, dict) and c.get("unlisted")]
     ids = [c.get("id") for c in chapters if isinstance(c, dict)]
-    labels = [str(c.get("label") or "") for c in chapters if isinstance(c, dict)]
-    if len(chapters) < 2:
-        E("chapters", f"只有 {len(chapters)} 章。架構至少要 2 個停靠點；只有一章代表還沒有架構。")
-    if len(chapters) > 4:
-        E("chapters", f"有 {len(chapters)} 章，超過 4 章。軸切得太細，合併相鄰的章節。")
-    elif len(chapters) == 4:
+    listed_labels = [str(c.get("label") or "") for c in listed]
+    if len(listed) < 2:
+        E("chapters", f"只有 {len(listed)} 個公開章節。架構至少要 2 個停靠點；只有一章代表還沒有架構。")
+    if len(listed) > 4:
+        E("chapters", f"有 {len(listed)} 個公開章節，超過 4 章。軸切得太細，合併相鄰的章節。")
+    elif len(listed) == 4:
         how = "每章開始前會自動插入目錄點亮頁" if toc_mode(data) == "per-chapter" else "章節短，只會在封面後插入一頁目錄"
         I("chapters", f"4 章：{how}。理想是 3 章以內，確認真的需要 4 章。")
+    if len(unlisted_ch) > 1:
+        W("chapters", f"有 {len(unlisted_ch)} 個 unlisted 驚喜章節，建議最多 1 個（如 One More Thing）以免稀釋反轉張力。")
+    elif unlisted_ch:
+        I("chapters", f"含不劇透驚喜章節（unlisted: true）：{', '.join(str(c.get('label') or c.get('id')) for c in unlisted_ch)}，將自動從總目錄與常駐導航隱藏。")
     if len(set(ids)) != len(ids) or any(not i for i in ids):
         E("chapters", "每章都要有唯一的 id。")
-    for i, lab in enumerate(labels):
+    for i, c in enumerate(chapters):
+        if not isinstance(c, dict):
+            continue
+        lab = str(c.get("label") or "")
         if not lab:
             E(f"chapters[{i}]", "缺少 label。")
-        elif visible_len(lab) > 10:
+        elif not c.get("unlisted") and visible_len(lab) > 10:
             W(f"chapters[{i}]", f"「{lab}」太長（{visible_len(lab)} 字）。章節名稱會放在導航列上，盡量 8 字以內。")
-    if labels and all(labels):
-        lens = [visible_len(x) for x in labels]
+    if listed_labels and all(listed_labels):
+        lens = [visible_len(x) for x in listed_labels]
         if max(lens) > 2 * min(lens) and max(lens) - min(lens) > 3:
-            W("chapters", f"章節名稱長度差很多（{', '.join(labels)}）。停靠點命名要平行：結構、長度、詞性一致。")
-        scripts = {"cjk" if CJK.search(x) else "latin" for x in labels}
+            W("chapters", f"章節名稱長度差很多（{', '.join(listed_labels)}）。停靠點命名要平行：結構、長度、詞性一致。")
+        scripts = {"cjk" if CJK.search(x) else "latin" for x in listed_labels}
         if len(scripts) > 1:
-            W("chapters", f"章節名稱混用中英文（{', '.join(labels)}）。命名要平行。")
+            W("chapters", f"章節名稱混用中英文（{', '.join(listed_labels)}）。命名要平行。")
 
     # ---- slides
     if not slides:

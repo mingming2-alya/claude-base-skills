@@ -3,7 +3,7 @@
 > **一句話定位**：用摸得到、會說故事的物件與場景承載內容，十五種畫風可整套切換。
 > **適合**：知識分享、新人引導、內部宣導、科普、故事型演講、活動流程。
 > **避免**：密集財務報表、高密度多欄比較（這類改用 `counsel`）。
-> **參考基準**：`outputs/illustration-integration/sheet5.jpg`（15 種畫風淺深雙底融合版）與《AI 的第三次搬家》。
+> **參考基準**：`assets/style-library.html`（04 號 `illustration` 活體舞台，含 15 種畫風淺深雙底融合規則）。
 
 ## 1. 十二條融合規則（所有畫風共通）
 
@@ -76,21 +76,17 @@
 
 > 帶有歷史固定色盤的畫風（岩畫、埃及、漢畫像石、瑪雅、梵谷、吶喊），三組主題配色主要調整強調色與輔助飾色。
 
-## 6. 動效個性（Phase B 參數）
+## 6. 動效個性與專屬動態模組（`motion-story` · 按需注入，未用到 0 KB）
 
-- **性格**：`stepped`（紙黏土／剪紙／像素採 5 幀逐格定格手感，像定格動畫一樣有手作觸感；手繪／水彩改 `spring` 搭配柔和入場）。
+- **動態個性**：**手感敘事（Tactile Bounce）**——溫潤彈性過衝回正、主角先落定、配角與標籤慢半拍跟上（Disney follow-through）；**禁止將 `steps(5)` 用於整頁位移動畫**（依 `references/motion-system.md` 採流暢 GPU 曲線配精準節拍）。
 - **CSS 變數**：
   ```css
-  --motion-mode: stepped;
-  --enter-easing: steps(5, end);
-  --step-frames: 5;
+  --motion-mode: spring;
+  --enter-easing: cubic-bezier(0.34, 1.38, 0.64, 1);
   --stagger-base: 90;
+  --morph-ms: 780;
   ```
-- **建議動態標記**：站點標籤加 `.rv` 逐格落位；SVG 引導虛線加 `data-draw`；畫面內裝置數字（如黏土平板螢幕 `4.2%`）可承接上一頁的 `data-morph` 飛入著陸！
-
-## 6. 專屬動態模組（`motion-story` · 按需注入，未用到 0 KB）
-
-- **動態個性**：**手感敘事（Tactile Bounce）**——溫潤彈性過衝回正、主角先落定、配角與標籤慢半拍跟上（Disney follow-through）。
+- **建議動態標記**：站點標籤加 `.rv`／`data-beat` 單向落位；實線引導用 SVG `<path data-draw>`，**虛線引導針用 HTML `data-wipe="down"`**（搭配觸及物件單次 `data-ripple`）；畫面內裝置數字可承接前頁 `data-morph` 飛入著陸。
 - **綁定原語**（用法見 `references/modules/style-motion-kits.md`）：
   - `[data-popup-fold]`：立體書 3D 翻折立起舞台＋標籤主從延遲彈跳（適合三幕故事、知識概念場景化）。
   - `[data-chat-replay]`：對話氣泡實況劇院，含輸入脈動「…」（適合還原真實用戶痛點、客服／團隊情境）。

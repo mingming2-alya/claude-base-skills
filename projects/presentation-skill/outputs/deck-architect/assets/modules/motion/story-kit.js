@@ -104,7 +104,8 @@
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       const sl = detail.slide;
       if (!sl) return;
-      sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.stop());
+      sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
+      sl.querySelectorAll('[data-popup-fold]').forEach(el => el._pfInit && el._pfInit.unfold());
     });
     deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
     deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });

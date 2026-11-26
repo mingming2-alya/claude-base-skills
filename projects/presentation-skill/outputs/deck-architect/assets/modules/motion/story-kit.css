@@ -34,28 +34,29 @@
 [data-chat-replay] {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 [data-chat-replay] [data-chat-msg] {
-  max-width: 82%;
-  padding: 9px 13px;
-  border-radius: 16px;
-  font-size: 0.86em;
-  line-height: 1.4;
+  max-width: 84%;
+  padding: 14px 20px;
+  border-radius: 18px;
+  font-size: max(20px, 0.9em);
+  line-height: 1.45;
   transform-origin: left bottom;
   transition: transform 0.46s cubic-bezier(0.34, 1.42, 0.64, 1), opacity 0.3s ease;
 }
 [data-chat-replay] [data-chat-msg="me"] {
   align-self: flex-end;
   transform-origin: right bottom;
-  background: var(--accent, #C85A32);
-  color: #fff;
+  background: var(--accent, #0D6B4F);
+  color: var(--accent-ink, #F4F2EC);
   border-bottom-right-radius: 4px;
 }
 [data-chat-replay] [data-chat-msg="other"] {
   align-self: flex-start;
-  background: var(--card, #FFFDF8);
-  border: 1px solid var(--line, rgba(43,33,24,0.16));
+  background: var(--bg-2, #E6E2DA);
+  color: var(--fg, #141619);
+  border: 1px solid var(--line, rgba(20, 22, 25, 0.18));
   border-bottom-left-radius: 4px;
 }
 [data-chat-replay] [data-chat-msg].is-hidden {
@@ -69,8 +70,8 @@
   gap: 4px;
   padding: 8px 12px;
   border-radius: 999px;
-  background: var(--card, #FFFDF8);
-  border: 1px solid var(--line, rgba(43,33,24,0.14));
+  background: var(--bg-2, #E6E2DA);
+  border: 1px solid var(--line, rgba(20, 22, 25, 0.16));
   opacity: 0;
   transform: scale(0.85);
   transition: opacity .2s ease, transform .25s ease;
@@ -78,7 +79,7 @@
 .cr-typing.is-on { opacity: 1; transform: scale(1); }
 .cr-typing i {
   width: 6px; height: 6px; border-radius: 50%;
-  background: var(--accent, #C85A32);
+  background: var(--accent, #0D6B4F);
   animation: cr-dot 0.9s infinite ease-in-out;
 }
 .cr-typing i:nth-child(2) { animation-delay: 0.16s; }
@@ -86,6 +87,21 @@
 @keyframes cr-dot {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
   40% { transform: translateY(-4px); opacity: 1; }
+}
+
+html.still [data-popup-fold] [data-pop-layer],
+body.low-power [data-popup-fold] [data-pop-layer],
+html.still [data-popup-fold] [data-pop-tag],
+body.low-power [data-popup-fold] [data-pop-tag],
+html.still [data-chat-replay] [data-chat-msg],
+body.low-power [data-chat-replay] [data-chat-msg] {
+  transition: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+html.still .cr-typing,
+body.low-power .cr-typing {
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce), print {

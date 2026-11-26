@@ -1564,3 +1564,28 @@
   4. **`references/contexts.md`、`references/samples.md`**：同步更新所有 Step 1a／1b 與快速模式合併說明，清零舊單輪 Step 1 措辭。
 - **打包驗證**：重新打包 `outputs/deck-architect.skill`（**82 檔，341.9 KB**，零 `__pycache__`）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,references/{grill.md,contexts.md,samples.md},templates/brief.md}`、`outputs/deck-architect.skill`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+
+## 2026-11-26｜`deck-architect` v4.7.6：兩大主柱終審校準、顧問標竿與不循規蹈矩敘事腦力激盪、4 套動態套件實測修補收官
+
+- **使用者總結與補充指示（寫入原則 #31）**：
+  - 將技能明確收斂為兩大主柱：**① 架構與內容**（架構定義＋內容細節補充；作為顧問站在這類主題的標竿與全面視角持續追問深挖、視情況給方案建議，並**協助梳理更好的敘事脈絡，不一定要循規蹈矩，敢跟用戶腦力激盪**）與 **② 排版與呈現**（核心是視覺吸引與引導，依不同內容主題選擇最合適的靜態與動態風格極致）。
+  - 核准全面落地本次終審抓出的兩大主柱校準與工程／規格瑕疵修補。
+- **本輪校準與修補內容**：
+  1. **主柱 1 校準（`references/grill.md`、`references/structure.md`、`templates/brief.md`、`SKILL.md`）**：
+     - Step 1a 新增**主題類型標竿視角與盲點掃描（Domain Benchmark Scan）**（涵蓋商業提案、年度成果、產品發表、架構評審、知識分享、策略週報 6 類題材雷達）與**不循規蹈矩的敘事脈絡腦力激盪**（反方質疑破題、倒敘體驗、偵探主線、藏牌反轉、微觀放大等，鼓勵混搭碰撞）。
+     - Step 1b 重新聚焦於**內容細節深挖、反方壓力測試（Devil's Advocate）與主動提供 2–3 個內容方案建議**；將風格綁定動態套件（`motion-*`）從 Step 1b／`brief.md` 徹底解耦，改交 Step 3a 選定風格後自動綁定。
+     - `SKILL.md` 升級至 v4.7.6 並大幅瘦身 YAML frontmatter `description`。
+  2. **主柱 2 校準（`references/samples.md`、`references/recipes/*.md`、`styles/*.md`、`assets/style-library.html`、`references/progress-report.md`）**：
+     - `samples.md` 改以**內容主題與氣質優先 × `stage_mode` 場合校準**推薦風格並同步鎖定 `motion-*`，增設視覺退化防線。
+     - 升級 `recipes/bento-causal.md`（嚴守原則 #26 ≤2 層文字＋甘特斜線／A-B 卡）、`linked-diagram.md`（細線分層＋延遲佔比條破除平庸白框）、`product-story.md`（修正路標主標題）、`editorial-drama.md`（補全原話暗房完整 HTML 範例）。
+     - 清零 `styles/illustration.md` 重複 `## 6.`／`steps(5)`／虛線 `data-draw` 衝突、`styles/workday.md`「依品牌→依主題」與 easing 差異、4 份 `styles/*.md` 外部懸空路徑、`style-library.html` `illustration` 卡誤標 `data-colorize-wipe` 與舊版號、`progress-report.md` 舊三選一措辭。
+  3. **工程 P0/P1 修復與第 16 項真機實測（`assets/modules/motion/*-kit.{css,js}`、`scripts/{deck_model.py,lint.py,assemble.py,check.mjs}`、`references/visual-guidance.md`）**：
+     - 4 套風格動態套件 CSS 全面對齊 `shell.css` 語意變數（修掉暗底白字撞白底），補齊 `html.still`/`body.low-power` 滿亮與靜止規則、`workday` 目標標 ≥18px、`story` 氣泡 ≥20px、`counsel` 零圓角與 `.odo-final` 可檢文字、`apple` 複本去重 `id` 及 `slideleave` 乾淨還原。
+     - `deck_model.py` 補登 4 套 `motion-*` 進 `CONTENT_MODULES` 消除 `lint.py`／`assemble.py` 白名單互打；全鏈路實作 `unlisted: true`（One More Thing 驚喜章節不進封面路線、總目錄與導航）。
+     - `check.mjs --motion` 新增第 16 項檢核覆蓋 4 套風格動態套件全部 11 個原語。
+- **驗證與重打包**：
+  - 於獨立測試簡報完成 `lint.py`（0 錯 0 警）→ `assemble.py`（確認 `unlisted` 不洩漏進 `DECK.chapters`）→ 無頭 Chromium CDP `check.mjs --jpg --motion` 全 7 頁淺深雙底實測（最低像素對比 **`5.41:1`**、全 11 個風格動態原語與低耗電／靜態契約通過 ✅）並目視驗收截圖。
+  - 既有範例 `v45-modular-demo`（`4.84:1`）與 `v4-alive-demo`（`4.70:1`）跑完 `check.mjs --motion` 全數零回歸通過 ✅。
+  - 重新打包 `outputs/deck-architect.skill`（**82 檔，349.3 KB**，零 `__pycache__`，SHA-256 校驗 100% 一致）。
+- **同步的檔案**：`inputs/presentation-principles.md`、`outputs/deck-architect/{SKILL.md,assets/{style-library.html,modules/motion/*},references/{grill.md,structure.md,samples.md,visual-guidance.md,progress-report.md,recipes/*.md},scripts/{deck_model.py,lint.py,assemble.py,check.mjs},styles/*.md,templates/brief.md}`、`outputs/deck-architect.skill`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+

@@ -34,6 +34,7 @@
     if (!root.querySelector('.sp-lit')) {
       const raw = root.innerHTML;
       root.innerHTML = `<div class="sp-cone"></div><div class="sp-base">${raw}</div><div class="sp-lit" aria-hidden="true">${raw}</div>`;
+      root.querySelectorAll('.sp-lit [id]').forEach(n => n.removeAttribute('id'));
     }
     let rafId = 0;
 
@@ -179,6 +180,7 @@
     if (!root.querySelector('.cw-color')) {
       const inner = root.innerHTML;
       root.innerHTML = `<div class="cw-mono">${inner}</div><div class="cw-color" aria-hidden="true">${inner}</div><div class="cw-beam"></div>`;
+      root.querySelectorAll('.cw-color [id]').forEach(n => n.removeAttribute('id'));
     }
     let timer = 0;
     function setPct(p) {

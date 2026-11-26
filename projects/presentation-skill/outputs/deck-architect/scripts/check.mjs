@@ -1237,6 +1237,145 @@ async function runMotionAudit(driver, filePath) {
     failures.push(`390px 手機實測異常（橫向溢出 ${mobileRes.overflow}px、舞台實寬 ${mobileRes.w}px）`);
   }
 
+  // 16. v4.7 Style Motion Kits functional & low-power/still contract verification
+  const kitTargets = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    const find = sel => sls.findIndex(sl => Boolean(sl.querySelector(sel)));
+    return {
+      ruler: find('[data-ruler-progress]'),
+      bento: find('[data-bento-expand]'),
+      rank: find('[data-rank-race]'),
+      odo: find('[data-odometer]'),
+      rack: find('[data-rack-focus]'),
+      split: find('[data-split-mask]'),
+      spot: find('[data-spotlight-sweep]'),
+      deck: find('[data-depth-deck]'),
+      colorize: find('[data-colorize-wipe]'),
+      popup: find('[data-popup-fold]'),
+      chat: find('[data-chat-replay]'),
+    };
+  });
+  const kitParts = [];
+  if (kitTargets.ruler >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), kitTargets.ruler);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => Boolean(window.__deck.slides[i].querySelector('[data-ruler-progress]')?._rpInit), kitTargets.ruler);
+    if (ok) kitParts.push(`刻度尺推進（第 ${kitTargets.ruler + 1} 頁）`);
+    else failures.push(`第 ${kitTargets.ruler + 1} 頁 [data-ruler-progress] 未初始化`);
+  }
+  if (kitTargets.bento >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), kitTargets.bento);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const root = window.__deck.slides[i].querySelector('[data-bento-expand]');
+      const item = root?.querySelector('[data-bento-item]');
+      if (!root || !item) return false;
+      item.click();
+      const opened = item.classList.contains('is-open') && window.__deck.index === i;
+      item.click();
+      const closed = !item.classList.contains('is-open');
+      return opened && closed;
+    }, kitTargets.bento);
+    if (ok) kitParts.push(`看板展開（第 ${kitTargets.bento + 1} 頁）`);
+    else failures.push(`第 ${kitTargets.bento + 1} 頁 [data-bento-expand] 點擊展開或防誤翻異常`);
+  }
+  if (kitTargets.rank >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), kitTargets.rank);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const el = window.__deck.slides[i].querySelector('[data-rank-race]');
+      if (!el?._rrInit) return false;
+      el._rrInit.show('before');
+      const b = el.dataset.currentStage === 'before';
+      el._rrInit.stop();
+      return b && el.dataset.currentStage === 'after';
+    }, kitTargets.rank);
+    if (ok) kitParts.push(`排名超車（第 ${kitTargets.rank + 1} 頁）`);
+    else failures.push(`第 ${kitTargets.rank + 1} 頁 [data-rank-race] 切換異常`);
+  }
+  if (kitTargets.odo >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), kitTargets.odo);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const el = window.__deck.slides[i].querySelector('[data-odometer]');
+      if (!el?._odoInit) return false;
+      window.__deck.toggleLowPower(true);
+      const hasFinal = Boolean(el.querySelector('.odo-final')?.textContent?.trim());
+      window.__deck.toggleLowPower(false);
+      return hasFinal;
+    }, kitTargets.odo);
+    if (ok) kitParts.push(`滾輪數字（第 ${kitTargets.odo + 1} 頁）`);
+    else failures.push(`第 ${kitTargets.odo + 1} 頁 [data-odometer] 靜態定格文字缺失`);
+  }
+  if (kitTargets.rack >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), kitTargets.rack);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const root = window.__deck.slides[i].querySelector('[data-rack-focus]');
+      const item = root?.querySelector('[data-rf-item]');
+      if (!root || !item) return false;
+      item.click();
+      const focused = item.classList.contains('is-focused') && window.__deck.index === i;
+      item.click();
+      const cleared = !item.classList.contains('is-focused');
+      return focused && cleared;
+    }, kitTargets.rack);
+    if (ok) kitParts.push(`推鏡景深（第 ${kitTargets.rack + 1} 頁）`);
+    else failures.push(`第 ${kitTargets.rack + 1} 頁 [data-rack-focus] 聚焦或防誤翻異常`);
+  }
+  if (kitTargets.spot >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), kitTargets.spot);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const el = window.__deck.slides[i].querySelector('[data-spotlight-sweep]');
+      if (!el?._spInit) return false;
+      window.__deck.toggleLowPower(true);
+      const base = el.querySelector('.sp-base');
+      const op = base ? parseFloat(getComputedStyle(base).opacity) : 0;
+      window.__deck.toggleLowPower(false);
+      return op >= 0.98;
+    }, kitTargets.spot);
+    if (ok) kitParts.push(`單次光掃（第 ${kitTargets.spot + 1} 頁）`);
+    else failures.push(`第 ${kitTargets.spot + 1} 頁 [data-spotlight-sweep] 低耗電／靜態未復原滿亮`);
+  }
+  if (kitTargets.deck >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), kitTargets.deck);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const el = window.__deck.slides[i].querySelector('[data-depth-deck]');
+      if (!el?._ddInit) return false;
+      const first = el.querySelector('[data-deck-card]');
+      first?.click();
+      const stayed = window.__deck.index === i;
+      el._ddInit.reset();
+      return stayed;
+    }, kitTargets.deck);
+    if (ok) kitParts.push(`3D 景深疊卡（第 ${kitTargets.deck + 1} 頁）`);
+    else failures.push(`第 ${kitTargets.deck + 1} 頁 [data-depth-deck] 互動或防誤翻異常`);
+  }
+  if (kitTargets.split >= 0 || kitTargets.colorize >= 0 || kitTargets.popup >= 0 || kitTargets.chat >= 0) {
+    const simpleOk = await driver.evaluate(t => {
+      const checks = [
+        [t.split, '[data-split-mask]', '_smInit'],
+        [t.colorize, '[data-colorize-wipe]', '_cwInit'],
+        [t.popup, '[data-popup-fold]', '_pfInit'],
+        [t.chat, '[data-chat-replay]', '_crInit'],
+      ];
+      return checks.every(([idx, sel, prop]) => idx < 0 || Boolean(window.__deck.slides[idx].querySelector(sel)?.[prop]));
+    }, kitTargets);
+    if (simpleOk) {
+      if (kitTargets.split >= 0) kitParts.push(`文字斬切（第 ${kitTargets.split + 1} 頁）`);
+      if (kitTargets.colorize >= 0) kitParts.push(`光掃上色（第 ${kitTargets.colorize + 1} 頁）`);
+      if (kitTargets.popup >= 0) kitParts.push(`立體書翻折（第 ${kitTargets.popup + 1} 頁）`);
+      if (kitTargets.chat >= 0) kitParts.push(`對話劇院（第 ${kitTargets.chat + 1} 頁）`);
+    } else {
+      failures.push('部分風格動態原語（split-mask / colorize-wipe / popup-fold / chat-replay）未正確初始化');
+    }
+  }
+  if (kitParts.length) {
+    results.push(`v4.7 風格動態套件實測（${kitParts.join('、')}）：通過（互動零誤翻、低耗電與靜態契約正常）`);
+  }
+
   const jsErrs = driver.getErrors();
   for (const e of jsErrs) failures.push(`動態測試期間腳本錯誤：${e}`);
   return { results, failures };

@@ -16,8 +16,8 @@
   <div class="split">
     <div class="copy">
       <div class="eyebrow">LIVE WORKFLOW DEMO</div>
-      <h2 data-role="title">三秒自動定位異常節點</h2>
-      <p>不需要手寫查詢語句，邊緣代理直接回傳延遲指標與安全切換建議。</p>
+      <h2 data-role="title">異常定位活流程</h2>
+      <p data-role="summary">無須手寫查詢，<mark class="em">三秒自動定位</mark>異常節點並給出切換建議。</p>
     </div>
     <div class="device-browser">
       <div class="db-bar"><i></i><i></i><i></i><span>console.kestrel.local</span></div>

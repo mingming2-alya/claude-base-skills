@@ -10,9 +10,25 @@
     if (el._odoInit) return el._odoInit;
     const initialText = (el.dataset.value || el.textContent || '0').trim();
     const digits = '0123456789';
+    let settleTimer = 0;
+
+    function renderStatic(str) {
+      clearTimeout(settleTimer);
+      el.innerHTML = '';
+      el.setAttribute('aria-label', str);
+      const fin = document.createElement('span');
+      fin.className = 'odo-final';
+      fin.textContent = str;
+      el.appendChild(fin);
+    }
 
     function render(text, animate) {
       const str = String(text);
+      clearTimeout(settleTimer);
+      if (!animate || isStatic()) {
+        renderStatic(str);
+        return;
+      }
       el.innerHTML = '';
       el.setAttribute('aria-label', str);
       const strips = [];
@@ -24,7 +40,6 @@
           box.setAttribute('aria-hidden', 'true');
           const strip = document.createElement('span');
           strip.className = 'odo-strip';
-          // Double cycle 0..9 + 0..9 for richer physical roll
           for (let k = 0; k < 20; k++) {
             const s = document.createElement('span');
             s.textContent = String(k % 10);
@@ -33,7 +48,7 @@
           box.appendChild(strip);
           el.appendChild(box);
           const d = parseInt(ch, 10);
-          strips.push({ strip, targetIdx: animate ? (10 + d) : d, delay: i * 65 });
+          strips.push({ strip, targetIdx: 10 + d, delay: i * 65 });
         } else {
           const st = document.createElement('span');
           st.className = 'odo-static';
@@ -42,20 +57,15 @@
           el.appendChild(st);
         }
       }
-      if (!animate || isStatic()) {
-        strips.forEach(({ strip, targetIdx }) => {
-          strip.style.transition = 'none';
-          strip.style.transform = `translateY(-${targetIdx * 1.05}em)`;
-        });
-      } else {
-        strips.forEach(({ strip, targetIdx, delay }) => {
-          strip.style.transition = 'none';
-          strip.style.transform = 'translateY(0)';
-          strip.getBoundingClientRect();
-          strip.style.transition = `transform ${820 + delay}ms cubic-bezier(0.16, 1.04, 0.28, 1) ${delay}ms`;
-          strip.style.transform = `translateY(-${targetIdx * 1.05}em)`;
-        });
-      }
+      strips.forEach(({ strip, targetIdx, delay }) => {
+        strip.style.transition = 'none';
+        strip.style.transform = 'translateY(0)';
+        strip.getBoundingClientRect();
+        strip.style.transition = `transform ${820 + delay}ms cubic-bezier(0.16, 1.04, 0.28, 1) ${delay}ms`;
+        strip.style.transform = `translateY(-${targetIdx * 1.05}em)`;
+      });
+      const maxDelay = strips.length ? strips[strips.length - 1].delay : 0;
+      settleTimer = setTimeout(() => renderStatic(str), 880 + maxDelay);
     }
 
     render(initialText, false);
@@ -195,6 +205,7 @@
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       const sl = detail.slide;
       if (!sl) return;
+      sl.querySelectorAll('[data-odometer]').forEach(el => el._odoInit && el._odoInit.set());
       sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.stop());
     });
     deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });

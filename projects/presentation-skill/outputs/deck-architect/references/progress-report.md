@@ -71,9 +71,9 @@ python3 <skill>/scripts/check_reports.py weekly.pptx --out check-report.md
 - **同一類之內先排風險高的，同風險再依進度排**（lint 會檢查）。如果某一類要依其他方式排序，設 `order: progress` 並在 `note` 說明，例如「依進度排列」。
 - 一頁最多 13 列。案例太多就拆成兩頁，第二頁設 `continued: true`、不放摘要。
 
-範例：`outputs/examples/progress-overview/storyboard.yaml`（內容為虛構示意）。
+（結構寫法可參考 `templates/storyboard.yaml` 與 `styles/workday.md`。）
 
 ## 5. 定期重做
 
 - 每期沿用同一份 storyboard 與主題，只更新數字與狀態。
-- 適合用快速模式：不需要 Grill 架構，也不需要三選一樣張。
+- 適合用快速模式：不需要完整兩階段 Grill 架構，也不需要 Gate 2 融合圖鑑與樣張流程。

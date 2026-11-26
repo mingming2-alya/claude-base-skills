@@ -30,8 +30,8 @@ ASSETS_DIR = SKILL_ROOT / "assets"
 sys.path.insert(0, str(HERE))
 
 from deck_model import (  # noqa: E402
-    AXES, EMPH_RE, FX_EFFECTS, StoryboardError, default_presenter_tools, load,
-    main_slides, toc_mode,
+    AXES, EMPH_RE, FX_EFFECTS, StoryboardError, default_presenter_tools,
+    listed_chapters, load, main_slides, toc_mode,
 )
 from lint import lint  # noqa: E402
 
@@ -157,14 +157,21 @@ def toc_shape(motion):
 
 
 def expand(data):
-    chapters = data["chapters"]
-    ids = [c["id"] for c in chapters]
+    all_chapters = data["chapters"]
+    listed = listed_chapters(data)
+    ids = [c["id"] for c in listed]
+    unlisted_ids = {c["id"] for c in all_chapters if isinstance(c, dict) and c.get("unlisted")}
     mode = toc_mode(data)
     use_toc = mode == "per-chapter"
     flow = main_slides(data)
     per_ch = {cid: [] for cid in ids}
     for s in flow:
-        if s.get("type", "content") == "content" and s.get("chapter") in per_ch and s.get("layout") not in ("pillars", "status-table"):
+        if (
+            s.get("type", "content") == "content"
+            and not s.get("unlisted")
+            and s.get("chapter") in per_ch
+            and s.get("layout") not in ("pillars", "status-table")
+        ):
             per_ch[s["chapter"]].append(s)
 
     out, started, agenda_done = [], set(), mode != "agenda"
@@ -178,16 +185,23 @@ def expand(data):
         elif t == "content" and s.get("layout") == "status-table":
             out.append({"kind": "status", "chi": -1, "src": s})
         elif t == "content":
-            cid = s["chapter"]
-            chi = ids.index(cid) if cid in ids else -1
-            if use_toc and cid in ids and cid not in started:
-                out.append({"kind": "toc", "chi": chi, "src": None})
-            started.add(cid)
-            siblings = per_ch.get(cid, [])
-            tab_idx = siblings.index(s) if s in siblings else 0
-            out.append({"kind": "content", "chi": chi, "src": s, "tab": tab_idx, "tabs": len(siblings)})
+            cid = s.get("chapter")
+            is_unlisted = bool(s.get("unlisted") or (cid in unlisted_ids))
+            if is_unlisted:
+                out.append({"kind": "content", "chi": -1, "src": s, "tab": 0, "tabs": 1, "unlisted": True})
+            else:
+                chi = ids.index(cid) if cid in ids else -1
+                if use_toc and cid in ids and cid not in started:
+                    out.append({"kind": "toc", "chi": chi, "src": None})
+                started.add(cid)
+                siblings = per_ch.get(cid, [])
+                tab_idx = siblings.index(s) if s in siblings else 0
+                out.append({"kind": "content", "chi": chi, "src": s, "tab": tab_idx, "tabs": len(siblings)})
         else:
-            out.append({"kind": t, "chi": -1, "src": s})
+            rec = {"kind": t, "chi": -1, "src": s}
+            if s.get("unlisted"):
+                rec["unlisted"] = True
+            out.append(rec)
 
     for s in data["slides"]:
         if isinstance(s, dict) and s.get("appendix"):
@@ -402,7 +416,7 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
 
     script_joined = "\n".join(sc.strip() for sc in scripts if sc.strip())
     content, script_joined = _scope_defs_ids(content, script_joined, f"s{idx}")
-    content = _populate_auto_nav(content, data.get("chapters") or [], rec["chi"])
+    content = _populate_auto_nav(content, listed_chapters(data), rec["chi"])
     content = _replace_slots(content, base_dir / "assets", mode, found_slots)
     content = _inline_local_imgs(content, base_dir)
     content = _inline_video_posters(content, base_dir)
@@ -415,6 +429,8 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
     )
     if rec.get("appendix"):
         extra_attrs += f' data-appendix="1" data-id="{esc(s.get("id", ""))}"'
+    if rec.get("unlisted"):
+        extra_attrs += ' data-unlisted="1"'
 
     m = SLIDE_OPEN_RE.search(content)
     if m:
@@ -427,6 +443,8 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
             extra_attrs += f' data-surface="{esc(s["surface"])}"'
         if s.get("nav") and "data-nav=" not in attrs:
             extra_attrs += f' data-nav="{esc(s["nav"])}"'
+        elif rec.get("unlisted") and "data-nav=" not in attrs:
+            extra_attrs += ' data-nav="none"'
         if s.get("transition") and "data-transition=" not in attrs:
             extra_attrs += f' data-transition="{esc(s["transition"])}"'
         replaced = f"<{tag} {attrs.strip()}{extra_attrs}>"
@@ -438,6 +456,8 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
             extra_attrs += f' data-surface="{esc(s["surface"])}"'
         if s.get("nav"):
             extra_attrs += f' data-nav="{esc(s["nav"])}"'
+        elif rec.get("unlisted"):
+            extra_attrs += ' data-nav="none"'
         if s.get("transition"):
             extra_attrs += f' data-transition="{esc(s["transition"])}"'
         back = '<button class="back" type="button">← 返回</button>' if rec.get("appendix") else ""
@@ -635,13 +655,17 @@ def static_nav(chapters, chi, tab, tabs, sources):
 
 def render_component_slide(rec, data, idx, total, ch_sources):
     s, kind = rec["src"] or {}, rec["kind"]
-    meta, chapters = data["meta"], data["chapters"]
+    meta, chapters = data["meta"], listed_chapters(data)
     notes = esc(s.get("notes", ""))
     attrs = f'id="s-{idx}" data-kind="{kind}" data-chi="{rec["chi"]}" data-notes="{notes}"'
     if s.get("surface"):
         attrs += f' data-surface="{esc(s["surface"])}"'
     if s.get("nav"):
         attrs += f' data-nav="{esc(s["nav"])}"'
+    elif rec.get("unlisted"):
+        attrs += ' data-nav="none"'
+    if rec.get("unlisted"):
+        attrs += ' data-unlisted="1"'
     if s.get("transition"):
         attrs += f' data-transition="{esc(s["transition"])}"'
     back = ""
@@ -712,7 +736,7 @@ def render_component_slide(rec, data, idx, total, ch_sources):
         )
 
     # content fallback component
-    snav = static_nav(chapters, rec["chi"], rec.get("tab", 0), rec.get("tabs", 1), ch_sources[rec["chi"]] if 0 <= rec["chi"] < len(ch_sources) else [])
+    snav = "" if rec.get("unlisted") else static_nav(chapters, rec["chi"], rec.get("tab", 0), rec.get("tabs", 1), ch_sources[rec["chi"]] if 0 <= rec["chi"] < len(ch_sources) else [])
     tabbed = " tabbed" if rec.get("tabs", 1) > 2 else ""
     attrs += f' data-tab="{rec.get("tab", 0)}" data-tabs="{rec.get("tabs", 1)}"'
     return (
@@ -1066,11 +1090,13 @@ PAGE_TPL = """<!doctype html>
 def assemble_deck(data, base_dir):
     meta = data["meta"]
     records = expand(data)
-    ids = [c["id"] for c in data["chapters"]]
+    listed = listed_chapters(data)
+    ids = [c["id"] for c in listed]
     ch_sources = [
         [
             s for s in main_slides(data)
             if s.get("type", "content") == "content"
+            and not s.get("unlisted")
             and s.get("chapter") == cid
             and s.get("layout") not in ("pillars", "status-table")
         ]
@@ -1123,10 +1149,10 @@ def assemble_deck(data, base_dir):
         "presenterTools": layers["presenter_tools"],
         "modules": layers["used_mods"],
         "fx": layers["used_fx"],
-        "chapters": [c["label"] for c in data["chapters"]],
+        "chapters": [c["label"] for c in listed],
         "tabs": [
             [(s.get("tab") or s.get("title")) for s in ch_sources[i]]
-            for i in range(len(data["chapters"]))
+            for i in range(len(listed))
         ],
         "motion": motion,
     }

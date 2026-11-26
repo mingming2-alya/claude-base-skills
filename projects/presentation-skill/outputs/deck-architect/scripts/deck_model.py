@@ -68,6 +68,7 @@ COMMON_FIELDS = {
     "appendix", "id", "role", "variant", "series", "signature", "file",
     "component", "summary", "key", "slot", "visual", "data", "items",
     "points", "text", "sub", "surface", "nav", "transition", "director",
+    "unlisted",
 }
 
 STAGE_MODES = {"briefing", "pitch", "keynote"}
@@ -78,6 +79,7 @@ CONTENT_MODULES = {
     "components", "ambient-fx", "live-controls", "fit", "media",
     "flow-carousel", "coverflow", "linked-highlight", "compare-slider",
     "code-stage", "visual-flair",
+    "motion-workday", "motion-counsel", "motion-apple", "motion-story",
 }
 FX_EFFECTS = {
     "ambient-dust", "soft-aurora", "constellation",
@@ -172,7 +174,7 @@ _NON_TEXT_KEYS = {
     "appendix", "role", "variant", "series", "bar", "signature", "file",
     "component", "slot", "visual", "scene_layout", "art_style", "state",
     "risk", "progress", "order", "stagger", "continued", "surface", "nav",
-    "transition", "director",
+    "transition", "director", "unlisted",
 }
 
 
@@ -222,19 +224,28 @@ def appendix_slides(data):
     return [s for s in data.get("slides") or [] if isinstance(s, dict) and s.get("appendix")]
 
 
+def listed_chapters(data):
+    """Chapters shown in cover route, automatic TOC, and persistent navigation (excludes unlisted: true surprise acts)."""
+    return [c for c in (data.get("chapters") or []) if isinstance(c, dict) and not c.get("unlisted")]
+
+
 def toc_mode(data):
     """How chapter navigation pages are inserted.
 
-    per-chapter: > 3 chapters and on average >= 2 content pages each -> a TOC highlight page before every chapter
-    agenda:      > 3 chapters but short chapters -> a single agenda page after the cover
-    none:        <= 3 chapters -> the persistent chapter bar is enough
+    per-chapter: > 3 listed chapters and on average >= 2 content pages each -> a TOC highlight page before every listed chapter
+    agenda:      > 3 listed chapters but short chapters -> a single agenda page after the cover
+    none:        <= 3 listed chapters -> the persistent chapter bar is enough
     """
-    chapters = data.get("chapters") or []
+    chapters = listed_chapters(data)
     if len(chapters) <= 3 or (data.get("meta") or {}).get("format") == "section":
         return "none"
+    listed_ids = {c.get("id") for c in chapters}
     n_content = sum(
         1 for s in main_slides(data)
-        if s.get("type", "content") == "content" and s.get("layout") not in ("pillars", "status-table")
+        if s.get("type", "content") == "content"
+        and not s.get("unlisted")
+        and s.get("chapter") in listed_ids
+        and s.get("layout") not in ("pillars", "status-table")
     )
     return "per-chapter" if n_content / len(chapters) >= 2 else "agenda"
 
@@ -247,7 +258,7 @@ def page_breakdown(data):
     closings = sum(1 for s in flow if s.get("type") == "closing")
     contents = sum(1 for s in flow if s.get("type", "content") == "content")
     mode = toc_mode(data)
-    tocs = len(data.get("chapters") or []) if mode == "per-chapter" else (1 if mode == "agenda" else 0)
+    tocs = len(listed_chapters(data)) if mode == "per-chapter" else (1 if mode == "agenda" else 0)
     total = covers + tocs + contents + shocks + closings
     return {
         "cover": covers,
