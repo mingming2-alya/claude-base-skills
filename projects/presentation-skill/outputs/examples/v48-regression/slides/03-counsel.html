@@ -1,0 +1,25 @@
+<section class="slide canvas" data-surface="light">
+  <style>
+    .slide .grid2 { flex: 1; display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 56px; align-items: center; }
+    .slide .big-num { font: 900 120px/1 var(--font-number); color: var(--accent-text); }
+    .slide .rf { display: grid; gap: 14px; margin-top: 28px; }
+    .slide .rf .card { padding: 18px 24px; border: 1px solid var(--line); background: var(--bg-2); font: 700 24px/1.3 var(--font-body); color: var(--fg); }
+  </style>
+  <header class="hd">
+    <h2 class="title" data-role="title">方案排名</h2>
+    <p class="sub" data-role="summary">新架構從第二名超車，導入期縮到 <mark class="em">12 天</mark>。</p>
+  </header>
+  <div class="grid2">
+    <div data-rank-race data-max="100" data-unit="分">
+      <div data-rank-item data-before="52" data-after="91"><span class="rr-pos"></span><span class="rr-name">方案 A（新架構）</span><div class="rr-bar-wrap"><div class="rr-bar"></div></div><span class="rr-score"></span></div>
+      <div data-rank-item data-before="78" data-after="74"><span class="rr-pos"></span><span class="rr-name">既有流程</span><div class="rr-bar-wrap"><div class="rr-bar"></div></div><span class="rr-score"></span></div>
+    </div>
+    <div>
+      <div class="big-num" data-odometer data-value="12天">12天</div>
+      <div class="rf" data-rack-focus>
+        <article class="card" data-rf-item>導入快</article>
+        <article class="card" data-rf-item>維運省</article>
+      </div>
+    </div>
+  </div>
+</section>

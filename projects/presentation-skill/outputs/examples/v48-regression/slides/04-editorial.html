@@ -1,0 +1,21 @@
+<section class="slide canvas" data-surface="split">
+  <style>
+    .slide { padding: 0 !important; display: grid !important; grid-template-columns: 35% 65%; }
+    .slide .anchor { background: var(--dark-bg, #141821); color: var(--dark-fg, #F4F2EC); padding: 92px 64px; display: flex; flex-direction: column; justify-content: space-between; }
+    .slide .anchor h2 { font: 900 58px/1.15 var(--font-display); }
+    .slide .rows { background: var(--light-bg, #F6F5F0); color: var(--light-fg, #171A20); padding: 92px 84px; display: flex; flex-direction: column; justify-content: center; }
+    .slide .row { display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: baseline; padding: 34px 0; border-bottom: 1px solid rgba(23,26,32,0.14); }
+    .slide .row:last-child { border-bottom: none; }
+    .slide .num { font: 900 56px/1 var(--font-number); color: var(--light-accent-text, #0F766E); }
+    .slide .txt strong { display: block; font: 800 30px/1.25 var(--font-body); }
+  </style>
+  <div class="anchor">
+    <h2 data-role="title">三個里程碑</h2>
+    <div style="font-size:22px;opacity:.75">2026 年度實測</div>
+  </div>
+  <div class="rows">
+    <div class="row"><div class="num" data-count>8.4ms</div><div class="txt"><strong>推論延遲壓進毫秒級</strong></div></div>
+    <div class="row" data-step="1"><div class="num" data-count>-62%</div><div class="txt"><strong>峰值記憶體大幅釋放</strong></div></div>
+    <div class="row" data-step="2"><div class="num" data-count>99.4%</div><div class="txt"><strong>三條產線連續零超時</strong></div></div>
+  </div>
+</section>

@@ -1,6 +1,6 @@
 {
   "version": "4.7",
-  "note": "風格 × 動態 × 主題一體化資料庫。全部 12 款風格皆支援淺／深雙底（用色鎖規則不鎖色碼）並各自綁定專屬動態 DNA（Motion DNA）；目前已就緒 4 款完整 Style & Motion DNA（counsel／apple／illustration／workday），其餘 8 款已預定動態個性，將於 Phase D 補齊完整憲法。assemble.py 會依簡報主題與實際用到的動態原語，按需細粒度注入對應模組（未用到 0 KB）。",
+  "note": "風格 × 動態一體化資料庫。全部 12 款風格皆支援淺／深雙底（用色鎖規則不鎖色碼）並各自綁定專屬動態 DNA（Motion DNA）；目前已就緒 4 款完整 Style & Motion DNA（counsel／apple／illustration／workday），其餘 8 款已預定動態個性，將於 Phase D 補齊完整憲法。主題→風格的推薦以 references/contexts.md〈主題類型總表〉為唯一來源；best_for 只描述各風格擅長的題材，stage_fit 只是常用場合的參考，不拿來排除風格。assemble.py 會依實際用到的動態原語按需細粒度注入對應模組（未用到 0 KB）。",
   "motion_library": {
     "kits": {
       "motion-workday": {

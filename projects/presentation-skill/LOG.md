@@ -1589,3 +1589,32 @@
   - 重新打包 `outputs/deck-architect.skill`（**82 檔，349.3 KB**，零 `__pycache__`，SHA-256 校驗 100% 一致）。
 - **同步的檔案**：`inputs/presentation-principles.md`、`outputs/deck-architect/{SKILL.md,assets/{style-library.html,modules/motion/*},references/{grill.md,structure.md,samples.md,visual-guidance.md,progress-report.md,recipes/*.md},scripts/{deck_model.py,lint.py,assemble.py,check.mjs},styles/*.md,templates/brief.md}`、`outputs/deck-architect.skill`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 
+
+## 2026-11-26｜最終檢查與 v4.8：主柱邊界定案、故事種子、建議附理由、主題表統一、可檢查產出，並修掉聚光卡住與 OKLCH 對比誤判
+
+- **背景**：使用者重申兩大主柱（① 架構與內容：顧問站在標竿與全面視角持續追問深挖、引導使用者提出想法、視情況給方案、協助梳理不一定循規蹈矩的敘事脈絡；② 排版與呈現：視覺的吸引與引導，依內容主題選最合適的靜態與動態風格極致），要求對 commit `7845dd2` 為止的所有設計與交付物做最後檢查，確認沒有走偏。
+- **檢查結論（第一輪）**：大方向沒偏；工程實跑可重現（lint 0 錯、`v45-modular-demo` 動態 12 項過、自建測試簡報 4 套套件 11 原語與 `unlisted` 正常、`.skill` 與原始碼一致、33 個主標題全為路標）。偏掉三處：① 呈現層決定跑到選風格之前（`brief.md` 1a 先填明暗／去框／導航、3a 又問一次明暗；1b 把 `ambient-fx`、`coverflow`、`code-stage` 當風格無關，但 `index.json` 的 `avoid_motions` 顯示它們受風格限制；Step 2 `director` 先定版型配方與轉場，違反原則 #9）；② 「引導使用者提出想法」偏弱，敘事候選全由 Agent 推出；③ v4.6 之後的主柱一沒在任何真實簡報上跑過。另有 6 個小問題。
+- **使用者決策（互動表單）**：
+  1. 故事種子：加。下一步：先跑真實簡報 PK。小問題：一起修，並要求加看「全流程整體與細節流程設計有沒有矛盾衝突、違背第一性原理」。
+  2. 主柱邊界：使用者先要求討論各方案優劣與第一性原理再決定。依原則 #28（前沿規則）、#9、#31 按「要先知道什麼才能決定」拆解後，選 **A｜延到選完風格後**（說服載體與視覺主角留主柱一，其餘呈現決定在 3a）。
+  3. 全流程稽核另找到的矛盾：主題分類有四套（`grill.md`、`contexts.md`、`samples.md`、`index.json`）且對不上，`stage_fit` 無人讀取、圖鑑卻寫死並會壓暗其他風格 → 選 **統一成一張主題表**；ROADMAP「不能檢查的規則不寫」與主柱一矛盾 → 使用者質疑我原先的選項（正式使用時不會有 PK），改提「可檢查產出＋關卡拍板」並獲採用；生動度稽核 → 選 **分開計數＋風格契合**。
+  4. **使用者補充**：無論哪個步驟，只要提建議方案，都要向使用者說明理由（寫成原則 #34）。
+- **本輪修改（v4.8）**：
+  - `SKILL.md`：版本 v4.8；新增「主柱邊界」與「每個建議都要附理由」；Step 1a 加故事種子、`stage_mode` 與播放環境；Step 1b 說服載體改白話內容需求並在關卡 1b 前跑 `lint.py brief.md`；Step 2 只寫 `hero`（與內容模組）；Step 3a 依主題類型總表與說服載體選風格並一起確認呈現規格，之後由 Agent 依風格補齊分鏡；快速模式寫明跳過 3a/3b 的做法；Step 4 子代理輸入改為 brief 內容＋3a 呈現規格；Step 5 加風格契合；參考檔索引同步。
+  - `references/grill.md`：改為七條運作原則（新增建議附理由、腦力激盪接著使用者自填內容延伸、主柱分離、可檢查產出）；節點群 B 新增故事種子；候選要標用到的種子；說服載體改白話並回頭限制風格；完成門檻加 brief lint。`structure.md`：候選從故事種子長出、推薦理由扣回事實。
+  - `references/contexts.md`：重寫——1a 只拍板 `stage_mode`，表中明暗／去框／導航改標「3a 校準」；新增〈主題類型總表〉（唯一來源，整合原四套分類，補上年度成果、架構評審、活動開場）；快速模式改為「使用者說過偏好就沿用，否則依總表」並註明品味記憶屬 Phase E。
+  - `references/samples.md`：3a 改為推薦風格（主題優先、說服載體回頭限制、場合只校準）＋一張表單確認風格與呈現規格；新增「3a 之後補齊分鏡」；3b 從 `templates/deck.css` 建立 `deck.css`、配色附主題理由。
+  - `templates/brief.md`：重寫成只記內容與場合的契約（新增播放環境、故事種子、三個候選與選定理由；移除明暗／去框／導航／模組清單），欄位穩定可供 lint。`templates/storyboard.yaml`：`director` 標明哪些欄位 Step 2 寫、哪些 3a 後補；數字頁因果說明移進 `notes`。新增 `templates/deck.css`（配方依賴的畫布基礎排版＋top-bar 上邊距）。
+  - `references/modules-catalog.md`：新增「誰在什麼時候決定哪些模組」（內容說服載體／呈現與氛圍／自動）。`content-shapes.md`：註明 talk 模式第三層字歸 `notes`。`visual-guidance.md`、`presentation-rules.md`：品管對照改為 3a 定案的呈現規格。
+  - 配方：`editorial-drama` 型態 A 改兩層字、移除英文小標、補 top-bar 時加 `nav: none`；`product-story` 移除英文小標。
+  - 腳本：`lint.py` 新增 brief 檢查（標準／快速模式分級、主柱邊界外洩警告、`無人機` 這類詞不誤判為「無」）與 `meta.style` 驗證；`check.mjs` 生動度 11 原語分開計數＋風格契合、離線 Google Fonts 改列提示、顏色改由瀏覽器畫像素換算（修 OKLCH 誤判）、漸層字 OKLCH 換算、`cover-inner`／`closing-inner` 改由畫布邊界檢查。
+  - `assets/runtime.js`：**修正聚光排程 token**——換頁後 `clearGuidanceState(prev)` 讓全域 `focusToken` 加一，使下一頁剛開始的 `data-focus-plan` 失效、畫面卡在第 1 拍且其餘卡片一直壓暗；改為每頁各自的 token。舊版 `check.mjs` 在本環境也重現此失敗，屬先前版本即存在的問題。
+  - `assets/style-library.html`：場合按鈕只標「此場合常用」、不再壓暗其他風格（用「常用」而非「推薦」，避免和 3a 依主題的推薦互相矛盾）。`styles/index.json` note 指向主題類型總表。
+  - `inputs/presentation-principles.md`：新增 #32 主柱邊界、#33 故事種子、#34 建議附理由；為已被取代的 #1、#7、#8、#11、#23 與製作流程第 2 點加註。`ROADMAP.md`：北極星、流程勾選、C.2 狀態與「可檢查產出＋關卡拍板」專案原則。
+- **新增範例**：`outputs/examples/v48-regression/`（引擎回歸測試，含 README）；`outputs/examples/v4-alive-demo/brief.md`（示範用，事後補寫，不是主柱一實測紀錄）。
+- **驗證**：
+  - `lint.py`：全部 storyboard 0 錯；`templates/brief.md` 如預期報 27 錯（未填範本）；示範 brief 0 錯 0 警；快速模式與破框缺漏、主柱邊界外洩的變體行為符合設計。
+  - `check.mjs --motion`（Playwright＋系統 Chrome，離線字體）：`v4-alive-demo` 4.70:1、`v45-modular-demo` 4.84:1、`v44-keynote-demo` 4.53:1、`v4-demo` 4.81:1，與紀錄一致、靜態全過、動態零 ❌（`v4-alive-demo` 聚光復原 5 頁、`v44-keynote-demo` 1 頁全過）；`v48-regression` 9 頁靜態與動態全過、最低 5.02:1、風格契合 3/3。新的「風格契合」對 v4.7 套件出現前做的範例（`v4-alive-demo`、`v44-keynote-demo`、`v4-demo`）提出警告，屬預期提示。
+  - 重新打包 `outputs/deck-architect.skill`（skill-creator `package_skill` 驗證通過，83 檔，369.4 KB，零 `__pycache__`，與原始碼逐位元一致）。
+- **同步的檔案**：`inputs/presentation-principles.md`、`outputs/deck-architect/{SKILL.md,assets/{runtime.js,style-library.html},references/{grill.md,structure.md,contexts.md,samples.md,modules-catalog.md,content-shapes.md,visual-guidance.md,presentation-rules.md,recipes/editorial-drama.md,recipes/product-story.md},scripts/{lint.py,check.mjs},styles/index.json,templates/{brief.md,storyboard.yaml,deck.css}}`、`outputs/deck-architect.skill`、`outputs/examples/v48-regression/`、`outputs/examples/v4-alive-demo/brief.md`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+- **下一步**：使用者提供一份真實簡報需求，從 Step 1a 跑到成品，重點觀察主柱一的顧問品質與成品生動度；跑完再決定是否進 Phase D。

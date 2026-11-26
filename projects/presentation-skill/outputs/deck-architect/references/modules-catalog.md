@@ -33,6 +33,14 @@
 | 遮罩斬切文字、聚光燈掃字、3D 景深疊卡、黑白光掃上色 | `motion-apple` | `[data-split-mask]`、`[data-spotlight-sweep]`、`[data-depth-deck]`、`[data-colorize-wipe]` | 綁定 `apple` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
 | 立體書 3D 翻折舞台、對話氣泡劇院 | `motion-story` | `[data-popup-fold]`、`[data-chat-replay]` | 綁定 `illustration` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
 
+### 誰在什麼時候決定哪些模組（主柱邊界）
+
+| 類別 | 模組 | 什麼時候決定 | 為什麼 |
+|---|---|---|---|
+| **內容說服載體** | `live-controls`、`media`、`flow-carousel`、`coverflow`（照片牆、Logo 牆）、`linked-highlight`、`compare-slider`、`code-stage`、`components`（進度總表、一頁總覽、裝置框）、`visual-flair` 的 `data-zoomable`（高密圖點擊放大） | Step 1b 用白話記成說服載體，Step 2 寫進 `director.module` | 它們回答「用什麼證明這個論點」，是內容需求；Step 3a 會拿它們回頭篩風格（對照 `avoid_motions`） |
+| **呈現與氛圍** | `ambient-fx`、`visual-flair` 的 `data-tilt`／`data-spotlight-hover`、4 套 `motion-*` | Step 3a 選定風格後 | 合不合適取決於風格：例如 `apple` 推薦 `ambient-fx`，`workday` 禁用 |
+| **自動** | `fit` | 不需要決定 | `assemble.py` 看到 `data-fit` 就自動注入 |
+
 ## 3. 場合預算上限（`stage_mode` Budgets）
 
 | 場合 `stage_mode` | `ambient-fx` 上限 | 允許高氛圍模組 | 推薦主力說服模組（含風格綁定動態） |

@@ -1,0 +1,77 @@
+/* @fonts family=Noto+Sans+TC:wght@400;500;700;900 */
+/*
+ * deck.css 起始範本（deck-architect）
+ * - Step 3b 畫樣張前從這份開始：第一段換成選定風格的字體（styles/<id>.md 第 2 節），
+ *   第二段換成 oklch.py --palette 驗過的配色（styles/color-system.md）。
+ * - 第三段是自由畫布的基礎排版：references/recipes/ 的配方假設這些 class 已存在
+ *   （.slide.canvas、.hd、.title、.sub、.foot-note）。風格需要時可以覆寫，但不要刪掉，
+ *   否則配方貼進來會變成標題縮在左上角、沒有邊距。
+ * - 第一行的 @fonts 註解會被 assemble.py 讀成 Google Fonts 連結；離線時由底盤的系統字體頂替。
+ */
+
+/* 1. 字體（換成選定風格的字體聲音） */
+:root {
+  --font-display: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  --font-label: "Noto Sans TC", "PingFang TC", sans-serif;
+  --font-number: "Noto Sans TC", "PingFang TC", sans-serif;
+}
+
+/* 2. 淺深雙底配色（換成 Step 3b 選定的那一組；未定義時底盤退回高對比安全預設） */
+:root {
+  --light-bg: oklch(97.5% 0.006 95);
+  --light-bg-2: oklch(99.2% 0.003 95);
+  --light-fg: oklch(22% 0.02 260);
+  --light-fg-2: oklch(38% 0.02 260);
+  --light-fg-3: oklch(46% 0.02 260);
+  --light-line: oklch(22% 0.02 260 / 0.14);
+  --light-line-2: oklch(22% 0.02 260 / 0.07);
+  --light-accent: oklch(50% 0.11 175);
+  --light-accent-text: oklch(46% 0.11 175);
+  --light-accent-ink: oklch(98% 0.005 95);
+
+  --dark-bg: oklch(19% 0.02 255);
+  --dark-bg-2: oklch(24% 0.025 255);
+  --dark-fg: oklch(96% 0.006 95);
+  --dark-fg-2: oklch(85% 0.012 255);
+  --dark-fg-3: oklch(72% 0.015 255);
+  --dark-line: oklch(96% 0.006 95 / 0.16);
+  --dark-line-2: oklch(96% 0.006 95 / 0.08);
+  --dark-accent: oklch(76% 0.13 165);
+  --dark-accent-text: oklch(84% 0.11 165);
+  --dark-accent-ink: oklch(18% 0.03 165);
+}
+
+/* 3. 自由畫布基礎排版（配方依賴） */
+.slide.canvas {
+  padding: 76px 104px 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+}
+/* 頂部章節列（nav_mode: top-bar）會佔掉上方空間：有頂列從 124px 起排，章內超過 2 頁出現頁籤時從 156px 起排（與內建版面一致） */
+html[data-nav-mode="top-bar"] .slide.canvas:not([data-nav]) { padding-top: 124px; }
+html[data-nav-mode="top-bar"] .slide.canvas:not([data-nav])[data-tabs]:not([data-tabs="1"]):not([data-tabs="2"]) { padding-top: 156px; }
+.hd {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.hd .title,
+h2.title {
+  font: 900 56px/1.15 var(--font-display);
+  letter-spacing: -0.015em;
+  color: var(--fg);
+}
+.hd .sub,
+p.sub,
+p.lead {
+  font: 600 26px/1.4 var(--font-body);
+  color: var(--fg-2);
+  max-width: 1200px;
+}
+.foot-note {
+  font: 500 18px/1.3 var(--font-body);
+  color: var(--fg-3);
+}

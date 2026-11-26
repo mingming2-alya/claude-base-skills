@@ -9,13 +9,13 @@ meta:
   presenter: 王小明 · 產品部         # 封面講者（可省略）
   date: 2026.12                      # 封面日期（可省略）
   delivery: talk                     # talk（上台講）/ discuss（會議討論）/ read（自己讀）/ auto（自動播放）
-  stage_mode: pitch                  # briefing（匯報）/ pitch（提案）/ keynote（發表會）
-  # nav_mode: top-bar                # top-bar（頂列）/ minimal-side（右側錨點）/ divider-only（僅扉頁；keynote 預設）
+  stage_mode: pitch                  # Step 1a 拍板：briefing（匯報）/ pitch（提案）/ keynote（發表會）
+  # nav_mode: top-bar                # Step 3a 依 stage_mode × 風格定案：top-bar（頂列）/ minimal-side（右側錨點）/ divider-only（僅扉頁）
   # presenter_tools: [grid, annotator, speaker]  # Layer 1 講者工具（talk/discuss 預設全開；read/auto 預設僅 grid；[] 關閉）
   # modules: [media, linked-highlight]           # 可選白名單：若投影片誤用未宣告模組，assemble.py 會印 [WARN]
-  style: counsel                     # Gate 2 選定後填入：counsel / apple / illustration / ...
-  mode: light                        # Gate 2 選定後填入：light / dark（單頁可用 surface: dark|light|split|photo 覆寫）
-  palette: 貼題綠                    # Gate 2 選定的三組 OKLCH 配色之一（寫進 deck.css）
+  style: counsel                     # Step 3a 選定後填入（已就緒：workday / counsel / apple / illustration）
+  mode: light                        # Step 3a 依明暗策略填入：light / dark（單頁可用 surface: dark|light|split|photo 覆寫）
+  palette: 貼題綠                    # Step 3b 選定的三組 OKLCH 配色之一（寫進 deck.css）
   minutes: 15                        # 總時長（分鐘），lint 會檢查時間預算與節奏
   pages: 12                          # 頁數上限（含封面與自動目錄，不含附件頁），可省略
   # format: section                  # 作為大簡報一章（一頁總覽）：不需封面與頁碼
@@ -56,7 +56,9 @@ chapters:
 #           table / quote / image / pillars / status-table）＋ 5 圖表形狀（chart-bar / chart-donut /
 #           chart-trend / chart-people / chart-map）＋ scene / free
 # - file: 指向自由編排片段（例 slides/03-chart.html）；也可依檔名 slides/03-*.html 自動對應
-# - signature: true 標記整份簡報的招牌頁（Gate 2 樣張優先挑它）
+# - signature: true 標記整份簡報的招牌頁（Step 3b 樣張優先挑它）
+# - surface: dark|light|split|photo 逐頁極性，Step 3a 依明暗策略補上
+# - talk 模式守原則 #26：每組最多兩層字（例：巨數＋標籤），背景與因果說明放 notes
 # - series: 同一類頁面寫相同名稱，刻意維持一致結構
 # - steps 的 detail 可用 \n 指定斷行
 # - appendix: true + id + link 可建立現場點入、按 Esc 返回的附件頁
@@ -74,9 +76,8 @@ slides:
     layout: number
     value: "0%"
     label: 上半年營收成長
-    note: 連續兩季持平，三個主要客戶續約延後
     source: 2026 上半年財務報告
-    notes: 先讓大家回到年初的感覺，不要急著解釋原因。
+    notes: 先讓大家回到年初的感覺，不要急著解釋原因。背景（被問到再講）：連續兩季持平，三個主要客戶續約延後。
 
   - chapter: past
     title: 問題出在哪
@@ -99,11 +100,11 @@ slides:
     title: 導入時間
     signature: true
     layout: compare
-    director:                           # 4 行極簡分鏡（briefing 僅關鍵頁填寫；pitch/keynote 建議逐頁填寫）
-      hero: 左右拖曳前後對比畫面（45 天人工導入 vs 12 天標準化陪跑）
-      archetype: interactive-proof      # 對應 references/recipes/：bento-causal / linked-diagram / interactive-proof / product-story / editorial-drama
-      module: compare-slider            # 預計使用之 Layer 2 模組（無則填 none）
-      choreo: "transition=zoom-rise; 靜態停 50% 即看懂差距，現場可拖曳"
+    director:                           # 極簡分鏡（briefing 僅關鍵頁填寫；pitch/keynote 建議逐頁填寫）
+      hero: 左右拖曳前後對比畫面（45 天人工導入 vs 12 天標準化陪跑）  # Step 2 寫：這頁的視覺主角，對應 brief 的說服載體
+      module: compare-slider            # Step 2 寫：說服載體需要的內容模組（無則填 none）
+      archetype: interactive-proof      # Step 3a 後補：依選定風格的版面語法挑做法，可對應 references/recipes/
+      choreo: "transition=zoom-rise; 靜態停 50% 即看懂差距，現場可拖曳"  # Step 3a 後補：依風格 motion_dna 與 visual-guidance 寫轉場與動線
     left:
       heading: 轉型前
       items: [平均 45 天上線, 客戶要自己讀文件]

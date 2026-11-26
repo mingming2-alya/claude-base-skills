@@ -1,0 +1,26 @@
+<section class="slide canvas" data-surface="dark">
+  <style>
+    .slide .grid2 { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    .slide .claim { font: 900 64px/1.15 var(--font-display); color: var(--fg); }
+    .slide .sweep { margin-top: 36px; font: 800 40px/1.2 var(--font-display); color: var(--fg); }
+    .slide [data-deck-card] { font: 700 26px/1.3 var(--font-body); }
+    .slide .wipe { margin-top: 28px; height: 150px; border-radius: 18px; background: linear-gradient(120deg, var(--accent), var(--bg-2)); }
+  </style>
+  <header class="hd">
+    <h2 class="title" data-role="title">產品亮點</h2>
+  </header>
+  <div class="grid2">
+    <div>
+      <div class="claim" data-split-mask>毫秒級推論<br>走進掌心</div>
+      <div class="sweep" data-spotlight-sweep style="--sp-r:170px">光線所至，即是焦點</div>
+    </div>
+    <div>
+      <div data-depth-deck style="height:280px">
+        <article data-deck-card>延遲 8.4 ms</article>
+        <article data-deck-card>功耗 15 W</article>
+        <article data-deck-card>零新硬體</article>
+      </div>
+      <div class="wipe" data-colorize-wipe></div>
+    </div>
+  </div>
+</section>

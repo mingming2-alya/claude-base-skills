@@ -431,7 +431,7 @@
       <h1>風格 × 動態 DNA 融合圖鑑（4 款完整就緒）</h1>
       <p class="sub">嚴守六大鐵律：先立 1920×1080 靜態美感上限與空間分群 → 按語意順序 3 拍從容演繹（每拍 1.4s 含靜止閱讀窗）→ 畫完完全靜止零永動干擾 → 隨時點擊互動立即接管。點 <code>↻ 3拍重播</code> 看完整節奏，點 <code>⛶ 放大</code> 全尺寸體驗。</p>
     </div>
-    <div class="filters" role="tablist" aria-label="依場合篩選推薦風格">
+    <div class="filters" role="tablist" aria-label="依場合標示常用風格（主題優先，不排除其他風格）">
       <button class="flt-btn on" type="button" data-flt="all">全部 4 款</button>
       <button class="flt-btn" type="button" data-flt="briefing">📊 日常匯報 briefing</button>
       <button class="flt-btn" type="button" data-flt="pitch">💡 提案分享 pitch</button>
@@ -587,7 +587,7 @@
       <div class="meta">
         <div class="meta-head">
           <div class="meta-title"><h2>日常工作款</h2><code>workday</code></div>
-          <span class="rec-badge">★ 此場合推薦</span>
+          <span class="rec-badge">★ 此場合常用</span>
         </div>
         <p class="desc">先做空間分群（左欄風險↓拍板＋右欄健康由高到低、雙欄底部對齊）× 3 拍聚光零過衝推演。</p>
         <div class="dna-row">
@@ -665,7 +665,7 @@
       <div class="meta">
         <div class="meta-head">
           <div class="meta-title"><h2>顧問報告</h2><code>counsel</code></div>
-          <span class="rec-badge">★ 此場合推薦</span>
+          <span class="rec-badge">★ 此場合常用</span>
         </div>
         <p class="desc">麥肯錫級「色塊即圖表」雙欄底線齊平 × 3 拍語意揭曉（目標線 → 達標柱 → 超標紅差距）與推鏡景深。</p>
         <div class="dna-row">
@@ -769,7 +769,7 @@
       <div class="meta">
         <div class="meta-head">
           <div class="meta-title"><h2>Apple 發表</h2><code>apple</code></div>
-          <span class="rec-badge">★ 此場合推薦</span>
+          <span class="rec-badge">★ 此場合常用</span>
         </div>
         <p class="desc">雙層微光玻璃平板舞台 × 單向 3 拍語意揭曉（單次光掃後完全靜止）與實時情境重繪。</p>
         <div class="dna-row">
@@ -843,7 +843,7 @@
       <div class="meta">
         <div class="meta-head">
           <div class="meta-title"><h2>插畫場景</h2><code>illustration</code></div>
-          <span class="rec-badge">★ 此場合推薦</span>
+          <span class="rec-badge">★ 此場合常用</span>
         </div>
         <p class="desc">真實無字 3D 手工黏土底圖融真文字 × 單次暖彩喚醒、左→中→右 3 拍時間接力與靜止閱讀窗。</p>
         <div class="dna-row">
@@ -884,14 +884,16 @@
     // ---- Occasion Filter ----
     const cards = [...document.querySelectorAll('.style-card')];
     const flts = [...document.querySelectorAll('.flt-btn')];
+    // Topic comes first (references/contexts.md): the occasion only marks common picks and
+    // never dims other styles. data-fit mirrors styles/index.json stage_fit.
     function applyFilter(mode) {
       flts.forEach(b => b.classList.toggle('on', b.dataset.flt === mode));
       cards.forEach(c => {
-        if (mode === 'all') { c.classList.remove('is-rec', 'is-muted'); }
+        c.classList.remove('is-muted');
+        if (mode === 'all') { c.classList.remove('is-rec'); }
         else {
           const fits = (c.dataset.fit || '').split(/\s+/).includes(mode);
           c.classList.toggle('is-rec', fits);
-          c.classList.toggle('is-muted', !fits);
         }
       });
     }

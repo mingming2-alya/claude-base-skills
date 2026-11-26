@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
-"""Lint a deck-architect v4 storyboard against narrative, structure, constraint, and pacing rules.
+"""Lint a deck-architect storyboard (or brief) against narrative, structure, constraint, and pacing rules.
 
-Usage: python3 lint.py path/to/storyboard.yaml [--json]
+Usage:
+  python3 lint.py path/to/storyboard.yaml [--json]
+  python3 lint.py path/to/brief.md [--json]      # Step 1b: checks the consultant work left traces
 
 Exit code 0 = no errors (warnings allowed), 1 = errors found, 2 = could not read file.
 Every message says what is wrong AND what to do about it, so the agent can fix it directly.
+
+The brief check can only prove that each consultant step was DONE (story seeds, three
+candidates, benchmark gaps, per-chapter objections, proof media). Whether it was done WELL
+is judged by the user at gate 1b.
 """
 import sys
 sys.dont_write_bytecode = True
@@ -25,6 +31,19 @@ from deck_model import (  # noqa: E402
 
 CJK = re.compile(r"[\u3400-\u9fff]")
 TOKEN_RE = re.compile(r"[\u4e00-\u9fff]{2,}|[A-Za-z0-9]{2,}")
+STYLE_INDEX = Path(__file__).resolve().parent.parent / "styles" / "index.json"
+
+
+def _load_style_status():
+    """Map style id -> status ('ready' / 'planned') from styles/index.json; {} if unreadable."""
+    try:
+        idx = json.loads(STYLE_INDEX.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {
+        str(s["id"]).lower(): str(s.get("status") or "")
+        for s in idx.get("styles", []) if isinstance(s, dict) and s.get("id")
+    }
 
 
 def _find_simplified(texts):
@@ -86,6 +105,16 @@ def lint(data):
     nav_mode = str(meta.get("nav_mode") or "").lower()
     if nav_mode and nav_mode not in NAV_MODES:
         E("meta.nav_mode", f"必須是 {', '.join(sorted(NAV_MODES))} 之一（目前：{nav_mode!r}）。")
+    style = str(meta.get("style") or "").strip()
+    if style:
+        style_status = _load_style_status()
+        ready = ", ".join(sorted(k for k, v in style_status.items() if v == "ready"))
+        if style_status and style.lower() not in style_status:
+            W("meta.style", f"「{style}」不在 styles/index.json 的風格清單裡（已就緒：{ready}）。"
+                            "Step 3a 選定的風格要用清單裡的 id，assemble.py 才找得到它的動態 DNA 與禁用清單。")
+        elif style_status and style_status[style.lower()] != "ready":
+            W("meta.style", f"「{style}」還在規劃中（{style_status[style.lower()]}），沒有完整的 Style DNA 與動態套件；"
+                            f"先改用已就緒的風格：{ready}。")
     ptools = meta.get("presenter_tools")
     if ptools is not None:
         if not isinstance(ptools, list):
@@ -488,13 +517,13 @@ def lint(data):
         if d is None:
             continue
         if not isinstance(d, dict):
-            W(f"slides[{n}].director", "director 應為 mapping（建議含 hero / archetype / module / choreo）。")
+            W(f"slides[{n}].director", "director 應為 mapping（Step 2 寫 hero／module；Step 3a 選定風格後補 archetype／choreo）。")
         else:
             dir_count += 1
             if not d.get("hero"):
-                W(f"slides[{n}].director", "缺少 hero（這頁最吸睛的視覺主角是什麼）。")
+                W(f"slides[{n}].director", "缺少 hero（這頁最吸睛的視覺主角是什麼，對應 brief 的說服載體）。")
     if stage_mode in ("pitch", "keynote") and len(content_main) >= 4 and dir_count == 0:
-        I("slides.director", f"stage_mode={stage_mode} 目前尚未填寫逐頁 director 分鏡（hero/archetype/module/choreo）；建議至少替關鍵頁補齊，避免 Step 4 退回純文字卡片。")
+        I("slides.director", f"stage_mode={stage_mode} 目前尚未填寫逐頁 director.hero（這頁的視覺主角）；建議至少替關鍵頁補齊，避免 Step 4 退回純文字卡片。archetype／choreo 等 Step 3a 選定風格後再補。")
 
     # ---- visual rhythm: adjacent slides should vary unless in same series
     flow = [(n, s) for n, s in enumerate(slides, 1) if isinstance(s, dict) and not s.get("appendix")]
@@ -524,17 +553,219 @@ def lint(data):
     return errors, warnings, infos
 
 
+# ----------------------------------------------------------------------------- brief.md (Step 1b gate)
+BRIEF_PLACEHOLDER = re.compile(r"<[^<>\n]{0,200}>")
+BRIEF_FIELD = re.compile(r"^\s*[-*]\s*\*\*(.+?)\*\*\s*[：:]\s*(.*)$")
+# Presentation decisions belong to Step 3a (after the style is chosen), never to the brief.
+BRIEF_PRESENTATION_TERMS = (
+    "明暗極性策略", "去框化比例", "導航殼層", "nav_mode", "ambient-fx",
+    "motion-workday", "motion-counsel", "motion-apple", "motion-story",
+)
+
+
+def _unfilled(value):
+    v = (value or "").strip()
+    return (not v) or v in ("…", "...", "-", "—") or bool(BRIEF_PLACEHOLDER.search(v))
+
+
+def _says_none(value):
+    """True for an explicit 'none' answer (無／略過), but not for words like 無人機 or 無塵室."""
+    v = (value or "").strip()
+    return bool(re.match(r"^(無|略過)(?:$|[\s。．.,，、；;：:（(／/])", v))
+
+
+def lint_brief(text):
+    """Check that brief.md carries every trace the consultant process must leave behind."""
+    errors, warnings, infos = [], [], []
+    E = lambda where, msg: errors.append(f"[ERROR] {where}: {msg}")  # noqa: E731
+    W = lambda where, msg: warnings.append(f"[WARN]  {where}: {msg}")  # noqa: E731
+    I = lambda where, msg: infos.append(f"[INFO]  {where}: {msg}")  # noqa: E731
+
+    lines = text.splitlines()
+    section = ""      # current "## " heading
+    sub = ""          # current "### " heading
+    fields = []       # (section, sub, label, value, line_no)
+    chapters = []     # (title, line_no) of ### blocks inside section 5
+    bullets_by_section = {}
+    for no, line in enumerate(lines, 1):
+        if line.startswith("## "):
+            section, sub = line[3:].strip(), ""
+            continue
+        if line.startswith("### "):
+            sub = line[4:].strip()
+            if section.startswith("5.") and not sub.startswith(("招牌亮點頁", "內容減法清單")):
+                chapters.append((sub, no))
+            continue
+        m = BRIEF_FIELD.match(line)
+        if m:
+            fields.append((section, sub, m.group(1).strip(), m.group(2).strip(), no))
+        elif re.match(r"^\s*[-*]\s+\S", line):
+            bullets_by_section.setdefault((section, sub), []).append((line.strip()[1:].strip(), no))
+
+    def find(prefix, sec=None, sb=None):
+        for s, b, label, value, no in fields:
+            if label.startswith(prefix) and (sec is None or s.startswith(sec)) and (sb is None or b == sb):
+                return value, no
+        return None, None
+
+    reported = set()
+
+    def need(prefix, where, strict, hint, sec=None):
+        value, no = find(prefix, sec)
+        if no is None:
+            (E if strict else W)(where, f"找不到「{prefix}」欄位。{hint}")
+            return None
+        if _unfilled(value):
+            reported.add(no)
+            (E if strict else W)(f"{where}（第 {no} 行）", f"還沒填。{hint}")
+            return None
+        return value
+
+    # ---- mode
+    mode_val, mode_no = find("製作模式")
+    fast = False
+    if mode_no is None or _unfilled(mode_val) or (("標準" in mode_val) == ("快速" in mode_val)):
+        if mode_no:
+            reported.add(mode_no)
+        E("1. 製作模式", "請寫明「標準」或「快速」。快速模式會放寬故事種子、候選數與反方質疑的檢查。")
+    else:
+        fast = "快速" in mode_val
+    strict = not fast
+
+    # ---- section 1–2: situation, benchmark, occasion
+    need("理性終點", "1. 理性終點", True, "聽完之後對方要相信什麼、做出什麼決定。")
+    need("體感預期", "1. 體感預期", strict, "演完燈亮那一刻，希望台下心裡冒出的那句話。")
+    need("對象起點", "1. 對象起點", True, "誰會聽、在意什麼、有什麼疑慮。")
+    need("主題類型與氣質", "1. 主題類型與氣質", True, "對照 contexts.md〈主題類型總表〉；Step 3a 靠它推薦風格。")
+    need("標竿必答維度與處置", "1. 標竿盲點", strict, "列出這類標竿必答的維度，逐項寫「已補齊」或「刻意略過（理由）」。")
+    need("時長與頁數算術", "1. 時長與頁數", True, "寫明分鐘數與頁數上限（含／不含封面與目錄）。")
+    sm = need("舞台光譜", "2. stage_mode", True, "briefing／pitch／keynote 三選一。")
+    stage = ""
+    if sm is not None:
+        hits = [k for k in ("briefing", "pitch", "keynote") if k in sm.lower()]
+        if len(hits) != 1:
+            E("2. stage_mode", f"要三選一（目前：{sm}）。")
+        else:
+            stage = hits[0]
+    dv = need("播放方式", "2. delivery", True, "talk／discuss／read／auto 四選一。")
+    if dv is not None:
+        hits = [k for k in ("talk", "discuss", "read", "auto") if k in dv.lower()]
+        if len(hits) != 1:
+            E("2. delivery", f"要四選一（目前：{dv}）。")
+    need("播放環境", "2. 播放環境", strict, "亮室會議室／暗場大螢幕／線上分享／列印或寄送；Step 3a 依它校準明暗。")
+
+    # ---- section 3: story seeds
+    seed = need("種子 1", "3. 故事種子", strict,
+                "先問使用者最想讓聽眾記住的 1–3 個時刻、案例、畫面或原話，敘事候選要圍繞它們長出來。")
+    if seed is not None and _says_none(seed) and strict:
+        W("3. 故事種子", "寫的是「無」。標準模式建議再試一次：用 Pre-Flight 讀到的素材提幾個候選種子給使用者挑或改寫。")
+    need("一句話核心訊息", "3. 一句話核心訊息", True, "若聽眾只記得一句話，是哪一句。")
+
+    # ---- section 4: candidates (Design It Twice) and the choice
+    need("候選 A", "4. 候選 A", strict, "穩健守正版：軸與方向、章節停靠點、用到的種子。")
+    b = need("候選 B", "4. 候選 B", strict, "聽眾痛點／反方逆推版。")
+    c = need("候選 C", "4. 候選 C（破框）", strict, "破框敘事版：打破了哪個慣例。")
+    if strict and c is not None and _says_none(c):
+        E("4. 候選 C（破框）", "標準模式一定要給至少 1 個破框敘事候選（DESIGN-IT-TWICE），不能略過。")
+    if strict and b is not None and _says_none(b):
+        E("4. 候選 B", "標準模式要給三個本質不同的候選，不能略過。")
+    need("選定與理由", "4. 選定與理由", True, "選了哪個或怎麼混搭，以及為什麼它能把聽眾帶到終點。")
+    in4, stops = False, []
+    for no, line in enumerate(lines, 1):
+        if line.startswith("## "):
+            in4 = line[3:].strip().startswith("4.")
+            continue
+        m = re.match(r"^\s*\d+\.\s+(.*)$", line)
+        if in4 and m:
+            stops.append((m.group(1), no))
+    if len([t for t, _ in stops if not _unfilled(t)]) < 2:
+        for t, n in stops:
+            if _unfilled(t):
+                reported.add(n)
+        E("4. 章節", "第 4 節的章節停靠點至少要 2 個（每個寫章名、分鐘數與這章唯一要記住的一件事）。")
+
+    # ---- section 5: per-chapter depth
+    if len(chapters) < 2:
+        E("5. 逐章內容", f"只找到 {len(chapters)} 章。每一章一個「### 章名」小節，架構至少要 2 個停靠點。")
+    for title, no in chapters:
+        where = f"5. {title}"
+        if _unfilled(title):
+            reported.add(no)
+            E(f"{where}（第 {no} 行）", "章名還沒填。")
+        for prefix, strict_field, hint in (
+            ("唯一記憶點", True, "這章講完，聽眾只帶走的那一件事。"),
+            ("反方質疑與回應", strict, "最挑剔的聽眾會怎麼挑戰，以及我們怎麼回應或交代邊界。"),
+            ("說服載體", strict, "用什麼證明這章的論點（白話描述）；Step 3a 會拿它回頭篩風格。"),
+        ):
+            value, vno = find(prefix, "5.", title)
+            if vno is None:
+                (E if strict_field else W)(where, f"缺少「{prefix}」。{hint}")
+            elif _unfilled(value):
+                reported.add(vno)
+                (E if strict_field else W)(f"{where}（第 {vno} 行）", f"「{prefix}」還沒填。{hint}")
+
+    hl, hl_no = find("亮點頁 1", "5.")
+    if stage in ("pitch", "keynote") and (hl_no is None or _unfilled(hl) or _says_none(hl)):
+        if hl_no:
+            reported.add(hl_no)
+        W("5. 招牌亮點頁", f"stage_mode={stage} 建議至少拍板 1 個招牌亮點頁（pitch 1–2、keynote 2–3），用白話描述畫面與互動。")
+
+    reduction = [(t, n) for (s, sb), items in bullets_by_section.items()
+                 if s.startswith("5.") and sb.startswith("內容減法清單") for t, n in items]
+    if not reduction or all(_unfilled(t) for t, _ in reduction):
+        for _, n in reduction:
+            reported.add(n)
+        W("5. 內容減法清單", "還沒填。列出要移進 notes 的長段落；真的沒有就寫「無」。")
+
+    # ---- section 6: number check
+    facts = [(t, n) for (s, sb), items in bullets_by_section.items() if s.startswith("6.") for t, n in items]
+    facts += [(v, n) for s, sb, label, v, n in fields if s.startswith("6.")]
+    if not facts or all(_unfilled(t) for t, _ in facts):
+        for _, n in facts:
+            reported.add(n)
+        E("6. 數字查核", "還沒填。逐項寫出處、口徑與查核結果；沒有數據就寫「無：目前沒有可確認的數據」。")
+
+    # ---- section 8: constraints
+    need("限制與不承諾", "8. limitations", strict, "做不到、有限制、不能承諾的邊界；沒有就寫「無」。")
+
+    # ---- pillar boundary: presentation decisions do not belong in the brief
+    leaked = sorted({t for t in BRIEF_PRESENTATION_TERMS if t in text})
+    if leaked:
+        W("主柱邊界", f"brief 出現呈現層決定（{', '.join(leaked)}）。明暗、去框比例、導航、氛圍與風格動態要等 "
+                     "Step 3a 選定風格後才決定，寫進 storyboard.yaml；brief 只記內容、場合與說服載體。")
+
+    # ---- anything else still holding a template placeholder
+    leftovers = [no for no, line in enumerate(lines, 1)
+                 if no not in reported and BRIEF_PLACEHOLDER.search(line) and "選填" not in line
+                 and not line.lstrip().startswith((">", "#", "<!--"))]
+    if leftovers:
+        shown = "、".join(str(n) for n in leftovers[:12]) + ("…" if len(leftovers) > 12 else "")
+        W("未填欄位", f"還有 {len(leftovers)} 行留著 <…> 範本文字（第 {shown} 行）。換成實際內容，不適用就寫「無」。")
+
+    I("brief", f"製作模式：{'快速' if fast else '標準'}；找到 {len(chapters)} 章。"
+               "lint 只檢查顧問流程有沒有留下產出；內容好不好，由使用者在關卡 1b 判斷。")
+    return errors, warnings, infos
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if len(args) != 1:
         print(__doc__)
         sys.exit(2)
-    try:
-        data = load(args[0])
-    except StoryboardError as e:
-        print(f"[ERROR] {e}")
-        sys.exit(2)
-    errors, warnings, infos = lint(data)
+    if args[0].lower().endswith(".md"):
+        try:
+            text = Path(args[0]).read_text(encoding="utf-8")
+        except OSError as e:
+            print(f"[ERROR] 讀不到 {args[0]}：{e}")
+            sys.exit(2)
+        errors, warnings, infos = lint_brief(text)
+    else:
+        try:
+            data = load(args[0])
+        except StoryboardError as e:
+            print(f"[ERROR] {e}")
+            sys.exit(2)
+        errors, warnings, infos = lint(data)
     if "--json" in sys.argv:
         print(json.dumps({"errors": errors, "warnings": warnings, "infos": infos}, ensure_ascii=False, indent=2))
     else:

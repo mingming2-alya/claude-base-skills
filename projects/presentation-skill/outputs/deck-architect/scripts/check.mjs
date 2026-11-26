@@ -28,6 +28,19 @@ import { pathToFileURL } from 'url';
 
 const require = createRequire(import.meta.url);
 
+// Signature motion primitives of a style, from the single style × motion database.
+function loadStyleDna(styleId) {
+  if (!styleId) return null;
+  try {
+    const idx = JSON.parse(fs.readFileSync(new URL('../styles/index.json', import.meta.url), 'utf8'));
+    const st = (idx.styles || []).find(s => String(s.id).toLowerCase() === styleId);
+    if (!st) return null;
+    return { status: st.status, signature: (st.motion_dna && st.motion_dna.signature_motions) || [] };
+  } catch {
+    return null;
+  }
+}
+
 // ----------------------------------------------------------------------------- browser abstraction
 function findChromium() {
   const candidates = [
@@ -56,13 +69,25 @@ async function createPlaywrightDriver() {
   const browser = await chromium.launch(opts);
   const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
   const errors = [];
-  page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
+  const notices = [];
+  page.on('console', m => {
+    if (m.type() !== 'error') return;
+    const url = (typeof m.location === 'function' && m.location()?.url) || '';
+    // Offline or firewalled: Google Fonts cannot load. The shell has a built-in system-font
+    // fallback, so this is a notice, not a failure.
+    if (/^Failed to load resource/.test(m.text()) && /fonts\.(googleapis|gstatic)\.com/.test(url)) {
+      if (!notices.length) notices.push('網路受限時載不到 Google Fonts，已由系統字體頂替（底盤內建退路，不算錯誤）。');
+      return;
+    }
+    errors.push(m.text());
+  });
   page.on('pageerror', e => errors.push(String(e)));
 
   return {
     name: 'playwright',
     clearErrors() { errors.length = 0; },
     getErrors() { return [...errors]; },
+    getNotices() { return [...notices]; },
     async setViewport(width, height) { await page.setViewportSize({ width, height }); },
     async goto(url) {
       await page.goto(url, { waitUntil: 'networkidle', timeout: 25000 }).catch(() => page.goto(url, { waitUntil: 'load' }));
@@ -195,6 +220,7 @@ async function createCdpDriver() {
     name: 'chromium-cdp',
     clearErrors() { errors.length = 0; },
     getErrors() { return [...errors]; },
+    getNotices() { return []; },
     async setViewport(width, height) {
       await send('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });
     },
@@ -268,9 +294,35 @@ const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.
 const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
 const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 
+// OKLCH -> sRGB 0–255 (Björn Ottosson's OKLab matrices), for gradient stops read as strings.
+function oklchToRgb(L, C, H) {
+  const a = C * Math.cos((H * Math.PI) / 180);
+  const b = C * Math.sin((H * Math.PI) / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.2914855480 * b) ** 3;
+  const lin = [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s,
+  ];
+  return lin.map(c => {
+    const v = Math.min(1, Math.max(0, c));
+    return Math.round(255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055));
+  });
+}
+
 function parseColorStops(bgImage) {
   const stops = [];
   if (!bgImage || !bgImage.includes('gradient')) return stops;
+  for (const m of bgImage.matchAll(/oklch\(\s*([\d.]+)(%?)\s+([\d.]+)\s+([\d.]+)(?:deg)?(?:\s*\/\s*([\d.]+)(%?))?\s*\)/g)) {
+    const a = m[5] === undefined ? 1 : parseFloat(m[5]) / (m[6] ? 100 : 1);
+    if (a >= 0.4) stops.push(oklchToRgb(parseFloat(m[1]) / (m[2] ? 100 : 1), parseFloat(m[3]), parseFloat(m[4])));
+  }
+  for (const m of bgImage.matchAll(/color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/g)) {
+    const a = m[4] === undefined ? 1 : parseFloat(m[4]);
+    if (a >= 0.4) stops.push([+m[1], +m[2], +m[3]].map(v => Math.round(Math.min(1, Math.max(0, v)) * 255)));
+  }
   for (const m of bgImage.matchAll(/rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+))?\s*\)/g)) {
     const a = m[4] !== undefined ? parseFloat(m[4]) : 1;
     if (a >= 0.4) stops.push([+m[1], +m[2], +m[3]]);
@@ -295,6 +347,20 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
     const scale = sr.width ? sr.width / 1920 : 1;
     const issues = [];
     const warnings = [];
+    // Normalise any computed CSS color (rgb, hex, oklch, color(srgb …), color-mix) to sRGB 0–255
+    // by painting one pixel: the skill's palettes are OKLCH, so string parsing is not enough.
+    const __cv = document.createElement('canvas');
+    __cv.width = __cv.height = 1;
+    const __cx = __cv.getContext('2d', { willReadFrequently: true });
+    const toRgba = c => {
+      if (!c) return null;
+      __cx.clearRect(0, 0, 1, 1);
+      __cx.fillStyle = 'rgba(0,0,0,0)';
+      __cx.fillStyle = c;
+      __cx.fillRect(0, 0, 1, 1);
+      const d = __cx.getImageData(0, 0, 1, 1).data;
+      return [d[0], d[1], d[2], d[3] / 255];
+    };
 
     // 1. Duplicate IDs inside SVGs of the active slide
     const seenIds = new Set();
@@ -325,8 +391,10 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
     const badFonts = [...(document.fonts || [])].filter(f => f.status === 'error').map(f => f.family);
     if (badFonts.length) warnings.push(`字體載入失敗（使用系統退路）：${[...new Set(badFonts)].join(', ')}`);
 
-    // 4. Container scroll overflow
-    for (const el of sl.querySelectorAll('.cover-inner, .shock-inner, .closing-inner, .pillars, .st-body, [data-check-box]')) {
+    // 4. Container scroll overflow (fixed-height boxes only). .cover-inner and .closing-inner are
+    // auto-height blocks anchored to the bottom: with a fallback font their giant line boxes report
+    // scroll overflow that is never clipped, so they rely on the canvas bounds check instead.
+    for (const el of sl.querySelectorAll('.shock-inner, .pillars, .st-body, [data-check-box]')) {
       if (el.scrollHeight > el.clientHeight + 3 || el.scrollWidth > el.clientWidth + 3) {
         issues.push(`區塊內容溢出（${el.className || el.tagName}）：${el.scrollWidth}x${el.scrollHeight} / ${el.clientWidth}x${el.clientHeight}`);
       }
@@ -392,8 +460,8 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
         const isSvg = el instanceof SVGElement;
         const clip = cs.webkitBackgroundClip || cs.backgroundClip || '';
         const fillCol = isSvg ? cs.fill : (cs.webkitTextFillColor || cs.color);
-        const m = (fillCol || '').match(/[\d.]+/g);
-        const alpha = m && m.length > 3 ? parseFloat(m[3]) : 1;
+        const rgba = /^(none|url\()/.test(fillCol || '') ? null : toRgba(fillCol);
+        const alpha = rgba ? rgba[3] : 1;
         const isGrad = !isSvg && clip.includes('text') && alpha < 0.2 && (cs.backgroundImage || '').includes('gradient');
         if (isGrad) {
           el.classList.add('__check_hide_grad');
@@ -401,10 +469,10 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
             text: txt.slice(0, 14), x: r.left, y: r.top, w: r.width, h: r.height,
             size: fs, weight: fw, gradient: cs.backgroundImage, rgb: null,
           });
-        } else if (m && alpha >= 0.4) {
+        } else if (rgba && alpha >= 0.4) {
           runs.push({
             text: txt.slice(0, 14), x: r.left, y: r.top, w: r.width, h: r.height,
-            size: fs, weight: fw, gradient: null, rgb: m.slice(0, 3).map(Number),
+            size: fs, weight: fw, gradient: null, rgb: rgba.slice(0, 3),
           });
         }
       }
@@ -804,8 +872,14 @@ async function runMotionAudit(driver, filePath) {
       const info = await driver.evaluate(i => {
         const sl = window.__deck.slides[i];
         const bg = getComputedStyle(sl).backgroundColor;
-        const m = (bg || '').match(/[\d.]+/g);
-        const rgb = m ? m.slice(0, 3).map(Number) : [0, 0, 0];
+        // Paint one pixel so oklch()/color() backgrounds are measured correctly, not string-parsed.
+        const cv = document.createElement('canvas');
+        cv.width = cv.height = 1;
+        const cx = cv.getContext('2d', { willReadFrequently: true });
+        cx.fillStyle = '#000';
+        cx.fillStyle = bg || '#000';
+        cx.fillRect(0, 0, 1, 1);
+        const rgb = [...cx.getImageData(0, 0, 1, 1).data.slice(0, 3)];
         const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
         const l = 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]);
         return { activeSurface: window.__deck.activeSurface, l, bg };
@@ -1441,7 +1515,11 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
       ['data-count', sl => Boolean(sl.querySelector('[data-count]'))],
       ['data-step', sl => Boolean(sl.querySelector('[data-step], [data-step-only]'))],
       ['data-transform-at', sl => Boolean(sl.querySelector('[data-transform-at]'))],
-      ['style-motion-kit', sl => Boolean(sl.querySelector('[data-ruler-progress], [data-bento-expand], [data-rank-race], [data-odometer], [data-rack-focus], [data-split-mask], [data-spotlight-sweep], [data-depth-deck], [data-colorize-wipe], [data-popup-fold], [data-chat-replay]'))],
+      // The 11 style-bound motion primitives are counted one by one: they are the dynamic
+      // "extreme" of each style, and the style-fit line below checks the chosen style's own.
+      ...['ruler-progress', 'bento-expand', 'rank-race', 'odometer', 'rack-focus', 'split-mask',
+        'spotlight-sweep', 'depth-deck', 'colorize-wipe', 'popup-fold', 'chat-replay']
+        .map(id => [id, sl => Boolean(sl.querySelector(`[data-${id}]`))]),
       ['interactive-module', sl => Boolean(sl.querySelector('[data-flow-carousel], [data-coverflow], [data-marquee], [data-compare-slider], [data-code-stage], [data-ref], [data-sound-ab], [data-sound-demo], [data-slide-video], .live-ctrl input[type="range"], [data-segmented]'))],
     ];
     let visualCount = 0;
@@ -1474,6 +1552,7 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
     const visualRatio = totalContent ? Math.round((visualCount / totalContent) * 100) : 100;
     return {
       stageMode,
+      style: String((window.DECK && window.DECK.style) || '').toLowerCase(),
       totalContent,
       visualCount,
       visualRatio,
@@ -1496,6 +1575,8 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
     '',
   ];
   if (jsErrs.length) lines.push('## 主控台／腳本錯誤', ...jsErrs.map(e => `- ${e}`), '');
+  const notices = typeof driver.getNotices === 'function' ? driver.getNotices() : [];
+  if (notices.length) lines.push('## 提示', ...notices.map(n => `- ${n}`), '');
   if (problems.length) {
     lines.push('## 問題（需修正）');
     for (const p of problems) {
@@ -1521,9 +1602,22 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
     if (liveliness.maxFlatStreak > maxStreakAllow) {
       liveWarns.push(`出現連續 ${liveliness.maxFlatStreak} 頁純文字無圖解頁面`);
     }
+    // Style fit: pillar 2 asks for the chosen style's own dynamic extreme, not for any motion.
+    const dna = loadStyleDna(liveliness.style);
+    let fitLine;
+    if (!dna || dna.status !== 'ready' || !dna.signature.length) {
+      fitLine = `- 風格契合：略過（\`meta.style\`=${liveliness.style || '未設定'}，不是已就緒風格）`;
+    } else {
+      const usedSig = dna.signature.filter(id => liveliness.primitives.includes(id));
+      fitLine = `- 風格契合（\`${liveliness.style}\` 招牌動態：${dna.signature.join('、')}）：用到 **${usedSig.length}/${dna.signature.length}**${usedSig.length ? `（${usedSig.join('、')}）` : ''}`;
+      if (!usedSig.length && mode !== 'briefing') {
+        liveWarns.push(`選定風格 ${liveliness.style} 的招牌動態一個都沒用到（${dna.signature.join('、')}）；主柱二要的是這款風格的動態極致，Polish Pass 先從招牌動態補，不要疊不屬於這款風格的效果`);
+      }
+    }
     lines.push(`## 生動度與反單調體檢（Liveliness Audit · \`stage_mode=${mode}\`）`);
     lines.push(`- 視覺／圖表／互動頁佔比：**${liveliness.visualCount}/${liveliness.totalContent}（${liveliness.visualRatio}%）**（標準 ≥ ${minVis}%）`);
     lines.push(`- 動態與互動原語多樣性：**${liveliness.primitives.length} 種**（${liveliness.primitives.join('、') || '無'}；標準 ≥ ${minPrim} 種）`);
+    lines.push(fitLine);
     if (liveWarns.length) {
       for (const lw of liveWarns) lines.push(`- ⚠️ [WARN] ${lw}`);
       if (liveliness.polishCandidates.length) {

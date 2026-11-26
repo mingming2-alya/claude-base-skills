@@ -527,7 +527,16 @@
   }
   initPrimitives();
 
-  let focusToken = 0;
+  // Per-slide focus-plan tokens. A single global counter let clearGuidanceState(prev), which runs
+  // after the page transition finishes, cancel the NEXT slide's freshly started plan, leaving it
+  // stuck at beat 1 with every other card dimmed.
+  const focusTokens = new WeakMap();
+  const bumpFocus = sl => {
+    if (!sl) return 0;
+    const t = (focusTokens.get(sl) || 0) + 1;
+    focusTokens.set(sl, t);
+    return t;
+  };
 
   function clearFocusClasses(sl) {
     if (!sl) return;
@@ -538,13 +547,14 @@
   }
 
   function clearFocus(sl) {
-    focusToken++;
-    clearFocusClasses(sl || slides[cur]);
+    const target = sl || slides[cur];
+    bumpFocus(target);
+    clearFocusClasses(target);
   }
 
   function clearGuidanceState(sl) {
     if (!sl) return;
-    focusToken++;
+    bumpFocus(sl);
     clearFocusClasses(sl);
     sl.querySelectorAll('[data-transform-at]').forEach(el => {
       el.classList.remove('pre-transform', 'transforming');
@@ -859,10 +869,10 @@
     const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
     const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
     if (focusPlan.length && focusEls.length) {
-      const myFocusToken = ++focusToken;
+      const myFocusToken = bumpFocus(sl);
       const visited = new Set();
       const applyStage = activeId => {
-        if (token !== navToken || myFocusToken !== focusToken || isStatic()) return;
+        if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
         sl.classList.add('is-focusing');
         for (const el of focusEls) {
           const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
@@ -881,14 +891,14 @@
           applyStage(stepItem.id);
         } else {
           later(() => {
-            if (token !== navToken || myFocusToken !== focusToken || isStatic()) return;
+            if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
             for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
             applyStage(stepItem.id);
           }, startAt);
         }
       });
       later(() => {
-        if (token !== navToken || myFocusToken !== focusToken) return;
+        if (token !== navToken || myFocusToken !== focusTokens.get(sl)) return;
         clearFocusClasses(sl);
       }, baseDelay + maxEnd);
     }

@@ -1,0 +1,20 @@
+<section class="slide canvas" data-surface="light">
+  <style>
+    .slide .grid2 { flex: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+    .slide .bx { display: grid; gap: 18px; }
+    .slide .bx .card { padding: 24px 28px; border-radius: 20px; border: 1px solid var(--line); background: var(--bg-2); }
+    .slide .bx h4 { font: 800 28px/1.25 var(--font-body); color: var(--fg); }
+    .slide .bx p { font: 600 22px/1.4 var(--font-body); color: var(--fg-2); }
+  </style>
+  <header class="hd">
+    <h2 class="title" data-role="title">進度刻度</h2>
+    <p class="sub" data-role="summary">北區移轉已到 <mark class="em">86%</mark>，越過 80% 目標線。</p>
+  </header>
+  <div class="grid2">
+    <div data-ruler-progress data-label="北區產線移轉完成度" data-value="86" data-max="100" data-target="80" data-unit="%" data-target-label="目標 80%"></div>
+    <div class="bx" data-bento-expand>
+      <article class="card" data-bento-item><h4>北區倉儲延遲 4 天</h4><div data-bento-detail><div><p>已調撥 2 條備援物流線</p></div></div></article>
+      <article class="card" data-bento-item><h4>南區按進度</h4><div data-bento-detail><div><p>本週無需介入</p></div></div></article>
+    </div>
+  </div>
+</section>

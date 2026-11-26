@@ -14,21 +14,23 @@
     .slide .row { display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: baseline; padding: 34px 0; border-bottom: 1px solid rgba(23,26,32,0.14); }
     .slide .row:last-child { border-bottom: none; }
     .slide .num { font: 900 56px/1 var(--font-number); color: var(--light-accent, #0F766E); }
-    .slide .txt strong { display: block; font: 800 28px/1.25 var(--font-body); }
-    .slide .txt span { display: block; margin-top: 6px; font: 500 21px/1.45 var(--font-body); color: #475569; }
+    .slide .txt strong { display: block; font: 800 30px/1.25 var(--font-body); }
   </style>
   <div class="anchor">
-    <div style="font:700 18px/1 var(--font-label);opacity:.7">KEY TAKEAWAYS</div>
     <h2 data-role="title">三個里程碑</h2>
-    <div style="font-size:20px;opacity:.75">2026 年度實測收斂</div>
+    <div style="font-size:22px;opacity:.75">2026 年度實測</div>
   </div>
   <div class="rows">
-    <div class="row"><div class="num" data-count>8.4ms</div><div class="txt"><strong>推論延遲壓進毫秒級</strong><span>從 27.6 ms 下降 70%，無須雲端回傳。</span></div></div>
-    <div class="row" data-step="1"><div class="num" data-count>-62%</div><div class="txt"><strong>峰值記憶體大幅釋放</strong><span>15W 無風扇邊緣裝置即可全速常駐。</span></div></div>
-    <div class="row" data-step="2"><div class="num" data-count>99.4%</div><div class="txt"><strong>三條產線連續零超時</strong><span>品質閘門自動保底，確保產線不停機。</span></div></div>
+    <div class="row"><div class="num" data-count>8.4ms</div><div class="txt"><strong>推論延遲壓進毫秒級</strong></div></div>
+    <div class="row" data-step="1"><div class="num" data-count>-62%</div><div class="txt"><strong>峰值記憶體大幅釋放</strong></div></div>
+    <div class="row" data-step="2"><div class="num" data-count>99.4%</div><div class="txt"><strong>三條產線連續零超時</strong></div></div>
   </div>
 </section>
 ```
+
+> **導航**：這頁是滿版分割、自己處理邊距（`padding: 0`）。整份簡報用 `top-bar` 頂部導航時，替這頁加 `nav: none`（storyboard）或 `data-nav="none"`，像震撼頁一樣淨空導航，否則頂列會壓在深色錨點上。
+>
+> **原則 #26**：每列只放「巨數＋短標」兩層。原本的第三層說明（「從 27.6 ms 下降 70%，無須雲端回傳」「15W 無風扇裝置即可全速常駐」「品質閘門自動保底」）是講者會口頭補充的內容，寫進這頁的 `notes`；左欄只留題目與一行時間範圍，不放英文小標。
 
 ### 型態 B｜全黑暗房原話見證（Verbatim Theater，原則 #26 合法豁免）
 ```html

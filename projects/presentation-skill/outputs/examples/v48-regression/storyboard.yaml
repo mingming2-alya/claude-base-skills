@@ -1,0 +1,104 @@
+# v4.8 引擎回歸測試：4 套風格動態套件（11 個原語）＋ unlisted 藏牌章節＋ templates/deck.css 畫布基礎排版。
+# 這份簡報刻意混用 4 套套件來測引擎，assemble.py 對 counsel 禁用 popup-fold 的 [WARN] 屬預期。
+meta:
+  title: 引擎回歸測試
+  subtitle: 四套風格動態原語與藏牌章節
+  presenter: deck-architect 品管
+  date: 2026.11
+  delivery: talk
+  stage_mode: pitch
+  style: counsel
+  mode: light
+  minutes: 8
+  pages: 10
+  lang: zh-Hant
+
+structure:
+  start: 改版後還沒確認四套動態套件與藏牌章節是否正常
+  destination: 確認引擎在 v4.8 沒有退化
+  axis: process
+  direction: 日常工作 → 顧問 → 發表 → 故事
+  sensitivity: false
+
+chapters:
+  - id: work
+    label: 工作與顧問
+    minutes: 3
+  - id: stage
+    label: 發表與故事
+    minutes: 3
+  - id: bonus
+    label: 藏牌
+    minutes: 1
+    unlisted: true
+
+slides:
+  - type: cover
+
+  - chapter: work
+    title: 進度刻度
+    layout: free
+    file: slides/02-workday.html
+    director:
+      hero: 刻度尺推進到 86% 並越過目標線
+      module: motion-workday
+    notes: 測試 ruler-progress 與 bento-expand。
+
+  - chapter: work
+    title: 方案排名
+    layout: free
+    file: slides/03-counsel.html
+    director:
+      hero: 方案 A 從第二名超車到第一名
+      module: motion-counsel
+    notes: 測試 rank-race、odometer 與 rack-focus。
+
+  - chapter: work
+    title: 本季進度與風險
+    layout: free
+    file: slides/03b-bento-focus.html
+    director:
+      hero: 左欄唯一風險到拍板、右欄健康總覽
+      module: none
+    notes: 測試 bento-causal 配方的 data-focus-plan 三拍聚光，演完要 100% 復原（v4.8 修掉換頁後卡在第 1 拍的問題）。
+
+  - chapter: work
+    title: 三個里程碑
+    layout: free
+    file: slides/04-editorial.html
+    surface: split
+    nav: none
+    director:
+      hero: 左側深色錨點＋右側三列巨數
+      module: none
+    notes: 測試 editorial-drama 型態 A（兩層字版本）在 templates/deck.css 下的排版。延遲從 27.6 ms 下降 70%；15W 無風扇裝置可全速常駐；品質閘門自動保底。
+
+  - chapter: stage
+    title: 產品亮點
+    layout: free
+    file: slides/05-apple.html
+    surface: dark
+    director:
+      hero: 斬切標題與 3D 疊卡
+      module: motion-apple
+    notes: 測試 split-mask、spotlight-sweep、depth-deck 與 colorize-wipe。
+
+  - chapter: stage
+    title: 使用者故事
+    layout: free
+    file: slides/06-story.html
+    director:
+      hero: 立體書翻折與對話氣泡
+      module: motion-story
+    notes: 測試 popup-fold 與 chat-replay。
+
+  - chapter: bonus
+    title: 還有一件事
+    layout: free
+    file: slides/07-unlisted.html
+    surface: dark
+    notes: 測試 unlisted 章節不會出現在封面路線、目錄與常駐導航。
+
+  - type: closing
+    text: 測試結束
+    sub: 跑完 lint、assemble、check 三步
