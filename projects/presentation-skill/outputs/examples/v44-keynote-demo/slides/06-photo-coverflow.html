@@ -1,0 +1,136 @@
+<style>
+.slide .backdrop-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 22% 28%, rgba(60, 212, 154, 0.22) 0%, transparent 45%),
+    radial-gradient(circle at 78% 72%, rgba(72, 148, 224, 0.20) 0%, transparent 48%),
+    linear-gradient(135deg, #0E131C 0%, #151C28 50%, #0C1017 100%);
+}
+.slide .head {
+  position: absolute;
+  left: 108px;
+  right: 108px;
+  top: 68px;
+  z-index: 4;
+  text-align: center;
+}
+.slide .eyebrow {
+  font: 700 20px/1 var(--font-label);
+  letter-spacing: 0.14em;
+  color: var(--accent-text);
+  margin-bottom: 12px;
+}
+.slide h2 {
+  font: 900 68px/1.1 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.slide .lead {
+  margin-top: 12px;
+  font: 500 26px/1.4 var(--font-body);
+  color: var(--fg-2);
+}
+.slide .cf-wrap {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  top: 256px;
+  bottom: 72px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.slide .coverflow {
+  --cf-height: 550px;
+  --cf-card-w: 740px;
+  --cf-card-h: 470px;
+}
+.slide .src {
+  position: absolute;
+  left: 108px;
+  bottom: 30px;
+  z-index: 4;
+  font: 400 18px/1.2 var(--font-label);
+  color: var(--fg-3);
+}
+</style>
+<section class="slide canvas" data-surface="photo" data-transition="zoom-rise">
+  <div class="backdrop-art" data-layer="bg" aria-hidden="true"></div>
+  <div class="photo-scrim" aria-hidden="true"></div>
+
+  <header class="head">
+    <div class="eyebrow">03 · 現場體驗 · 3D 照片輪播組件（HTML5 原生透視）</div>
+    <h2 data-role="title">五大日常聲景實拍</h2>
+    <p class="lead" data-role="summary">從早班捷運到深夜母帶監聽，<mark class="em">全天候一致安靜</mark>。</p>
+  </header>
+
+  <div class="cf-wrap">
+    <div class="coverflow" data-coverflow data-initial="2" data-interval="4000" data-spread-x="440">
+      <div class="cf-stage">
+        <figure class="cf-item">
+          <svg viewBox="0 0 740 470" aria-hidden="true">
+            <defs><linearGradient id="sc1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#172A3A"/><stop offset="100%" stop-color="#0B131D"/></linearGradient></defs>
+            <rect width="740" height="470" fill="url(#sc1)"/>
+            <rect x="64" y="96" width="612" height="196" rx="18" fill="rgba(255,255,255,0.06)" stroke="rgba(98,232,181,0.38)" stroke-width="2"/>
+            <line x1="64" y1="216" x2="676" y2="216" stroke="rgba(98,232,181,0.28)" stroke-width="2"/>
+            <circle cx="190" cy="156" r="44" fill="rgba(98,232,181,0.22)"/>
+            <circle cx="548" cy="156" r="64" fill="rgba(98,232,181,0.12)"/>
+          </svg>
+          <figcaption>都會通勤｜早班捷運靜音艙<small>78 dB 車廂低頻轟鳴直降 36 dB</small></figcaption>
+        </figure>
+
+        <figure class="cf-item">
+          <svg viewBox="0 0 740 470" aria-hidden="true">
+            <defs><linearGradient id="sc2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1D2B44"/><stop offset="100%" stop-color="#0C1220"/></linearGradient></defs>
+            <rect width="740" height="470" fill="url(#sc2)"/>
+            <ellipse cx="370" cy="196" rx="220" ry="118" fill="rgba(116,185,255,0.14)" stroke="rgba(170,215,255,0.42)" stroke-width="2"/>
+            <path d="M 150 230 Q 370 140 590 218" stroke="#85C7FF" stroke-width="3" fill="none"/>
+          </svg>
+          <figcaption>高空巡航｜隔離引擎持續低頻<small>12 小時長程航班無耳壓負擔</small></figcaption>
+        </figure>
+
+        <figure class="cf-item">
+          <svg viewBox="0 0 740 470" aria-hidden="true">
+            <defs><linearGradient id="sc3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#13332C"/><stop offset="100%" stop-color="#0B1717"/></linearGradient></defs>
+            <rect width="740" height="470" fill="url(#sc3)"/>
+            <circle cx="370" cy="186" r="120" fill="rgba(60,212,154,0.16)" stroke="rgba(98,232,181,0.48)" stroke-width="2"/>
+            <circle cx="370" cy="186" r="72" fill="rgba(60,212,154,0.22)"/>
+            <path d="M 220 186 C 270 132, 320 240, 370 186 C 420 132, 470 240, 520 186" stroke="#62E8B5" stroke-width="4" fill="none" stroke-linecap="round"/>
+          </svg>
+          <figcaption>開放辦公｜專注同時保留人聲對談<small>智慧人聲通透，免摘耳機即時回應同事</small></figcaption>
+        </figure>
+
+        <figure class="cf-item">
+          <svg viewBox="0 0 740 470" aria-hidden="true">
+            <defs><linearGradient id="sc4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2D231B"/><stop offset="100%" stop-color="#121010"/></linearGradient></defs>
+            <rect width="740" height="470" fill="url(#sc4)"/>
+            <rect x="132" y="108" width="476" height="176" rx="22" fill="rgba(230,181,85,0.10)" stroke="rgba(230,181,85,0.42)" stroke-width="2"/>
+            <line x1="184" y1="196" x2="556" y2="196" stroke="#E6B555" stroke-width="4" stroke-dasharray="14 10"/>
+          </svg>
+          <figcaption>深夜創作｜零底噪母帶級監聽<small>11.4 mm 複合鈦振膜還原真實聲場細節</small></figcaption>
+        </figure>
+
+        <figure class="cf-item">
+          <svg viewBox="0 0 740 470" aria-hidden="true">
+            <defs><linearGradient id="sc5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1B2832"/><stop offset="100%" stop-color="#0B1116"/></linearGradient></defs>
+            <rect width="740" height="470" fill="url(#sc5)"/>
+            <path d="M 90 240 C 210 150, 330 270, 450 170 C 550 110, 610 210, 660 150" stroke="#6CE0D0" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M 90 278 C 220 198, 340 296, 470 212 C 560 162, 620 236, 660 190" stroke="rgba(108,224,208,0.42)" stroke-width="2.5" fill="none"/>
+          </svg>
+          <figcaption>雨夜慢跑｜防風噪通透守護安全<small>自動抑制陣風呼嘯，清晰感知周遭車流</small></figcaption>
+        </figure>
+      </div>
+
+      <div class="cf-controls live-only">
+        <button type="button" class="cf-prev" aria-label="上一張場景">‹</button>
+        <div class="cf-dots"></div>
+        <button type="button" class="cf-next" aria-label="下一張場景">›</button>
+      </div>
+    </div>
+  </div>
+
+  <p class="src" data-role="source">資料來源：海潮聲學 2026 使用者場域實測紀實</p>
+</section>

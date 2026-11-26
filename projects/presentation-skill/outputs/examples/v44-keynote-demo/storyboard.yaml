@@ -1,0 +1,136 @@
+meta:
+  title: 海潮聲學・WaveCore S1 年度發表
+  subtitle: 把嘈雜留在門外，只留真實人聲
+  kicker: 2026 年度聲學發表
+  presenter: 海潮聲學產品團隊
+  date: 2026.12
+  lang: zh-Hant
+  style: apple
+  mode: dark
+  stage_mode: keynote
+  nav_mode: divider-only
+  format: deck
+  delivery: talk
+  minutes: 10
+  pages: 7
+
+structure:
+  start: 聽眾覺得高階降噪耳機已成規格紅海，只剩數字軍備競賽
+  destination: 親身感受到 WaveCore S1 透過聲學腔體、逆相演算法與無感體驗帶來的真實安靜，並支持年底量產上市
+  axis: causal
+  direction: 聲學腔體 → 降噪演算法 → 現場體驗
+  sensitivity: false
+
+constraints:
+  limitations:
+    - 降噪深度 −42 dB 為 80–400 Hz 低頻消音室與通勤實測值，高頻突發尖音採被動隔音輔助
+  forbidden:
+    - 100% 完全靜音
+    - 業界唯一
+  must_include:
+    - "-42 dB"
+    - "11.4 mm"
+    - "38 hr"
+
+chapters:
+  - id: chamber
+    label: 聲學腔體
+    minutes: 3
+  - id: cancel
+    label: 降噪演算法
+    minutes: 4
+  - id: scene
+    label: 現場體驗
+    minutes: 3
+
+slides:
+  - type: cover
+    surface: dark
+    file: slides/01-cover.html
+    notes: >
+      歡迎來到海潮聲學 2026 年度發表。背景循環播放的是 WaveCore S1 的即時聲波開場短片。
+      今天不談冰冷的規格堆砌，只用十分鐘帶大家看我們如何把嘈雜留在門外，只留真實人聲。
+
+  - type: content
+    chapter: chamber
+    title: 雙腔體聲學結構
+    surface: light
+    nav: minimal-side
+    transition: iris
+    signature: true
+    layout: free
+    file: slides/02-chamber-light.html
+    summary: ==11.4 mm== 複合鈦振膜，4.8 克單耳無壓配戴。
+    source: 海潮聲學 2026 聲學實驗室量測報告（N=30 樣機）
+    notes: >
+      切進純淨白棚，我們直接剖開耳機本體看結構。
+      11.4 mm 複合鈦振膜搭配前導微氣孔，讓低頻聲壓在 0.18 毫秒內完成平衡，
+      同時把單耳重量壓在 4.8 克，久戴三小時也不悶脹。
+
+  - type: content
+    chapter: cancel
+    title: 主動逆相降噪原理
+    surface: dark
+    nav: minimal-side
+    transition: zoom-rise
+    layout: free
+    file: slides/03-step-cancel.html
+    summary: 雙麥即時生成逆相聲波，通勤低頻直降 ==−42 dB==。
+    source: 海潮聲學消音室 80–400 Hz 低頻實測（高頻突發尖音採被動隔音輔助）
+    notes: >
+      這頁由講者點擊步進掌控節奏：
+      先停在畫面原本的橘色雜訊波——通勤時最煩的是 80 到 400 Hz 低頻轟鳴。
+      點擊第 1 步：畫出雙麥克風產生的青色逆相波，現場抵銷雜訊。
+      點擊第 2 步：帶出 −42 dB 降噪深度。
+      點擊第 3 步：收斂出 98% 低頻抑制且保留真實人聲的關鍵結論。
+
+  - type: content
+    chapter: cancel
+    title: 捷運車廂親耳實測
+    surface: split
+    transition: push
+    layout: free
+    file: slides/04-sound-split.html
+    summary: 同一段車廂實錄，降噪後低頻底噪由 ==78 降至 36 dB==，總續航 38 hr。
+    source: 台北捷運板南線實地收音（80–400 Hz 頻段，續航 38 hr 含充電盒）
+    notes: >
+      與其看十張圖表，不如現場親耳聽兩秒。
+      先點 A 播放未開降噪的 78 dB 車廂低頻轟鳴，再點 B 瞬間切換 WaveCore ANC。
+      注意系統同時保住 99.2% 人聲清晰度，且總續航達 38 hr。
+      提醒限制：−42 dB 針對 80–400 Hz 低頻，高頻突發尖音仍由耳塞被動隔音輔助。
+
+  - type: content
+    chapter: scene
+    title: 三步無感調校流程
+    surface: light
+    transition: sheet-up
+    layout: free
+    file: slides/05-flow-carousel.html
+    summary: 戴上即完成耳道掃描、場景降噪與 ==多裝置切換==。
+    source: WaveCore Companion App v3.0 互動原型（2026.11）
+    notes: >
+      軟體體驗不必烤成幾百 MB 影片。現場這張互動輪播卡就是 HTML5 原生動態：
+      第一步 3 秒耳道聲學掃描；第二步依環境分貝自動切換降噪深度；
+      第三步筆電會議與手機來電無縫接手。可隨時點擊左側步驟停留講解。
+
+  - type: content
+    chapter: scene
+    title: 五大日常聲景實拍
+    surface: photo
+    transition: zoom-rise
+    layout: free
+    file: slides/06-photo-coverflow.html
+    summary: 從早班捷運到深夜母帶監聽，==全天候一致安靜==。
+    source: 海潮聲學 2026 使用者場域實測紀實
+    notes: >
+      最後用 3D 照片輪播帶大家看五個真實日常場景：
+      早班捷運靜音艙、高空巡航隔離引擎、開放辦公保留同事對話、深夜創作零底噪監聽與雨夜慢跑防風噪。
+      現場可以直接點擊左右卡片聚焦任一場景。
+
+  - type: closing
+    surface: dark
+    file: slides/07-closing.html
+    text: 安靜，是一種設計
+    sub: WaveCore S1 · 12 月 15 日正式上市
+    notes: >
+      先停在「安靜，是一種設計」留白兩秒，再點擊揭示上市日期與收尾致謝。

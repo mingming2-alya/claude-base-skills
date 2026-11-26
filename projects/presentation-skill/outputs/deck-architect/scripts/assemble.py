@@ -333,6 +333,8 @@ def _populate_auto_nav(markup, chapters, chi):
 
 
 IMG_SRC_RE = re.compile(r'(<img\b[^>]*?\bsrc=")([^"]+)(")', re.I)
+VIDEO_POSTER_RE = re.compile(r'(<video\b[^>]*?\bposter=")([^"]+)(")', re.I)
+EXT_MEDIA_SRC_RE = re.compile(r'<(?:video|audio|source)\b[^>]*?\bsrc="([^"]+)"', re.I)
 
 
 def _inline_local_imgs(markup, base_dir):
@@ -352,7 +354,37 @@ def _inline_local_imgs(markup, base_dir):
     return IMG_SRC_RE.sub(repl, markup)
 
 
-def load_free_slide(path, rec, data, idx, base_dir, found_slots):
+def _inline_video_posters(markup, base_dir):
+    """Inline relative local <video poster="..."> images so static/print frames stay offline-safe while video src stays external."""
+    def repl(m):
+        pre, poster, post = m.groups()
+        if poster.startswith(("data:", "http://", "https://", "//", "#")):
+            return m.group(0)
+        p = (base_dir / poster).resolve()
+        if not p.is_file():
+            return m.group(0)
+        mime, _ = mimetypes.guess_type(str(p))
+        mime = mime or "image/png"
+        b64 = base64.b64encode(p.read_bytes()).decode("ascii")
+        return f"{pre}data:{mime};base64,{b64}{post}"
+
+    return VIDEO_POSTER_RE.sub(repl, markup)
+
+
+def _check_external_media(markup, base_dir, slide_id, media_refs):
+    """Keep <video>/<audio> src external (never Base64-inline large media) and warn if relative files are missing."""
+    for m in EXT_MEDIA_SRC_RE.finditer(markup):
+        src = m.group(1).strip()
+        if not src or src.startswith(("http://", "https://", "//", "data:")):
+            continue
+        p = (base_dir / src).resolve()
+        exists = p.is_file()
+        media_refs.append({"slide": slide_id, "src": src, "exists": exists})
+        if not exists:
+            print(f"[WARN]  {slide_id}: 外連影音檔案不存在：{src}（請確認相對路徑與輸出 deck.html 對應）")
+
+
+def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
     """Parse a per-slide HTML fragment (either full HTML or <section class="slide"> fragment)."""
     raw = path.read_text(encoding="utf-8")
     styles = STYLE_BLOCK_RE.findall(raw)
@@ -372,6 +404,8 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots):
     content = _populate_auto_nav(content, data.get("chapters") or [], rec["chi"])
     content = _replace_slots(content, base_dir / "assets", mode, found_slots)
     content = _inline_local_imgs(content, base_dir)
+    content = _inline_video_posters(content, base_dir)
+    _check_external_media(content, base_dir, slide_id, media_refs)
 
     # Ensure outer <section class="slide canvas" ...> wrapper carries thin-shell data attributes
     extra_attrs = (
@@ -388,11 +422,23 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots):
             attrs = re.sub(r'class="([^"]*)"', r'class="\1 canvas"', attrs, count=1)
         # Strip any pre-existing id on outer slide element to keep id="s-{idx}" deterministic
         attrs = re.sub(r'\bid="[^"]*"', "", attrs)
+        if s.get("surface") and "data-surface=" not in attrs:
+            extra_attrs += f' data-surface="{esc(s["surface"])}"'
+        if s.get("nav") and "data-nav=" not in attrs:
+            extra_attrs += f' data-nav="{esc(s["nav"])}"'
+        if s.get("transition") and "data-transition=" not in attrs:
+            extra_attrs += f' data-transition="{esc(s["transition"])}"'
         replaced = f"<{tag} {attrs.strip()}{extra_attrs}>"
         content = content[:m.start()] + replaced + content[m.end():]
         if rec.get("appendix") and 'class="back"' not in content:
             content = content.replace(replaced, replaced + '<button class="back" type="button">← 返回</button>', 1)
     else:
+        if s.get("surface"):
+            extra_attrs += f' data-surface="{esc(s["surface"])}"'
+        if s.get("nav"):
+            extra_attrs += f' data-nav="{esc(s["nav"])}"'
+        if s.get("transition"):
+            extra_attrs += f' data-transition="{esc(s["transition"])}"'
         back = '<button class="back" type="button">← 返回</button>' if rec.get("appendix") else ""
         content = f'<section class="slide canvas"{extra_attrs}>{back}{content}</section>'
 
@@ -591,6 +637,12 @@ def render_component_slide(rec, data, idx, total, ch_sources):
     meta, chapters = data["meta"], data["chapters"]
     notes = esc(s.get("notes", ""))
     attrs = f'id="s-{idx}" data-kind="{kind}" data-chi="{rec["chi"]}" data-notes="{notes}"'
+    if s.get("surface"):
+        attrs += f' data-surface="{esc(s["surface"])}"'
+    if s.get("nav"):
+        attrs += f' data-nav="{esc(s["nav"])}"'
+    if s.get("transition"):
+        attrs += f' data-transition="{esc(s["transition"])}"'
     back = ""
     if rec.get("appendix"):
         attrs += f' data-appendix="1" data-id="{esc(s.get("id"))}"'
@@ -670,14 +722,82 @@ def render_component_slide(rec, data, idx, total, ch_sources):
     )
 
 
-# ----------------------------------------------------------------------------- deck assembly
+# ----------------------------------------------------------------------------- deck assembly & 7-module on-demand injector
 SHELL_CSS = (ASSETS_DIR / "shell.css").read_text(encoding="utf-8")
-COMPONENTS_CSS = (ASSETS_DIR / "components.css").read_text(encoding="utf-8")
 RUNTIME_JS = (ASSETS_DIR / "runtime.js").read_text(encoding="utf-8")
-FIT_JS = (ASSETS_DIR / "fit.js").read_text(encoding="utf-8")
+
+# Declarative on-demand module registry: 0 bytes injected when a deck does not use a module.
+OPTIONAL_MODULES = [
+    (
+        "components",
+        lambda ctx: ctx["component_count"] > 0 or bool(re.search(r'\bclass="[^"]*\b(?:cmp|status|overview|toc)\b', ctx["html"])),
+        "components.css",
+        None,
+    ),
+    (
+        "ambient-fx",
+        lambda ctx: "data-fx=" in ctx["html"],
+        "modules/ambient-fx.css",
+        "modules/ambient-fx.js",
+    ),
+    (
+        "live-controls",
+        lambda ctx: bool(re.search(r'\blive-ctrl\b|<input\b[^>]*type=["\']range["\']', ctx["html"])),
+        "modules/live-controls.css",
+        None,
+    ),
+    (
+        "fit",
+        lambda ctx: ctx["component_count"] > 0 or "data-fit" in ctx["html"],
+        None,
+        "fit.js",
+    ),
+    (
+        "media",
+        lambda ctx: bool(re.search(r'\bdata-(?:slide-video|sound-demo)\b', ctx["html"])),
+        "modules/media.css",
+        "modules/media.js",
+    ),
+    (
+        "flow-carousel",
+        lambda ctx: "data-flow-carousel" in ctx["html"],
+        "modules/flow-carousel.css",
+        "modules/flow-carousel.js",
+    ),
+    (
+        "coverflow",
+        lambda ctx: "data-coverflow" in ctx["html"],
+        "modules/coverflow.css",
+        "modules/coverflow.js",
+    ),
+]
+
+
+def _collect_optional_modules(slides_html, component_count):
+    ctx = {"html": slides_html, "component_count": component_count}
+    used, skipped = [], []
+    css_parts, js_parts = [], []
+    saved_bytes = 0
+    for name, pred, css_rel, js_rel in OPTIONAL_MODULES:
+        css_path = ASSETS_DIR / css_rel if css_rel else None
+        js_path = ASSETS_DIR / js_rel if js_rel else None
+        if pred(ctx):
+            used.append(name)
+            if css_path and css_path.is_file():
+                css_parts.append(css_path.read_text(encoding="utf-8"))
+            if js_path and js_path.is_file():
+                js_parts.append(js_path.read_text(encoding="utf-8"))
+        else:
+            skipped.append(name)
+            if css_path and css_path.is_file():
+                saved_bytes += css_path.stat().st_size
+            if js_path and js_path.is_file():
+                saved_bytes += js_path.stat().st_size
+    return used, skipped, saved_bytes, "\n".join(css_parts), "\n".join(js_parts)
+
 
 PAGE_TPL = """<!doctype html>
-<html lang="{lang}" data-shape="{shape}" data-motion="{motion}" data-format="{fmt}" data-style="{style}" data-mode="{mode}">
+<html lang="{lang}" data-shape="{shape}" data-motion="{motion}" data-format="{fmt}" data-style="{style}" data-mode="{mode}" data-stage-mode="{stage_mode}" data-nav-mode="{nav_mode}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -685,7 +805,7 @@ PAGE_TPL = """<!doctype html>
 {fonts}
 <style>
 {shell_css}
-{components_css}
+{module_css}
 {deck_css}
 {slide_css}
 </style>
@@ -703,7 +823,7 @@ PAGE_TPL = """<!doctype html>
 <script>window.DECK={deck_json};</script>
 <script>{slide_js}</script>
 <script>{runtime_js}</script>
-<script>{fit_js}</script>
+<script>{module_js}</script>
 </body>
 </html>
 """
@@ -731,13 +851,14 @@ def assemble_deck(data, base_dir):
 
     slides_html, slide_css_parts, slide_js_parts, font_sources = [], [], [], [deck_css]
     found_slots = []
+    media_refs = []
     free_count = 0
 
     for idx, rec in enumerate(records, 1):
         frag = find_fragment(rec, idx, base_dir)
         if frag is not None:
             free_count += 1
-            s_html, s_css, s_js, raw = load_free_slide(frag, rec, data, idx, base_dir, found_slots)
+            s_html, s_css, s_js, raw = load_free_slide(frag, rec, data, idx, base_dir, found_slots, media_refs)
             slides_html.append(s_html)
             if s_css:
                 slide_css_parts.append(s_css)
@@ -747,11 +868,21 @@ def assemble_deck(data, base_dir):
         else:
             slides_html.append(render_component_slide(rec, data, idx, total, ch_sources))
 
+    slides_joined = "\n".join(slides_html)
+    component_count = len(records) - free_count
+    used_mods, skipped_mods, saved_bytes, module_css, module_js = _collect_optional_modules(slides_joined, component_count)
+
     motion = motion_for(data["structure"])
+    stage_mode = str(meta.get("stage_mode") or "").lower()
+    nav_mode = str(meta.get("nav_mode") or ("divider-only" if stage_mode == "keynote" else "top-bar")).lower()
+
     deck_json = {
         "title": re.sub(r"==", "", str(meta.get("title", "Deck"))),
         "style": str(meta.get("style") or meta.get("theme") or ""),
         "mode": str(meta.get("mode") or ""),
+        "stageMode": stage_mode,
+        "navMode": nav_mode,
+        "modules": used_mods,
         "chapters": [c["label"] for c in data["chapters"]],
         "tabs": [
             [(s.get("tab") or s.get("title")) for s in ch_sources[i]]
@@ -767,19 +898,30 @@ def assemble_deck(data, base_dir):
         fmt=esc(meta.get("format", "deck")),
         style=esc(meta.get("style") or meta.get("theme") or ""),
         mode=esc(meta.get("mode") or ""),
+        stage_mode=esc(stage_mode),
+        nav_mode=esc(nav_mode),
         title=esc(deck_json["title"]),
         fonts=collect_fonts(*font_sources),
         shell_css=SHELL_CSS,
-        components_css=COMPONENTS_CSS,
+        module_css=module_css,
         deck_css=deck_css,
         slide_css="\n".join(slide_css_parts),
-        slides="\n".join(slides_html),
+        slides=slides_joined,
         deck_json=json.dumps(deck_json, ensure_ascii=False),
         slide_js="\n".join(slide_js_parts),
         runtime_js=RUNTIME_JS,
-        fit_js=FIT_JS,
+        module_js=module_js,
     )
-    return html_out, {"total": len(records), "free": free_count, "component": len(records) - free_count, "slots": found_slots}
+    return html_out, {
+        "total": len(records),
+        "free": free_count,
+        "component": component_count,
+        "slots": found_slots,
+        "modules": used_mods,
+        "skipped_modules": skipped_mods,
+        "saved_bytes": saved_bytes,
+        "media": media_refs,
+    }
 
 
 # ----------------------------------------------------------------------------- Gate 2 comparison sheet builder
@@ -882,6 +1024,13 @@ def main():
 
     out.write_text(html_out, encoding="utf-8")
     print(f"\n已組裝：{out}（共 {stats['total']} 頁：自由畫布 {stats['free']} 頁、商務／自動元件 {stats['component']} 頁）")
+    used_str = ", ".join(stats["modules"]) if stats["modules"] else "無（純輕底盤）"
+    skip_str = ", ".join(stats["skipped_modules"]) if stats["skipped_modules"] else "無"
+    saved_kb = stats["saved_bytes"] / 1024
+    print(f"按需模組：已注入 [{used_str}]｜略過 [{skip_str}]（省下 {saved_kb:.1f} KB）")
+    if stats["media"]:
+        ok_m = sum(1 for x in stats["media"] if x["exists"])
+        print(f"外連影音：共 {len(stats['media'])} 筆（{ok_m} 筆本機檔案存在，保持相對路徑未轉 Base64）")
     if stats["slots"]:
         upgraded = [x for x in stats["slots"] if x["upgraded"]]
         pending = [x for x in stats["slots"] if not x["upgraded"]]

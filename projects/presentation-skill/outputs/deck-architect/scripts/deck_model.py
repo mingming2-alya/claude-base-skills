@@ -67,8 +67,12 @@ COMMON_FIELDS = {
     "type", "chapter", "title", "tab", "layout", "notes", "source", "link",
     "appendix", "id", "role", "variant", "series", "signature", "file",
     "component", "summary", "key", "slot", "visual", "data", "items",
-    "points", "text", "sub",
+    "points", "text", "sub", "surface", "nav", "transition",
 }
+
+STAGE_MODES = {"briefing", "pitch", "keynote"}
+NAV_MODES = {"top-bar", "minimal-side", "divider-only"}
+SURFACES = {"dark", "light", "split", "photo"}
 
 LAYOUT_FIELDS = {
     "point": {"key", "support"},
@@ -145,7 +149,8 @@ _NON_TEXT_KEYS = {
     "notes", "src", "chapter", "layout", "type", "tab", "source", "id", "link",
     "appendix", "role", "variant", "series", "bar", "signature", "file",
     "component", "slot", "visual", "scene_layout", "art_style", "state",
-    "risk", "progress", "order", "stagger", "continued",
+    "risk", "progress", "order", "stagger", "continued", "surface", "nav",
+    "transition",
 }
 
 

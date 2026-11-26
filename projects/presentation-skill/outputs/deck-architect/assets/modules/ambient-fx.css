@@ -1,0 +1,24 @@
+/* deck-architect v4.4 On-Demand Module: ambient-fx
+ * Injected by assemble.py only when slides declare [data-fx="ambient-dust|soft-aurora"].
+ */
+.fx-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+html.still .fx-canvas,
+body.low-power .fx-canvas {
+  display: none !important;
+}
+
+@media print {
+  .fx-canvas { display: none !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-canvas { display: none !important; }
+}

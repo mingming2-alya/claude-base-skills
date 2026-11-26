@@ -15,10 +15,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from deck_model import (  # noqa: E402
     AXES, CELL_STATES, COMMON_FIELDS, DELIVERY_MODES, DENSE_LAYOUTS, EMPH_RE,
-    LAYOUT_FIELDS, LAYOUTS, RISK_LEVELS, SIMPLIFIED_CHARS, SLIDE_TYPES,
-    TRANSITION_PHRASES, StoryboardError, all_slide_texts_with_notes,
-    appendix_slides, capacity_problems, char_limit_for, emphasis_count, load,
-    main_slides, page_breakdown, slide_texts, toc_mode, visible_len,
+    LAYOUT_FIELDS, LAYOUTS, NAV_MODES, RISK_LEVELS, SIMPLIFIED_CHARS,
+    SLIDE_TYPES, STAGE_MODES, SURFACES, TRANSITION_PHRASES, StoryboardError,
+    all_slide_texts_with_notes, appendix_slides, capacity_problems,
+    char_limit_for, emphasis_count, load, main_slides, page_breakdown,
+    slide_texts, toc_mode, visible_len,
 )
 
 CJK = re.compile(r"[\u3400-\u9fff]")
@@ -78,6 +79,12 @@ def lint(data):
         delivery = "talk"
     lang = str(meta.get("lang") or "zh-Hant")
     check_trad = lang.lower().startswith("zh-hant") or lang.lower() == "zh-tw"
+    stage_mode = str(meta.get("stage_mode") or "").lower()
+    if stage_mode and stage_mode not in STAGE_MODES:
+        E("meta.stage_mode", f"必須是 {', '.join(sorted(STAGE_MODES))} 之一（目前：{stage_mode!r}）。")
+    nav_mode = str(meta.get("nav_mode") or "").lower()
+    if nav_mode and nav_mode not in NAV_MODES:
+        E("meta.nav_mode", f"必須是 {', '.join(sorted(NAV_MODES))} 之一（目前：{nav_mode!r}）。")
 
     # ---- structure: the core of this skill
     for k, hint in (("start", "聽眾現在知道什麼、在意什麼"), ("destination", "聽完要相信或做什麼")):
@@ -164,6 +171,9 @@ def lint(data):
             signatures += 1
         if is_appendix and not s.get("id"):
             E(where, "附件頁（appendix: true）需要 id，才能被 link 指到。")
+        surf = str(s.get("surface") or "").lower()
+        if surf and surf not in SURFACES:
+            E(where, f"surface 必須是 {', '.join(sorted(SURFACES))} 之一（目前：{surf!r}）。")
 
         # ---- constraints: forbidden phrases (ERROR)
         for bad in forbidden:

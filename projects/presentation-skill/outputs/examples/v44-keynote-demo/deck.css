@@ -1,0 +1,47 @@
+/* @fonts family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;900 */
+/* WaveCore S1 Bipolar Keynote Palette (OKLCH-tuned Seafoam Emerald + Warm Studio Ivory + Deep Graphite) */
+:root {
+  --font-display: "Noto Sans TC", var(--font-sans-fallback);
+  --font-body: "Noto Sans TC", var(--font-sans-fallback);
+  --font-number: "Archivo", "Noto Sans TC", var(--font-sans-fallback);
+  --font-label: "Noto Sans TC", var(--font-sans-fallback);
+
+  /* Dual-polarity semantic tokens consumed by shell.css [data-surface="dark|light|split|photo"] */
+  --dark-bg: #0D1117;
+  --dark-bg-2: #161C26;
+  --dark-fg: #F2F0EB;
+  --dark-fg-2: #BFC7D4;
+  --dark-fg-3: #909AA9;
+  --dark-line: rgba(242, 240, 235, .20);
+  --dark-line-2: rgba(242, 240, 235, .11);
+  --dark-accent: #3CD49A;
+  --dark-accent-text: #62E8B5;
+  --dark-accent-ink: #0D1117;
+
+  --light-bg: #F4F2ED;
+  --light-bg-2: #E9E5DC;
+  --light-fg: #151921;
+  --light-fg-2: #3C4350;
+  --light-fg-3: #575E6C;
+  --light-line: rgba(21, 25, 33, .18);
+  --light-line-2: rgba(21, 25, 33, .10);
+  --light-accent: #0C6B4E;
+  --light-accent-text: #0A5A41;
+  --light-accent-ink: #F4F2ED;
+
+  /* Default deck root (dark keynote base) */
+  --bg: var(--dark-bg);
+  --bg-2: var(--dark-bg-2);
+  --fg: var(--dark-fg);
+  --fg-2: var(--dark-fg-2);
+  --fg-3: var(--dark-fg-3);
+  --line: var(--dark-line);
+  --line-2: var(--dark-line-2);
+  --accent: var(--dark-accent);
+  --accent-text: var(--dark-accent-text);
+  --accent-ink: var(--dark-accent-ink);
+  --coral: #F26D52;
+  --gold: #E6B555;
+  --motion-mode: spring;
+  --stagger-base: 58;
+}

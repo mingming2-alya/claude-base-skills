@@ -1,0 +1,201 @@
+<style>
+.slide .head {
+  position: absolute;
+  left: 108px;
+  right: 108px;
+  top: 72px;
+}
+.slide .eyebrow {
+  font: 700 20px/1 var(--font-label);
+  letter-spacing: 0.12em;
+  color: var(--accent-text);
+  margin-bottom: 12px;
+}
+.slide h2 {
+  font: 900 68px/1.1 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.slide .lead {
+  margin-top: 12px;
+  font: 500 27px/1.4 var(--font-body);
+  color: var(--fg-2);
+}
+.slide .carousel-wrap {
+  position: absolute;
+  left: 108px;
+  right: 108px;
+  top: 266px;
+  bottom: 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.slide .flow-carousel {
+  grid-template-columns: 440px minmax(0, 1fr);
+  gap: 48px;
+  --fc-height: 600px;
+}
+.slide .fc-card {
+  background: #FAF9F6;
+  border: 1px solid rgba(21, 25, 33, 0.14);
+  box-shadow: 0 22px 54px rgba(21, 25, 33, 0.08);
+  padding: 44px 48px;
+}
+.slide .card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.slide .card-badge {
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(12, 107, 78, 0.10);
+  color: var(--accent-text);
+  font: 700 19px/1 var(--font-label);
+}
+.slide .card-stat {
+  font: 900 38px/1 var(--font-number);
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+.slide .card-ui {
+  margin: 26px 0;
+  padding: 28px 32px;
+  border-radius: 18px;
+  background: #121721;
+  color: #F2F0EB;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.slide .ui-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: 600 21px/1.3 var(--font-body);
+}
+.slide .ui-pill {
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: rgba(60, 212, 154, 0.20);
+  color: #79F0C3;
+  font: 700 18px/1 var(--font-number);
+}
+.slide .ui-bars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.slide .ui-meter {
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.slide .ui-meter b {
+  display: block;
+  font: 900 32px/1.1 var(--font-number);
+  color: #79F0C3;
+}
+.slide .ui-meter span {
+  display: block;
+  margin-top: 6px;
+  font: 500 18px/1.2 var(--font-body);
+  color: #C4CCD8;
+}
+.slide .card-foot {
+  font: 600 24px/1.45 var(--font-body);
+  color: var(--fg-2);
+}
+.slide .src {
+  position: absolute;
+  left: 108px;
+  bottom: 34px;
+  font: 400 18px/1.2 var(--font-label);
+  color: var(--fg-3);
+}
+</style>
+<section class="slide canvas" data-surface="light" data-transition="sheet-up">
+  <header class="head">
+    <div class="eyebrow">03 · 現場體驗 · HTML5 原生活流程輪播（零影片膨脹）</div>
+    <h2 data-role="title">三步無感調校流程</h2>
+    <p class="lead" data-role="summary">戴上即完成耳道掃描、場景降噪與 <mark class="em">多裝置切換</mark>。</p>
+  </header>
+
+  <div class="carousel-wrap">
+    <div class="flow-carousel" data-flow-carousel data-interval="3600">
+      <div class="fc-tabs" role="tablist" aria-label="調校步驟">
+        <button type="button" class="fc-tab is-active" data-fc-idx="0">
+          <span class="fc-num">01</span>
+          <span class="fc-tab-body"><span>耳道聲學掃描</span><span class="fc-sub">3 秒建立個人等化曲線</span></span>
+        </button>
+        <button type="button" class="fc-tab" data-fc-idx="1">
+          <span class="fc-num">02</span>
+          <span class="fc-tab-body"><span>場景自適應降噪</span><span class="fc-sub">即時辨識捷運、辦公與步行</span></span>
+        </button>
+        <button type="button" class="fc-tab" data-fc-idx="2">
+          <span class="fc-num">03</span>
+          <span class="fc-tab-body"><span>多裝置無縫接手</span><span class="fc-sub">筆電會議與手機來電自動切換</span></span>
+        </button>
+      </div>
+
+      <div class="fc-viewport">
+        <article class="fc-card is-active" data-fc-card="0">
+          <div class="card-top">
+            <span class="card-badge">STEP 01 · 耳道掃描</span>
+            <span class="card-stat">3.0 秒</span>
+          </div>
+          <div class="card-ui">
+            <div class="ui-row"><span>內建回授麥克風聲學掃描</span><span class="ui-pill">配戴密合度 98%</span></div>
+            <svg viewBox="0 0 760 150" fill="none" aria-label="個人化頻率響應曲線">
+              <line x1="0" y1="75" x2="760" y2="75" stroke="rgba(255,255,255,0.14)" stroke-dasharray="6 6"/>
+              <path d="M 10 112 C 120 96, 220 42, 360 66 C 480 88, 610 30, 750 54" stroke="#62E8B5" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="360" cy="66" r="7" fill="#62E8B5"/>
+              <circle cx="620" cy="40" r="7" fill="#62E8B5"/>
+            </svg>
+            <div class="ui-bars">
+              <div class="ui-meter"><b>80 Hz</b><span>低頻補償 +2.4 dB</span></div>
+              <div class="ui-meter"><b>2.4 kHz</b><span>人聲聚焦自然</span></div>
+              <div class="ui-meter"><b>14 kHz</b><span>空氣感延展</span></div>
+            </div>
+          </div>
+          <p class="card-foot">首次配戴自動發送無感測試音，依每個人耳道幾何客製化 EQ 與降噪濾波器。</p>
+        </article>
+
+        <article class="fc-card" data-fc-card="1">
+          <div class="card-top">
+            <span class="card-badge">STEP 02 · 場景偵測</span>
+            <span class="card-stat">−42 dB</span>
+          </div>
+          <div class="card-ui">
+            <div class="ui-row"><span>即時環境音譜分類</span><span class="ui-pill">捷運模式啟動</span></div>
+            <div class="ui-bars">
+              <div class="ui-meter"><b>深度降噪</b><span>通勤／飛行 −42 dB</span></div>
+              <div class="ui-meter"><b>人聲通透</b><span>辦公交談免摘耳機</span></div>
+              <div class="ui-meter"><b>抗風抑噪</b><span>戶外慢跑自動啟用</span></div>
+            </div>
+          </div>
+          <p class="card-foot">走進車廂自動切入深度降噪，走進辦公室自動保留人聲頻段，全程免掏手機。</p>
+        </article>
+
+        <article class="fc-card" data-fc-card="2">
+          <div class="card-top">
+            <span class="card-badge">STEP 03 · 雙裝置同步</span>
+            <span class="card-stat">0.4 秒</span>
+          </div>
+          <div class="card-ui">
+            <div class="ui-row"><span>低延遲雙點連線引擎</span><span class="ui-pill">無縫切換就緒</span></div>
+            <div class="ui-bars">
+              <div class="ui-meter"><b>裝置 A</b><span>工作筆電・視訊會議</span></div>
+              <div class="ui-meter"><b>裝置 B</b><span>隨身手機・語音來電</span></div>
+              <div class="ui-meter"><b>400 ms</b><span>音源接手切換延遲</span></div>
+            </div>
+          </div>
+          <p class="card-foot">筆電剪輯或開會中來電立即接手，掛斷後自動回到原播放進度，不需重新配對。</p>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <p class="src" data-role="source">資料來源：WaveCore Companion App v3.0 互動原型（2026.11）</p>
+</section>

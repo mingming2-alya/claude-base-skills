@@ -309,10 +309,15 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
     }
     if (dupIds.size) issues.push(`SVG 內有重複 id：${[...dupIds].join(', ')}`);
 
-    // 2. Broken images
+    // 2. Broken images & video poster presence
     for (const img of sl.querySelectorAll('img')) {
       if (!img.complete || !img.naturalWidth) {
         issues.push(`圖片載入失敗：${(img.getAttribute('src') || '').slice(0, 40)}`);
+      }
+    }
+    for (const vid of sl.querySelectorAll('video[data-slide-video]')) {
+      if (!vid.getAttribute('poster')) {
+        warnings.push('<video data-slide-video> 缺少 poster 靜態海報圖（列印或 ?still=1 時可能出現黑框）');
       }
     }
 
@@ -351,9 +356,14 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
       const txt = t.textContent.trim();
       if (!txt) continue;
       const el = t.parentElement;
-      if (!el || el.closest('style,script,title,defs,[aria-hidden="true"],.toc li.off,.snav')) continue;
+      if (!el || el.closest('style,script,title,defs,[aria-hidden="true"],[data-step-hidden="1"],.toc li.off,.snav')) continue;
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) < 0.05) continue;
+
+      const range = document.createRange();
+      range.selectNodeContents(t);
+      const rects = [...range.getClientRects()].filter(r => r.width > 1.5 && r.height > 1.5);
+      if (!rects.length) continue;
 
       const fs = parseFloat(cs.fontSize) / scale;
       const fw = parseInt(cs.fontWeight, 10) || 400;
@@ -362,10 +372,6 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
         seenSmall.add(txt.slice(0, 14));
         issues.push(`文字太小（${fs.toFixed(0)}px）：「${txt.slice(0, 18)}」`);
       }
-
-      const range = document.createRange();
-      range.selectNodeContents(t);
-      const rects = [...range.getClientRects()].filter(r => r.width > 1.5 && r.height > 1.5);
       for (const r of rects) {
         // Trim CJK font ascent/descent box padding for fair boundary check
         const lh = parseFloat(cs.lineHeight) || fs * 1.2 * scale;
@@ -561,17 +567,18 @@ async function runMotionAudit(driver, filePath) {
     await driver.wait(1050);
     const rapid = await driver.evaluate(() => {
       const idx = window.__deck.index;
+      const stepIdx = window.__deck.stepIndex || 0;
       const morphLeft = document.getElementById('morph-layer')?.children.length || 0;
       const hiddenMorph = [...document.querySelectorAll('[data-morph]')].filter(e => e.style.visibility === 'hidden').length;
       const actives = document.querySelectorAll('.slide.active').length;
       const leavings = document.querySelectorAll('.slide.leaving').length;
       const staleBgFocus = [...document.querySelectorAll('.slide:not(.active)')].filter(s => s.classList.contains('is-focusing') || s.querySelector('.focus-dim, .pre-transform')).length;
-      return { idx, morphLeft, hiddenMorph, actives, leavings, staleBgFocus };
+      return { idx, stepIdx, morphLeft, hiddenMorph, actives, leavings, staleBgFocus };
     });
-    if (rapid.idx >= 3 && rapid.morphLeft === 0 && rapid.hiddenMorph === 0 && rapid.actives === 1 && rapid.leavings === 0 && rapid.staleBgFocus === 0) {
-      results.push(`連按打斷測試（4 次／180ms）：通過（精準落於第 ${rapid.idx + 1} 頁，無殘留 clone、壓暗與鎖死）`);
+    if ((rapid.idx + rapid.stepIdx) >= 3 && rapid.morphLeft === 0 && rapid.hiddenMorph === 0 && rapid.actives === 1 && rapid.leavings === 0 && rapid.staleBgFocus === 0) {
+      results.push(`連按打斷測試（4 次／180ms）：通過（精準落於第 ${rapid.idx + 1} 頁${rapid.stepIdx ? ` 步進 ${rapid.stepIdx}` : ''}，無殘留 clone、壓暗與鎖死）`);
     } else {
-      failures.push(`連按打斷異常：index=${rapid.idx}, morphLeft=${rapid.morphLeft}, hiddenMorph=${rapid.hiddenMorph}, actives=${rapid.actives}, leavings=${rapid.leavings}, staleBgFocus=${rapid.staleBgFocus}`);
+      failures.push(`連按打斷異常：index=${rapid.idx}, stepIdx=${rapid.stepIdx}, morphLeft=${rapid.morphLeft}, hiddenMorph=${rapid.hiddenMorph}, actives=${rapid.actives}, leavings=${rapid.leavings}, staleBgFocus=${rapid.staleBgFocus}`);
     }
   }
 
@@ -777,6 +784,272 @@ async function runMotionAudit(driver, filePath) {
     results.push(`引導線與描繪原語檢核（${connAudit.drawCount} 條 SVG 描線／${connAudit.wipeCount} 處方向揭露）：通過（零退化 SVG 縮放）`);
   }
 
+  // 8. v4.4 Per-slide polarity (data-surface="dark|light|split|photo") & stage chrome sync
+  const surfaceTargets = await driver.evaluate(() => {
+    const out = [];
+    const seen = new Set();
+    window.__deck.slides.forEach((sl, i) => {
+      const s = sl.dataset.surface;
+      if (s && !seen.has(s)) { seen.add(s); out.push({ idx: i, surface: s }); }
+    });
+    return out;
+  });
+  if (surfaceTargets.length) {
+    const surfLums = {};
+    let surfOk = true;
+    const surfErrs = [];
+    for (const st of surfaceTargets) {
+      await driver.evaluate(i => window.__deck.go(i, true), st.idx);
+      await driver.wait(80);
+      const info = await driver.evaluate(i => {
+        const sl = window.__deck.slides[i];
+        const bg = getComputedStyle(sl).backgroundColor;
+        const m = (bg || '').match(/[\d.]+/g);
+        const rgb = m ? m.slice(0, 3).map(Number) : [0, 0, 0];
+        const lin = c => { c /= 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; };
+        const l = 0.2126 * lin(rgb[0]) + 0.7152 * lin(rgb[1]) + 0.0722 * lin(rgb[2]);
+        return { activeSurface: window.__deck.activeSurface, l, bg };
+      }, st.idx);
+      surfLums[st.surface] = info.l;
+      if (info.activeSurface !== st.surface) {
+        surfOk = false;
+        surfErrs.push(`第 ${st.idx + 1} 頁 activeSurface=${info.activeSurface}（預期 ${st.surface}）`);
+      }
+    }
+    if (surfLums.light !== undefined && surfLums.dark !== undefined) {
+      if (surfLums.light < 0.50 || surfLums.dark > 0.18) {
+        surfOk = false;
+        surfErrs.push(`光暗雙極亮度未拉開（light=${surfLums.light.toFixed(2)}, dark=${surfLums.dark.toFixed(2)}）`);
+      }
+    }
+    if (surfOk) {
+      results.push(`單頁明暗極性 data-surface（${surfaceTargets.map(x => x.surface).join('／')}）：通過（變數與舞台外殼極性同步切換）`);
+    } else {
+      failures.push(`單頁極性異常：${surfErrs.join('；')}`);
+    }
+  }
+
+  // 9. v4.4 nav_mode (top-bar / minimal-side / divider-only) & auto-hiding #ctrl-bar
+  const navBarCheck = await driver.evaluate(() => {
+    const bar = document.getElementById('ctrl-bar');
+    const prog = document.getElementById('deck-progress');
+    if (!bar || !prog) return { ok: false, reason: '找不到 #ctrl-bar 或 #deck-progress' };
+    const startHidden = !bar.classList.contains('visible');
+    const shown = window.__deck.setCtrlBarVisible(true, true);
+    const posTxt = (bar.querySelector('.cb-pos')?.textContent || '').trim();
+    window.__deck.setCtrlBarVisible(false);
+    const endHidden = !bar.classList.contains('visible');
+
+    // Verify per-slide nav_mode classes on content slides
+    const navMode = window.__deck.navMode || 'top-bar';
+    const checkedModes = new Set();
+    let modeErr = '';
+    for (let i = 0; i < window.__deck.slides.length; i++) {
+      const sl = window.__deck.slides[i];
+      if (sl.dataset.kind !== 'content' || sl.dataset.appendix === '1' || Number(sl.dataset.chi ?? -1) < 0) continue;
+      const eff = sl.dataset.nav || (sl.querySelector('nav.slide-nav, nav[data-auto-nav], [data-auto-nav]') ? 'inline' : navMode);
+      if (checkedModes.has(eff)) continue;
+      checkedModes.add(eff);
+      window.__deck.go(i, true);
+      const hideTop = window.__deck.stage.classList.contains('hide-nav');
+      const showSide = window.__deck.stage.classList.contains('show-side-nav');
+      if (eff === 'divider-only' && (!hideTop || showSide)) modeErr = `divider-only 未隱藏頂/側導航 (第 ${i + 1} 頁)`;
+      if (eff === 'minimal-side' && (!hideTop || !showSide)) modeErr = `minimal-side 未顯示側邊錨點 (第 ${i + 1} 頁)`;
+      if (eff === 'top-bar' && (hideTop || showSide)) modeErr = `top-bar 未顯示頂部章節列 (第 ${i + 1} 頁)`;
+    }
+    return {
+      ok: startHidden && shown && Boolean(posTxt) && endHidden && !modeErr,
+      navMode,
+      checkedModes: [...checkedModes],
+      posTxt,
+      reason: modeErr || `startHidden=${startHidden}, shown=${shown}, endHidden=${endHidden}`,
+    };
+  });
+  if (navBarCheck.ok) {
+    results.push(`導航模式（${navBarCheck.navMode}${navBarCheck.checkedModes.length ? '｜實測 ' + navBarCheck.checkedModes.join('／') : ''}）與自動隱藏底控膠囊：通過（頁碼 ${navBarCheck.posTxt}、浮現與自動收合正常）`);
+  } else {
+    failures.push(`導航與底控列異常：${navBarCheck.reason}`);
+  }
+
+  // 10. v4.4 Dual-track presenter-paced data-step (forward reveal, swap hide, backward final landing, static expand)
+  const stepTarget = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    for (let i = 0; i < sls.length; i++) {
+      if (sls[i].dataset.appendix === '1') continue;
+      if (sls[i].querySelector('[data-step], [data-step-only], [data-step-hide]')) {
+        const nextMain = sls.findIndex((s, j) => j > i && s.dataset.appendix !== '1');
+        return { idx: i, nextMain };
+      }
+    }
+    return null;
+  });
+  if (stepTarget) {
+    await driver.evaluate(i => window.__deck.go(i, true, { step: 0 }), stepTarget.idx);
+    await driver.wait(80);
+    const s0 = await driver.evaluate(i => {
+      const sl = window.__deck.slides[i];
+      const step1 = sl.querySelector('[data-step="1"], [data-step-only="1"]');
+      return {
+        idx: window.__deck.index,
+        stepIndex: window.__deck.stepIndex,
+        stepTotal: window.__deck.stepTotal,
+        step1Hidden: step1 ? step1.dataset.stepHidden === '1' : false,
+      };
+    }, stepTarget.idx);
+
+    for (let k = 1; k <= s0.stepTotal; k++) {
+      await driver.evaluate(() => window.__deck.step(1));
+      await driver.wait(280);
+    }
+    const sEnd = await driver.evaluate(i => {
+      const sl = window.__deck.slides[i];
+      const step1 = sl.querySelector('[data-step="1"]');
+      const only0 = sl.querySelector('[data-step-only="0"]');
+      return {
+        idx: window.__deck.index,
+        stepIndex: window.__deck.stepIndex,
+        step1Shown: step1 ? step1.dataset.stepHidden === '0' : true,
+        only0Hidden: only0 ? only0.dataset.stepHidden === '1' : true,
+      };
+    }, stepTarget.idx);
+
+    let backLandingOk = true;
+    let stepBackOk = true;
+    if (stepTarget.nextMain >= 0) {
+      await driver.evaluate(() => window.__deck.step(1));
+      await driver.wait(420);
+      const afterAdvance = await driver.evaluate(() => window.__deck.index);
+      await driver.evaluate(() => window.__deck.step(-1));
+      await driver.wait(420);
+      const afterBack = await driver.evaluate(() => ({ idx: window.__deck.index, stepIndex: window.__deck.stepIndex, stepTotal: window.__deck.stepTotal }));
+      backLandingOk = afterAdvance === stepTarget.nextMain && afterBack.idx === stepTarget.idx && afterBack.stepIndex === afterBack.stepTotal;
+      await driver.evaluate(() => window.__deck.step(-1));
+      await driver.wait(260);
+      const afterStepBack = await driver.evaluate(() => window.__deck.stepIndex);
+      stepBackOk = afterStepBack === Math.max(0, s0.stepTotal - 1);
+    }
+
+    // Verify still mode expands to final step cleanly
+    const stillExpandOk = await driver.evaluate(i => {
+      window.__deck.go(i, true, { step: 0 });
+      window.__deck.setStill(true);
+      const expanded = window.__deck.stepIndex === window.__deck.stepTotal;
+      window.__deck.setStill(false);
+      return expanded;
+    }, stepTarget.idx);
+
+    if (s0.stepTotal > 0 && s0.stepIndex === 0 && s0.step1Hidden && sEnd.idx === stepTarget.idx && sEnd.stepIndex === s0.stepTotal && sEnd.step1Shown && sEnd.only0Hidden && backLandingOk && stepBackOk && stillExpandOk) {
+      results.push(`講者點擊步進 data-step（第 ${stepTarget.idx + 1} 頁共 ${s0.stepTotal} 步）：通過（逐層揭曉／換幕退場／回翻落終態／靜態全展開）`);
+    } else {
+      failures.push(`data-step 步進異常：s0=${JSON.stringify(s0)}, sEnd=${JSON.stringify(sEnd)}, backLanding=${backLandingOk}, stepBack=${stepBackOk}, stillExpand=${stillExpandOk}`);
+    }
+  }
+
+  // 11. v4.4 External media (<video>/<audio>) pause & reset on leave + HTML5 native carousels (flow-carousel / coverflow)
+  const mediaWidgetTargets = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    const videos = [], audios = [], flows = [], covers = [];
+    const base64Media = [];
+    sls.forEach((sl, i) => {
+      sl.querySelectorAll('video[data-slide-video]').forEach(v => {
+        const src = v.getAttribute('src') || v.querySelector('source')?.getAttribute('src') || '';
+        if (src.startsWith('data:')) base64Media.push(`第 ${i + 1} 頁 <video> 不應內嵌 Base64`);
+        videos.push(i);
+      });
+      sl.querySelectorAll('audio[data-sound-demo]').forEach(a => {
+        const src = a.getAttribute('src') || a.querySelector('source')?.getAttribute('src') || '';
+        if (src.startsWith('data:')) base64Media.push(`第 ${i + 1} 頁 <audio> 不應內嵌 Base64`);
+        audios.push(i);
+      });
+      if (sl.querySelector('[data-flow-carousel]')) flows.push(i);
+      if (sl.querySelector('[data-coverflow]')) covers.push(i);
+    });
+    return { videos: [...new Set(videos)], audios: [...new Set(audios)], flows, covers, base64Media };
+  });
+  if (mediaWidgetTargets.base64Media.length) {
+    failures.push(...mediaWidgetTargets.base64Media);
+  }
+  const mwParts = [];
+  if (mediaWidgetTargets.videos.length) {
+    const vi = mediaWidgetTargets.videos[0];
+    const other = vi === 0 ? Math.min(1, count - 1) : 0;
+    await driver.evaluate(i => window.__deck.go(i, true), vi);
+    await driver.wait(220);
+    await driver.evaluate(i => {
+      const v = window.__deck.slides[i].querySelector('video[data-slide-video]');
+      if (v) { try { v.currentTime = 0.25; } catch (_) {} }
+    }, vi);
+    await driver.evaluate(i => window.__deck.go(i, true), other);
+    await driver.wait(160);
+    const vRes = await driver.evaluate(i => {
+      const v = window.__deck.slides[i].querySelector('video[data-slide-video]');
+      return { paused: v ? v.paused : false, time: v ? v.currentTime : -1 };
+    }, vi);
+    if (vRes.paused && vRes.time === 0) mwParts.push(`外連影片（第 ${vi + 1} 頁）離頁停播歸零`);
+    else failures.push(`第 ${vi + 1} 頁影片離頁未停播歸零：${JSON.stringify(vRes)}`);
+  }
+  if (mediaWidgetTargets.audios.length) {
+    const ai = mediaWidgetTargets.audios[0];
+    const other = ai === 0 ? Math.min(1, count - 1) : 0;
+    await driver.evaluate(i => window.__deck.go(i, true), ai);
+    await driver.wait(180);
+    const aClickOk = await driver.evaluate(i => {
+      const sl = window.__deck.slides[i];
+      const btn = sl.querySelector('.sound-play-btn');
+      const a = sl.querySelector('audio[data-sound-demo]');
+      if (!btn || !a) return false;
+      btn.click();
+      try { a.currentTime = 0.2; } catch (_) {}
+      return window.__deck.index === i;
+    }, ai);
+    await driver.evaluate(i => window.__deck.go(i, true), other);
+    await driver.wait(160);
+    const aRes = await driver.evaluate(i => {
+      const a = window.__deck.slides[i].querySelector('audio[data-sound-demo]');
+      const bar = a?._soundBar;
+      return { paused: a ? a.paused : false, time: a ? a.currentTime : -1, playingCls: bar ? bar.classList.contains('is-playing') : false };
+    }, ai);
+    if (aClickOk && aRes.paused && aRes.time === 0 && !aRes.playingCls) mwParts.push(`實測音檔（第 ${ai + 1} 頁）不誤翻頁且離頁歸零`);
+    else failures.push(`第 ${ai + 1} 頁音檔控制異常：clickOk=${aClickOk}, res=${JSON.stringify(aRes)}`);
+  }
+  if (mediaWidgetTargets.flows.length) {
+    const fi = mediaWidgetTargets.flows[0];
+    await driver.evaluate(i => window.__deck.go(i, true), fi);
+    await driver.wait(140);
+    const fRes = await driver.evaluate(i => {
+      const root = window.__deck.slides[i].querySelector('[data-flow-carousel]');
+      const tabs = [...root.querySelectorAll('[data-fc-idx]')];
+      const before = root.dataset.activeIndex;
+      const targetTab = tabs[1] || tabs[0];
+      targetTab.click();
+      const after = root.dataset.activeIndex;
+      const stayed = window.__deck.index === i;
+      tabs[0].click();
+      return { before, after, stayed };
+    }, fi);
+    if (fRes.stayed && fRes.before !== fRes.after) mwParts.push(`活流程輪播（第 ${fi + 1} 頁）切換不誤翻頁`);
+    else failures.push(`第 ${fi + 1} 頁活流程輪播異常：${JSON.stringify(fRes)}`);
+  }
+  if (mediaWidgetTargets.covers.length) {
+    const ci = mediaWidgetTargets.covers[0];
+    await driver.evaluate(i => window.__deck.go(i, true), ci);
+    await driver.wait(140);
+    const cRes = await driver.evaluate(i => {
+      const root = window.__deck.slides[i].querySelector('[data-coverflow]');
+      const nextBtn = root.querySelector('.cf-next');
+      const before = root.dataset.activeIndex;
+      nextBtn.click();
+      const after = root.dataset.activeIndex;
+      const stayed = window.__deck.index === i;
+      return { before, after, stayed };
+    }, ci);
+    if (cRes.stayed && cRes.before !== cRes.after) mwParts.push(`3D 照片輪播（第 ${ci + 1} 頁）切換不誤翻頁`);
+    else failures.push(`第 ${ci + 1} 頁 3D 照片輪播異常：${JSON.stringify(cRes)}`);
+  }
+  if (mwParts.length) {
+    results.push(`多媒體與原生輪播原語（${mwParts.join('、')}）：通過`);
+  }
+
   const jsErrs = driver.getErrors();
   for (const e of jsErrs) failures.push(`動態測試期間腳本錯誤：${e}`);
   return { results, failures };
@@ -789,7 +1062,7 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
   driver.clearErrors();
   await driver.setViewport(1920, 1080);
   await driver.goto(pathToFileURL(filePath).href + '?still=1');
-  await driver.addTempStyle('#hint, #toast { display: none !important; }', '__check_hide_hint');
+  await driver.addTempStyle('#hint, #toast, #ctrl-bar, #deck-progress { display: none !important; }', '__check_hide_hint');
 
   const isDeck = await driver.evaluate(() => Boolean(window.__deck && typeof window.__deck.count === 'number'));
 

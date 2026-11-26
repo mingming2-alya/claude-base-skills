@@ -22,6 +22,7 @@
 - **去框化比例**：高紀律結構化卡片（`briefing`）／ 半去框化（`pitch`）／ 高去框化 ≥40–50% 無圓角框（`keynote`）
 - **導航殼層（`nav_mode`）**：`top-bar` ／ `minimal-side` ／ `divider-only`（大扉頁定位＋系列頁局部側邊錨點）
 - **節拍控制**：全自動視覺指引（`0-step`）／ 雙軌（自動指引 ＋ 關鍵懸念／多層換幕頁 `data-step`）
+- **預期啟用按需模組（`assemble.py` 掃描掛載，未用到 0 KB）**：勾選與需求對齊者——`[ ] components`（進度表／總覽／目錄）、`[ ] ambient-fx`（微塵／極光）、`[ ] live-controls`（互動試算滑桿）、`[ ] media`（外連影片／實測音檔）、`[ ] flow-carousel`（HTML5 活流程輪播）、`[ ] coverflow`（3D 照片輪播）、`[ ] fit`（自動縮字）
 
 ## 3. 一句話核心訊息與承重母題
 - **一句話核心訊息**：<若聽眾只記得一句話>

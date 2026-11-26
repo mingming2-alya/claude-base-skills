@@ -1,21 +1,23 @@
 <!doctype html>
-<html lang="zh-Hant" data-shape="row" data-motion="horizontal" data-format="deck" data-style="apple" data-mode="dark">
+<html lang="zh-Hant" data-shape="row" data-motion="horizontal" data-format="deck" data-style="apple" data-mode="dark" data-stage-mode="" data-nav-mode="top-bar">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>星塵烘焙・智慧補貨系統導入</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@600;700;800;900&family=Geist:wght@500;600;700;800&family=Chiron+GoRound+TC:wght@700;900&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
 <style>
-/* deck-architect v4.3 Thin Shell CSS (Phase B.3 — 60fps GPU Core + Visual Guidance Spec)
+/* deck-architect v4.4 Thin Shell CSS (Phase C.2 — Bipolar Surface, Multi-Mode Nav, Auto-Hide Bar, Dual-Track data-step)
  *
  * Locks only invariants that must never break across slides:
  *  - 1920x1080 auto-scaled stage with compositor isolation (contain: layout style paint)
  *  - Offline CJK + Latin system font fallback stacks
- *  - Single-source navigation/tab hooks (fully styleable or replaceable via data-nav="inline")
- *  - 60fps GPU-composited transition archetypes (push | zoom-rise | iris | shock | morph | sheet-up | modal)
- *  - Phase B.3 Visual Guidance helpers: 3-tier focus dimming, mobile-visible spotlight, target ripples, rail travel beads
- *  - Interactive live-figure controls (.live-ctrl / .live-only) with print/static isolation
+ *  - Per-slide polarity tokens via data-surface="light|dark|split|photo" (customizable via --light-* and --dark-*)
+ *  - Navigation modes: top-bar | minimal-side (#nav-side) | divider-only, plus auto-hiding floating #ctrl-bar & #deck-progress
+ *  - 60fps GPU-composited transitions + Visual Guidance helpers + Presenter-paced data-step
  *  - Dual static freeze (?still=1, B low-power mode, prefers-reduced-motion) & exact 16:9 print/PDF
+ *
+ * Optional features (components.css, ambient-fx, live-controls, media, flow-carousel, coverflow)
+ * are modularized and injected on-demand by assemble.py (0 KB when unused).
  */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -72,7 +74,7 @@
   --nav-accent: var(--accent);
   --nav-border: var(--line-2);
 
-  /* Phase B.2 60fps motion personality tokens (spring | crisp | tactile) */
+  /* 60fps motion personality tokens (spring | crisp | tactile) */
   --motion-mode: spring;
   --spring-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
@@ -103,6 +105,106 @@ html, body {
   transform-origin: center center;
   overflow: hidden;
   background: var(--bg);
+}
+
+/* ---------------------------------------------------------------- per-slide polarity (v4.4 data-surface) */
+.slide[data-surface="light"] {
+  --bg: var(--light-bg, #F4F2ED);
+  --bg-2: var(--light-bg-2, #E8E4DC);
+  --fg: var(--light-fg, #161920);
+  --fg-2: var(--light-fg-2, #3D434F);
+  --fg-3: var(--light-fg-3, #5A606D);
+  --line: var(--light-line, rgba(22, 25, 32, .20));
+  --line-2: var(--light-line-2, rgba(22, 25, 32, .11));
+  --accent: var(--light-accent, #0D6B4F);
+  --accent-text: var(--light-accent-text, #0A5941);
+  --accent-ink: var(--light-accent-ink, #F4F2ED);
+  --nav-color: var(--light-fg-3, #5A606D);
+  --nav-active: var(--light-fg, #161920);
+  --nav-accent: var(--light-accent, #0D6B4F);
+  --nav-border: var(--light-line-2, rgba(22, 25, 32, .12));
+}
+
+.slide[data-surface="dark"] {
+  --bg: var(--dark-bg, #0E1117);
+  --bg-2: var(--dark-bg-2, #171C26);
+  --fg: var(--dark-fg, #F0EFEA);
+  --fg-2: var(--dark-fg-2, #BCC3D0);
+  --fg-3: var(--dark-fg-3, #929BA9);
+  --line: var(--dark-line, rgba(240, 239, 234, .22));
+  --line-2: var(--dark-line-2, rgba(240, 239, 234, .12));
+  --accent: var(--dark-accent, #3ED49C);
+  --accent-text: var(--dark-accent-text, #5CE3B0);
+  --accent-ink: var(--dark-accent-ink, #0E1117);
+  --nav-color: var(--dark-fg-3, #929BA9);
+  --nav-active: var(--dark-fg, #F0EFEA);
+  --nav-accent: var(--dark-accent, #3ED49C);
+  --nav-border: var(--dark-line-2, rgba(240, 239, 234, .14));
+}
+
+.slide[data-surface="split"] {
+  --bg: var(--light-bg, #F4F2ED);
+  --bg-2: var(--light-bg-2, #E8E4DC);
+  --fg: var(--light-fg, #161920);
+  --fg-2: var(--light-fg-2, #3D434F);
+  --fg-3: var(--light-fg-3, #5A606D);
+  --line: var(--light-line, rgba(22, 25, 32, .18));
+  --line-2: var(--light-line-2, rgba(22, 25, 32, .11));
+  --accent: var(--light-accent, #0D6B4F);
+  --accent-text: var(--light-accent-text, #0A5941);
+  --accent-ink: var(--light-accent-ink, #F4F2ED);
+  --split-dark-bg: var(--dark-bg, #12161E);
+  --split-dark-fg: var(--dark-fg, #F0EFEA);
+  --split-dark-fg-2: var(--dark-fg-2, #B9C0CC);
+  --split-dark-accent: var(--dark-accent-text, #5CE3B0);
+}
+:where(.slide[data-surface="split"] .split-anchor) {
+  background: var(--split-dark-bg);
+  color: var(--split-dark-fg);
+}
+:where(.slide[data-surface="split"] .split-main) {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.slide[data-surface="photo"] {
+  --bg: var(--photo-bg, #101319);
+  --bg-2: var(--dark-bg-2, #181E29);
+  --fg: var(--dark-fg, #F4F2EC);
+  --fg-2: var(--dark-fg-2, #D0D6E0);
+  --fg-3: var(--dark-fg-3, #A4ADB9);
+  --line: var(--dark-line, rgba(244, 242, 236, .26));
+  --line-2: var(--dark-line-2, rgba(244, 242, 236, .14));
+  --accent: var(--dark-accent, #3ED49C);
+  --accent-text: var(--dark-accent-text, #5CE3B0);
+  --accent-ink: var(--dark-accent-ink, #0E1117);
+}
+:where(.slide[data-surface="photo"] .photo-scrim) {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(12, 15, 21, .56) 0%, rgba(12, 15, 21, .34) 48%, rgba(12, 15, 21, .78) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Stage-level chrome polarity sync (adapts #nav, #tabs, #nav-side to active slide's surface) */
+#stage[data-active-surface="light"],
+#stage[data-active-surface="split"] {
+  --chrome-nav-color: var(--light-fg-3, #5A606D);
+  --chrome-nav-active: var(--light-fg, #161920);
+  --chrome-nav-accent: var(--light-accent, var(--accent));
+  --chrome-nav-border: var(--light-line-2, rgba(22, 25, 32, .14));
+  --chrome-side-bg: rgba(244, 242, 237, .82);
+  --chrome-side-border: rgba(22, 25, 32, .14);
+}
+#stage[data-active-surface="dark"],
+#stage[data-active-surface="photo"] {
+  --chrome-nav-color: var(--dark-fg-3, #929BA9);
+  --chrome-nav-active: var(--dark-fg, #F0EFEA);
+  --chrome-nav-accent: var(--dark-accent, var(--accent));
+  --chrome-nav-border: var(--dark-line-2, rgba(240, 239, 234, .16));
+  --chrome-side-bg: rgba(14, 17, 23, .76);
+  --chrome-side-border: rgba(240, 239, 234, .18);
 }
 
 /* ---------------------------------------------------------------- slide container (GPU-isolated) */
@@ -153,7 +255,7 @@ mark.em {
 .unit { font-size: .42em; font-weight: 500; letter-spacing: 0; opacity: .75; margin-left: .08em; font-family: var(--font-body); }
 .ph { display: inline-block; max-width: 100%; }
 
-/* ---------------------------------------------------------------- replaceable image/scene slot & low-res FX canvas */
+/* ---------------------------------------------------------------- replaceable image/scene slot */
 .asset-slot {
   position: absolute;
   inset: 0;
@@ -169,15 +271,6 @@ mark.em {
   height: 100%;
   object-fit: cover;
 }
-/* Logical 480x270 canvas stretched smoothly by GPU -> 16x cheaper than 1920x1080 buffer */
-.fx-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
 /* Ensure slide content sits above background scene & FX layers with zero specificity */
 :where(.slide.canvas > :not(.asset-slot):not(.scene):not(.fx-canvas):not([data-layer="bg"]):not(.back):not(.more-btn)) {
   position: relative;
@@ -190,13 +283,20 @@ mark.em {
   pointer-events: none;
 }
 
-/* ---------------------------------------------------------------- Phase B overlays & visual guidance helpers */
+/* ---------------------------------------------------------------- overlays, visual guidance & data-step */
 #morph-layer {
   position: absolute;
   inset: 0;
   z-index: 20;
   pointer-events: none;
   overflow: hidden;
+}
+
+/* Presenter-paced click steps ([data-step], [data-step-hide], [data-step-only]) */
+.slide [data-step-hidden="1"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Flowing SVG offset-path token helper (visual-explainer MIT) */
@@ -233,7 +333,7 @@ mark.em {
   animation: deck-spotlight-ring 1250ms cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
-/* Phase B.3 3-tier focus dimming + high-contrast spotlight choreographer ([data-focus-plan] + [data-focus]) */
+/* 3-tier focus dimming + high-contrast spotlight choreographer ([data-focus-plan] + [data-focus]) */
 #stage .slide [data-focus] {
   transition:
     opacity 500ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -261,13 +361,13 @@ mark.em {
   transform: translate3d(0, -4px, 0) scale(1.035);
 }
 
-/* Instant zero-cost BEFORE state setup for [data-transform-at] (zero reverse paint transitions on slide entry!) */
+/* Instant zero-cost BEFORE state setup for [data-transform-at] */
 .slide .pre-transform,
 .slide .pre-transform * {
   transition: none !important;
 }
 
-/* Target-lock concentric ripple over physical anchors or chart endpoints (100% GPU, hidden in static/print) */
+/* Target-lock concentric ripple over physical anchors or chart endpoints */
 .target-ripple {
   position: absolute;
   width: 24px;
@@ -282,7 +382,7 @@ mark.em {
   z-index: 4;
 }
 
-/* Chronological rail travel bead (100% GPU translate3d, hidden in static/print) */
+/* Chronological rail travel bead */
 .rail-bead {
   position: absolute;
   width: 14px;
@@ -297,41 +397,7 @@ mark.em {
   z-index: 4;
 }
 
-/* Interactive live controls (isolated from slide click-to-advance) */
-.live-ctrl {
-  user-select: none;
-}
-.live-ctrl input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-  outline: none;
-  cursor: pointer;
-}
-.live-ctrl input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--slider-thumb, #4BE2A5);
-  border: 3px solid var(--slider-ring, #0D1117);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-  cursor: grab;
-  transition: transform .15s ease;
-}
-.live-ctrl input[type="range"]::-webkit-slider-thumb:active {
-  cursor: grabbing;
-  transform: scale(1.14);
-}
-.live-ctrl input[type="range"]:focus-visible {
-  box-shadow: 0 0 0 3px rgba(75, 226, 165, 0.45);
-}
-
-/* ---------------------------------------------------------------- persistent navigation (customizable) */
+/* ---------------------------------------------------------------- navigation modes (top-bar / minimal-side / divider-only) */
 #nav {
   position: absolute;
   left: var(--nav-left);
@@ -344,8 +410,8 @@ mark.em {
   align-items: center;
   font: 500 var(--nav-size)/1 var(--font-label);
   letter-spacing: var(--label-tracking);
-  color: var(--nav-color);
-  transition: opacity .24s ease;
+  color: var(--chrome-nav-color, var(--nav-color));
+  transition: opacity .24s ease, color .24s ease;
   pointer-events: none;
 }
 #nav span {
@@ -354,14 +420,14 @@ mark.em {
   transition: color .28s ease;
 }
 #nav span.on {
-  color: var(--nav-active);
+  color: var(--chrome-nav-active, var(--nav-active));
   font-weight: 700;
 }
 #nav .ind {
   position: absolute;
   bottom: 0;
   height: 2px;
-  background: var(--nav-accent);
+  background: var(--chrome-nav-accent, var(--nav-accent));
   transition: left .42s cubic-bezier(.22, 1, .36, 1), width .42s cubic-bezier(.22, 1, .36, 1);
 }
 #nav.with-rule::after {
@@ -371,7 +437,7 @@ mark.em {
   right: 0;
   bottom: 0;
   height: 1px;
-  background: var(--nav-border);
+  background: var(--chrome-nav-border, var(--nav-border));
 }
 
 #tabs {
@@ -383,8 +449,8 @@ mark.em {
   gap: 24px;
   font: 500 19px/1 var(--font-label);
   letter-spacing: var(--label-tracking);
-  color: var(--nav-color);
-  transition: opacity .24s ease;
+  color: var(--chrome-nav-color, var(--nav-color));
+  transition: opacity .24s ease, color .24s ease;
   pointer-events: none;
 }
 #tabs span {
@@ -393,13 +459,79 @@ mark.em {
   transition: color .25s ease, border-color .25s ease;
 }
 #tabs span.on {
-  color: var(--nav-active);
-  border-bottom-color: var(--nav-accent);
+  color: var(--chrome-nav-active, var(--nav-active));
+  border-bottom-color: var(--chrome-nav-accent, var(--nav-accent));
 }
 
 #stage.hide-nav #nav,
 #stage.hide-nav #tabs { opacity: 0; }
 #stage.no-trans *, #stage.no-trans { transition: none !important; }
+
+/* minimal-side: sleek right-edge chapter anchor rail */
+#nav-side {
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 14;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .26s ease;
+}
+#stage.show-side-nav #nav-side {
+  opacity: 1;
+  pointer-events: auto;
+}
+#nav-side .ns-item {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--chrome-nav-color, var(--nav-color));
+  font: 600 18px/1 var(--font-label);
+  transition: background .22s ease, border-color .22s ease, color .22s ease;
+}
+#nav-side .ns-item .ns-lab {
+  opacity: 0;
+  transform: translate3d(6px, 0, 0);
+  transition: opacity .22s ease, transform .22s ease;
+  white-space: nowrap;
+}
+#nav-side .ns-item .ns-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--chrome-nav-color, var(--nav-color));
+  opacity: .55;
+  transition: height .28s cubic-bezier(0.22, 1, 0.36, 1), background .22s ease, opacity .22s ease;
+}
+#nav-side .ns-item.on {
+  color: var(--chrome-nav-active, var(--nav-active));
+}
+#nav-side .ns-item.on .ns-dot {
+  height: 28px;
+  background: var(--chrome-nav-accent, var(--nav-accent));
+  opacity: 1;
+}
+#nav-side:hover .ns-item,
+#nav-side .ns-item:focus-visible {
+  background: var(--chrome-side-bg, rgba(16, 19, 25, .72));
+  border-color: var(--chrome-side-border, rgba(255, 255, 255, .14));
+}
+#nav-side:hover .ns-item .ns-lab,
+#nav-side .ns-item:focus-visible .ns-lab {
+  opacity: 1;
+  transform: none;
+}
 
 /* Inline chapter nav (for free-canvas slides & print fallback) */
 .snav { display: none; }
@@ -416,7 +548,7 @@ mark.em {
   font-weight: 700;
 }
 
-/* ---------------------------------------------------------------- interactive chrome */
+/* ---------------------------------------------------------------- interactive chrome & auto-hiding bottom bar */
 .back {
   position: absolute;
   right: 64px;
@@ -477,12 +609,12 @@ mark.em {
 #toast {
   position: fixed;
   left: 50%;
-  bottom: 28px;
+  bottom: 78px;
   transform: translateX(-50%) translateY(10px);
-  z-index: 45;
+  z-index: 46;
   padding: 10px 22px;
   border-radius: 999px;
-  background: rgba(14, 17, 22, 0.9);
+  background: rgba(14, 17, 22, 0.92);
   border: 1px solid rgba(244, 242, 236, 0.18);
   color: #F4F2EC;
   font: 600 16px/1.3 var(--font-sans-fallback);
@@ -495,18 +627,98 @@ mark.em {
   transform: translateX(-50%) translateY(0);
 }
 
-#hint {
+/* Unified 2px progress bar + auto-hiding floating control capsule */
+#deck-progress {
   position: fixed;
-  right: 16px;
-  bottom: 12px;
-  z-index: 41;
-  color: #9A9EA6;
-  font: 12px/1.4 var(--font-sans-fallback);
-  opacity: 0;
-  transition: opacity .35s ease;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  z-index: 42;
+  background: rgba(128, 134, 148, 0.18);
   pointer-events: none;
 }
-body:hover #hint { opacity: .78; }
+#deck-progress-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: var(--accent, #3ED49C);
+  transition: transform .36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#ctrl-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%) translateY(14px);
+  z-index: 44;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 18, 24, 0.88);
+  border: 1px solid rgba(244, 242, 236, 0.16);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.34);
+  color: #F4F2EC;
+  font: 500 13px/1 var(--font-sans-fallback);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .24s ease, transform .24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#ctrl-bar.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+#ctrl-bar .cb-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: rgba(244, 242, 236, 0.88);
+  height: 30px;
+  min-width: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font: 600 13px/1 var(--font-sans-fallback);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease;
+}
+#ctrl-bar .cb-btn:hover { background: rgba(255, 255, 255, 0.12); color: #FFFFFF; }
+#ctrl-bar .cb-btn.is-on { background: rgba(62, 212, 156, 0.22); color: #7BF0C3; }
+#ctrl-bar .cb-pos {
+  padding: 0 8px;
+  font: 700 13px/1 var(--font-number);
+  font-variant-numeric: tabular-nums;
+  color: #F4F2EC;
+  white-space: nowrap;
+}
+#ctrl-bar .cb-step {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(62, 212, 156, 0.18);
+  color: #7BF0C3;
+  font: 700 12px/1 var(--font-number);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  display: none;
+}
+#ctrl-bar .cb-step.has-steps { display: inline-flex; align-items: center; }
+#ctrl-bar .cb-sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(244, 242, 236, 0.16);
+  margin: 0 2px;
+}
+
+#hint {
+  display: none;
+}
 
 /* ---------------------------------------------------------------- static freeze & low-power */
 html.still *,
@@ -518,14 +730,14 @@ body.low-power *::after {
   animation-play-state: paused !important;
   transition: none !important;
 }
-html.still .fx-canvas,
-body.low-power .fx-canvas,
 html.still .flow-token,
 body.low-power .flow-token,
 html.still [data-ripple],
 body.low-power [data-ripple],
 html.still [data-travel],
-body.low-power [data-travel] {
+body.low-power [data-travel],
+html.still #ctrl-bar,
+html.still #deck-progress {
   display: none !important;
 }
 html.still .slide [data-focus],
@@ -535,7 +747,11 @@ body.low-power .slide [data-focus] {
   box-shadow: none !important;
 }
 html.hide-ctrl .live-only,
-body.hide-ctrl .live-only {
+body.hide-ctrl .live-only,
+html.hide-ctrl #ctrl-bar,
+body.hide-ctrl #ctrl-bar,
+html.hide-ctrl #deck-progress,
+body.hide-ctrl #deck-progress {
   display: none !important;
 }
 
@@ -584,7 +800,8 @@ body.hide-ctrl .live-only {
   html, body { height: auto; overflow: visible; background: none; }
   #viewport { position: static; display: block; background: none; }
   #stage { transform: none !important; width: 1920px; height: auto; overflow: visible; }
-  #nav, #tabs, #curtain, #morph-layer, #notes, #hint, #toast, .back, .more-btn, .live-only, .fx-canvas, .flow-token, [data-ripple], [data-travel] { display: none !important; }
+  #nav, #tabs, #nav-side, #curtain, #morph-layer, #notes, #hint, #toast, #ctrl-bar, #deck-progress,
+  .back, .more-btn, .live-only, .flow-token, [data-ripple], [data-travel] { display: none !important; }
   .slide {
     position: relative;
     visibility: visible !important;
@@ -595,7 +812,9 @@ body.hide-ctrl .live-only {
     transform: none !important;
     clip-path: none !important;
   }
-  .slide * { opacity: 1; transform: none !important; animation: none !important; }
+  .slide * { animation: none !important; }
+  .slide [data-step-hidden="1"] { display: none !important; }
+  .slide [data-step]:not([data-step-hidden="1"]) { opacity: 1 !important; visibility: visible !important; transform: none !important; }
   .toc li.off { opacity: .28 !important; }
   .snav {
     display: flex;
@@ -620,314 +839,74 @@ body.hide-ctrl .live-only {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #nav .ind, #tabs span, #nav span, #toast { transition: none !important; }
-  .fx-canvas, .flow-token, [data-ripple], [data-travel] { display: none !important; }
+  #nav .ind, #tabs span, #nav span, #toast, #ctrl-bar, #deck-progress-fill { transition: none !important; }
+  .flow-token, [data-ripple], [data-travel] { display: none !important; }
   .slide * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
 
-/* deck-architect v4 Business Components & Quick-Mode Fallback CSS
- *
- * Scoped strictly to deterministic component slides (.cmp, .status, .overview, .toc)
- * so free-canvas slides (.slide.canvas) NEVER suffer CSS specificity conflicts.
+/* deck-architect v4.4 On-Demand Module: ambient-fx
+ * Injected by assemble.py only when slides declare [data-fx="ambient-dust|soft-aurora"].
  */
-
-/* ---------------------------------------------------------------- shared component chrome */
-.slide.cmp,
-.slide.status,
-.slide.overview,
-.slide.toc {
-  font-size: 28px;
-  line-height: 1.65;
-}
-
-.slide.cmp .source,
-.slide.status .source,
-.slide.overview .source {
+.fx-canvas {
   position: absolute;
-  left: 96px;
-  bottom: 36px;
-  font: 400 19px/1.3 var(--font-label);
-  color: var(--fg-3);
-  z-index: 5;
-}
-
-.slide.cmp .foot,
-.slide.status .pageno {
-  position: absolute;
-  right: 96px;
-  bottom: 36px;
-  font: 500 19px/1 var(--font-label);
-  color: var(--fg-3);
-  font-variant-numeric: tabular-nums;
-  z-index: 5;
-}
-
-/* ---------------------------------------------------------------- status-table (weekly progress overview) */
-.slide.status .st-head {
-  position: absolute;
-  left: 80px;
-  right: 80px;
-  top: 44px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 36px;
-}
-.slide.status .st-head .title {
-  font: var(--title-weight) 54px/1.15 var(--font-display);
-  letter-spacing: var(--title-tracking);
-}
-.slide.status .legend {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  font: 500 20px/1 var(--font-label);
-  color: var(--fg-3);
-  white-space: nowrap;
-}
-.slide.status .legend span { display: inline-flex; align-items: center; gap: 8px; }
-.slide.status .st-body {
-  position: absolute;
-  left: 80px;
-  right: 80px;
-  top: 136px;
-  bottom: 84px;
-  overflow: hidden;
-}
-.slide.status .st-summary {
-  list-style: none;
-  margin-bottom: 18px;
-  padding: 4px 0 4px 22px;
-  border-left: 3px solid var(--accent);
-  display: grid;
-  gap: 6px;
-}
-.slide.status .st-summary li { font: 500 23px/1.45 var(--font-body); }
-.slide.status .status-table {
+  inset: 0;
   width: 100%;
-  border-collapse: collapse;
-  font: 400 21px/1.25 var(--font-body);
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
 }
-.slide.status .status-table th {
-  font: 600 20px/1.2 var(--font-label);
-  color: var(--fg-3);
-  text-align: left;
-  padding: 8px 10px;
-  border-bottom: 2px solid var(--line);
+
+html.still .fx-canvas,
+body.low-power .fx-canvas {
+  display: none !important;
 }
-.slide.status .status-table td {
-  padding: 9px 10px;
-  border-bottom: 1px solid var(--line-2);
-  vertical-align: middle;
+
+@media print {
+  .fx-canvas { display: none !important; }
 }
-.slide.status .status-table tr.grp td {
-  font: 700 22px/1.2 var(--font-display);
-  padding-top: 14px;
-  border-bottom: 1px solid var(--line);
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-canvas { display: none !important; }
 }
-.slide.status .g-note { margin-left: 14px; font: 400 20px/1 var(--font-label); color: var(--fg-3); }
-.slide.status .c-name { font-weight: 600; min-width: 260px; }
-.slide.status .c-owner { color: var(--fg-3); white-space: nowrap; }
-.slide.status .st { white-space: nowrap; color: var(--fg-3); }
-.slide.status .st i, .slide.status .legend i {
-  width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: middle;
+
+/* deck-architect v4.4 On-Demand Module: live-controls
+ * Injected by assemble.py only when slides contain .live-ctrl or range inputs.
+ */
+.live-ctrl {
+  user-select: none;
 }
-.slide.status .st-done i, .slide.status .legend .st-done { background: var(--fg); }
-.slide.status .st-done { color: var(--fg); }
-.slide.status .st-doing i, .slide.status .legend .st-doing { background: var(--accent); }
-.slide.status .st-doing { color: var(--fg); font-weight: 600; }
-.slide.status .st-target i, .slide.status .legend .st-target { background: transparent; border: 2px solid var(--fg-3); }
-.slide.status .st-na i { display: none; }
-.slide.status .c-prog { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
-.slide.status .bar {
-  display: inline-block; width: 88px; height: 8px; background: var(--line-2);
-  margin-right: 10px; vertical-align: middle; overflow: hidden;
+.live-ctrl input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--slider-track, rgba(255, 255, 255, 0.16));
+  outline: none;
+  cursor: pointer;
 }
-.slide.status .bar span { display: block; height: 100%; background: var(--fg); }
-.slide.status .c-risk { white-space: nowrap; }
-.slide.status .dot {
-  display: inline-block; width: 15px; height: 15px; border-radius: 50%; margin-right: 8px; vertical-align: middle;
+[data-surface="light"] .live-ctrl input[type="range"] {
+  background: var(--slider-track, rgba(20, 24, 32, 0.14));
 }
-.slide.status .dot-red { background: #C82828; }
-.slide.status .dot-yellow { background: #C9820B; }
-.slide.status .dot-green { background: #1E874B; }
-.slide.status tr.rk-red td.c-name { box-shadow: inset 5px 0 0 #C82828; padding-left: 16px; }
-.slide.status .c-sup { color: var(--fg); max-width: 420px; }
-.slide.status .source { left: 80px; }
-
-/* ---------------------------------------------------------------- overview: pillars (annual section) */
-.slide.overview .ov-head { position: absolute; left: 96px; right: 96px; top: 72px; }
-.slide.overview .ov-kicker {
-  font: 600 22px/1.2 var(--font-label);
-  color: var(--fg-3);
-  margin-bottom: 18px;
+.live-ctrl input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--slider-thumb, var(--accent, #4BE2A5));
+  border: 3px solid var(--slider-ring, var(--bg, #0D1117));
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  cursor: grab;
+  transition: transform .15s ease;
 }
-.slide.overview .ov-headline {
-  font: var(--display-weight) 92px/1.1 var(--font-display);
-  letter-spacing: var(--display-tracking);
+.live-ctrl input[type="range"]::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.14);
 }
-.slide.overview .pillars {
-  position: absolute;
-  left: 96px;
-  right: 96px;
-  top: 296px;
-  bottom: 100px;
-  display: grid;
-  grid-template-columns: repeat(var(--n), 1fr);
-  gap: 44px;
-  align-items: start;
+.live-ctrl input[type="range"]:focus-visible {
+  box-shadow: 0 0 0 3px rgba(75, 226, 165, 0.45);
 }
-.slide.overview .pillar {
-  margin-top: calc(var(--k) * 56px);
-  padding-top: 24px;
-  border-top: 2px solid var(--line);
-  position: relative;
-}
-.slide.overview .pillar[data-link]:hover h3 { color: var(--accent-text); }
-.slide.overview .pk { font: 600 20px/1.2 var(--font-label); color: var(--fg-3); margin-bottom: 12px; }
-.slide.overview .pillar h3 { font: var(--title-weight) 44px/1.2 var(--font-display); transition: color .25s; }
-.slide.overview .psub { margin-top: 12px; font: 400 25px/1.5 var(--font-body); color: var(--fg-2); }
-.slide.overview .pillar ul { list-style: none; margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-.slide.overview .pillar li { font: 500 24px/1.45 var(--font-body); padding-left: 24px; position: relative; }
-.slide.overview .pillar li::before { content: ""; position: absolute; left: 0; top: .72em; width: 12px; height: 2px; background: var(--accent); }
-.slide.overview .stats { display: flex; flex-wrap: wrap; gap: 18px 40px; margin-top: 24px; }
-.slide.overview .sv { font: var(--number-weight) 78px/1 var(--font-number); letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-.slide.overview .sl { margin-top: 8px; font: 400 21px/1.3 var(--font-body); color: var(--fg-3); }
-.slide.overview .more { display: inline-block; margin-top: 20px; font: 600 20px/1 var(--font-label); color: var(--accent-text); }
-
-/* ---------------------------------------------------------------- automatic TOC highlight page */
-.slide.toc .toc-list { list-style: none; position: absolute; inset: 0; display: flex; padding: 0 120px; }
-.slide.toc li { transition: opacity .5s; }
-.slide.toc li.off { opacity: .28; }
-.slide.toc .i { font: var(--numeral-weight) 84px/1 var(--font-number); letter-spacing: -.03em; color: var(--fg-3); display: block; margin-bottom: 24px; }
-.slide.toc li.on .i { color: var(--accent-text); }
-.slide.toc .l { font: var(--display-weight) 68px/1.15 var(--font-display); }
-[data-shape="row"] .slide.toc .toc-list { align-items: center; }
-[data-shape="row"] .slide.toc li { flex: 1; border-top: 2px solid var(--line-2); padding-top: 36px; margin-right: 44px; }
-[data-shape="row"] .slide.toc li.on { border-top-color: var(--accent); }
-[data-shape="column"] .slide.toc .toc-list { flex-direction: column; justify-content: center; gap: 32px; }
-[data-shape="column"] .slide.toc li { display: flex; align-items: baseline; gap: 44px; border-left: 3px solid transparent; padding-left: 36px; }
-[data-shape="column"] .slide.toc li.on { border-left-color: var(--accent); }
-[data-shape="column"] .slide.toc .i { margin: 0; font-size: 58px; }
-[data-shape="rings"] .slide.toc .toc-list { align-items: center; justify-content: center; }
-[data-shape="rings"] .slide.toc li {
-  position: absolute; left: 50%; top: 50%; border: 1px solid var(--line-2); border-radius: 50%;
-  transform: translate(-50%, -50%); width: calc(var(--r) * 1px); height: calc(var(--r) * 1px);
-  display: flex; align-items: flex-start; justify-content: center; padding-top: 32px;
-}
-[data-shape="rings"] .slide.toc li.on { border-color: var(--accent); border-width: 2px; }
-[data-shape="rings"] .slide.toc .i { display: none; }
-[data-shape="rings"] .slide.toc .l { font-size: 44px; }
-
-/* ---------------------------------------------------------------- quick-mode / fallback components (.slide.cmp) */
-.slide.cmp.cover { background: var(--cover-bg, var(--bg)); color: var(--cover-fg, var(--fg)); }
-.slide.cmp.cover .kicker { position: absolute; left: 120px; top: 108px; font: 600 22px/1 var(--font-label); color: var(--cover-fg-3, var(--fg-3)); }
-.slide.cmp.cover .cover-inner { position: absolute; left: 120px; right: 120px; bottom: 290px; }
-.slide.cmp.cover .cover-title { font: var(--display-weight) 144px/1.05 var(--font-display); letter-spacing: var(--display-tracking); max-width: 1640px; }
-.slide.cmp.cover .cover-sub { margin-top: 32px; font: 400 38px/1.45 var(--font-body); color: var(--cover-fg-2, var(--fg-2)); max-width: 1280px; }
-.slide.cmp.cover .route {
-  position: absolute; left: 120px; right: 120px; bottom: 88px; display: grid;
-  grid-template-columns: 1.4fr repeat(var(--n), 1fr); gap: 36px; font: 500 22px/1.4 var(--font-label);
-  color: var(--cover-fg-2, var(--fg-2));
-}
-.slide.cmp.cover .route.no-who { grid-template-columns: repeat(var(--n), 1fr); }
-.slide.cmp.cover .route > div { border-top: 1px solid var(--cover-line, var(--line)); padding-top: 16px; }
-.slide.cmp.cover .route i { display: block; font-style: normal; color: var(--cover-fg-3, var(--fg-3)); margin-bottom: 6px; font-variant-numeric: tabular-nums; }
-
-.slide.cmp.closing { background: var(--cover-bg, var(--bg)); color: var(--cover-fg, var(--fg)); }
-.slide.cmp.closing .closing-inner { position: absolute; left: 120px; right: 120px; bottom: 200px; }
-.slide.cmp.closing .closing-text { font: var(--display-weight) 168px/1.08 var(--font-display); }
-.slide.cmp.closing .closing-sub { margin-top: 28px; font: 400 38px/1.45 var(--font-body); color: var(--cover-fg-2, var(--fg-2)); }
-
-.slide.cmp.shock { background: var(--shock-bg); color: var(--shock-fg); }
-.slide.cmp.shock .shock-inner { position: absolute; left: 120px; right: 120px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
-.slide.cmp.shock .shock-text { font: var(--display-weight) 144px/1.1 var(--font-display); max-width: 1640px; }
-.slide.cmp.shock .shock-text mark.em { color: var(--shock-em); }
-.slide.cmp.shock .shock-sub { margin-top: 40px; font: 400 38px/1.45 var(--font-body); opacity: .78; }
-.slide.cmp.shock .source { color: inherit; opacity: .6; }
-
-/* Standard content component: title is ALWAYS largest heading on the slide */
-.slide.cmp.content .slide-head { position: absolute; left: 96px; right: 96px; top: 124px; }
-.slide.cmp.content.tabbed .slide-head { top: 156px; }
-.slide.cmp.content .title { font: var(--display-weight) 78px/1.12 var(--font-display); letter-spacing: var(--title-tracking); }
-.slide.cmp.content .body {
-  position: absolute; left: 96px; right: 96px; top: 244px; bottom: 108px;
-  display: flex; flex-direction: column; justify-content: center;
-}
-.slide.cmp.content.tabbed .body { top: 274px; }
-
-.slide.cmp .point .key { font: 700 54px/1.3 var(--font-display); max-width: 1460px; }
-.slide.cmp .point .key.whole { color: var(--accent-text); }
-.slide.cmp .point .support { margin-top: 36px; max-width: 1120px; font: 400 30px/1.6 var(--font-body); color: var(--fg-2); padding-left: 24px; border-left: 3px solid var(--accent); }
-
-.slide.cmp .number { display: grid; grid-template-columns: auto minmax(0, 660px); column-gap: 72px; align-items: end; justify-content: start; }
-.slide.cmp .number .value { grid-row: 1 / 3; font: var(--number-weight) 240px/.88 var(--font-number); letter-spacing: -.04em; }
-.slide.cmp .number .label { font: 700 44px/1.25 var(--font-display); align-self: end; }
-.slide.cmp .number .note { font: 400 28px/1.55 var(--font-body); color: var(--fg-2); margin-top: 16px; align-self: start; }
-.slide.cmp .pair { display: inline-flex; align-items: baseline; gap: .12em; white-space: nowrap; }
-.slide.cmp .pair .was { color: var(--fg-3); }
-.slide.cmp .pair .arrow { font-size: .5em; font-weight: 400; color: var(--fg-3); margin: 0 .12em; }
-
-.slide.cmp .stats-lead { font: 600 34px/1.4 var(--font-body); color: var(--fg-2); margin-bottom: 40px; max-width: 1320px; }
-.slide.cmp .stats-row { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 44px; }
-.slide.cmp .stats-row .stat { padding-top: 22px; border-top: 2px solid var(--line); }
-.slide.cmp .stats-row .sh { margin-bottom: 12px; font: 700 30px/1.3 var(--font-display); }
-.slide.cmp .stats-row .sv { font: var(--number-weight) 120px/1 var(--font-number); letter-spacing: -.04em; white-space: nowrap; }
-.slide.cmp .stats-row .sl { margin-top: 14px; font: 500 28px/1.35 var(--font-body); }
-.slide.cmp .stats-row .sn { margin-top: 8px; font: 400 22px/1.45 var(--font-body); color: var(--fg-3); }
-.slide.cmp .lnote { margin-top: 28px; padding-left: 20px; border-left: 3px solid var(--accent); font: 400 26px/1.5 var(--font-body); color: var(--fg-2); }
-
-.slide.cmp .bullets { list-style: none; display: flex; flex-direction: column; max-width: 1420px; }
-.slide.cmp .bullets li { font: 500 36px/1.45 var(--font-body); padding: 20px 0 20px 64px; position: relative; border-top: 1px solid var(--line-2); }
-.slide.cmp .bullets li:last-child { border-bottom: 1px solid var(--line-2); }
-.slide.cmp .bullets li::before { content: ""; position: absolute; left: 0; top: calc(20px + .72em); width: 32px; height: 3px; background: var(--accent); }
-
-.slide.cmp .steps { list-style: none; display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 44px; }
-.slide.cmp .steps li { padding-top: 22px; border-top: 2px solid var(--line); }
-.slide.cmp .steps .n { display: block; font: var(--numeral-weight) 88px/1 var(--font-number); color: var(--fg-3); margin-bottom: 18px; }
-.slide.cmp .steps li:has(mark.em) .n { color: var(--accent-text); }
-.slide.cmp .steps .t { display: block; font: 700 32px/1.4 var(--font-body); }
-.slide.cmp .steps .d { display: block; margin-top: 10px; font: 400 25px/1.5 var(--font-body); color: var(--fg-2); }
-
-.slide.cmp .compare { display: grid; grid-template-columns: .95fr 1.05fr; align-items: stretch; min-height: 440px; }
-.slide.cmp .compare .col { padding: 44px 52px; }
-.slide.cmp .compare .col:first-child { color: var(--fg-2); border-top: 2px solid var(--line-2); }
-.slide.cmp .compare .col:last-child { background: var(--accent); color: var(--accent-ink); border-radius: var(--radius); }
-.slide.cmp .compare .col:last-child mark.em { color: var(--em-on-accent, inherit); }
-.slide.cmp .compare h3 { font: 600 22px/1 var(--font-label); margin-bottom: 28px; opacity: .82; }
-.slide.cmp .compare ul { list-style: none; display: flex; flex-direction: column; gap: 22px; }
-.slide.cmp .compare li { font: 700 40px/1.35 var(--font-display); }
-
-.slide.cmp .lanes { display: grid; grid-template-columns: 120px repeat(var(--n), minmax(0, 1fr)); gap: 16px 20px; align-items: stretch; }
-.slide.cmp .lanes .ll { font: 700 22px/1.3 var(--font-label); color: var(--fg-3); display: flex; align-items: center; }
-.slide.cmp .lanes .lane { display: grid; grid-template-rows: 1fr auto 1fr; gap: 12px; border-left: 1px solid var(--line-2); padding-left: 16px; }
-.slide.cmp .lanes .lo { list-style: none; font: 400 21px/1.45 var(--font-body); color: var(--fg-2); display: flex; flex-direction: column; gap: 6px; }
-.slide.cmp .lanes .lc { font: 600 20px/1.35 var(--font-label); color: var(--accent-text); padding: 6px 0; border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); }
-.slide.cmp .lanes .ln { display: flex; flex-direction: column; gap: 6px; }
-.slide.cmp .lanes .ln .n { font: 800 22px/1 var(--font-number); color: var(--accent-text); }
-.slide.cmp .lanes .ln .t { font: 700 24px/1.35 var(--font-body); }
-.slide.cmp .lanes .ln .d { font: 400 20px/1.4 var(--font-body); color: var(--fg-2); }
-
-.slide.cmp .tl { list-style: none; display: grid; grid-template-columns: repeat(var(--n), 1fr); gap: 32px; border-top: 2px solid var(--line); padding-top: 28px; }
-.slide.cmp .tl .w { display: block; font: 700 22px/1.2 var(--font-number); color: var(--accent-text); margin-bottom: 10px; }
-.slide.cmp .tl .t { display: block; font: 700 28px/1.35 var(--font-body); }
-.slide.cmp .tl .d { display: block; margin-top: 8px; font: 400 22px/1.45 var(--font-body); color: var(--fg-2); }
-
-.slide.cmp .tbl { width: 100%; border-collapse: collapse; font: 400 24px/1.4 var(--font-body); }
-.slide.cmp .tbl th { font: 700 21px/1.2 var(--font-label); color: var(--fg-3); text-align: left; padding: 12px 14px; border-bottom: 2px solid var(--line); }
-.slide.cmp .tbl td { padding: 14px; border-bottom: 1px solid var(--line-2); }
-.slide.cmp .tbl .num { text-align: right; font-variant-numeric: tabular-nums; }
-
-.slide.cmp .quote { max-width: 1440px; }
-.slide.cmp .quote::before { content: "\201C"; display: block; font: 700 200px/.8 var(--font-quote); color: var(--accent); margin-bottom: 8px; }
-.slide.cmp .quote p { font: var(--quote-weight) 58px/1.4 var(--font-quote); }
-.slide.cmp .quote cite { display: flex; align-items: center; gap: 18px; margin-top: 40px; font: 500 24px/1.4 var(--font-label); color: var(--fg-3); font-style: normal; }
-.slide.cmp .quote cite::before { content: ""; width: 40px; height: 2px; background: var(--fg-3); }
-
-.slide.cmp .image { display: grid; grid-template-columns: 1.35fr 1fr; gap: 64px; align-items: end; height: 100%; }
-.slide.cmp .image .img { height: 100%; overflow: hidden; background: var(--bg-2); border-radius: var(--radius); }
-.slide.cmp .image img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.slide.cmp .image .caption { font: 700 38px/1.4 var(--font-display); }
 
 /* @fonts family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@600;700;800;900&family=Geist:wght@500;600;700;800&family=Chiron+GoRound+TC:wght@700;900&family=Nunito:wght@800;900 */
 
@@ -3660,7 +3639,7 @@ body.hide-ctrl .live-only {
 <div id="notes"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="hint">← → 翻頁 · F 全螢幕 · N 備註 · B 靜態 · P 列印</div>
-<script>window.DECK={"title": "星塵烘焙・智慧補貨系統導入", "style": "apple", "mode": "dark", "chapters": ["現況痛點", "試點成果", "導入節奏"], "tabs": [["報廢痛點與降幅"], ["星塵預報 2.0", "清晨到打烊的三個站"], ["五店效益即時試算", "五店導入進度與風險"]], "motion": "horizontal"};</script>
+<script>window.DECK={"title": "星塵烘焙・智慧補貨系統導入", "style": "apple", "mode": "dark", "stageMode": "", "navMode": "top-bar", "modules": ["ambient-fx", "live-controls"], "chapters": ["現況痛點", "試點成果", "導入節奏"], "tabs": [["報廢痛點與降幅"], ["星塵預報 2.0", "清晨到打烊的三個站"], ["五店效益即時試算", "五店導入進度與風險"]], "motion": "horizontal"};</script>
 <script>(function(slide){
 const storesIn = slide.querySelector('#sim-stores');
 const rateIn = slide.querySelector('#sim-rate');
@@ -3784,28 +3763,18 @@ presets.forEach(b => b.addEventListener('click', () => {
 }));
 render(false, null);
 })(document.getElementById('s-6'));</script>
-<script>/* deck-architect v4.3 Thin Shell Runtime (Phase B.3 — 60fps GPU Core + Visual Guidance Spec)
+<script>/* deck-architect v4.4 Thin Shell Runtime (Phase C.2 — Bipolar Surface, Multi-Mode Nav, Auto-Hide Bar, Dual-Track data-step)
  *
- * Zero external dependencies (~11 KB gzip), 100% offline single-file HTML playback:
- *  - Silky 60/120fps compositor-only WAAPI transitions (zero JS keyframe bloat, zero lockout)
- *  - 6 narrative transition archetypes (data-transition="push|zoom-rise|iris|shock|morph|sheet-up|modal")
- *    with automatic directional reversal on backward navigation
- *  - Multi-element Keynote Magic Move ([data-morph="id"], MIT open-slide) with zero layout thrash
- *  - Phase B.3 Visual Guidance Choreography (preserves single-click/key slide navigation unchanged):
- *      [data-focus-plan] + [data-focus] 3-tier spotlight + context dimming (auto-clears to 100%)
- *      [data-transform-at] live causal state flip (.pre-transform -> final state)
- *      [data-draw] true SVG pathLength="1" directional stroke draw & progress rings (MIT visual-explainer)
- *      [data-wipe="right|left|down|up"] pure GPU clip-path directional reveal (dashed pins, rails, slashes)
- *      [data-pop] crisp endpoint dot/arrowhead bloom synced to connector arrival
- *      [data-ripple] single target-lock concentric ring over physical anchors
- *      [data-travel="x|y"] chronological rail travel bead (pure GPU translate3d)
- *      [data-nudge="x|y"] subtle interactive slider affordance cue
- *      [data-spotlight] mobile-visible high-contrast focus ring
- *      [data-beat] / [data-grow] / [data-count] / [data-stagger]
- *  - Deferred 480x270 Canvas 2D ambient FX lifecycle ([data-fx]; MIT lewislulu/html-ppt-skill)
- *  - Native mobile touch swipe + interactive live-figure isolation (.live-ctrl / [data-interactive])
- *  - Dual static freeze (?still=1, B low-power toggle, prefers-reduced-motion, @media print)
- *  - Flagship plugin lifecycle events: deck:slideenter, deck:slideleave, deck:still, deck:lowpower
+ * Zero external dependencies, 100% offline single-file HTML playback:
+ *  - Per-slide polarity sync (data-surface="light|dark|split|photo" -> #stage[data-active-surface])
+ *  - Navigation modes: top-bar | minimal-side (#nav-side) | divider-only, with per-slide data-nav overrides
+ *  - Unified auto-hiding floating bottom control capsule (#ctrl-bar) + 2px progress bar (#deck-progress)
+ *  - Dual-track pacing: default 0-step Visual Guidance Choreography + presenter-paced click steps
+ *      (data-step / data-step-hide / data-step-only / data-step-from, deferred inner primitives,
+ *       backward navigation lands on previous slide's final step, ?still=1 & print expand to final state)
+ *  - 60fps compositor-only 6 narrative transitions + cross-slide Magic Move (data-morph)
+ *  - Lifecycle event bus (#stage): deck:slideenter, deck:slideleave, deck:stepchange, deck:still, deck:lowpower
+ *    (consumed by on-demand modules: ambient-fx, media, flow-carousel, coverflow)
  */
 (function () {
   const stage = document.getElementById('stage');
@@ -3845,14 +3814,18 @@ render(false, null);
   if (hideCtrlMode) document.documentElement.classList.add('hide-ctrl');
 
   const isStatic = () => Boolean(stillMode || lowPower || reduce);
-  const M = (window.DECK && window.DECK.motion) || 'horizontal';
+  const DECK = window.DECK || {};
+  const M = DECK.motion || 'horizontal';
+  const deckStageMode = DECK.stageMode || document.documentElement.dataset.stageMode || '';
+  const deckNavMode = DECK.navMode || document.documentElement.dataset.navMode || (deckStageMode === 'keynote' ? 'divider-only' : 'top-bar');
 
   // Apple critically damped & expo-out compositor curves (2-keyframe GPU-only -> locked 60/120fps)
   const EASE_SPRING = 'cubic-bezier(0.22, 1, 0.36, 1)';
   const EASE_CRISP = 'cubic-bezier(0.16, 1, 0.3, 1)';
-  const EASE_CINEMA = 'cubic-bezier(0.32, 0.72, 0, 1)'; // Apple iOS/Keynote sheet curve!
+  const EASE_CINEMA = 'cubic-bezier(0.32, 0.72, 0, 1)';
 
   let cur = -1;
+  let curStep = 0;
   let navToken = 0;
   let toastTimer = null;
   const returnTo = [];
@@ -3860,8 +3833,10 @@ render(false, null);
   const activeTimers = new Set();
   const activeRafs = new Set();
   const hiddenMorphEls = new Set();
+  const stepAnims = new WeakMap();
 
   const isApp = i => slides[i] && slides[i].dataset.appendix === '1';
+  const mainIndices = slides.map((_, i) => i).filter(i => !isApp(i));
 
   function trackAnim(anim) {
     if (!anim) return anim;
@@ -3885,7 +3860,7 @@ render(false, null);
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
   }
 
-  // ---------------------------------------------------------------- stage fit & nav
+  // ---------------------------------------------------------------- stage fit & navigation (top-bar / minimal-side / divider-only)
   document.querySelectorAll('[data-shape="rings"] .toc-list').forEach(ol => {
     const lis = [...ol.children], n = lis.length;
     const big = M === 'zoom-in';
@@ -3902,7 +3877,7 @@ render(false, null);
   addEventListener('resize', fit);
   fit();
 
-  const chapters = (window.DECK && window.DECK.chapters) || [];
+  const chapters = DECK.chapters || [];
   let labels = [], ind = null;
   if (nav && chapters.length) {
     nav.innerHTML = chapters.map(l => '<span>' + String(l).replace(/</g, '&lt;') + '</span>').join('') + '<i class="ind"></i>';
@@ -3910,14 +3885,72 @@ render(false, null);
     ind = nav.querySelector('.ind');
   }
 
+  // Mount minimal-side chapter rail (#nav-side)
+  let sideNav = document.getElementById('nav-side');
+  let sideItems = [];
+  if (chapters.length) {
+    if (!sideNav) {
+      sideNav = document.createElement('nav');
+      sideNav.id = 'nav-side';
+      sideNav.setAttribute('aria-label', '章節導航');
+      stage.appendChild(sideNav);
+    }
+    const chFirstSlide = chapters.map((_, ci) =>
+      slides.findIndex(s => s.dataset.appendix !== '1' && Number(s.dataset.chi ?? -1) === ci)
+    );
+    sideNav.innerHTML = chapters.map((l, ci) =>
+      '<button type="button" class="ns-item" data-chi="' + ci + '" aria-label="' + String(l).replace(/"/g, '&quot;') + '">' +
+      '<span class="ns-lab">' + String(l).replace(/</g, '&lt;') + '</span><span class="ns-dot"></span></button>'
+    ).join('');
+    sideItems = [...sideNav.querySelectorAll('.ns-item')];
+    sideItems.forEach((btn, ci) => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const target = chFirstSlide[ci];
+        if (target >= 0) go(target, false, { step: 0 });
+      });
+    });
+  }
+
+  function resolveSurface(sl) {
+    if (!sl) return DECK.mode || document.documentElement.dataset.mode || 'dark';
+    return sl.dataset.surface || DECK.mode || document.documentElement.dataset.mode || 'dark';
+  }
+
+  function syncSurface(sl) {
+    const surf = resolveSurface(sl);
+    stage.dataset.activeSurface = surf;
+    return surf;
+  }
+
+  function resolveNavMode(sl) {
+    if (!sl) return deckNavMode;
+    if (sl.dataset.nav) return sl.dataset.nav;
+    if (sl.querySelector('nav.slide-nav, nav[data-auto-nav], [data-auto-nav]')) return 'inline';
+    return deckNavMode;
+  }
+
   function setNav(sl) {
-    if (!nav || !tabsEl) return;
     const kind = sl.dataset.kind || 'content';
     const chi = Number(sl.dataset.chi ?? -1);
-    const navMode = sl.dataset.nav || (sl.querySelector('nav.slide-nav, nav[data-auto-nav], [data-auto-nav]') ? 'inline' : 'shell');
-    const hide = kind !== 'content' || navMode === 'inline' || navMode === 'none' || chi < 0 || !labels[chi];
-    stage.classList.toggle('hide-nav', hide);
-    if (hide) { tabsEl.style.opacity = 0; return; }
+    const effMode = resolveNavMode(sl);
+    const hasChapter = kind === 'content' && chi >= 0 && Boolean(chapters[chi]);
+
+    const showSide = hasChapter && effMode === 'minimal-side';
+    const showTop = hasChapter && (effMode === 'top-bar' || effMode === 'shell');
+
+    stage.classList.toggle('show-side-nav', showSide);
+    stage.classList.toggle('hide-nav', !showTop);
+
+    if (sideItems.length) {
+      sideItems.forEach((item, i) => item.classList.toggle('on', i === chi));
+    }
+
+    if (!nav || !tabsEl) return;
+    if (!showTop) {
+      tabsEl.style.opacity = 0;
+      return;
+    }
 
     labels.forEach((l, i) => l.classList.toggle('on', i === chi));
     const on = labels[chi];
@@ -3927,7 +3960,7 @@ render(false, null);
     }
     const tabs = Number(sl.dataset.tabs || 0);
     const tab = Number(sl.dataset.tab || 0);
-    const tabList = (window.DECK && window.DECK.tabs && window.DECK.tabs[chi]) || [];
+    const tabList = (DECK.tabs && DECK.tabs[chi]) || [];
     if (tabs > 2 && tabList.length > 2) {
       if (tabsEl.dataset.chi != String(chi)) {
         tabsEl.innerHTML = tabList.map(t => '<span>' + String(t).replace(/</g, '&lt;') + '</span>').join('');
@@ -3940,6 +3973,111 @@ render(false, null);
     }
   }
 
+  // ---------------------------------------------------------------- unified auto-hiding bottom control bar & 2px progress bar
+  let progressEl = document.getElementById('deck-progress');
+  let progressFill = document.getElementById('deck-progress-fill');
+  if (!progressEl) {
+    progressEl = document.createElement('div');
+    progressEl.id = 'deck-progress';
+    progressEl.setAttribute('aria-hidden', 'true');
+    progressFill = document.createElement('div');
+    progressFill.id = 'deck-progress-fill';
+    progressEl.appendChild(progressFill);
+    document.body.appendChild(progressEl);
+  }
+
+  let ctrlBar = document.getElementById('ctrl-bar');
+  if (!ctrlBar) {
+    ctrlBar = document.createElement('div');
+    ctrlBar.id = 'ctrl-bar';
+    ctrlBar.setAttribute('role', 'toolbar');
+    ctrlBar.setAttribute('aria-label', '簡報控制列');
+    ctrlBar.innerHTML =
+      '<button type="button" class="cb-btn" data-cb="prev" aria-label="上一頁">‹</button>' +
+      '<span class="cb-pos">01 / 01</span>' +
+      '<span class="cb-step" aria-label="頁內步進"></span>' +
+      '<button type="button" class="cb-btn" data-cb="next" aria-label="下一頁">›</button>' +
+      '<span class="cb-sep" aria-hidden="true"></span>' +
+      '<button type="button" class="cb-btn" data-cb="notes" aria-label="講者備註 (N)">備註 N</button>' +
+      '<button type="button" class="cb-btn" data-cb="static" aria-label="靜態省電 (B)">靜態 B</button>' +
+      '<button type="button" class="cb-btn" data-cb="fs" aria-label="全螢幕 (F)">全螢幕 F</button>';
+    document.body.appendChild(ctrlBar);
+  }
+
+  const cbPosEl = ctrlBar.querySelector('.cb-pos');
+  const cbStepEl = ctrlBar.querySelector('.cb-step');
+  const cbNotesBtn = ctrlBar.querySelector('[data-cb="notes"]');
+  const cbStaticBtn = ctrlBar.querySelector('[data-cb="static"]');
+  const cbFsBtn = ctrlBar.querySelector('[data-cb="fs"]');
+  let ctrlHideTimer = 0;
+  let ctrlHover = false;
+
+  function setCtrlBarVisible(visible, keepOpen) {
+    clearTimeout(ctrlHideTimer);
+    if (!ctrlBar || stillMode || hideCtrlMode) return false;
+    ctrlBar.classList.toggle('visible', Boolean(visible));
+    if (visible && !keepOpen && !ctrlHover) {
+      ctrlHideTimer = setTimeout(() => {
+        if (!ctrlHover) ctrlBar.classList.remove('visible');
+      }, 2200);
+    }
+    return ctrlBar.classList.contains('visible');
+  }
+
+  function updateCtrlBar() {
+    if (!ctrlBar) return;
+    const sl = slides[cur];
+    const totalMain = Math.max(1, mainIndices.length);
+    const pad = n => (n < 10 ? '0' : '') + n;
+    if (sl && isApp(cur)) {
+      if (cbPosEl) cbPosEl.textContent = '附件';
+    } else {
+      const mPos = Math.max(1, mainIndices.indexOf(cur) + 1);
+      if (cbPosEl) cbPosEl.textContent = pad(mPos) + ' / ' + pad(totalMain);
+      if (progressFill) {
+        const ratio = totalMain > 1 ? (mPos - 1) / (totalMain - 1) : 1;
+        progressFill.style.transform = 'scaleX(' + Math.max(0.03, ratio).toFixed(4) + ')';
+      }
+    }
+    const maxS = getMaxStep(sl);
+    if (cbStepEl) {
+      if (maxS > 0) {
+        cbStepEl.textContent = '步進 ' + curStep + '/' + maxS;
+        cbStepEl.classList.add('has-steps');
+      } else {
+        cbStepEl.textContent = '';
+        cbStepEl.classList.remove('has-steps');
+      }
+    }
+    if (cbNotesBtn && notesEl) cbNotesBtn.classList.toggle('is-on', notesEl.classList.contains('show'));
+    if (cbStaticBtn) cbStaticBtn.classList.toggle('is-on', lowPower);
+    if (cbFsBtn) cbFsBtn.classList.toggle('is-on', Boolean(document.fullscreenElement));
+  }
+
+  ctrlBar.addEventListener('mouseenter', () => { ctrlHover = true; clearTimeout(ctrlHideTimer); });
+  ctrlBar.addEventListener('mouseleave', () => {
+    ctrlHover = false;
+    ctrlHideTimer = setTimeout(() => ctrlBar.classList.remove('visible'), 1400);
+  });
+  ctrlBar.addEventListener('click', e => {
+    e.stopPropagation();
+    const btn = e.target.closest('[data-cb]');
+    if (!btn) return;
+    const act = btn.dataset.cb;
+    if (act === 'prev') step(-1);
+    else if (act === 'next') step(1);
+    else if (act === 'notes' && notesEl) { notesEl.classList.toggle('show'); updateCtrlBar(); }
+    else if (act === 'static') toggleLowPower();
+    else if (act === 'fs') {
+      document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
+    }
+  });
+  document.addEventListener('fullscreenchange', updateCtrlBar);
+  addEventListener('mousemove', e => {
+    if (stillMode || hideCtrlMode) return;
+    if (e.clientY >= innerHeight - 96) setCtrlBarVisible(true, false);
+  }, { passive: true });
+
   function showNotes(sl) {
     if (notesEl) notesEl.textContent = sl.dataset.notes || '（這頁沒有講者備註）';
   }
@@ -3951,6 +4089,115 @@ render(false, null);
     const morphMs = parseFloat(cs.getPropertyValue('--morph-ms')) || 680;
     const ease = mode === 'crisp' ? EASE_CRISP : EASE_SPRING;
     return { mode, staggerBase, morphMs, ease };
+  }
+
+  // ---------------------------------------------------------------- dual-track presenter-paced data-step engine
+  const STEP_SEL = '[data-step], [data-step-hide], [data-step-only]';
+
+  function stepRule(el) {
+    if (el.dataset.stepOnly !== undefined) {
+      const k = parseInt(el.dataset.stepOnly, 10) || 0;
+      return { show: k, hide: k + 1 };
+    }
+    const show = el.dataset.step !== undefined ? (parseInt(el.dataset.step, 10) || 0) : 0;
+    const hide = el.dataset.stepHide !== undefined ? (parseInt(el.dataset.stepHide, 10) || Infinity) : Infinity;
+    return { show, hide };
+  }
+
+  function getMaxStep(sl) {
+    if (!sl) return 0;
+    let max = 0;
+    sl.querySelectorAll(STEP_SEL).forEach(el => {
+      if (el.dataset.step !== undefined) max = Math.max(max, parseInt(el.dataset.step, 10) || 0);
+      if (el.dataset.stepHide !== undefined) max = Math.max(max, parseInt(el.dataset.stepHide, 10) || 0);
+      if (el.dataset.stepOnly !== undefined) max = Math.max(max, parseInt(el.dataset.stepOnly, 10) || 0);
+    });
+    return max;
+  }
+
+  function deferredStepOf(el, sl) {
+    const host = el.closest('[data-step], [data-step-only]');
+    if (!host || !sl.contains(host)) return 0;
+    return stepRule(host).show;
+  }
+
+  function cancelElStepAnim(el) {
+    const prev = stepAnims.get(el);
+    if (prev) { try { prev.cancel(); } catch (_) {} stepAnims.delete(el); }
+  }
+
+  function stepFromTransform(el) {
+    const dir = el.dataset.stepFrom || el.dataset.from || 'up';
+    if (dir === 'left') return 'translate3d(-26px,0,0)';
+    if (dir === 'right') return 'translate3d(26px,0,0)';
+    if (dir === 'down') return 'translate3d(0,-20px,0)';
+    if (dir === 'scale') return 'scale(0.94)';
+    if (dir === 'none') return 'none';
+    return 'translate3d(0,22px,0)';
+  }
+
+  function applySlideStep(sl, targetStep, dir, instant, token) {
+    if (!sl) return;
+    const maxS = getMaxStep(sl);
+    const k = Math.max(0, Math.min(maxS, targetStep));
+    curStep = k;
+    sl.dataset.currentStep = String(k);
+    const cfg = slideMotion(sl);
+
+    sl.querySelectorAll(STEP_SEL).forEach(el => {
+      const r = stepRule(el);
+      const nowVis = k >= r.show && k < r.hide;
+      const wasVis = el.dataset.stepHidden !== '1' && el.dataset.stepHidden !== undefined;
+
+      cancelElStepAnim(el);
+
+      if (instant || isStatic() || el.dataset.stepHidden === undefined) {
+        el.dataset.stepHidden = nowVis ? '0' : '1';
+        if (nowVis) snapSubtreeFinal(el);
+        return;
+      }
+
+      if (!wasVis && nowVis) {
+        el.dataset.stepHidden = '0';
+        const anim = trackAnim(el.animate(
+          [{ opacity: 0, transform: stepFromTransform(el) }, { opacity: 1, transform: 'none' }],
+          { duration: 480, easing: cfg.ease, fill: 'backwards' }
+        ));
+        stepAnims.set(el, anim);
+        if (dir >= 0) triggerSubtreePrimitives(el, sl, 40, token);
+        else snapSubtreeFinal(el);
+      } else if (wasVis && !nowVis) {
+        const anim = trackAnim(el.animate(
+          [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translate3d(0,-10px,0)' }],
+          { duration: 220, easing: 'ease-out', fill: 'forwards' }
+        ));
+        stepAnims.set(el, anim);
+        anim.finished.then(() => {
+          if (token === navToken && Number(sl.dataset.currentStep) === k) {
+            el.dataset.stepHidden = '1';
+            try { anim.cancel(); } catch (_) {}
+          }
+        }, () => {});
+      }
+    });
+
+    updateCtrlBar();
+    if (!instant) {
+      stage.dispatchEvent(new CustomEvent('deck:stepchange', {
+        detail: { index: cur, slide: sl, step: curStep, totalSteps: maxS, dir },
+      }));
+    }
+  }
+
+  function setStep(k, dir = 1) {
+    const sl = slides[cur];
+    if (!sl) return curStep;
+    const maxS = getMaxStep(sl);
+    if (!maxS) return 0;
+    const nextK = Math.max(0, Math.min(maxS, k));
+    if (nextK === curStep) return curStep;
+    applySlideStep(sl, nextK, dir, isStatic(), navToken);
+    return curStep;
   }
 
   // ---------------------------------------------------------------- init semantic primitives
@@ -4011,14 +4258,15 @@ render(false, null);
     sl.querySelectorAll('.spot-pulse').forEach(el => el.classList.remove('spot-pulse'));
   }
 
-  function snapSlideFinal(sl) {
-    if (!sl) return;
-    clearGuidanceState(sl);
-    sl.querySelectorAll('[data-count]').forEach(el => {
+  function snapSubtreeFinal(root) {
+    if (!root) return;
+    const counts = root.matches && root.matches('[data-count]') ? [root, ...root.querySelectorAll('[data-count]')] : [...root.querySelectorAll('[data-count]')];
+    counts.forEach(el => {
       const tn = findNumTextNode(el);
       if (tn && el.dataset.countFinal !== undefined) tn.nodeValue = el.dataset.countFinal;
     });
-    sl.querySelectorAll('[data-draw]').forEach(el => {
+    const draws = root.matches && root.matches('[data-draw]') ? [root, ...root.querySelectorAll('[data-draw]')] : [...root.querySelectorAll('[data-draw]')];
+    draws.forEach(el => {
       if (el.getAttribute('data-draw') === 'ring') {
         if (el.dataset.ringFinal !== undefined) el.style.strokeDashoffset = el.dataset.ringFinal;
       } else if (!el.dataset.drawDashed) {
@@ -4026,6 +4274,23 @@ render(false, null);
         el.style.strokeDashoffset = '';
       }
     });
+  }
+
+  function snapSlideFinal(sl) {
+    if (!sl) return;
+    clearGuidanceState(sl);
+    const maxS = getMaxStep(sl);
+    if (maxS > 0) {
+      sl.dataset.currentStep = String(maxS);
+      if (slides[cur] === sl) curStep = maxS;
+      sl.querySelectorAll(STEP_SEL).forEach(el => {
+        cancelElStepAnim(el);
+        const r = stepRule(el);
+        const vis = maxS >= r.show && maxS < r.hide;
+        el.dataset.stepHidden = vis ? '0' : '1';
+      });
+    }
+    snapSubtreeFinal(sl);
   }
 
   function parseFocusPlan(raw) {
@@ -4038,7 +4303,6 @@ render(false, null);
     return out.sort((a, b) => a.start - b.start);
   }
 
-  // Semantic beat delay helper: Beat 1 = immediate anchor, Beat 2 = causal cue, Beat 3 = takeaway, Beat 4 = supporting
   const BEAT_MS = { '1': 120, '2': 760, '3': 1480, '4': 2200 };
   function beatDelay(el, fallback) {
     if (el.dataset.delay !== undefined) return parseFloat(el.dataset.delay) || 0;
@@ -4047,65 +4311,21 @@ render(false, null);
     return fallback;
   }
 
-  function animateSlideContent(sl, baseDelay, token, morphedIds) {
-    if (!sl || isStatic()) { snapSlideFinal(sl); return; }
+  // Reusable primitive animators (run at slide entry for step-0, or on step reveal for deferred step-k)
+  function runPrimitives(root, sl, baseDelay, token, morphedIds, skipDeferred) {
     const cfg = slideMotion(sl);
+    const q = sel => {
+      const list = [];
+      if (root !== sl && root.matches && root.matches(sel)) list.push(root);
+      root.querySelectorAll(sel).forEach(el => list.push(el));
+      return skipDeferred ? list.filter(el => deferredStepOf(el, sl) === 0) : list;
+    };
 
-    // 0a. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
-    const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
-    const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
-    if (focusPlan.length && focusEls.length) {
-      const visited = new Set();
-      const applyStage = activeId => {
-        if (token !== navToken || isStatic()) return;
-        sl.classList.add('is-focusing');
-        for (const el of focusEls) {
-          const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
-          const isAct = ids.includes(activeId);
-          const isVis = !isAct && ids.some(id => visited.has(id));
-          el.classList.toggle('focus-active', isAct);
-          el.classList.toggle('focus-visited', isVis);
-          el.classList.toggle('focus-dim', !isAct && !isVis);
-        }
-      };
-      let maxEnd = 0;
-      focusPlan.forEach((step, idx) => {
-        maxEnd = Math.max(maxEnd, step.end);
-        const startAt = step.start === 0 ? 0 : baseDelay + step.start;
-        if (startAt === 0 && idx === 0) {
-          applyStage(step.id);
-        } else {
-          later(() => {
-            if (token !== navToken || isStatic()) return;
-            for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
-            applyStage(step.id);
-          }, startAt);
-        }
-      });
-      later(() => {
-        if (token !== navToken) return;
-        clearFocusClasses(sl);
-      }, baseDelay + maxEnd);
-    }
-
-    // 0b. Live Causal State Transformation ([data-transform-at="ms"]: .pre-transform -> final DOM state)
-    sl.querySelectorAll('[data-transform-at]').forEach(el => {
-      const ms = parseFloat(el.dataset.transformAt) || 1200;
-      el.classList.remove('transforming');
-      el.classList.add('pre-transform');
-      later(() => {
-        if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
-        el.classList.remove('pre-transform');
-        el.classList.add('transforming');
-        later(() => { el.classList.remove('transforming'); }, 840);
-      }, baseDelay + ms);
-    });
-
-    // 1. Non-uniform staggered groups ([data-stagger]) — lightweight 2-keyframe compositor only
+    // 1. Non-uniform staggered groups ([data-stagger])
     const staggeredSet = new Set();
-    sl.querySelectorAll('[data-stagger]').forEach(group => {
+    q('[data-stagger]').forEach(group => {
       const stepMs = parseFloat(group.getAttribute('data-stagger')) || cfg.staggerBase;
-      const gDelay = baseDelay + beatDelay(group, 140);
+      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40);
       const items = [...group.children].filter(el => el.nodeType === 1);
       items.forEach((el, i) => {
         staggeredSet.add(el);
@@ -4118,9 +4338,9 @@ render(false, null);
       });
     });
 
-    // 2. Semantic directional reveals (.rv, [data-beat]) — strictly skip nested, specialized & morphed
+    // 2. Semantic directional reveals (.rv, [data-beat])
     let rvIdx = 0;
-    sl.querySelectorAll('.rv, [data-beat]').forEach(el => {
+    q('.rv, [data-beat]').forEach(el => {
       if (staggeredSet.has(el)) return;
       if (
         el.hasAttribute('data-stagger') || el.hasAttribute('data-grow') || el.hasAttribute('data-draw') ||
@@ -4129,6 +4349,7 @@ render(false, null);
       ) return;
       if (el.parentElement && el.parentElement.closest('.rv, [data-stagger]')) return;
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
+      if (!skipDeferred && el === root) return; // root already animated by applySlideStep
       const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)));
       const dir = el.dataset.from || 'up';
       const fromT = dir === 'left' ? 'translate3d(-24px,0,0)'
@@ -4143,9 +4364,9 @@ render(false, null);
     });
 
     // 3. Mobile-visible high-contrast spotlight cues ([data-spotlight])
-    sl.querySelectorAll('[data-spotlight]').forEach(el => {
+    q('[data-spotlight]').forEach(el => {
       el.classList.remove('spot-pulse');
-      const d = baseDelay + beatDelay(el, 540);
+      const d = baseDelay + beatDelay(el, skipDeferred ? 540 : 120);
       later(() => {
         if (token !== navToken || isStatic()) return;
         el.classList.add('spot-pulse');
@@ -4153,8 +4374,8 @@ render(false, null);
       }, d);
     });
 
-    // 4. Throttled rolling numbers ([data-count]) — updates at ~30Hz AFTER transition starts to avoid layout thrash
-    sl.querySelectorAll('[data-count]').forEach(el => {
+    // 4. Throttled rolling numbers ([data-count])
+    q('[data-count]').forEach(el => {
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
       const tn = findNumTextNode(el);
       const finalStr = el.dataset.countFinal;
@@ -4166,7 +4387,7 @@ render(false, null);
       const dec = numRaw.includes('.') ? numRaw.split('.')[1].length : 0;
       const target = parseFloat(numRaw.replace(/,/g, ''));
       const dur = parseFloat(el.dataset.dur) || 820;
-      const delay = baseDelay + beatDelay(el, 280);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
       const fmt = v => {
         let s = dec > 0 ? v.toFixed(dec) : String(Math.round(v));
         if (hasComma) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -4194,8 +4415,8 @@ render(false, null);
     });
 
     // 5. True SVG stroke draw & progress rings ([data-draw])
-    sl.querySelectorAll('[data-draw]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 280);
+    q('[data-draw]').forEach(el => {
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80);
       const dur = parseFloat(el.dataset.dur) || 880;
       if (el.getAttribute('data-draw') === 'ring') {
         const circ = parseFloat(el.dataset.circ || '0');
@@ -4223,9 +4444,9 @@ render(false, null);
     });
 
     // 6. Directional bar growth ([data-grow="x|x-left|y|y-down"])
-    sl.querySelectorAll('[data-grow]').forEach((el, idx) => {
+    q('[data-grow]').forEach((el, idx) => {
       const dir = (el.getAttribute('data-grow') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 220 + idx * 65);
+      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65);
       const dur = parseFloat(el.dataset.dur) || 720;
       if (el instanceof SVGElement) el.style.transformBox = 'fill-box';
       if (dir === 'x-left') {
@@ -4243,10 +4464,10 @@ render(false, null);
       }
     });
 
-    // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"]) — zero dash distortion!
-    sl.querySelectorAll('[data-wipe]').forEach(el => {
+    // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"])
+    q('[data-wipe]').forEach(el => {
       const dir = (el.getAttribute('data-wipe') || 'right').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 280);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
       const dur = parseFloat(el.dataset.dur) || 540;
       const fromClip = dir === 'left' ? 'inset(0 0 0 100%)'
         : dir === 'down' ? 'inset(0 0 100% 0)'
@@ -4259,8 +4480,8 @@ render(false, null);
     });
 
     // 8. Endpoint dot / arrowhead / badge crisp pop ([data-pop])
-    sl.querySelectorAll('[data-pop]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 320);
+    q('[data-pop]').forEach(el => {
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120);
       const dur = parseFloat(el.dataset.dur) || 340;
       if (el instanceof SVGElement) {
         el.style.transformBox = 'fill-box';
@@ -4273,8 +4494,8 @@ render(false, null);
     });
 
     // 9. Target-lock concentric ripple ([data-ripple])
-    sl.querySelectorAll('[data-ripple]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 560);
+    q('[data-ripple]').forEach(el => {
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 560 : 160);
       const dur = parseFloat(el.dataset.dur) || 1050;
       trackAnim(el.animate(
         [
@@ -4287,10 +4508,10 @@ render(false, null);
     });
 
     // 10. Chronological rail travel bead ([data-travel="x|y"])
-    sl.querySelectorAll('[data-travel]').forEach(el => {
+    q('[data-travel]').forEach(el => {
       const axis = (el.getAttribute('data-travel') || 'x').toLowerCase();
       const dist = parseFloat(el.dataset.travelDist || '800');
-      const delay = baseDelay + beatDelay(el, 320);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 100);
       const dur = parseFloat(el.dataset.dur) || 2400;
       const p0 = 'translate3d(0,0,0)';
       const p1 = axis === 'y'
@@ -4310,8 +4531,8 @@ render(false, null);
       ));
     });
 
-    // 11. Single subtle interactive control affordance nudge ([data-nudge="x|y"])
-    sl.querySelectorAll('[data-nudge]').forEach(el => {
+    // 11. Interactive control affordance nudge ([data-nudge="x|y"])
+    q('[data-nudge]').forEach(el => {
       const axis = (el.getAttribute('data-nudge') || 'x').toLowerCase();
       const delay = baseDelay + beatDelay(el, 1100);
       const dur = parseFloat(el.dataset.dur) || 920;
@@ -4332,103 +4553,66 @@ render(false, null);
     });
   }
 
-  // ---------------------------------------------------------------- deferred low-res Canvas 2D FX (MIT lewislulu)
-  let fxRaf = 0;
-  let fxCanvas = null;
-
-  function stopFx() {
-    if (fxRaf) { cancelAnimationFrame(fxRaf); fxRaf = 0; }
-    if (fxCanvas) {
-      const ctx = fxCanvas.getContext('2d');
-      if (ctx) ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-      fxCanvas = null;
-    }
+  function triggerSubtreePrimitives(el, sl, delay, token) {
+    if (!el || isStatic()) { snapSubtreeFinal(el); return; }
+    runPrimitives(el, sl, delay, token, null, false);
   }
 
-  function startFx(sl, deferMs, token) {
-    stopFx();
-    if (!sl || isStatic()) return;
-    const fx = sl.dataset.fx;
-    if (!fx) return;
+  function animateSlideContent(sl, baseDelay, token, morphedIds) {
+    if (!sl || isStatic()) { snapSlideFinal(sl); return; }
 
-    const boot = () => {
-      if (token !== navToken || isStatic() || slides[cur] !== sl) return;
-      let canvas = sl.querySelector(':scope > canvas.fx-canvas');
-      if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.className = 'fx-canvas';
-        // 480x270 logical buffer stretched smoothly by GPU -> 16x cheaper than 1920x1080!
-        canvas.width = 480;
-        canvas.height = 270;
-        canvas.setAttribute('aria-hidden', 'true');
-        const anchor = sl.querySelector(':scope > .scrim, :scope > .asset-slot');
-        if (anchor && anchor.nextSibling) sl.insertBefore(canvas, anchor.nextSibling);
-        else sl.prepend(canvas);
-      }
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      fxCanvas = canvas;
+    // 0a. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
+    const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
+    const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
+    if (focusPlan.length && focusEls.length) {
+      const visited = new Set();
+      const applyStage = activeId => {
+        if (token !== navToken || isStatic()) return;
+        sl.classList.add('is-focusing');
+        for (const el of focusEls) {
+          const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
+          const isAct = ids.includes(activeId);
+          const isVis = !isAct && ids.some(id => visited.has(id));
+          el.classList.toggle('focus-active', isAct);
+          el.classList.toggle('focus-visited', isVis);
+          el.classList.toggle('focus-dim', !isAct && !isVis);
+        }
+      };
+      let maxEnd = 0;
+      focusPlan.forEach((stepItem, idx) => {
+        maxEnd = Math.max(maxEnd, stepItem.end);
+        const startAt = stepItem.start === 0 ? 0 : baseDelay + stepItem.start;
+        if (startAt === 0 && idx === 0) {
+          applyStage(stepItem.id);
+        } else {
+          later(() => {
+            if (token !== navToken || isStatic()) return;
+            for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
+            applyStage(stepItem.id);
+          }, startAt);
+        }
+      });
+      later(() => {
+        if (token !== navToken) return;
+        clearFocusClasses(sl);
+      }, baseDelay + maxEnd);
+    }
 
-      if (fx === 'ambient-dust') {
-        const pts = Array.from({ length: 20 }, (_, i) => ({
-          x: 170 + ((i * 53) % 295),
-          y: (i * 23) % 270,
-          r: 0.7 + (i % 3) * 0.45,
-          vy: -0.07 - (i % 4) * 0.025,
-          vx: -0.04 + (i % 3) * 0.025,
-          ph: i * 0.7,
-          a: 0.22 + (i % 4) * 0.08,
-        }));
-        let last = 0;
-        const draw = now => {
-          fxRaf = requestAnimationFrame(draw);
-          if (now - last < 40) return;
-          last = now;
-          ctx.clearRect(0, 0, 480, 270);
-          for (const p of pts) {
-            p.y += p.vy;
-            p.x += p.vx + Math.sin(now * 0.0008 + p.ph) * 0.04;
-            if (p.y < -4) { p.y = 274; p.x = 170 + Math.random() * 295; }
-            if (p.x < 100) p.x = 472;
-            const alpha = p.a * (0.65 + 0.35 * Math.sin(now * 0.0014 + p.ph));
-            ctx.fillStyle = 'rgba(255,232,188,' + alpha.toFixed(3) + ')';
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        };
-        fxRaf = requestAnimationFrame(draw);
-      } else if (fx === 'soft-aurora') {
-        const orbs = [
-          { x: 365, y: 120, rx: 115, col: '58,217,155', a: 0.11, sp: 0.00055, ph: 0 },
-          { x: 130, y: 210, rx: 95, col: '74,195,250', a: 0.085, sp: 0.00042, ph: 2.1 },
-          { x: 280, y: 220, rx: 85, col: '242,201,107', a: 0.065, sp: 0.00038, ph: 4.2 },
-        ];
-        let last = 0;
-        const draw = now => {
-          fxRaf = requestAnimationFrame(draw);
-          if (now - last < 50) return;
-          last = now;
-          ctx.clearRect(0, 0, 480, 270);
-          for (const o of orbs) {
-            const dx = Math.sin(now * o.sp + o.ph) * 11;
-            const dy = Math.cos(now * o.sp * 0.8 + o.ph) * 7;
-            const a = o.a * (0.78 + 0.22 * Math.sin(now * o.sp * 1.4 + o.ph));
-            const g = ctx.createRadialGradient(o.x + dx, o.y + dy, 0, o.x + dx, o.y + dy, o.rx);
-            g.addColorStop(0, 'rgba(' + o.col + ',' + a.toFixed(3) + ')');
-            g.addColorStop(1, 'rgba(' + o.col + ',0)');
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(o.x + dx, o.y + dy, o.rx, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        };
-        fxRaf = requestAnimationFrame(draw);
-      }
-    };
+    // 0b. Live Causal State Transformation ([data-transform-at="ms"])
+    sl.querySelectorAll('[data-transform-at]').forEach(el => {
+      if (deferredStepOf(el, sl) > 0) return;
+      const ms = parseFloat(el.dataset.transformAt) || 1200;
+      el.classList.remove('transforming');
+      el.classList.add('pre-transform');
+      later(() => {
+        if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
+        el.classList.remove('pre-transform');
+        el.classList.add('transforming');
+        later(() => { el.classList.remove('transforming'); }, 840);
+      }, baseDelay + ms);
+    });
 
-    if (deferMs > 0) later(boot, deferMs);
-    else boot();
+    runPrimitives(sl, sl, baseDelay, token, morphedIds, true);
   }
 
   // ---------------------------------------------------------------- cross-slide Magic Move (MIT open-slide)
@@ -4465,6 +4649,7 @@ render(false, null);
     const s = sr.width ? sr.width / 1920 : 1;
     const fromMap = new Map();
     prev.querySelectorAll('[data-morph]').forEach(el => {
+      if (el.dataset.stepHidden === '1') return;
       const id = el.dataset.morph;
       if (id && !fromMap.has(id)) {
         const box = stageBox(el, sr, s);
@@ -4473,11 +4658,11 @@ render(false, null);
     });
     if (!fromMap.size) return [];
 
-    // Single synchronous measurement pass (no double toggle)
     const wasActive = next.classList.contains('active');
     if (!wasActive) { next.classList.add('active'); next.style.opacity = '0'; }
     const pairs = [];
     next.querySelectorAll('[data-morph]').forEach(toEl => {
+      if (toEl.dataset.stepHidden === '1') return;
       const id = toEl.dataset.morph;
       const from = fromMap.get(id);
       if (!from) return;
@@ -4504,7 +4689,6 @@ render(false, null);
       const toCS = getComputedStyle(toEl);
       const isTextOnly = fromCS.backgroundColor === 'rgba(0, 0, 0, 0)' || fromCS.backgroundColor === 'transparent';
 
-      // Handle gradient-clipped hero text (e.g., Shock +1.8% -> Simulator +1.8%) cleanly
       const fromClip = fromCS.webkitBackgroundClip || fromCS.backgroundClip || '';
       const fromGrad = fromClip.includes('text') && (fromCS.backgroundImage || '').includes('gradient');
       if (fromGrad) {
@@ -4585,7 +4769,6 @@ render(false, null);
 
   function freezeNow() {
     navToken++;
-    stopFx();
     cleanupFlight(null, slides[cur]);
     if (slides[cur]) {
       slides[cur].classList.add('active');
@@ -4594,13 +4777,13 @@ render(false, null);
       slides[cur].style.clipPath = '';
       snapSlideFinal(slides[cur]);
     }
+    updateCtrlBar();
   }
 
   // ---------------------------------------------------------------- 6 narrative transition archetypes (60fps GPU)
   function resolveTransition(prev, next, dir, morphPairs) {
     if (next.dataset.appendix === '1' || (prev && prev.dataset.appendix === '1')) return 'modal';
     if (next.dataset.kind === 'shock' && dir > 0 && curtain) return 'shock';
-    // Forward uses next's declared transition; backward mirrors prev's declared transition!
     const declared = dir > 0 ? (next.dataset.transition || '') : (prev && prev.dataset.transition || '');
     if (declared) return declared;
     if (morphPairs.length) return 'morph';
@@ -4611,7 +4794,7 @@ render(false, null);
     return chChange ? 'push' : 'cross';
   }
 
-  function go(n, instant) {
+  function go(n, instant, opts) {
     n = Math.max(0, Math.min(slides.length - 1, n));
     if (n === cur && !instant) return;
     const prev = cur >= 0 ? slides[cur] : null;
@@ -4623,17 +4806,27 @@ render(false, null);
     cur = n;
 
     const instantly = Boolean(instant || isStatic() || !prev || prev === next);
+
+    // Initialize target step on incoming slide BEFORE morph collection or paint
+    const maxS = getMaxStep(next);
+    let targetStep = 0;
+    if (isStatic() || (opts && opts.step === 'final')) targetStep = maxS;
+    else if (opts && typeof opts.step === 'number') targetStep = Math.max(0, Math.min(maxS, opts.step));
+    else if (dir < 0 && prev && prev !== next && !instant) targetStep = maxS;
+    applySlideStep(next, targetStep, 0, true, token);
+
     const morphPairs = (!instantly && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
 
-    stopFx();
     cleanupFlight(instantly ? null : prev, next);
 
     if (prev && prev !== next) {
       stage.dispatchEvent(new CustomEvent('deck:slideleave', { detail: { index: prevIdx, slide: prev, next } }));
     }
 
+    syncSurface(next);
     setNav(next);
     showNotes(next);
+    updateCtrlBar();
     try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
 
     if (instantly) {
@@ -4643,10 +4836,10 @@ render(false, null);
       next.style.opacity = '';
       next.style.transform = '';
       next.style.clipPath = '';
-      snapSlideFinal(next);
+      if (isStatic()) snapSlideFinal(next);
+      else snapSubtreeFinal(next);
       stage.offsetWidth;
       requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
-      if (!isStatic()) startFx(next, 180, token);
     } else {
       const kind = resolveTransition(prev, next, dir, morphPairs);
       const cfg = slideMotion(next);
@@ -4661,6 +4854,7 @@ render(false, null);
 
       if (kind === 'shock' && curtain) {
         stage.classList.add('hide-nav');
+        stage.classList.remove('show-side-nav');
         prev.classList.remove('active');
         prev.classList.add('leaving');
         const cIn = trackAnim(curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' }));
@@ -4680,12 +4874,10 @@ render(false, null);
                 { duration: 860, delay: 90, easing: EASE_SPRING, fill: 'backwards' }
               ));
             }
-            animateSlideContent(next, 240, token, null);
-            startFx(next, 620, token);
+            if (targetStep === 0) animateSlideContent(next, 240, token, null);
           }, 220);
         }, () => {});
       } else {
-        // Hold outgoing slide opacity:1 underneath so background NEVER flashes
         prev.classList.remove('active');
         prev.classList.add('leaving', 'in-flight');
         next.classList.add('active', 'in-flight');
@@ -4704,7 +4896,6 @@ render(false, null);
             if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 780));
             contentDelay = 300;
           } else {
-            // Reverse iris: incoming dark tablet sits behind while warm clay contracts smoothly into the tablet!
             prev.style.zIndex = '5';
             next.style.zIndex = '4';
             const aOut = trackAnim(prev.animate(
@@ -4790,8 +4981,10 @@ render(false, null);
           contentDelay = 120;
         }
 
-        animateSlideContent(next, contentDelay, token, morphedIds);
-        startFx(next, 620, token);
+        // Only run slide-entry choreography when landing at step 0 (not when backing into final step)
+        if (targetStep === 0) {
+          animateSlideContent(next, contentDelay, token, morphedIds);
+        }
 
         Promise.all(waits).then(() => {
           if (token !== navToken) return;
@@ -4814,28 +5007,45 @@ render(false, null);
     }
 
     if (typeof window.__deckFit === 'function') window.__deckFit();
-    const detail = { index: cur, slide: next, prev, instant: instantly, staticMode: isStatic() };
+    const detail = {
+      index: cur,
+      slide: next,
+      prev,
+      instant: instantly,
+      staticMode: isStatic(),
+      surface: stage.dataset.activeSurface,
+      step: curStep,
+      totalSteps: maxS,
+    };
     stage.dispatchEvent(new CustomEvent('deck:slideenter', { detail }));
     stage.dispatchEvent(new CustomEvent('deck:slidechange', { detail }));
   }
 
   function step(d) {
     if (isApp(cur)) { back(); return; }
+    const sl = slides[cur];
+    const maxS = getMaxStep(sl);
+    if (!isStatic() && maxS > 0) {
+      if (d > 0 && curStep < maxS) { setStep(curStep + 1, 1); return; }
+      if (d < 0 && curStep > 0) { setStep(curStep - 1, -1); return; }
+    }
     let n = cur + d;
     while (n >= 0 && n < slides.length && isApp(n)) n += d;
-    if (n >= 0 && n < slides.length) go(n);
+    if (n >= 0 && n < slides.length) {
+      go(n, false, d < 0 ? { step: 'final' } : { step: 0 });
+    }
   }
 
   function openLink(id) {
     const n = slides.findIndex(s => s.dataset.appendix === '1' && s.dataset.id === id);
     if (n < 0) return;
     if (!isApp(cur)) returnTo.push(cur);
-    go(n);
+    go(n, false, { step: 0 });
   }
 
   function back() {
     const n = returnTo.length ? returnTo.pop() : 0;
-    go(n);
+    go(n, false, { step: 'final' });
   }
 
   function toggleLowPower(force) {
@@ -4845,7 +5055,7 @@ render(false, null);
       freezeNow();
       toast('已切換靜態省電模式（按 B 恢復動態）');
     } else {
-      startFx(slides[cur], 120, navToken);
+      updateCtrlBar();
       toast('已恢復動態播放');
     }
     stage.dispatchEvent(new CustomEvent('deck:lowpower', { detail: { lowPower } }));
@@ -4856,12 +5066,12 @@ render(false, null);
     stillMode = Boolean(flag);
     document.documentElement.classList.toggle('still', stillMode);
     if (stillMode) freezeNow();
-    else startFx(slides[cur], 120, navToken);
+    else updateCtrlBar();
     stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: stillMode } }));
   }
 
   // ---------------------------------------------------------------- input handling (keyboard + click + mobile swipe)
-  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], input, select, textarea, label, #notes, a, button:not(.back):not([data-link])';
+  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], #ctrl-bar, #nav-side, input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
 
   addEventListener('keydown', e => {
     const k = e.key;
@@ -4873,13 +5083,13 @@ render(false, null);
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); step(1); }
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); step(-1); }
     else if (k === 'Escape' && isApp(cur)) { e.preventDefault(); back(); }
-    else if (k === 'Home') go(0);
-    else if (k === 'End') go(slides.length - 1);
+    else if (k === 'Home') go(0, false, { step: 0 });
+    else if (k === 'End') go(slides.length - 1, false, { step: 0 });
     else if (k === 'b' || k === 'B') { e.preventDefault(); toggleLowPower(); }
     else if (k === 'f' || k === 'F') {
       document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
     }
-    else if ((k === 'n' || k === 'N') && notesEl) notesEl.classList.toggle('show');
+    else if ((k === 'n' || k === 'N') && notesEl) { notesEl.classList.toggle('show'); updateCtrlBar(); }
     else if (k === 'p' || k === 'P') print();
   });
 
@@ -4900,6 +5110,7 @@ render(false, null);
       if (e.touches.length !== 1 || e.target.closest(INTERACTIVE_SEL)) { swiping = false; return; }
       tx = e.touches[0].clientX;
       ty = e.touches[0].clientY;
+      if (ty >= innerHeight - 80) setCtrlBarVisible(true, false);
       swiping = true;
     }, { passive: true });
     viewportEl.addEventListener('touchend', e => {
@@ -4916,78 +5127,156 @@ render(false, null);
   if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
 
   window.__deck = {
-    go: (n, instant = true) => go(n, instant),
+    go: (n, instant = true, opts) => go(n, instant, opts),
     step,
+    setStep,
     openLink,
     back,
     setStill,
     toggleLowPower,
+    setCtrlBarVisible,
     isStatic,
     stage,
     count: slides.length,
+    navMode: deckNavMode,
+    stageMode: deckStageMode,
     get index() { return cur; },
+    get stepIndex() { return curStep; },
+    get stepTotal() { return getMaxStep(slides[cur]); },
+    get activeSurface() { return stage.dataset.activeSurface || ''; },
     get slides() { return slides; },
     get lowPower() { return lowPower; },
   };
 })();
 </script>
-<script>/* deck-architect v4 typography auto-fit
- *
- * Works on both v4 free-canvas slides ([data-fit="phrase"], [data-fit="figure"])
- * and business components (.key, .shock-text, .closing-text, .cover-title, .number .value, .stats-row .sv).
+<script>/* deck-architect v4.4 On-Demand Module: ambient-fx
+ * Deferred 480x270 Canvas 2D ambient FX (ambient-dust | soft-aurora; MIT lewislulu/html-ppt-skill).
+ * Decoupled via #stage lifecycle events (deck:slideenter / deck:slideleave / deck:still / deck:lowpower).
  */
 (function () {
-  function fitPhrases() {
-    document.querySelectorAll('[data-fit="phrase"], .key, .shock-text, .closing-text, .cover-title').forEach(function (el) {
-      var phs = [].slice.call(el.querySelectorAll('.ph'));
-      if (!phs.length) return;
-      el.style.fontSize = '';
-      var base = parseFloat(getComputedStyle(el).fontSize);
-      if (!base) return;
-      var size = base;
-      function wraps() {
-        var lh = parseFloat(getComputedStyle(el).lineHeight) || size * 1.2;
-        return phs.some(function (p) { return p.offsetHeight > lh * 1.5; });
+  const deck = window.__deck;
+  if (!deck || !deck.stage) return;
+
+  let fxRaf = 0;
+  let fxCanvas = null;
+  let fxTimer = 0;
+  let fxToken = 0;
+
+  function stopFx() {
+    fxToken++;
+    if (fxTimer) { clearTimeout(fxTimer); fxTimer = 0; }
+    if (fxRaf) { cancelAnimationFrame(fxRaf); fxRaf = 0; }
+    if (fxCanvas) {
+      const ctx = fxCanvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+      fxCanvas = null;
+    }
+  }
+
+  function startFx(sl, deferMs) {
+    stopFx();
+    if (!sl || deck.isStatic()) return;
+    const fx = sl.dataset.fx;
+    if (!fx) return;
+    const tok = fxToken;
+
+    const boot = () => {
+      fxTimer = 0;
+      if (tok !== fxToken || deck.isStatic() || deck.slides[deck.index] !== sl) return;
+      let canvas = sl.querySelector(':scope > canvas.fx-canvas');
+      if (!canvas) {
+        canvas = document.createElement('canvas');
+        canvas.className = 'fx-canvas';
+        // 480x270 logical buffer stretched smoothly by GPU -> 16x cheaper than 1920x1080
+        canvas.width = 480;
+        canvas.height = 270;
+        canvas.setAttribute('aria-hidden', 'true');
+        const anchor = sl.querySelector(':scope > .scrim, :scope > .asset-slot');
+        if (anchor && anchor.nextSibling) sl.insertBefore(canvas, anchor.nextSibling);
+        else sl.prepend(canvas);
       }
-      while (wraps() && size > base * 0.72) {
-        size -= base * 0.04;
-        el.style.fontSize = size + 'px';
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      fxCanvas = canvas;
+
+      if (fx === 'ambient-dust') {
+        const pts = Array.from({ length: 20 }, (_, i) => ({
+          x: 170 + ((i * 53) % 295),
+          y: (i * 23) % 270,
+          r: 0.7 + (i % 3) * 0.45,
+          vy: -0.07 - (i % 4) * 0.025,
+          vx: -0.04 + (i % 3) * 0.025,
+          ph: i * 0.7,
+          a: 0.22 + (i % 4) * 0.08,
+        }));
+        let last = 0;
+        const draw = now => {
+          fxRaf = requestAnimationFrame(draw);
+          if (now - last < 40) return;
+          last = now;
+          ctx.clearRect(0, 0, 480, 270);
+          for (const p of pts) {
+            p.y += p.vy;
+            p.x += p.vx + Math.sin(now * 0.0008 + p.ph) * 0.04;
+            if (p.y < -4) { p.y = 274; p.x = 170 + Math.random() * 295; }
+            if (p.x < 100) p.x = 472;
+            const alpha = p.a * (0.65 + 0.35 * Math.sin(now * 0.0014 + p.ph));
+            ctx.fillStyle = 'rgba(255,232,188,' + alpha.toFixed(3) + ')';
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        };
+        fxRaf = requestAnimationFrame(draw);
+      } else if (fx === 'soft-aurora') {
+        const orbs = [
+          { x: 365, y: 120, rx: 115, col: '58,217,155', a: 0.11, sp: 0.00055, ph: 0 },
+          { x: 130, y: 210, rx: 95, col: '74,195,250', a: 0.085, sp: 0.00042, ph: 2.1 },
+          { x: 280, y: 220, rx: 85, col: '242,201,107', a: 0.065, sp: 0.00038, ph: 4.2 },
+        ];
+        let last = 0;
+        const draw = now => {
+          fxRaf = requestAnimationFrame(draw);
+          if (now - last < 50) return;
+          last = now;
+          ctx.clearRect(0, 0, 480, 270);
+          for (const o of orbs) {
+            const dx = Math.sin(now * o.sp + o.ph) * 11;
+            const dy = Math.cos(now * o.sp * 0.8 + o.ph) * 7;
+            const a = o.a * (0.78 + 0.22 * Math.sin(now * o.sp * 1.4 + o.ph));
+            const g = ctx.createRadialGradient(o.x + dx, o.y + dy, 0, o.x + dx, o.y + dy, o.rx);
+            g.addColorStop(0, 'rgba(' + o.col + ',' + a.toFixed(3) + ')');
+            g.addColorStop(1, 'rgba(' + o.col + ',0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(o.x + dx, o.y + dy, o.rx, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        };
+        fxRaf = requestAnimationFrame(draw);
       }
-      if (wraps()) el.style.fontSize = '';
-    });
+    };
+
+    if (deferMs > 0) fxTimer = setTimeout(boot, deferMs);
+    else boot();
   }
 
-  function fitFigures() {
-    document.querySelectorAll('.slide').forEach(function (sl) {
-      var groups = sl.querySelectorAll('[data-fit-group="figure"], .body');
-      var list = groups.length ? [].slice.call(groups) : [sl];
-      list.forEach(function (box) {
-        var els = [].slice.call(box.querySelectorAll('[data-fit="figure"], .number .value, .stats-row .sv'));
-        if (!els.length) return;
-        els.forEach(function (e) { e.style.fontSize = ''; });
-        var base = els.map(function (e) { return parseFloat(getComputedStyle(e).fontSize) || 64; });
-        var k = 1;
-        function over() {
-          return box.scrollWidth > box.clientWidth + 2 ||
-            els.some(function (e) { return e.scrollWidth > e.clientWidth + 2; });
-        }
-        while (over() && k > 0.5) {
-          k -= 0.05;
-          els.forEach(function (e, i) { e.style.fontSize = (base[i] * k) + 'px'; });
-        }
-      });
-    });
-  }
+  deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
+    if (detail.staticMode) { stopFx(); return; }
+    startFx(detail.slide, detail.instant ? 180 : 620);
+  });
+  deck.stage.addEventListener('deck:slideleave', stopFx);
+  deck.stage.addEventListener('deck:still', ({ detail }) => {
+    if (detail.still) stopFx();
+    else startFx(deck.slides[deck.index], 120);
+  });
+  deck.stage.addEventListener('deck:lowpower', ({ detail }) => {
+    if (detail.lowPower) stopFx();
+    else startFx(deck.slides[deck.index], 120);
+  });
 
-  function run() {
-    fitPhrases();
-    fitFigures();
-  }
-
-  window.__deckFit = run;
-  run();
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(run);
+  if (!deck.isStatic() && deck.slides[deck.index]) {
+    startFx(deck.slides[deck.index], 180);
   }
 })();
 </script>

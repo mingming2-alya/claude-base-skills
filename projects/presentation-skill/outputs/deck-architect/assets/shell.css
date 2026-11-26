@@ -1,13 +1,15 @@
-/* deck-architect v4.3 Thin Shell CSS (Phase B.3 — 60fps GPU Core + Visual Guidance Spec)
+/* deck-architect v4.4 Thin Shell CSS (Phase C.2 — Bipolar Surface, Multi-Mode Nav, Auto-Hide Bar, Dual-Track data-step)
  *
  * Locks only invariants that must never break across slides:
  *  - 1920x1080 auto-scaled stage with compositor isolation (contain: layout style paint)
  *  - Offline CJK + Latin system font fallback stacks
- *  - Single-source navigation/tab hooks (fully styleable or replaceable via data-nav="inline")
- *  - 60fps GPU-composited transition archetypes (push | zoom-rise | iris | shock | morph | sheet-up | modal)
- *  - Phase B.3 Visual Guidance helpers: 3-tier focus dimming, mobile-visible spotlight, target ripples, rail travel beads
- *  - Interactive live-figure controls (.live-ctrl / .live-only) with print/static isolation
+ *  - Per-slide polarity tokens via data-surface="light|dark|split|photo" (customizable via --light-* and --dark-*)
+ *  - Navigation modes: top-bar | minimal-side (#nav-side) | divider-only, plus auto-hiding floating #ctrl-bar & #deck-progress
+ *  - 60fps GPU-composited transitions + Visual Guidance helpers + Presenter-paced data-step
  *  - Dual static freeze (?still=1, B low-power mode, prefers-reduced-motion) & exact 16:9 print/PDF
+ *
+ * Optional features (components.css, ambient-fx, live-controls, media, flow-carousel, coverflow)
+ * are modularized and injected on-demand by assemble.py (0 KB when unused).
  */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -64,7 +66,7 @@
   --nav-accent: var(--accent);
   --nav-border: var(--line-2);
 
-  /* Phase B.2 60fps motion personality tokens (spring | crisp | tactile) */
+  /* 60fps motion personality tokens (spring | crisp | tactile) */
   --motion-mode: spring;
   --spring-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
@@ -95,6 +97,106 @@ html, body {
   transform-origin: center center;
   overflow: hidden;
   background: var(--bg);
+}
+
+/* ---------------------------------------------------------------- per-slide polarity (v4.4 data-surface) */
+.slide[data-surface="light"] {
+  --bg: var(--light-bg, #F4F2ED);
+  --bg-2: var(--light-bg-2, #E8E4DC);
+  --fg: var(--light-fg, #161920);
+  --fg-2: var(--light-fg-2, #3D434F);
+  --fg-3: var(--light-fg-3, #5A606D);
+  --line: var(--light-line, rgba(22, 25, 32, .20));
+  --line-2: var(--light-line-2, rgba(22, 25, 32, .11));
+  --accent: var(--light-accent, #0D6B4F);
+  --accent-text: var(--light-accent-text, #0A5941);
+  --accent-ink: var(--light-accent-ink, #F4F2ED);
+  --nav-color: var(--light-fg-3, #5A606D);
+  --nav-active: var(--light-fg, #161920);
+  --nav-accent: var(--light-accent, #0D6B4F);
+  --nav-border: var(--light-line-2, rgba(22, 25, 32, .12));
+}
+
+.slide[data-surface="dark"] {
+  --bg: var(--dark-bg, #0E1117);
+  --bg-2: var(--dark-bg-2, #171C26);
+  --fg: var(--dark-fg, #F0EFEA);
+  --fg-2: var(--dark-fg-2, #BCC3D0);
+  --fg-3: var(--dark-fg-3, #929BA9);
+  --line: var(--dark-line, rgba(240, 239, 234, .22));
+  --line-2: var(--dark-line-2, rgba(240, 239, 234, .12));
+  --accent: var(--dark-accent, #3ED49C);
+  --accent-text: var(--dark-accent-text, #5CE3B0);
+  --accent-ink: var(--dark-accent-ink, #0E1117);
+  --nav-color: var(--dark-fg-3, #929BA9);
+  --nav-active: var(--dark-fg, #F0EFEA);
+  --nav-accent: var(--dark-accent, #3ED49C);
+  --nav-border: var(--dark-line-2, rgba(240, 239, 234, .14));
+}
+
+.slide[data-surface="split"] {
+  --bg: var(--light-bg, #F4F2ED);
+  --bg-2: var(--light-bg-2, #E8E4DC);
+  --fg: var(--light-fg, #161920);
+  --fg-2: var(--light-fg-2, #3D434F);
+  --fg-3: var(--light-fg-3, #5A606D);
+  --line: var(--light-line, rgba(22, 25, 32, .18));
+  --line-2: var(--light-line-2, rgba(22, 25, 32, .11));
+  --accent: var(--light-accent, #0D6B4F);
+  --accent-text: var(--light-accent-text, #0A5941);
+  --accent-ink: var(--light-accent-ink, #F4F2ED);
+  --split-dark-bg: var(--dark-bg, #12161E);
+  --split-dark-fg: var(--dark-fg, #F0EFEA);
+  --split-dark-fg-2: var(--dark-fg-2, #B9C0CC);
+  --split-dark-accent: var(--dark-accent-text, #5CE3B0);
+}
+:where(.slide[data-surface="split"] .split-anchor) {
+  background: var(--split-dark-bg);
+  color: var(--split-dark-fg);
+}
+:where(.slide[data-surface="split"] .split-main) {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.slide[data-surface="photo"] {
+  --bg: var(--photo-bg, #101319);
+  --bg-2: var(--dark-bg-2, #181E29);
+  --fg: var(--dark-fg, #F4F2EC);
+  --fg-2: var(--dark-fg-2, #D0D6E0);
+  --fg-3: var(--dark-fg-3, #A4ADB9);
+  --line: var(--dark-line, rgba(244, 242, 236, .26));
+  --line-2: var(--dark-line-2, rgba(244, 242, 236, .14));
+  --accent: var(--dark-accent, #3ED49C);
+  --accent-text: var(--dark-accent-text, #5CE3B0);
+  --accent-ink: var(--dark-accent-ink, #0E1117);
+}
+:where(.slide[data-surface="photo"] .photo-scrim) {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(12, 15, 21, .56) 0%, rgba(12, 15, 21, .34) 48%, rgba(12, 15, 21, .78) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Stage-level chrome polarity sync (adapts #nav, #tabs, #nav-side to active slide's surface) */
+#stage[data-active-surface="light"],
+#stage[data-active-surface="split"] {
+  --chrome-nav-color: var(--light-fg-3, #5A606D);
+  --chrome-nav-active: var(--light-fg, #161920);
+  --chrome-nav-accent: var(--light-accent, var(--accent));
+  --chrome-nav-border: var(--light-line-2, rgba(22, 25, 32, .14));
+  --chrome-side-bg: rgba(244, 242, 237, .82);
+  --chrome-side-border: rgba(22, 25, 32, .14);
+}
+#stage[data-active-surface="dark"],
+#stage[data-active-surface="photo"] {
+  --chrome-nav-color: var(--dark-fg-3, #929BA9);
+  --chrome-nav-active: var(--dark-fg, #F0EFEA);
+  --chrome-nav-accent: var(--dark-accent, var(--accent));
+  --chrome-nav-border: var(--dark-line-2, rgba(240, 239, 234, .16));
+  --chrome-side-bg: rgba(14, 17, 23, .76);
+  --chrome-side-border: rgba(240, 239, 234, .18);
 }
 
 /* ---------------------------------------------------------------- slide container (GPU-isolated) */
@@ -145,7 +247,7 @@ mark.em {
 .unit { font-size: .42em; font-weight: 500; letter-spacing: 0; opacity: .75; margin-left: .08em; font-family: var(--font-body); }
 .ph { display: inline-block; max-width: 100%; }
 
-/* ---------------------------------------------------------------- replaceable image/scene slot & low-res FX canvas */
+/* ---------------------------------------------------------------- replaceable image/scene slot */
 .asset-slot {
   position: absolute;
   inset: 0;
@@ -161,15 +263,6 @@ mark.em {
   height: 100%;
   object-fit: cover;
 }
-/* Logical 480x270 canvas stretched smoothly by GPU -> 16x cheaper than 1920x1080 buffer */
-.fx-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
 /* Ensure slide content sits above background scene & FX layers with zero specificity */
 :where(.slide.canvas > :not(.asset-slot):not(.scene):not(.fx-canvas):not([data-layer="bg"]):not(.back):not(.more-btn)) {
   position: relative;
@@ -182,13 +275,20 @@ mark.em {
   pointer-events: none;
 }
 
-/* ---------------------------------------------------------------- Phase B overlays & visual guidance helpers */
+/* ---------------------------------------------------------------- overlays, visual guidance & data-step */
 #morph-layer {
   position: absolute;
   inset: 0;
   z-index: 20;
   pointer-events: none;
   overflow: hidden;
+}
+
+/* Presenter-paced click steps ([data-step], [data-step-hide], [data-step-only]) */
+.slide [data-step-hidden="1"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* Flowing SVG offset-path token helper (visual-explainer MIT) */
@@ -225,7 +325,7 @@ mark.em {
   animation: deck-spotlight-ring 1250ms cubic-bezier(0.22, 1, 0.36, 1) 1;
 }
 
-/* Phase B.3 3-tier focus dimming + high-contrast spotlight choreographer ([data-focus-plan] + [data-focus]) */
+/* 3-tier focus dimming + high-contrast spotlight choreographer ([data-focus-plan] + [data-focus]) */
 #stage .slide [data-focus] {
   transition:
     opacity 500ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -253,13 +353,13 @@ mark.em {
   transform: translate3d(0, -4px, 0) scale(1.035);
 }
 
-/* Instant zero-cost BEFORE state setup for [data-transform-at] (zero reverse paint transitions on slide entry!) */
+/* Instant zero-cost BEFORE state setup for [data-transform-at] */
 .slide .pre-transform,
 .slide .pre-transform * {
   transition: none !important;
 }
 
-/* Target-lock concentric ripple over physical anchors or chart endpoints (100% GPU, hidden in static/print) */
+/* Target-lock concentric ripple over physical anchors or chart endpoints */
 .target-ripple {
   position: absolute;
   width: 24px;
@@ -274,7 +374,7 @@ mark.em {
   z-index: 4;
 }
 
-/* Chronological rail travel bead (100% GPU translate3d, hidden in static/print) */
+/* Chronological rail travel bead */
 .rail-bead {
   position: absolute;
   width: 14px;
@@ -289,41 +389,7 @@ mark.em {
   z-index: 4;
 }
 
-/* Interactive live controls (isolated from slide click-to-advance) */
-.live-ctrl {
-  user-select: none;
-}
-.live-ctrl input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-  outline: none;
-  cursor: pointer;
-}
-.live-ctrl input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--slider-thumb, #4BE2A5);
-  border: 3px solid var(--slider-ring, #0D1117);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
-  cursor: grab;
-  transition: transform .15s ease;
-}
-.live-ctrl input[type="range"]::-webkit-slider-thumb:active {
-  cursor: grabbing;
-  transform: scale(1.14);
-}
-.live-ctrl input[type="range"]:focus-visible {
-  box-shadow: 0 0 0 3px rgba(75, 226, 165, 0.45);
-}
-
-/* ---------------------------------------------------------------- persistent navigation (customizable) */
+/* ---------------------------------------------------------------- navigation modes (top-bar / minimal-side / divider-only) */
 #nav {
   position: absolute;
   left: var(--nav-left);
@@ -336,8 +402,8 @@ mark.em {
   align-items: center;
   font: 500 var(--nav-size)/1 var(--font-label);
   letter-spacing: var(--label-tracking);
-  color: var(--nav-color);
-  transition: opacity .24s ease;
+  color: var(--chrome-nav-color, var(--nav-color));
+  transition: opacity .24s ease, color .24s ease;
   pointer-events: none;
 }
 #nav span {
@@ -346,14 +412,14 @@ mark.em {
   transition: color .28s ease;
 }
 #nav span.on {
-  color: var(--nav-active);
+  color: var(--chrome-nav-active, var(--nav-active));
   font-weight: 700;
 }
 #nav .ind {
   position: absolute;
   bottom: 0;
   height: 2px;
-  background: var(--nav-accent);
+  background: var(--chrome-nav-accent, var(--nav-accent));
   transition: left .42s cubic-bezier(.22, 1, .36, 1), width .42s cubic-bezier(.22, 1, .36, 1);
 }
 #nav.with-rule::after {
@@ -363,7 +429,7 @@ mark.em {
   right: 0;
   bottom: 0;
   height: 1px;
-  background: var(--nav-border);
+  background: var(--chrome-nav-border, var(--nav-border));
 }
 
 #tabs {
@@ -375,8 +441,8 @@ mark.em {
   gap: 24px;
   font: 500 19px/1 var(--font-label);
   letter-spacing: var(--label-tracking);
-  color: var(--nav-color);
-  transition: opacity .24s ease;
+  color: var(--chrome-nav-color, var(--nav-color));
+  transition: opacity .24s ease, color .24s ease;
   pointer-events: none;
 }
 #tabs span {
@@ -385,13 +451,79 @@ mark.em {
   transition: color .25s ease, border-color .25s ease;
 }
 #tabs span.on {
-  color: var(--nav-active);
-  border-bottom-color: var(--nav-accent);
+  color: var(--chrome-nav-active, var(--nav-active));
+  border-bottom-color: var(--chrome-nav-accent, var(--nav-accent));
 }
 
 #stage.hide-nav #nav,
 #stage.hide-nav #tabs { opacity: 0; }
 #stage.no-trans *, #stage.no-trans { transition: none !important; }
+
+/* minimal-side: sleek right-edge chapter anchor rail */
+#nav-side {
+  position: absolute;
+  right: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 14;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .26s ease;
+}
+#stage.show-side-nav #nav-side {
+  opacity: 1;
+  pointer-events: auto;
+}
+#nav-side .ns-item {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--chrome-nav-color, var(--nav-color));
+  font: 600 18px/1 var(--font-label);
+  transition: background .22s ease, border-color .22s ease, color .22s ease;
+}
+#nav-side .ns-item .ns-lab {
+  opacity: 0;
+  transform: translate3d(6px, 0, 0);
+  transition: opacity .22s ease, transform .22s ease;
+  white-space: nowrap;
+}
+#nav-side .ns-item .ns-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--chrome-nav-color, var(--nav-color));
+  opacity: .55;
+  transition: height .28s cubic-bezier(0.22, 1, 0.36, 1), background .22s ease, opacity .22s ease;
+}
+#nav-side .ns-item.on {
+  color: var(--chrome-nav-active, var(--nav-active));
+}
+#nav-side .ns-item.on .ns-dot {
+  height: 28px;
+  background: var(--chrome-nav-accent, var(--nav-accent));
+  opacity: 1;
+}
+#nav-side:hover .ns-item,
+#nav-side .ns-item:focus-visible {
+  background: var(--chrome-side-bg, rgba(16, 19, 25, .72));
+  border-color: var(--chrome-side-border, rgba(255, 255, 255, .14));
+}
+#nav-side:hover .ns-item .ns-lab,
+#nav-side .ns-item:focus-visible .ns-lab {
+  opacity: 1;
+  transform: none;
+}
 
 /* Inline chapter nav (for free-canvas slides & print fallback) */
 .snav { display: none; }
@@ -408,7 +540,7 @@ mark.em {
   font-weight: 700;
 }
 
-/* ---------------------------------------------------------------- interactive chrome */
+/* ---------------------------------------------------------------- interactive chrome & auto-hiding bottom bar */
 .back {
   position: absolute;
   right: 64px;
@@ -469,12 +601,12 @@ mark.em {
 #toast {
   position: fixed;
   left: 50%;
-  bottom: 28px;
+  bottom: 78px;
   transform: translateX(-50%) translateY(10px);
-  z-index: 45;
+  z-index: 46;
   padding: 10px 22px;
   border-radius: 999px;
-  background: rgba(14, 17, 22, 0.9);
+  background: rgba(14, 17, 22, 0.92);
   border: 1px solid rgba(244, 242, 236, 0.18);
   color: #F4F2EC;
   font: 600 16px/1.3 var(--font-sans-fallback);
@@ -487,18 +619,98 @@ mark.em {
   transform: translateX(-50%) translateY(0);
 }
 
-#hint {
+/* Unified 2px progress bar + auto-hiding floating control capsule */
+#deck-progress {
   position: fixed;
-  right: 16px;
-  bottom: 12px;
-  z-index: 41;
-  color: #9A9EA6;
-  font: 12px/1.4 var(--font-sans-fallback);
-  opacity: 0;
-  transition: opacity .35s ease;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  z-index: 42;
+  background: rgba(128, 134, 148, 0.18);
   pointer-events: none;
 }
-body:hover #hint { opacity: .78; }
+#deck-progress-fill {
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  transform: scaleX(0);
+  background: var(--accent, #3ED49C);
+  transition: transform .36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#ctrl-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%) translateY(14px);
+  z-index: 44;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 18, 24, 0.88);
+  border: 1px solid rgba(244, 242, 236, 0.16);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.34);
+  color: #F4F2EC;
+  font: 500 13px/1 var(--font-sans-fallback);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .24s ease, transform .24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#ctrl-bar.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+#ctrl-bar .cb-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: rgba(244, 242, 236, 0.88);
+  height: 30px;
+  min-width: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font: 600 13px/1 var(--font-sans-fallback);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease;
+}
+#ctrl-bar .cb-btn:hover { background: rgba(255, 255, 255, 0.12); color: #FFFFFF; }
+#ctrl-bar .cb-btn.is-on { background: rgba(62, 212, 156, 0.22); color: #7BF0C3; }
+#ctrl-bar .cb-pos {
+  padding: 0 8px;
+  font: 700 13px/1 var(--font-number);
+  font-variant-numeric: tabular-nums;
+  color: #F4F2EC;
+  white-space: nowrap;
+}
+#ctrl-bar .cb-step {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(62, 212, 156, 0.18);
+  color: #7BF0C3;
+  font: 700 12px/1 var(--font-number);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  display: none;
+}
+#ctrl-bar .cb-step.has-steps { display: inline-flex; align-items: center; }
+#ctrl-bar .cb-sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(244, 242, 236, 0.16);
+  margin: 0 2px;
+}
+
+#hint {
+  display: none;
+}
 
 /* ---------------------------------------------------------------- static freeze & low-power */
 html.still *,
@@ -510,14 +722,14 @@ body.low-power *::after {
   animation-play-state: paused !important;
   transition: none !important;
 }
-html.still .fx-canvas,
-body.low-power .fx-canvas,
 html.still .flow-token,
 body.low-power .flow-token,
 html.still [data-ripple],
 body.low-power [data-ripple],
 html.still [data-travel],
-body.low-power [data-travel] {
+body.low-power [data-travel],
+html.still #ctrl-bar,
+html.still #deck-progress {
   display: none !important;
 }
 html.still .slide [data-focus],
@@ -527,7 +739,11 @@ body.low-power .slide [data-focus] {
   box-shadow: none !important;
 }
 html.hide-ctrl .live-only,
-body.hide-ctrl .live-only {
+body.hide-ctrl .live-only,
+html.hide-ctrl #ctrl-bar,
+body.hide-ctrl #ctrl-bar,
+html.hide-ctrl #deck-progress,
+body.hide-ctrl #deck-progress {
   display: none !important;
 }
 
@@ -576,7 +792,8 @@ body.hide-ctrl .live-only {
   html, body { height: auto; overflow: visible; background: none; }
   #viewport { position: static; display: block; background: none; }
   #stage { transform: none !important; width: 1920px; height: auto; overflow: visible; }
-  #nav, #tabs, #curtain, #morph-layer, #notes, #hint, #toast, .back, .more-btn, .live-only, .fx-canvas, .flow-token, [data-ripple], [data-travel] { display: none !important; }
+  #nav, #tabs, #nav-side, #curtain, #morph-layer, #notes, #hint, #toast, #ctrl-bar, #deck-progress,
+  .back, .more-btn, .live-only, .flow-token, [data-ripple], [data-travel] { display: none !important; }
   .slide {
     position: relative;
     visibility: visible !important;
@@ -587,7 +804,9 @@ body.hide-ctrl .live-only {
     transform: none !important;
     clip-path: none !important;
   }
-  .slide * { opacity: 1; transform: none !important; animation: none !important; }
+  .slide * { animation: none !important; }
+  .slide [data-step-hidden="1"] { display: none !important; }
+  .slide [data-step]:not([data-step-hidden="1"]) { opacity: 1 !important; visibility: visible !important; transform: none !important; }
   .toc li.off { opacity: .28 !important; }
   .snav {
     display: flex;
@@ -612,7 +831,7 @@ body.hide-ctrl .live-only {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #nav .ind, #tabs span, #nav span, #toast { transition: none !important; }
-  .fx-canvas, .flow-token, [data-ripple], [data-travel] { display: none !important; }
+  #nav .ind, #tabs span, #nav span, #toast, #ctrl-bar, #deck-progress-fill { transition: none !important; }
+  .flow-token, [data-ripple], [data-travel] { display: none !important; }
   .slide * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }

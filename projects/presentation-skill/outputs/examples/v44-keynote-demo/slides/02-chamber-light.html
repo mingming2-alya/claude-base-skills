@@ -1,0 +1,181 @@
+<style>
+.slide .head {
+  position: absolute;
+  left: 108px;
+  right: 120px;
+  top: 76px;
+}
+.slide .eyebrow {
+  font: 700 20px/1 var(--font-label);
+  letter-spacing: 0.12em;
+  color: var(--accent-text);
+  margin-bottom: 14px;
+}
+.slide h2 {
+  font: 900 72px/1.1 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.slide .lead {
+  margin-top: 14px;
+  font: 500 28px/1.45 var(--font-body);
+  color: var(--fg-2);
+}
+.slide .stage-grid {
+  position: absolute;
+  left: 108px;
+  right: 132px;
+  top: 268px;
+  bottom: 96px;
+  display: grid;
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: 72px;
+  align-items: center;
+}
+.slide .cutaway {
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slide .cutaway svg {
+  width: 100%;
+  height: auto;
+  max-height: 680px;
+  overflow: visible;
+}
+.slide .metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.slide .metric-row {
+  padding: 34px 0;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  align-items: baseline;
+  gap: 24px;
+}
+.slide .metric-row:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.slide .m-val {
+  font: 900 76px/1 var(--font-number);
+  letter-spacing: -0.04em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.slide .m-val.em {
+  color: var(--accent-text);
+}
+.slide .m-val small {
+  font: 700 26px/1 var(--font-body);
+  margin-left: 6px;
+  color: var(--fg-2);
+}
+.slide .m-lbl {
+  font: 700 28px/1.3 var(--font-body);
+  color: var(--fg);
+}
+.slide .m-note {
+  margin-top: 6px;
+  font: 400 21px/1.4 var(--font-body);
+  color: var(--fg-3);
+}
+.slide .src {
+  position: absolute;
+  left: 108px;
+  bottom: 34px;
+  font: 400 18px/1.2 var(--font-label);
+  color: var(--fg-3);
+}
+</style>
+<section class="slide canvas" data-surface="light" data-nav="minimal-side" data-transition="iris" data-iris-origin="38% 55%" data-focus-plan="1@0-2000, 2@2000-4100">
+  <header class="head">
+    <div class="eyebrow">01 · 聲學腔體</div>
+    <h2 data-role="title">雙腔體聲學結構</h2>
+    <p class="lead" data-role="summary"><mark class="em">11.4 mm</mark> 複合鈦振膜，4.8 克單耳無壓配戴。</p>
+  </header>
+
+  <div class="stage-grid">
+    <!-- Borderless white-studio acoustic chamber cutaway (Zero Card-itis!) -->
+    <div class="cutaway" data-focus="1" data-focus-style="clean">
+      <svg viewBox="0 0 820 560" fill="none" aria-label="雙腔體聲學剖面圖">
+        <defs>
+          <radialGradient id="studioShadow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#151921" stop-opacity="0.16"/>
+            <stop offset="100%" stop-color="#151921" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="shellMetal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2D3542"/>
+            <stop offset="55%" stop-color="#1A202B"/>
+            <stop offset="100%" stop-color="#0E1219"/>
+          </linearGradient>
+          <linearGradient id="tiDome" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#45C898"/>
+            <stop offset="100%" stop-color="#0C6B4E"/>
+          </linearGradient>
+        </defs>
+
+        <ellipse cx="400" cy="495" rx="285" ry="26" fill="url(#studioShadow)"/>
+
+        <!-- Outer acoustic housing -->
+        <path d="M 190 250 C 190 120 315 72 452 92 C 580 112 650 184 646 284 C 642 386 558 446 436 446 C 316 446 248 408 214 352 L 154 332 C 134 324 134 276 156 266 Z" fill="url(#shellMetal)" stroke="#485366" stroke-width="2.5"/>
+
+        <!-- Rear decompression chamber -->
+        <path d="M 432 132 C 530 144 596 202 592 280 C 588 358 524 402 432 402 Z" fill="#252E3C" stroke="#5A677D" stroke-width="1.8"/>
+
+        <!-- 11.4mm Titanium Diaphragm -->
+        <path d="M 386 150 C 424 195 424 345 386 390" stroke="url(#tiDome)" stroke-width="14" stroke-linecap="round"/>
+        <path d="M 358 186 C 384 220 384 320 358 354" stroke="#89F0C9" stroke-width="4" stroke-linecap="round" data-draw data-delay="380" data-dur="720"/>
+
+        <!-- Front acoustic nozzle -->
+        <rect x="200" y="218" width="136" height="104" rx="18" fill="#12161E" stroke="#4D5A6E" stroke-width="2"/>
+        <path d="M 224 270 L 332 270" stroke="#3CD49A" stroke-width="3.5" stroke-dasharray="10 8"/>
+
+        <!-- Callout lines (true SVG draw) -->
+        <path d="M 404 180 L 456 88 L 656 88" stroke="#0C6B4E" stroke-width="2.5" data-draw data-delay="640" data-dur="620"/>
+        <circle cx="404" cy="180" r="7" fill="#0C6B4E" data-pop data-delay="1220"/>
+        <text x="468" y="74" fill="#151921" font-size="22" font-weight="700" font-family="Noto Sans TC, sans-serif">11.4 mm 複合鈦振膜</text>
+
+        <path d="M 556 320 L 620 426 L 774 426" stroke="#3C4350" stroke-width="2.2" data-draw data-delay="860" data-dur="580"/>
+        <circle cx="556" cy="320" r="6" fill="#3C4350" data-pop data-delay="1400"/>
+        <text x="616" y="410" fill="#151921" font-size="21" font-weight="700" font-family="Noto Sans TC, sans-serif">微氣孔洩壓後腔</text>
+
+        <path d="M 264 316 L 210 426 L 44 426" stroke="#0C6B4E" stroke-width="2.2" data-draw data-delay="980" data-dur="560"/>
+        <circle cx="264" cy="316" r="6" fill="#0C6B4E" data-pop data-delay="1500"/>
+        <text x="44" y="410" fill="#151921" font-size="21" font-weight="700" font-family="Noto Sans TC, sans-serif">前饋雙麥陣列</text>
+      </svg>
+    </div>
+
+    <!-- Borderless naked metrics separated only by 1px hairlines -->
+    <div class="metrics" data-focus="2" data-focus-style="clean">
+      <div class="metric-row" data-beat="2" data-from="right">
+        <div class="m-val em" data-count>11.4<small>mm</small></div>
+        <div>
+          <div class="m-lbl">複合鈦金屬振膜</div>
+          <div class="m-note">剛性提升 38%，高頻延伸零毛邊</div>
+        </div>
+      </div>
+      <div class="metric-row" data-beat="3" data-from="right">
+        <div class="m-val" data-count>4.8<small>g</small></div>
+        <div>
+          <div class="m-lbl">單耳無感配重</div>
+          <div class="m-note">重心貼合耳甲艇，久戴零壓迫</div>
+        </div>
+      </div>
+      <div class="metric-row" data-beat="4" data-from="right">
+        <div class="m-val" data-count>0.18<small>ms</small></div>
+        <div>
+          <div class="m-lbl">腔體聲壓平衡</div>
+          <div class="m-note">微氣孔即時釋壓，徹底消除耳鳴感</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="src" data-role="source">資料來源：海潮聲學 2026 聲學實驗室量測報告（N=30 樣機）</p>
+</section>

@@ -1,15 +1,15 @@
 ---
 name: deck-architect
-description: 架構先行的簡報製作技能（v4.4-spec）：先以設計樹前沿（Design Tree + Frontier）互動表單 Grill 釐清理性終點、體感預期、對象前置著陸（Grounding）、場合舞台光譜（briefing/pitch/keynote）、承重母題與說服載體，並以 Design It Twice 必給跳脫思維破框候選；再以單一視覺關卡提供三款對準 brief 契約的多元風格樣張與 OKLCH 配色；最後以「輕底盤、強自由」混合架構產出圖文融合、真文字可編輯、通過真實像素 WCAG 與動態品管的 HTML 簡報。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
+description: 架構先行的簡報製作技能（v4.4）：先以設計樹前沿（Design Tree + Frontier）互動表單 Grill 釐清理性終點、體感預期、對象前置著陸（Grounding）、場合舞台光譜（briefing/pitch/keynote）、承重母題、說服載體與按需引擎模組，並以 Design It Twice 必給跳脫思維破框候選；再以單一視覺關卡提供三款對準 brief 契約的多元風格樣張與 OKLCH 配色；最後以「輕底盤、強自由＋7 項按需自動注入模組」混合架構產出圖文融合、真文字可編輯、通過真實像素 WCAG 與 11 項動態品管的 HTML 簡報。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
 ---
 
-# Deck Architect v4.4：設計樹定調，舞台自由表達
+# Deck Architect v4.4：設計樹定調，按需組裝舞台
 
-信念：**簡報的成敗在架構與說服載體，驚豔來自依場合開合的舞台光譜、風格憲法與自由畫布**。先當「架構師 × 創意總監」把路徑、體感預期、破框切法與資產載體逼清楚，再端出真正兌現預期的三款風格樣張，最後以「輕底盤、強自由」產出高品質 HTML 簡報。
+信念：**簡報的成敗在架構與說服載體，驚豔來自依場合開合的舞台光譜、風格憲法與自由畫布**。先當「架構師 × 創意總監」把路徑、體感預期、破框切法與呈現期待逼清楚（由此決定下游按需注入哪些模組），再端出真正兌現預期的三款風格樣張，最後以「輕底盤、強自由」產出高品質 HTML 簡報。
 
 使用者只在**三個關卡**拍板，其餘自動完成：
 
-1. **Grill 設計樹前沿清空時（⛔ 關卡一）**：確認 `brief.md`（雙重目標、Stage Spec 舞台光譜、承重母題、架構與頁數算術、逐章說服載體與資產地圖、限制與地雷）
+1. **Grill 設計樹前沿清空時（⛔ 關卡一）**：確認 `brief.md`（雙重目標、Stage Spec 舞台光譜與按需模組、承重母題、架構與頁數算術、逐章說服載體與資產地圖、限制與地雷）
 2. **看完風格與配色樣張時（⛔ 關卡二）**：從三款真正拉開差距的風格（含明暗策略與三組 OKLCH 配色）中定調
 3. **看完成品時（⛔ 關卡三）**：檢視成品、截圖與品管報告並回饋修改
 
@@ -21,22 +21,23 @@ description: 架構先行的簡報製作技能（v4.4-spec）：先以設計樹�
 
 ```text
 decks/<name>/
-├── brief.md                 # Step 1：Grill 設計樹交接契約（Stage Spec、母題、載體地圖、限制）
-├── storyboard.yaml          # Step 2：唯一內容來源（敘事、章節、每頁形狀、constraints）
-├── deck.css                 # Step 4：這份簡報的風格與 OKLCH 配色變數／共性樣式
+├── brief.md                 # Step 1：Grill 設計樹交接契約（Stage Spec、按需模組、母題、載體地圖、限制）
+├── storyboard.yaml          # Step 2：唯一內容來源（敘事、章節、每頁形狀與 surface/nav、constraints）
+├── deck.css                 # Step 4：這份簡報的風格與雙極 OKLCH 配色變數（--light-* / --dark-*）
 ├── samples/                 # Step 3：Gate 2 樣張（2–3 頁 × 3 方向）＋ sheet.html / sheet.jpg
 ├── slides/                  # Step 4：逐頁自由編排 HTML 片段（01-cover.html 等）
-├── assets/                  # 可選：使用者提供或生成的實物／底圖／照片（大影音採外連相對路徑）
+├── assets/                  # 可選：使用者提供或生成的靜態圖／底圖／海報（自動 Base64 內嵌）
+├── media/                   # 可選：外連影片／實測音檔（保持相對路徑，不轉 Base64）
 ├── IMAGE_UPGRADE.md         # 可選：AI 升級生圖清單（零等待程式版同步附上）
-├── deck.html                # Step 4：assemble.py 掛載輕底盤產出的單檔成品
-└── check/                   # Step 5：check.mjs 逐頁截圖與真實像素 WCAG＋動態品管報告
+├── deck.html                # Step 4：assemble.py 掛載輕底盤與按需模組產出的成品
+└── check/                   # Step 5：check.mjs 逐頁截圖與真實像素 WCAG＋11 項動態品管報告
 ```
 
-## 架構模式：輕底盤、強自由（Thin Shell + Free Canvas + 分層混合動態）
+## 架構模式：輕底盤、強自由 ＋ 7 項按需自動注入模組
 
-- **輕底盤（`assemble.py` 自動掛載，零外部依賴 100% 離線播放）**：1920×1080 舞台縮放、單一資料來源章節導航／頁籤（支援 `data-auto-nav` 風格客製）、可打斷解析彈簧與 6 種敘事切頁、跨頁 Magic Move（`data-morph`）、視覺指引原語（`data-focus-plan`、`data-transform-at`、`data-draw`、`data-wipe`、`data-pop`、`data-ripple`）、動態數據原語（`data-count`、`data-grow`、`data-stagger`）、現場互動控件隔離（`.live-ctrl`）、延遲啟動 Canvas 2D 氛圍層（`data-fx`）、震撼頁停頓、附件點入返回、SVG `<defs>` ID 隔離、本機圖檔內嵌與 `.asset-slot` 升級、講者備註（`N`）、靜態凍結（`B`／`?still=1`）、全螢幕（`F`）、列印 PDF（`P`）。
+- **核心輕底盤（`assemble.py` 常駐掛載，零外部依賴 100% 離線播放）**：1920×1080 舞台縮放、單頁極性 `data-surface="dark|light|split|photo"` 與外殼反差同步、三種導航模式 `nav_mode`（`top-bar`／`minimal-side`／`divider-only`）＋全模式自動隱藏底控膠囊與 2px 進度條、可打斷 60fps 六種敘事切頁與 `data-morph` Magic Move、雙軌節拍（視覺指引 `data-focus-plan`/`data-transform-at`/`data-draw`/`data-wipe`/`data-pop`/`data-ripple`/`data-count` ＋講者點擊步進 `data-step`/`data-step-only`/`data-step-hide`）、附件點入返回、SVG `<defs>` ID 隔離、本機靜態圖與影片 `poster` 內嵌、講者備註（`N`）、靜態凍結（`B`／`?still=1`）、全螢幕（`F`）、列印 PDF（`P`）。
+- **七項按需自動注入模組（`assets/modules/`，掃描投影片按需載入，未用到 0 KB）**：`components`（商務元件 CSS）、`ambient-fx`（`data-fx` Canvas 2D 氛圍層）、`live-controls`（互動滑桿樣式）、`fit`（自動縮字）、`media`（`<video data-slide-video>`／`<audio data-sound-demo>` 外連影音控制）、`flow-carousel`（`[data-flow-carousel]` 活產品流程輪播卡）、`coverflow`（`[data-coverflow]` 3D 照片輪播）。
 - **自由編排畫布（預設 90%+ 頁面）**：依 `brief.md` 的 **Stage Spec（`briefing`/`pitch`/`keynote`）**、選定 **Style DNA** 與 `references/visual-guidance.md`，在 `slides/XX-*.html` 撰寫最貼題的 HTML／CSS／SVG（CSS 選擇器加 `.slide` 前綴確保跨頁零汙染）。
-- **高紀律商務元件（按需自動生成）**：`status-table`（週進度長表）、`pillars`（年度一頁總覽）、自動 `toc` 目錄頁，以及快速模式未寫客製片段的頁面，由 `assemble.py` 從 `storyboard.yaml` 直接生成。
 - **旗艦外掛（按需、先問過）**：日常不載入外部動效庫；僅在旗艦專案需要異形 MorphSVG、影片級時間軸或 WebGL 時，徵詢同意後透過 `#stage` 生命週期事件掛載。
 
 ## 流程
@@ -48,18 +49,18 @@ decks/<name>/
 1. **Pre-Flight 靜默偵察**：先讀完使用者提供的所有舊檔、簡報、模板與數據，主動查核關鍵數字並盤點既有圖片／照片／影音／原話。
 2. **根節點定調**：釐清理性終點 × **體感預期（Audience Feeling）**、對象起點與 **Grounding 基線**、拍板三段式舞台光譜 **`stage_mode`**（`briefing`/`pitch`/`keynote`，依場合決定明暗雙極、去框比例、導航與點擊步進）、時長與頁數算術、人際顧慮，以及單獨先問先讀既有框架。
 3. **Explore × Design It Twice**：挖掘**承重母題（Leading Motif）**，讀 `references/structure.md` 提出 3 個本質不同約束的架構候選——**標準模式全面必給至少 1 個跳脫思維破框候選**（既有框架必列其一），並給出有主見的比較推薦或混搭建議。
-4. **內容 × 說服載體（Proof Medium）× 缺口點破（Gap-Naming）**：逐章定出唯一記憶點、Grounding 順序與最適說服載體（實物剖面／原話暗房／外連影音／HTML5 活流程輪播／去框編輯／結構化卡片），點破素材缺口並議定補法；核實證據口徑、限制與不承諾、地雷與高光控場。
+4. **內容 × 說服載體（Proof Medium）× 按需能力對齊**：逐章定出唯一記憶點、Grounding 順序與最適說服載體（實物剖面／原話暗房／外連影音／HTML5 活流程輪播／3D 照片輪播／去框編輯／結構化卡片），點破素材缺口並將具體呈現期待對應到 7 項按需模組清單；核實證據口徑、限制與不承諾、地雷與高光控場。
 5. **完成門檻**：設計樹前沿全空後寫出 `brief.md`（`templates/brief.md`），**停下來等使用者確認**。
 
 ### Step 2｜架構展開 → `storyboard.yaml`
 
-讀 `references/presentation-rules.md` 與 `references/content-shapes.md`，把 `brief.md` 展開成逐頁內容（格式見 `templates/storyboard.yaml`）：將限制與地雷寫入 `constraints`、標出招牌頁 `signature: true`、設定 `meta.delivery`、把口頭補充移進 `notes`。接著執行：
+讀 `references/presentation-rules.md` 與 `references/content-shapes.md`，把 `brief.md` 展開成逐頁內容（格式見 `templates/storyboard.yaml`）：設定 `meta.stage_mode`／`meta.nav_mode`／`meta.delivery` 與單頁 `surface`/`nav`/`transition`、將限制與地雷寫入 `constraints`、標出招牌頁 `signature: true`、把口頭補充移進 `notes`。接著執行：
 
 ```bash
 python3 <skill>/scripts/lint.py decks/<name>/storyboard.yaml
 ```
 
-修完所有 ERROR（WARNING 須修正或於架構摘要說明），呈交一頁**架構摘要**（章節、每頁題目、內容形狀、說服載體、頁數算術與震撼頁位置）。
+修完所有 ERROR（WARNING 須修正或於架構摘要說明），呈交一頁**架構摘要**（章節、每頁題目、內容形狀、極性與說服載體、頁數算術與震撼頁位置）。
 
 ### Step 3｜單一視覺關卡（對準 `brief.md` 契約）→ `samples/sheet.jpg`　⛔ 關卡二
 
@@ -78,12 +79,12 @@ node <skill>/scripts/check.mjs --sheet decks/<name>/samples
 
 ### Step 4｜製作 → `deck.html`（＋可選 `IMAGE_UPGRADE.md`）
 
-1. 將選定的 `style`、`mode`／極性策略與配色寫入 `storyboard.yaml` 與 `deck.css`。
+1. 將選定的 `style`、`mode`／雙極配色變數（`--light-*`／`--dark-*`）寫入 `storyboard.yaml` 與 `deck.css`。
 2. 讀 `references/visual-guidance.md` 與 `references/motion-system.md`，依 `stage_mode` 與 Style DNA 逐頁在 `slides/` 撰寫自由畫布：
    - **實物與無字底圖優先**：有真實素材或生圖工具時，優先融合實物照／16:9 無字底圖與 HTML 真文字層（反左右割裂構圖）；無圖時先以程式版呈現並包入 `.asset-slot[data-slot]`。
-   - **依場合開合極性與去框**：`briefing` 穩健單底色＋高紀律卡片；`pitch`/`keynote` 依規格運用光暗反差與五大去框／融合原型（白棚裸數爆炸圖、羽化融圖 Bento、35/65 分割、物象軌跡、原話暗房／光學信號燈）。
-   - **先定靜態動線、再編動態指引**：搭配 `data-focus-plan`、`data-transform-at`、SVG `<path data-draw>`、`data-wipe`、`data-pop`/`data-ripple`、`data-morph` 與 `.live-ctrl`；嚴守一拍一主角、閱讀窗靜止、語意順序高於轉場花招。
-3. 組裝單檔簡報（`assemble.py` 自動內嵌本機 `assets/` 靜態圖片）：
+   - **依場合開合極性與去框**：`briefing` 穩健單底色＋高紀律卡片；`pitch`/`keynote` 依規格運用 `data-surface` 光暗反差與五大去框／融合原型（白棚裸數爆炸圖、羽化融圖 Bento、35/65 分割、物象軌跡、原話暗房／光學信號燈）。
+   - **雙軌節拍與按需模組**：先定靜態動線，再編 `data-focus-plan`／`data-transform-at`／`data-draw`／`data-wipe`／`data-morph`，關鍵 1–3 懸念頁用 `data-step`，依 Step 1 對齊結果掛載 `<video data-slide-video>`、`<audio data-sound-demo>`、`[data-flow-carousel]`、`[data-coverflow]` 或 `.live-ctrl`。
+3. 組裝單檔簡報（`assemble.py` 自動按需注入模組、內嵌靜態圖與影片海報、保留外連影音相對路徑）：
 
 ```bash
 python3 <skill>/scripts/assemble.py decks/<name>/storyboard.yaml --write-upgrade-list
@@ -97,7 +98,7 @@ python3 <skill>/scripts/assemble.py decks/<name>/storyboard.yaml --write-upgrade
 node <skill>/scripts/check.mjs decks/<name>/deck.html --motion
 ```
 
-`check.mjs` 先以 `?still=1` 檢驗真實背景像素 WCAG 對比（含漸層字）、主標題≥總結、溢出與邊界、最小字級、SVG 重複 ID 與圖片／腳本錯誤；加 `--motion` 則自動實測 7 項動態與視覺指引指標。接著**親自看截圖**（含場合節奏與去框化、靜態動線、去小字程度、斷行美感），有問題修對應 `slides/` 或 `storyboard.yaml` 後重建，**最多修 2 輪**；未解項如實回報。
+`check.mjs` 先以 `?still=1` 檢驗真實背景像素 WCAG 對比（含漸層字）、主標題≥總結、溢出與邊界、最小字級、SVG 重複 ID 與圖片／腳本錯誤；加 `--motion` 則自動實測最多 **11 項**動態與 v4.4 引擎指標（連按打斷、Magic Move、互動滑桿、低耗電凍結、附件返回、視覺指引復原、SVG 描繪原語、`data-surface` 極性同步、`nav_mode`＋底控自動隱藏、`data-step` 雙軌步進與回翻、外連影音離頁歸零與原生輪播切換）。接著**親自看截圖**（含場合節奏與去框化、靜態動線、去小字程度、斷行美感），有問題修對應 `slides/` 或 `storyboard.yaml` 後重建，**最多修 2 輪**；未解項如實回報。
 
 ### Step 6｜交付　⛔ 關卡三
 

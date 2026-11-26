@@ -1,0 +1,160 @@
+<style>
+.slide .head {
+  position: absolute;
+  left: 108px;
+  right: 132px;
+  top: 76px;
+}
+.slide .eyebrow {
+  font: 700 20px/1 var(--font-label);
+  letter-spacing: 0.12em;
+  color: var(--accent-text);
+  margin-bottom: 14px;
+}
+.slide h2 {
+  font: 900 72px/1.1 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--fg);
+}
+.slide .lead {
+  margin-top: 14px;
+  font: 500 28px/1.45 var(--font-body);
+  color: var(--fg-2);
+}
+.slide .step-grid {
+  position: absolute;
+  left: 108px;
+  right: 132px;
+  top: 274px;
+  bottom: 102px;
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 56px;
+  align-items: stretch;
+}
+.slide .wave-stage {
+  position: relative;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px 12px;
+}
+.slide .wave-layer {
+  position: absolute;
+  inset: 28px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.slide .wave-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 700 22px/1.2 var(--font-label);
+}
+.slide .wave-tag.warn { color: #FFA28B; }
+.slide .wave-tag.good { color: var(--accent-text); }
+.slide .wave-note {
+  font: 500 24px/1.45 var(--font-body);
+  color: var(--fg-2);
+}
+.slide .right-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 28px;
+}
+.slide .eq-box {
+  padding: 36px 0 32px;
+  border-top: 2px solid var(--accent);
+  border-bottom: 1px solid var(--line);
+}
+.slide .eq-formula {
+  font: 700 26px/1.4 var(--font-number);
+  color: var(--fg-2);
+  letter-spacing: 0.02em;
+}
+.slide .eq-hero {
+  margin-top: 18px;
+  font: 900 132px/0.95 var(--font-number);
+  letter-spacing: -0.04em;
+  color: var(--accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.slide .eq-hero small {
+  font: 700 38px/1 var(--font-body);
+  color: var(--fg);
+  margin-left: 8px;
+}
+.slide .eq-sub {
+  margin-top: 14px;
+  font: 500 23px/1.45 var(--font-body);
+  color: var(--fg-2);
+}
+.slide .verdict {
+  padding: 26px 28px;
+  border-left: 4px solid var(--accent);
+  background: rgba(60, 212, 154, 0.09);
+  font: 700 27px/1.45 var(--font-body);
+  color: var(--fg);
+}
+.slide .src {
+  position: absolute;
+  left: 108px;
+  bottom: 34px;
+  font: 400 18px/1.2 var(--font-label);
+  color: var(--fg-3);
+}
+</style>
+<section class="slide canvas" data-surface="dark" data-nav="minimal-side" data-transition="zoom-rise">
+  <header class="head">
+    <div class="eyebrow">02 · 降噪演算法（講者點擊步進示範）</div>
+    <h2 data-role="title">主動逆相降噪原理</h2>
+    <p class="lead" data-role="summary">雙麥即時生成逆相聲波，通勤低頻直降 <mark class="em">−42 dB</mark>。</p>
+  </header>
+
+  <div class="step-grid">
+    <!-- Left stage: Step 0 shows raw noise -> Step 1 swaps cleanly to inverted cancellation wave -->
+    <div class="wave-stage">
+      <div class="wave-layer" data-step-only="0">
+        <div class="wave-tag warn">● 步驟 0｜未降噪車廂低頻轟鳴（80–400 Hz）</div>
+        <svg viewBox="0 0 880 320" fill="none" aria-label="原始雜訊波形">
+          <line x1="0" y1="160" x2="880" y2="160" stroke="rgba(242,240,235,0.16)" stroke-width="1.5" stroke-dasharray="6 8"/>
+          <path d="M 0 160 C 60 36, 120 284, 180 160 C 240 24, 300 296, 360 160 C 420 42, 480 278, 540 160 C 600 28, 660 292, 720 160 C 780 54, 830 266, 880 160" stroke="#F26D52" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+        <p class="wave-note">傳統耳塞僅阻擋高頻，低頻車廂震動仍長驅直入耳膜。</p>
+      </div>
+
+      <div class="wave-layer" data-step="1" data-step-from="none">
+        <div class="wave-tag good">● 步驟 1｜雙麥即時運算 180° 逆相抵銷波</div>
+        <svg viewBox="0 0 880 320" fill="none" aria-label="逆相抵銷波形">
+          <line x1="0" y1="160" x2="880" y2="160" stroke="rgba(242,240,235,0.20)" stroke-width="1.5"/>
+          <!-- Original noise faded -->
+          <path d="M 0 160 C 60 36, 120 284, 180 160 C 240 24, 300 296, 360 160 C 420 42, 480 278, 540 160 C 600 28, 660 292, 720 160 C 780 54, 830 266, 880 160" stroke="rgba(242,109,82,0.34)" stroke-width="4" stroke-linecap="round"/>
+          <!-- Inverted counter-wave drawn live when Step 1 clicks! -->
+          <path d="M 0 160 C 60 284, 120 36, 180 160 C 240 296, 300 24, 360 160 C 420 278, 480 42, 540 160 C 600 292, 660 28, 720 160 C 780 266, 830 54, 880 160" stroke="#62E8B5" stroke-width="6" stroke-linecap="round" data-draw data-dur="820"/>
+          <!-- Resulting flat silence line -->
+          <path d="M 0 160 L 880 160" stroke="#F2F0EB" stroke-width="3.5" stroke-linecap="round" data-draw data-delay="520" data-dur="560"/>
+        </svg>
+        <p class="wave-note">48 kHz 雙核 DSP 每秒校準 4.8 萬次，波峰精準對消波谷。</p>
+      </div>
+    </div>
+
+    <!-- Right stage: Step 2 builds hero equation -> Step 3 lands takeaway -->
+    <div class="right-col">
+      <div class="eq-box" data-step="2" data-step-from="right">
+        <div class="eq-formula">Noise(t) + AntiPhase(t) → 0</div>
+        <div class="eq-hero" data-count>−42<small>dB</small></div>
+        <div class="eq-sub">80–400 Hz 通勤低頻平均降噪深度</div>
+      </div>
+
+      <div class="verdict" data-step="3" data-step-from="up">
+        消除 98% 低頻轟鳴，同時完整保留 1–4 kHz 真實人聲語調。
+      </div>
+    </div>
+  </div>
+
+  <p class="src" data-role="source">資料來源：海潮聲學消音室 80–400 Hz 低頻實測（高頻突發尖音採被動隔音輔助）</p>
+</section>

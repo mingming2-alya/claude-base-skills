@@ -63,15 +63,33 @@
 
 ---
 
-## 5. v4.4 雙軌擴充規格（下一輪底盤引擎實作目標）
+## 5. v4.4 雙軌引擎與 7 項按需自動注入模組（已實作）
 
-> 以下三項已於 2026-11-25 規格定案，排定於下一輪 `runtime.js`／`shell.css`／`assemble.py` 引擎升級實作。**在底盤尚未實作前，撰寫成品請勿直接假設這些屬性已生效，僅於 `brief.md`／`storyboard.yaml` 標記設計意圖。**
+v4.4 輕底盤引擎將**核心基礎設施**與**可選專項能力**徹底解耦：`assemble.py` 會自動掃描組裝後的投影片 HTML，**僅將實際用到的模組注入 `deck.html`（未用到即 0 KB 零負擔）**，並寫入 `window.DECK.modules`。
 
-1. **講者可控點擊步進（`data-step="1|2|3"`）**：與預設 `0-step` 自動演繹雙軌並行。限 `pitch`／`keynote` 中需要講者停頓掌控包袱的 1–3 頁（單頁多層換幕、公式滑入補完、壓軸金句）；`→` 推進步進、尾步後翻下頁、`←` 退回、`?still=1` 與列印自動展開最終態。
-2. **雙軌影音媒體原語（外連媒體控制＋HTML5 原生活 Demo）**：
-   - **真實影片／實證音檔**：透過外部相對路徑媒體目錄掛載 `<video data-slide-video>`（自動播放／靜音循環／離頁即停歸零）與 `<audio data-sound-demo>`（含視覺波形與一鍵播停），不將大型影音塞入 Base64；`?still=1` 與列印定格海報幀。
-   - **HTML5 原生活產品流程輪播卡與 3D 照片輪播**：以 ~15 KB 原生 CSS/SVG 動畫與 `.live-ctrl` 互動切換重現產品流程展示與照片 CoverFlow，免去預錄肥大 MP4 且支援無限解析度。
-3. **單頁極性切換與自動隱藏控制列**：支援單頁 `data-surface="dark|light|split|photo"` 變數切換，以及 `nav_mode: divider-only` 下底部工具列自動隱藏（滑鼠移近底邊浮現）。
+### 5.1 核心雙軌擴充（常駐於 `shell.css` ＋ `runtime.js`）
+1. **單頁明暗極性（`data-surface="dark|light|split|photo"`）**：
+   - 可寫在 `<section class="slide canvas" data-surface="light">` 或 `storyboard.yaml` 單頁 `surface:` 欄位。
+   - 底盤依 `--light-*`／`--dark-*`（`deck.css` 可覆寫，未定則自動退回高對比安全預設）切換底色與文字變數，並同步更新 `#stage[data-active-surface]` 讓導航與外殼自動反差。
+2. **導航模式（`meta.nav_mode`：`top-bar` / `minimal-side` / `divider-only`）與自動隱藏底控膠囊**：
+   - `meta.stage_mode: keynote` 預設 `divider-only`；單頁可用 `data-nav="minimal-side|top-bar|divider-only|inline|none"` 覆寫。
+   - 所有模式統一內建 **2px 極細進度條**與**自動隱藏懸浮底控膠囊 `#ctrl-bar`**（滑鼠移近視窗底邊 96px 浮現，顯示頁碼、步進狀態與 `N/B/F` 快捷鈕，2.2 秒無操作自動淡出；`?still=1`、列印與 `?hide-ctrl=1` 完全隱藏）。
+3. **講者可控點擊步進（`data-step` / `data-step-hide` / `data-step-only`）**：
+   - 與預設 `0-step` 自動視覺指引雙軌並行。`data-step="1|2|3"` 累積揭曉，`data-step-hide="2"` 指定步數退場，`data-step-only="0|1"` 單步獨顯（支援單頁多層換幕）；可配 `data-step-from="up|down|left|right|scale|none"`。
+   - 步進區塊內部的 `data-draw`、`data-wipe`、`data-count`、`data-pop` 會延遲至該步點擊才觸發。
+   - 尾步後按 `→` 翻下頁；往回翻進前頁時自動落於該頁終態（step N），步進中按 `←` 逐層回退；`?still=1`、`B` 鍵與列印自動展開最終態並隱藏已退場圖層。
+
+### 5.2 七項按需自動注入模組（`assets/modules/`，`assemble.py` 掃描掛載）
+
+| 模組 | 觸發語法／條件 | 能力摘要 |
+|---|---|---|
+| `components` | 含自動生成商務頁或 `.cmp/.status/.overview/.toc` | `components.css`（純自由畫布簡報省 **17.6 KB**） |
+| `ambient-fx` | `data-fx="ambient-dust\|soft-aurora"` | 延遲啟動 `480×270` Canvas 2D 氛圍層（透過 `#stage` 生命週期事件解耦） |
+| `live-controls` | `.live-ctrl` 或 `<input type="range">` | 現場互動試算滑桿樣式（核心保留點擊隔離） |
+| `fit` | `data-fit="phrase\|figure"` 或商務元件頁 | 斷行與巨數自動縮放 `fit.js` |
+| `media` | `<video data-slide-video>` 或 `<audio data-sound-demo>` | 外連相對路徑**不轉 Base64**（僅內嵌 `poster`）、翻頁／靜態自動停播歸零；音檔自動渲染 36 條動態波形＋A/B 互斥播停 |
+| `flow-carousel` | `[data-flow-carousel]`（含 `.fc-tabs` 與 `.fc-card`） | 輕量 HTML5 原生垂直活產品流程輪播卡（自動輪播／點擊切換／懸停暫停／靜態定格） |
+| `coverflow` | `[data-coverflow]`（含 `.cf-stage` 與 `.cf-item`） | 純 GPU 3D 透視照片 CoverFlow 輪播（點擊聚焦／前後鈕／圓點指示／靜態置中展開） |
 
 ---
 

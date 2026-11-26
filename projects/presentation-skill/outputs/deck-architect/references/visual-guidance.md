@@ -29,9 +29,9 @@
 ### 1. 光暗極性節奏（Per-Slide Polarity Cadence）
 - **`briefing`（`single` 單一主調）**：全場鎖定單一 `light` 或 `dark` 底色，確保決策與週報高速掃讀的視覺穩定性。
 - **`pitch`（`accent-invert` 局部反轉）**：正文維持主調，在原話見證、關鍵對比或震撼轉折切換反極性，製造記憶點。
-- **`keynote`（`bipolar` 光暗雙極呼吸）**：把極性當敘事與認知切換器——**亮棚（`light`）**承載理性規格、實物剖面與工具流程；**暗場（`dark`）**承載開場、章節大扉頁、影音、原話暗房、發光信號與情緒震撼；**分割（`split-dark-light`）**與**照片（`photo`）**承載收斂總結與團隊溫度。避免連續 >5 頁同極性同構圖，讓每次切黑都保有「突然關燈」的舞台衝擊力。
+- **`keynote`（`bipolar` 光暗雙極呼吸）**：把極性當敘事與認知切換器——**亮棚（`light`）**承載理性規格、實物剖面與工具流程；**暗場（`dark`）**承載開場、章節大扉頁、影音、原話暗房、發光信號與情緒震撼；**分割（`split`）**與**照片（`photo`）**承載收斂總結與團隊溫度。避免連續 >5 頁同極性同構圖，讓每次切黑都保有「突然關燈」的舞台衝擊力。
 
-> *註：整份簡報單頁 `surface` 變數切換的底盤自動化支援將於下一輪引擎升級實作；現行可在自由畫布頁（`slides/XX-*.html`）透過 `#s-N` 局部覆寫背景與文字配色變數，並由 `check.mjs` 逐頁實測像素 WCAG 對比把關。*
+> *實作語法*：在 `storyboard.yaml` 單頁寫 `surface: light|dark|split|photo` 或於自由畫布 `<section class="slide canvas" data-surface="...">` 宣告，底盤自動套用 `--light-*`／`--dark-*` 雙極配色並同步反轉導航外殼，再由 `check.mjs --motion` 驗證亮度拉開與逐頁像素 WCAG 對比。
 
 ### 2. 去框化紀律（Anti-Card-itis）與五大進階編輯原型
 在 `pitch`（半去框化）與 `keynote`（≥40–50% 內容頁無圓角卡片框）場合，優先以留白、尺寸反差、細線與實物建立階層，避免「大框包小框」的後台監控感。除既有四大動線原型外，擴充五大進階靜態原型：
@@ -80,19 +80,23 @@
 
 ### 2. 雙軌節拍契約（Auto-Choreography ＋ Presenter-Paced `data-step`）
 - **自動視覺指引（預設，全模式適用）**：90% 以上頁面維持「一鍵翻一頁」零負擔直覺契約，頁內透過自動聚光與描線引導視線。
-- **講者可控點擊步進（`data-step`，限 `pitch`／`keynote` 的關鍵 1–3 頁）**：用於**需要講者配合口白停頓、製造懸念與逐層拆解**的頁面——例如單頁多層換幕總圖、轉折公式滑入補完、照片牆壓出主題字或壓軸金句落幕。按 `→` 逐步揭曉、最後一步後再按才翻下頁；`?still=1` 與列印自動展開最終態。
-  - *（註：`data-step` 輕底盤引擎原語排定於下一輪引擎實作；在引擎未實作前，於 `brief.md` 與 `storyboard.yaml` 先標註設計意圖，實際產出頁暫以 `data-focus-plan` 或分頁方式承接。）*
+- **講者可控點擊步進（`data-step` / `data-step-hide` / `data-step-only`，限 `pitch`／`keynote` 關鍵 1–3 頁）**：用於**需要講者配合口白停頓、製造懸念與逐層拆解**的頁面——例如單頁多層換幕總圖、轉折公式滑入補完、照片牆壓出主題字或壓軸金句落幕。按 `→` 逐步揭曉（步進內部 `data-draw`/`data-count` 同步延遲觸發）、尾步後翻下頁、回翻落於終態；`?still=1` 與列印自動展開最終態。
 
-### 3. 雙軌影音與活 Demo 原則（v4.4 定案）
-- **真實影片與實證音檔（外連媒體控制）**：開場大片、工廠實拍與實測降噪音檔（讓感官直接驗證）採**外部相對路徑媒體資料夾**掛載（不把數百 MB 影音塞進單檔 Base64），翻頁自動暫停歸零、`?still=1` 與列印顯示清晰海報幀。（底盤 `<video data-slide-video>`／`<audio data-sound-demo>` 控制器於下一輪引擎實作。）
-- **產品流程展示與照片輪播（HTML5 原生輕量動畫）**：AI 工具流程示範（垂直輪播卡片＋步驟切換）與高層來訪／團隊照片 3D CoverFlow 輪播，優先以 **~15 KB 原生 HTML/CSS/SVG 動畫與互動組件**實作，比預錄 MP4 更銳利、零檔案膨脹且可現場點擊切換。
+### 3. 雙軌影音與活 Demo 原則（按需模組自動注入，未用到 0 KB）
+- **真實影片與實證音檔（`media` 按需模組）**：開場大片、工廠實拍與實測降噪音檔透過外部相對路徑掛載 `<video data-slide-video>`（`assemble.py` 僅內嵌 `poster`、絕不轉 Base64）與 `<audio data-sound-demo>`（36 條動態波形＋A/B 互斥播停），翻頁與靜態自動停播歸零。
+- **產品流程展示與照片輪播（`flow-carousel`／`coverflow` 按需模組）**：AI／產品流程示範（`[data-flow-carousel]` 垂直輪播卡＋步驟切換）與團隊／場域照片 3D CoverFlow 輪播（`[data-coverflow]`），以輕量原生 HTML/CSS/SVG 實作並按需注入，比預錄 MP4 更銳利、零檔案膨脹且可現場點擊切換。
 
 ---
 
-## 五、底盤現有視覺指引原語速查表（`shell.css` + `runtime.js` v4.3）
+## 五、底盤視覺指引與 v4.4 引擎原語速查表（`shell.css` + `runtime.js` + `modules/`）
 
 | 屬性／語法 | 用途與視覺效果 | 關鍵參數 | 靜態／列印行為 |
 |---|---|---|---|
+| `data-surface="dark\|light\|split\|photo"` | 單頁明暗極性切換並同步導航外殼反差 | `--light-*`、`--dark-*`、`.split-anchor` | 完整保留該頁極性 |
+| `meta.nav_mode` / `data-nav` | 導航殼層分級（`top-bar`／`minimal-side`／`divider-only`）＋自動隱藏底控膠囊 | 單頁 `data-nav` 可覆寫 | 隱藏 `#ctrl-bar` 與進度條 |
+| `data-step` / `data-step-only` / `data-step-hide` | 講者可控點擊步進＋單頁換幕退場（內含原語延遲觸發） | `1\|2\|3`、`data-step-from` | 自動展開終態並隱藏退場層 |
+| `<video data-slide-video>` / `<audio data-sound-demo>` | 外連影音控制（`media` 按需模組，不轉 Base64，離頁停播歸零） | `data-autoplay`、`data-loop`、`poster`、`data-label` | 顯示海報幀與靜態波形 |
+| `[data-flow-carousel]` / `[data-coverflow]` | HTML5 原生活產品流程輪播卡／3D 透視照片輪播（按需模組） | `data-interval`、`data-initial`、`data-spread-x` | 定格於主焦點卡片 |
 | `data-focus-plan` ＋ `data-focus="1\|2\|3"` | 三層聚光壓暗排程，結束自動全頁復原 `1.0` | `1@0-2100, 2@2100-4150`、`--spot-border`、`--spot-glow` | 停用，全頁 `opacity: 1` |
 | `data-spotlight` | 高反差雙層光暈單次聚光框（手機亦清晰） | `data-delay`、`--spot-border`、`--spot-glow` | 維持正常邊框 |
 | `data-transform-at="780"` | 因果現場演變（進頁套 `.pre-transform`，到點切換最終態） | 毫秒數 | 直接呈現最終態 |

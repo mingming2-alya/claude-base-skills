@@ -1423,3 +1423,23 @@
   - 確認 `git diff` 零內部敏感字詞、零大型二進位檔。
 - **同步的檔案**：`inputs/presentation-principles.md`、`inputs/phase-c-teardown-learnings.md`、`outputs/deck-architect/{SKILL.md,templates/brief.md,references/{grill.md,contexts.md,structure.md,samples.md,visual-guidance.md,presentation-rules.md,motion-system.md}}`、`outputs/deck-architect.skill`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：進入 **Phase C.2｜v4.4 底盤引擎升級**（實作單頁極性 `data-surface`、自動隱藏底控、`data-step` 點擊步進、外連 `<video>`/`<audio>` 控制器與 HTML5 原生活流程／3D 照片輪播）。
+
+## 2026-11-25｜Phase C.2 引擎完成：`deck-architect` v4.4 底盤五大能力 ＋ 7 項按需自動注入模組 ＋ 11 項實測驗證
+
+- **互動表單對齊與使用者拍板之五大關鍵設計**：
+  1. **單頁極性與全模式統一自動隱藏底控列**：`shell.css` 內建 `--light-*`／`--dark-*` 安全 OKLCH 退路並同步 `#stage[data-active-surface]` 外殼反差；三種 `nav_mode`（`top-bar`／`minimal-side` 右側章節點錨點／`divider-only`）全面配對統一的 2px 極細進度條與自動隱藏浮動底控膠囊 `#ctrl-bar`（滑鼠移近底邊 96px 浮現，顯示頁碼、步進與 `N/B/F`，2.2 秒無操作淡出；`?still=1` 與列印完全隱藏）。
+  2. **講者可控點擊步進 `data-step` 雙軌語意**：支援累積揭曉（`data-step="1|2|3"`）與單頁換幕退場（`data-step-only`／`data-step-hide`），且步進區塊內部的 `data-draw`/`data-wipe`/`data-count`/`data-pop` 延遲至該步點擊才觸發；往回翻進前頁落於該頁終態（step N），步進中按 `←` 逐層回退；`?still=1`／`B` 鍵／列印自動展開終態。
+  3. **全面模組化按需自動注入（使用者關鍵指令）**：盤點所有既有與新增專項能力，將 **7 項模組**全面改由 `assemble.py` 掃描投影片按需掛載、未用到 0 KB，透過 `#stage` 生命週期事件解耦：
+     - 既有 4 項：`components`（`components.css` 17.6 KB）、`ambient-fx`（`modules/ambient-fx.{css,js}`）、`live-controls`（`modules/live-controls.css`）、`fit`（`fit.js`）。
+     - v4.4 新增 3 項：`media`（`modules/media.{css,js}`：`<video data-slide-video>` 外連相對路徑＋海報內嵌＋離頁停播歸零、`<audio data-sound-demo>` 36 條波形＋A/B 互斥播停）、`flow-carousel`（`modules/flow-carousel.{css,js}`：`[data-flow-carousel]` 活產品流程輪播卡）、`coverflow`（`modules/coverflow.{css,js}`：`[data-coverflow]` 純 GPU 3D 照片輪播）。
+  4. **強化 Step 1 Grill 需求對齊責任（使用者關鍵洞見）**：既然 7 項模組採按需注入，Step 1 Grill 成為決定性關卡；同步更新 `references/grill.md` 與 `templates/brief.md`，要求 Step 1 明確將使用者的呈現期待收斂到按需模組清單，避免盲目堆疊或遺漏。
+  5. **完整驗收與打包**：`check.mjs --motion` 由 7 項擴充至 11 項、以全新虛構範例＋既有兩範例零回歸跑通、逐頁目視截圖並重打包 `deck-architect.skill`。
+- **過程中抓到並根治的兩個關鍵 Bug**：
+  - `assets/shell.css` 標頭註解誤寫 `--light-*/--dark-*` 造成 `*/` 提早關閉註解、讓瀏覽器丟棄 `*, *::before, *::after { margin: 0; padding: 0 }` reset；透過目視截圖與 `v4-demo` 回歸實測第一時間抓出並修正。
+  - `scripts/check.mjs` 靜態檢核原本在檢查 `rects.length` 前先判最小字級，導致 `display: none` 隱藏祖先內的文字（如靜態隱藏之影片控制條）被誤報小字；修正順序並同步將媒體按鈕字級提升至 18px。
+- **驗證與交付**：
+  - **全新虛構旗艦範例 `outputs/examples/v44-keynote-demo/`**（「海潮聲學・WaveCore S1 年度發表」，7 頁涵蓋 `dark`/`light`/`split`/`photo`、`divider-only`＋`minimal-side`、`data-step` 換幕、12.5 KB 合成 WebM 影片與 2 支 31.3 KB 實測 WAV 音檔、`[data-flow-carousel]` 與 `[data-coverflow]`）：`lint.py` 0 錯 0 警；`assemble.py` 按需注入 5 模組、略過 2 模組（省 18.3 KB）；`check.mjs --motion` 7 頁靜態全通過（最低 **`4.53:1`**）＋全部動態與 4 項 v4.4 新測項全 ✅；逐頁目視截圖通過。
+  - **既有範例零回歸驗證**：`v4-alive-demo` 按需注入 `[ambient-fx, live-controls]`、略過 5 模組（省 **48.7 KB**），8 頁靜態（最低 **`4.70:1`**）＋全項 `--motion` 全 ✅；`v4-demo` 按需注入 `[components, fit]`、略過 5 模組（省 **35.7 KB**），8 頁靜態（最低 **`4.81:1`**）＋全項 `--motion` 全 ✅。
+  - **文件同步與重打包**：更新 `SKILL.md`、`references/motion-system.md`、`references/visual-guidance.md`、`references/grill.md`、`templates/brief.md`、`templates/storyboard.yaml`；重新打包 `outputs/deck-architect.skill`（38 檔，166.3 KB，零 `__pycache__`）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/{shell.css,runtime.js,modules/*},scripts/{assemble.py,check.mjs,deck_model.py,lint.py},references/{motion-system.md,visual-guidance.md,grill.md},templates/{brief.md,storyboard.yaml}}`、`outputs/deck-architect.skill`、`outputs/examples/v44-keynote-demo/`、`outputs/examples/v4-alive-demo/`、`outputs/examples/v4-demo/`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+- **下一步**：交由使用者審閱 v4.4 引擎實作與範例，決定進行真實簡報 PK 複驗或推進 Phase D。

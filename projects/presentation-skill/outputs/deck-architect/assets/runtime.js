@@ -1,25 +1,15 @@
-/* deck-architect v4.3 Thin Shell Runtime (Phase B.3 — 60fps GPU Core + Visual Guidance Spec)
+/* deck-architect v4.4 Thin Shell Runtime (Phase C.2 — Bipolar Surface, Multi-Mode Nav, Auto-Hide Bar, Dual-Track data-step)
  *
- * Zero external dependencies (~11 KB gzip), 100% offline single-file HTML playback:
- *  - Silky 60/120fps compositor-only WAAPI transitions (zero JS keyframe bloat, zero lockout)
- *  - 6 narrative transition archetypes (data-transition="push|zoom-rise|iris|shock|morph|sheet-up|modal")
- *    with automatic directional reversal on backward navigation
- *  - Multi-element Keynote Magic Move ([data-morph="id"], MIT open-slide) with zero layout thrash
- *  - Phase B.3 Visual Guidance Choreography (preserves single-click/key slide navigation unchanged):
- *      [data-focus-plan] + [data-focus] 3-tier spotlight + context dimming (auto-clears to 100%)
- *      [data-transform-at] live causal state flip (.pre-transform -> final state)
- *      [data-draw] true SVG pathLength="1" directional stroke draw & progress rings (MIT visual-explainer)
- *      [data-wipe="right|left|down|up"] pure GPU clip-path directional reveal (dashed pins, rails, slashes)
- *      [data-pop] crisp endpoint dot/arrowhead bloom synced to connector arrival
- *      [data-ripple] single target-lock concentric ring over physical anchors
- *      [data-travel="x|y"] chronological rail travel bead (pure GPU translate3d)
- *      [data-nudge="x|y"] subtle interactive slider affordance cue
- *      [data-spotlight] mobile-visible high-contrast focus ring
- *      [data-beat] / [data-grow] / [data-count] / [data-stagger]
- *  - Deferred 480x270 Canvas 2D ambient FX lifecycle ([data-fx]; MIT lewislulu/html-ppt-skill)
- *  - Native mobile touch swipe + interactive live-figure isolation (.live-ctrl / [data-interactive])
- *  - Dual static freeze (?still=1, B low-power toggle, prefers-reduced-motion, @media print)
- *  - Flagship plugin lifecycle events: deck:slideenter, deck:slideleave, deck:still, deck:lowpower
+ * Zero external dependencies, 100% offline single-file HTML playback:
+ *  - Per-slide polarity sync (data-surface="light|dark|split|photo" -> #stage[data-active-surface])
+ *  - Navigation modes: top-bar | minimal-side (#nav-side) | divider-only, with per-slide data-nav overrides
+ *  - Unified auto-hiding floating bottom control capsule (#ctrl-bar) + 2px progress bar (#deck-progress)
+ *  - Dual-track pacing: default 0-step Visual Guidance Choreography + presenter-paced click steps
+ *      (data-step / data-step-hide / data-step-only / data-step-from, deferred inner primitives,
+ *       backward navigation lands on previous slide's final step, ?still=1 & print expand to final state)
+ *  - 60fps compositor-only 6 narrative transitions + cross-slide Magic Move (data-morph)
+ *  - Lifecycle event bus (#stage): deck:slideenter, deck:slideleave, deck:stepchange, deck:still, deck:lowpower
+ *    (consumed by on-demand modules: ambient-fx, media, flow-carousel, coverflow)
  */
 (function () {
   const stage = document.getElementById('stage');
@@ -59,14 +49,18 @@
   if (hideCtrlMode) document.documentElement.classList.add('hide-ctrl');
 
   const isStatic = () => Boolean(stillMode || lowPower || reduce);
-  const M = (window.DECK && window.DECK.motion) || 'horizontal';
+  const DECK = window.DECK || {};
+  const M = DECK.motion || 'horizontal';
+  const deckStageMode = DECK.stageMode || document.documentElement.dataset.stageMode || '';
+  const deckNavMode = DECK.navMode || document.documentElement.dataset.navMode || (deckStageMode === 'keynote' ? 'divider-only' : 'top-bar');
 
   // Apple critically damped & expo-out compositor curves (2-keyframe GPU-only -> locked 60/120fps)
   const EASE_SPRING = 'cubic-bezier(0.22, 1, 0.36, 1)';
   const EASE_CRISP = 'cubic-bezier(0.16, 1, 0.3, 1)';
-  const EASE_CINEMA = 'cubic-bezier(0.32, 0.72, 0, 1)'; // Apple iOS/Keynote sheet curve!
+  const EASE_CINEMA = 'cubic-bezier(0.32, 0.72, 0, 1)';
 
   let cur = -1;
+  let curStep = 0;
   let navToken = 0;
   let toastTimer = null;
   const returnTo = [];
@@ -74,8 +68,10 @@
   const activeTimers = new Set();
   const activeRafs = new Set();
   const hiddenMorphEls = new Set();
+  const stepAnims = new WeakMap();
 
   const isApp = i => slides[i] && slides[i].dataset.appendix === '1';
+  const mainIndices = slides.map((_, i) => i).filter(i => !isApp(i));
 
   function trackAnim(anim) {
     if (!anim) return anim;
@@ -99,7 +95,7 @@
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1800);
   }
 
-  // ---------------------------------------------------------------- stage fit & nav
+  // ---------------------------------------------------------------- stage fit & navigation (top-bar / minimal-side / divider-only)
   document.querySelectorAll('[data-shape="rings"] .toc-list').forEach(ol => {
     const lis = [...ol.children], n = lis.length;
     const big = M === 'zoom-in';
@@ -116,7 +112,7 @@
   addEventListener('resize', fit);
   fit();
 
-  const chapters = (window.DECK && window.DECK.chapters) || [];
+  const chapters = DECK.chapters || [];
   let labels = [], ind = null;
   if (nav && chapters.length) {
     nav.innerHTML = chapters.map(l => '<span>' + String(l).replace(/</g, '&lt;') + '</span>').join('') + '<i class="ind"></i>';
@@ -124,14 +120,72 @@
     ind = nav.querySelector('.ind');
   }
 
+  // Mount minimal-side chapter rail (#nav-side)
+  let sideNav = document.getElementById('nav-side');
+  let sideItems = [];
+  if (chapters.length) {
+    if (!sideNav) {
+      sideNav = document.createElement('nav');
+      sideNav.id = 'nav-side';
+      sideNav.setAttribute('aria-label', '章節導航');
+      stage.appendChild(sideNav);
+    }
+    const chFirstSlide = chapters.map((_, ci) =>
+      slides.findIndex(s => s.dataset.appendix !== '1' && Number(s.dataset.chi ?? -1) === ci)
+    );
+    sideNav.innerHTML = chapters.map((l, ci) =>
+      '<button type="button" class="ns-item" data-chi="' + ci + '" aria-label="' + String(l).replace(/"/g, '&quot;') + '">' +
+      '<span class="ns-lab">' + String(l).replace(/</g, '&lt;') + '</span><span class="ns-dot"></span></button>'
+    ).join('');
+    sideItems = [...sideNav.querySelectorAll('.ns-item')];
+    sideItems.forEach((btn, ci) => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const target = chFirstSlide[ci];
+        if (target >= 0) go(target, false, { step: 0 });
+      });
+    });
+  }
+
+  function resolveSurface(sl) {
+    if (!sl) return DECK.mode || document.documentElement.dataset.mode || 'dark';
+    return sl.dataset.surface || DECK.mode || document.documentElement.dataset.mode || 'dark';
+  }
+
+  function syncSurface(sl) {
+    const surf = resolveSurface(sl);
+    stage.dataset.activeSurface = surf;
+    return surf;
+  }
+
+  function resolveNavMode(sl) {
+    if (!sl) return deckNavMode;
+    if (sl.dataset.nav) return sl.dataset.nav;
+    if (sl.querySelector('nav.slide-nav, nav[data-auto-nav], [data-auto-nav]')) return 'inline';
+    return deckNavMode;
+  }
+
   function setNav(sl) {
-    if (!nav || !tabsEl) return;
     const kind = sl.dataset.kind || 'content';
     const chi = Number(sl.dataset.chi ?? -1);
-    const navMode = sl.dataset.nav || (sl.querySelector('nav.slide-nav, nav[data-auto-nav], [data-auto-nav]') ? 'inline' : 'shell');
-    const hide = kind !== 'content' || navMode === 'inline' || navMode === 'none' || chi < 0 || !labels[chi];
-    stage.classList.toggle('hide-nav', hide);
-    if (hide) { tabsEl.style.opacity = 0; return; }
+    const effMode = resolveNavMode(sl);
+    const hasChapter = kind === 'content' && chi >= 0 && Boolean(chapters[chi]);
+
+    const showSide = hasChapter && effMode === 'minimal-side';
+    const showTop = hasChapter && (effMode === 'top-bar' || effMode === 'shell');
+
+    stage.classList.toggle('show-side-nav', showSide);
+    stage.classList.toggle('hide-nav', !showTop);
+
+    if (sideItems.length) {
+      sideItems.forEach((item, i) => item.classList.toggle('on', i === chi));
+    }
+
+    if (!nav || !tabsEl) return;
+    if (!showTop) {
+      tabsEl.style.opacity = 0;
+      return;
+    }
 
     labels.forEach((l, i) => l.classList.toggle('on', i === chi));
     const on = labels[chi];
@@ -141,7 +195,7 @@
     }
     const tabs = Number(sl.dataset.tabs || 0);
     const tab = Number(sl.dataset.tab || 0);
-    const tabList = (window.DECK && window.DECK.tabs && window.DECK.tabs[chi]) || [];
+    const tabList = (DECK.tabs && DECK.tabs[chi]) || [];
     if (tabs > 2 && tabList.length > 2) {
       if (tabsEl.dataset.chi != String(chi)) {
         tabsEl.innerHTML = tabList.map(t => '<span>' + String(t).replace(/</g, '&lt;') + '</span>').join('');
@@ -154,6 +208,111 @@
     }
   }
 
+  // ---------------------------------------------------------------- unified auto-hiding bottom control bar & 2px progress bar
+  let progressEl = document.getElementById('deck-progress');
+  let progressFill = document.getElementById('deck-progress-fill');
+  if (!progressEl) {
+    progressEl = document.createElement('div');
+    progressEl.id = 'deck-progress';
+    progressEl.setAttribute('aria-hidden', 'true');
+    progressFill = document.createElement('div');
+    progressFill.id = 'deck-progress-fill';
+    progressEl.appendChild(progressFill);
+    document.body.appendChild(progressEl);
+  }
+
+  let ctrlBar = document.getElementById('ctrl-bar');
+  if (!ctrlBar) {
+    ctrlBar = document.createElement('div');
+    ctrlBar.id = 'ctrl-bar';
+    ctrlBar.setAttribute('role', 'toolbar');
+    ctrlBar.setAttribute('aria-label', '簡報控制列');
+    ctrlBar.innerHTML =
+      '<button type="button" class="cb-btn" data-cb="prev" aria-label="上一頁">‹</button>' +
+      '<span class="cb-pos">01 / 01</span>' +
+      '<span class="cb-step" aria-label="頁內步進"></span>' +
+      '<button type="button" class="cb-btn" data-cb="next" aria-label="下一頁">›</button>' +
+      '<span class="cb-sep" aria-hidden="true"></span>' +
+      '<button type="button" class="cb-btn" data-cb="notes" aria-label="講者備註 (N)">備註 N</button>' +
+      '<button type="button" class="cb-btn" data-cb="static" aria-label="靜態省電 (B)">靜態 B</button>' +
+      '<button type="button" class="cb-btn" data-cb="fs" aria-label="全螢幕 (F)">全螢幕 F</button>';
+    document.body.appendChild(ctrlBar);
+  }
+
+  const cbPosEl = ctrlBar.querySelector('.cb-pos');
+  const cbStepEl = ctrlBar.querySelector('.cb-step');
+  const cbNotesBtn = ctrlBar.querySelector('[data-cb="notes"]');
+  const cbStaticBtn = ctrlBar.querySelector('[data-cb="static"]');
+  const cbFsBtn = ctrlBar.querySelector('[data-cb="fs"]');
+  let ctrlHideTimer = 0;
+  let ctrlHover = false;
+
+  function setCtrlBarVisible(visible, keepOpen) {
+    clearTimeout(ctrlHideTimer);
+    if (!ctrlBar || stillMode || hideCtrlMode) return false;
+    ctrlBar.classList.toggle('visible', Boolean(visible));
+    if (visible && !keepOpen && !ctrlHover) {
+      ctrlHideTimer = setTimeout(() => {
+        if (!ctrlHover) ctrlBar.classList.remove('visible');
+      }, 2200);
+    }
+    return ctrlBar.classList.contains('visible');
+  }
+
+  function updateCtrlBar() {
+    if (!ctrlBar) return;
+    const sl = slides[cur];
+    const totalMain = Math.max(1, mainIndices.length);
+    const pad = n => (n < 10 ? '0' : '') + n;
+    if (sl && isApp(cur)) {
+      if (cbPosEl) cbPosEl.textContent = '附件';
+    } else {
+      const mPos = Math.max(1, mainIndices.indexOf(cur) + 1);
+      if (cbPosEl) cbPosEl.textContent = pad(mPos) + ' / ' + pad(totalMain);
+      if (progressFill) {
+        const ratio = totalMain > 1 ? (mPos - 1) / (totalMain - 1) : 1;
+        progressFill.style.transform = 'scaleX(' + Math.max(0.03, ratio).toFixed(4) + ')';
+      }
+    }
+    const maxS = getMaxStep(sl);
+    if (cbStepEl) {
+      if (maxS > 0) {
+        cbStepEl.textContent = '步進 ' + curStep + '/' + maxS;
+        cbStepEl.classList.add('has-steps');
+      } else {
+        cbStepEl.textContent = '';
+        cbStepEl.classList.remove('has-steps');
+      }
+    }
+    if (cbNotesBtn && notesEl) cbNotesBtn.classList.toggle('is-on', notesEl.classList.contains('show'));
+    if (cbStaticBtn) cbStaticBtn.classList.toggle('is-on', lowPower);
+    if (cbFsBtn) cbFsBtn.classList.toggle('is-on', Boolean(document.fullscreenElement));
+  }
+
+  ctrlBar.addEventListener('mouseenter', () => { ctrlHover = true; clearTimeout(ctrlHideTimer); });
+  ctrlBar.addEventListener('mouseleave', () => {
+    ctrlHover = false;
+    ctrlHideTimer = setTimeout(() => ctrlBar.classList.remove('visible'), 1400);
+  });
+  ctrlBar.addEventListener('click', e => {
+    e.stopPropagation();
+    const btn = e.target.closest('[data-cb]');
+    if (!btn) return;
+    const act = btn.dataset.cb;
+    if (act === 'prev') step(-1);
+    else if (act === 'next') step(1);
+    else if (act === 'notes' && notesEl) { notesEl.classList.toggle('show'); updateCtrlBar(); }
+    else if (act === 'static') toggleLowPower();
+    else if (act === 'fs') {
+      document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
+    }
+  });
+  document.addEventListener('fullscreenchange', updateCtrlBar);
+  addEventListener('mousemove', e => {
+    if (stillMode || hideCtrlMode) return;
+    if (e.clientY >= innerHeight - 96) setCtrlBarVisible(true, false);
+  }, { passive: true });
+
   function showNotes(sl) {
     if (notesEl) notesEl.textContent = sl.dataset.notes || '（這頁沒有講者備註）';
   }
@@ -165,6 +324,115 @@
     const morphMs = parseFloat(cs.getPropertyValue('--morph-ms')) || 680;
     const ease = mode === 'crisp' ? EASE_CRISP : EASE_SPRING;
     return { mode, staggerBase, morphMs, ease };
+  }
+
+  // ---------------------------------------------------------------- dual-track presenter-paced data-step engine
+  const STEP_SEL = '[data-step], [data-step-hide], [data-step-only]';
+
+  function stepRule(el) {
+    if (el.dataset.stepOnly !== undefined) {
+      const k = parseInt(el.dataset.stepOnly, 10) || 0;
+      return { show: k, hide: k + 1 };
+    }
+    const show = el.dataset.step !== undefined ? (parseInt(el.dataset.step, 10) || 0) : 0;
+    const hide = el.dataset.stepHide !== undefined ? (parseInt(el.dataset.stepHide, 10) || Infinity) : Infinity;
+    return { show, hide };
+  }
+
+  function getMaxStep(sl) {
+    if (!sl) return 0;
+    let max = 0;
+    sl.querySelectorAll(STEP_SEL).forEach(el => {
+      if (el.dataset.step !== undefined) max = Math.max(max, parseInt(el.dataset.step, 10) || 0);
+      if (el.dataset.stepHide !== undefined) max = Math.max(max, parseInt(el.dataset.stepHide, 10) || 0);
+      if (el.dataset.stepOnly !== undefined) max = Math.max(max, parseInt(el.dataset.stepOnly, 10) || 0);
+    });
+    return max;
+  }
+
+  function deferredStepOf(el, sl) {
+    const host = el.closest('[data-step], [data-step-only]');
+    if (!host || !sl.contains(host)) return 0;
+    return stepRule(host).show;
+  }
+
+  function cancelElStepAnim(el) {
+    const prev = stepAnims.get(el);
+    if (prev) { try { prev.cancel(); } catch (_) {} stepAnims.delete(el); }
+  }
+
+  function stepFromTransform(el) {
+    const dir = el.dataset.stepFrom || el.dataset.from || 'up';
+    if (dir === 'left') return 'translate3d(-26px,0,0)';
+    if (dir === 'right') return 'translate3d(26px,0,0)';
+    if (dir === 'down') return 'translate3d(0,-20px,0)';
+    if (dir === 'scale') return 'scale(0.94)';
+    if (dir === 'none') return 'none';
+    return 'translate3d(0,22px,0)';
+  }
+
+  function applySlideStep(sl, targetStep, dir, instant, token) {
+    if (!sl) return;
+    const maxS = getMaxStep(sl);
+    const k = Math.max(0, Math.min(maxS, targetStep));
+    curStep = k;
+    sl.dataset.currentStep = String(k);
+    const cfg = slideMotion(sl);
+
+    sl.querySelectorAll(STEP_SEL).forEach(el => {
+      const r = stepRule(el);
+      const nowVis = k >= r.show && k < r.hide;
+      const wasVis = el.dataset.stepHidden !== '1' && el.dataset.stepHidden !== undefined;
+
+      cancelElStepAnim(el);
+
+      if (instant || isStatic() || el.dataset.stepHidden === undefined) {
+        el.dataset.stepHidden = nowVis ? '0' : '1';
+        if (nowVis) snapSubtreeFinal(el);
+        return;
+      }
+
+      if (!wasVis && nowVis) {
+        el.dataset.stepHidden = '0';
+        const anim = trackAnim(el.animate(
+          [{ opacity: 0, transform: stepFromTransform(el) }, { opacity: 1, transform: 'none' }],
+          { duration: 480, easing: cfg.ease, fill: 'backwards' }
+        ));
+        stepAnims.set(el, anim);
+        if (dir >= 0) triggerSubtreePrimitives(el, sl, 40, token);
+        else snapSubtreeFinal(el);
+      } else if (wasVis && !nowVis) {
+        const anim = trackAnim(el.animate(
+          [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translate3d(0,-10px,0)' }],
+          { duration: 220, easing: 'ease-out', fill: 'forwards' }
+        ));
+        stepAnims.set(el, anim);
+        anim.finished.then(() => {
+          if (token === navToken && Number(sl.dataset.currentStep) === k) {
+            el.dataset.stepHidden = '1';
+            try { anim.cancel(); } catch (_) {}
+          }
+        }, () => {});
+      }
+    });
+
+    updateCtrlBar();
+    if (!instant) {
+      stage.dispatchEvent(new CustomEvent('deck:stepchange', {
+        detail: { index: cur, slide: sl, step: curStep, totalSteps: maxS, dir },
+      }));
+    }
+  }
+
+  function setStep(k, dir = 1) {
+    const sl = slides[cur];
+    if (!sl) return curStep;
+    const maxS = getMaxStep(sl);
+    if (!maxS) return 0;
+    const nextK = Math.max(0, Math.min(maxS, k));
+    if (nextK === curStep) return curStep;
+    applySlideStep(sl, nextK, dir, isStatic(), navToken);
+    return curStep;
   }
 
   // ---------------------------------------------------------------- init semantic primitives
@@ -225,14 +493,15 @@
     sl.querySelectorAll('.spot-pulse').forEach(el => el.classList.remove('spot-pulse'));
   }
 
-  function snapSlideFinal(sl) {
-    if (!sl) return;
-    clearGuidanceState(sl);
-    sl.querySelectorAll('[data-count]').forEach(el => {
+  function snapSubtreeFinal(root) {
+    if (!root) return;
+    const counts = root.matches && root.matches('[data-count]') ? [root, ...root.querySelectorAll('[data-count]')] : [...root.querySelectorAll('[data-count]')];
+    counts.forEach(el => {
       const tn = findNumTextNode(el);
       if (tn && el.dataset.countFinal !== undefined) tn.nodeValue = el.dataset.countFinal;
     });
-    sl.querySelectorAll('[data-draw]').forEach(el => {
+    const draws = root.matches && root.matches('[data-draw]') ? [root, ...root.querySelectorAll('[data-draw]')] : [...root.querySelectorAll('[data-draw]')];
+    draws.forEach(el => {
       if (el.getAttribute('data-draw') === 'ring') {
         if (el.dataset.ringFinal !== undefined) el.style.strokeDashoffset = el.dataset.ringFinal;
       } else if (!el.dataset.drawDashed) {
@@ -240,6 +509,23 @@
         el.style.strokeDashoffset = '';
       }
     });
+  }
+
+  function snapSlideFinal(sl) {
+    if (!sl) return;
+    clearGuidanceState(sl);
+    const maxS = getMaxStep(sl);
+    if (maxS > 0) {
+      sl.dataset.currentStep = String(maxS);
+      if (slides[cur] === sl) curStep = maxS;
+      sl.querySelectorAll(STEP_SEL).forEach(el => {
+        cancelElStepAnim(el);
+        const r = stepRule(el);
+        const vis = maxS >= r.show && maxS < r.hide;
+        el.dataset.stepHidden = vis ? '0' : '1';
+      });
+    }
+    snapSubtreeFinal(sl);
   }
 
   function parseFocusPlan(raw) {
@@ -252,7 +538,6 @@
     return out.sort((a, b) => a.start - b.start);
   }
 
-  // Semantic beat delay helper: Beat 1 = immediate anchor, Beat 2 = causal cue, Beat 3 = takeaway, Beat 4 = supporting
   const BEAT_MS = { '1': 120, '2': 760, '3': 1480, '4': 2200 };
   function beatDelay(el, fallback) {
     if (el.dataset.delay !== undefined) return parseFloat(el.dataset.delay) || 0;
@@ -261,65 +546,21 @@
     return fallback;
   }
 
-  function animateSlideContent(sl, baseDelay, token, morphedIds) {
-    if (!sl || isStatic()) { snapSlideFinal(sl); return; }
+  // Reusable primitive animators (run at slide entry for step-0, or on step reveal for deferred step-k)
+  function runPrimitives(root, sl, baseDelay, token, morphedIds, skipDeferred) {
     const cfg = slideMotion(sl);
+    const q = sel => {
+      const list = [];
+      if (root !== sl && root.matches && root.matches(sel)) list.push(root);
+      root.querySelectorAll(sel).forEach(el => list.push(el));
+      return skipDeferred ? list.filter(el => deferredStepOf(el, sl) === 0) : list;
+    };
 
-    // 0a. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
-    const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
-    const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
-    if (focusPlan.length && focusEls.length) {
-      const visited = new Set();
-      const applyStage = activeId => {
-        if (token !== navToken || isStatic()) return;
-        sl.classList.add('is-focusing');
-        for (const el of focusEls) {
-          const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
-          const isAct = ids.includes(activeId);
-          const isVis = !isAct && ids.some(id => visited.has(id));
-          el.classList.toggle('focus-active', isAct);
-          el.classList.toggle('focus-visited', isVis);
-          el.classList.toggle('focus-dim', !isAct && !isVis);
-        }
-      };
-      let maxEnd = 0;
-      focusPlan.forEach((step, idx) => {
-        maxEnd = Math.max(maxEnd, step.end);
-        const startAt = step.start === 0 ? 0 : baseDelay + step.start;
-        if (startAt === 0 && idx === 0) {
-          applyStage(step.id);
-        } else {
-          later(() => {
-            if (token !== navToken || isStatic()) return;
-            for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
-            applyStage(step.id);
-          }, startAt);
-        }
-      });
-      later(() => {
-        if (token !== navToken) return;
-        clearFocusClasses(sl);
-      }, baseDelay + maxEnd);
-    }
-
-    // 0b. Live Causal State Transformation ([data-transform-at="ms"]: .pre-transform -> final DOM state)
-    sl.querySelectorAll('[data-transform-at]').forEach(el => {
-      const ms = parseFloat(el.dataset.transformAt) || 1200;
-      el.classList.remove('transforming');
-      el.classList.add('pre-transform');
-      later(() => {
-        if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
-        el.classList.remove('pre-transform');
-        el.classList.add('transforming');
-        later(() => { el.classList.remove('transforming'); }, 840);
-      }, baseDelay + ms);
-    });
-
-    // 1. Non-uniform staggered groups ([data-stagger]) — lightweight 2-keyframe compositor only
+    // 1. Non-uniform staggered groups ([data-stagger])
     const staggeredSet = new Set();
-    sl.querySelectorAll('[data-stagger]').forEach(group => {
+    q('[data-stagger]').forEach(group => {
       const stepMs = parseFloat(group.getAttribute('data-stagger')) || cfg.staggerBase;
-      const gDelay = baseDelay + beatDelay(group, 140);
+      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40);
       const items = [...group.children].filter(el => el.nodeType === 1);
       items.forEach((el, i) => {
         staggeredSet.add(el);
@@ -332,9 +573,9 @@
       });
     });
 
-    // 2. Semantic directional reveals (.rv, [data-beat]) — strictly skip nested, specialized & morphed
+    // 2. Semantic directional reveals (.rv, [data-beat])
     let rvIdx = 0;
-    sl.querySelectorAll('.rv, [data-beat]').forEach(el => {
+    q('.rv, [data-beat]').forEach(el => {
       if (staggeredSet.has(el)) return;
       if (
         el.hasAttribute('data-stagger') || el.hasAttribute('data-grow') || el.hasAttribute('data-draw') ||
@@ -343,6 +584,7 @@
       ) return;
       if (el.parentElement && el.parentElement.closest('.rv, [data-stagger]')) return;
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
+      if (!skipDeferred && el === root) return; // root already animated by applySlideStep
       const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)));
       const dir = el.dataset.from || 'up';
       const fromT = dir === 'left' ? 'translate3d(-24px,0,0)'
@@ -357,9 +599,9 @@
     });
 
     // 3. Mobile-visible high-contrast spotlight cues ([data-spotlight])
-    sl.querySelectorAll('[data-spotlight]').forEach(el => {
+    q('[data-spotlight]').forEach(el => {
       el.classList.remove('spot-pulse');
-      const d = baseDelay + beatDelay(el, 540);
+      const d = baseDelay + beatDelay(el, skipDeferred ? 540 : 120);
       later(() => {
         if (token !== navToken || isStatic()) return;
         el.classList.add('spot-pulse');
@@ -367,8 +609,8 @@
       }, d);
     });
 
-    // 4. Throttled rolling numbers ([data-count]) — updates at ~30Hz AFTER transition starts to avoid layout thrash
-    sl.querySelectorAll('[data-count]').forEach(el => {
+    // 4. Throttled rolling numbers ([data-count])
+    q('[data-count]').forEach(el => {
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
       const tn = findNumTextNode(el);
       const finalStr = el.dataset.countFinal;
@@ -380,7 +622,7 @@
       const dec = numRaw.includes('.') ? numRaw.split('.')[1].length : 0;
       const target = parseFloat(numRaw.replace(/,/g, ''));
       const dur = parseFloat(el.dataset.dur) || 820;
-      const delay = baseDelay + beatDelay(el, 280);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
       const fmt = v => {
         let s = dec > 0 ? v.toFixed(dec) : String(Math.round(v));
         if (hasComma) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -408,8 +650,8 @@
     });
 
     // 5. True SVG stroke draw & progress rings ([data-draw])
-    sl.querySelectorAll('[data-draw]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 280);
+    q('[data-draw]').forEach(el => {
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80);
       const dur = parseFloat(el.dataset.dur) || 880;
       if (el.getAttribute('data-draw') === 'ring') {
         const circ = parseFloat(el.dataset.circ || '0');
@@ -437,9 +679,9 @@
     });
 
     // 6. Directional bar growth ([data-grow="x|x-left|y|y-down"])
-    sl.querySelectorAll('[data-grow]').forEach((el, idx) => {
+    q('[data-grow]').forEach((el, idx) => {
       const dir = (el.getAttribute('data-grow') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 220 + idx * 65);
+      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65);
       const dur = parseFloat(el.dataset.dur) || 720;
       if (el instanceof SVGElement) el.style.transformBox = 'fill-box';
       if (dir === 'x-left') {
@@ -457,10 +699,10 @@
       }
     });
 
-    // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"]) — zero dash distortion!
-    sl.querySelectorAll('[data-wipe]').forEach(el => {
+    // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"])
+    q('[data-wipe]').forEach(el => {
       const dir = (el.getAttribute('data-wipe') || 'right').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 280);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
       const dur = parseFloat(el.dataset.dur) || 540;
       const fromClip = dir === 'left' ? 'inset(0 0 0 100%)'
         : dir === 'down' ? 'inset(0 0 100% 0)'
@@ -473,8 +715,8 @@
     });
 
     // 8. Endpoint dot / arrowhead / badge crisp pop ([data-pop])
-    sl.querySelectorAll('[data-pop]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 320);
+    q('[data-pop]').forEach(el => {
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120);
       const dur = parseFloat(el.dataset.dur) || 340;
       if (el instanceof SVGElement) {
         el.style.transformBox = 'fill-box';
@@ -487,8 +729,8 @@
     });
 
     // 9. Target-lock concentric ripple ([data-ripple])
-    sl.querySelectorAll('[data-ripple]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, 560);
+    q('[data-ripple]').forEach(el => {
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 560 : 160);
       const dur = parseFloat(el.dataset.dur) || 1050;
       trackAnim(el.animate(
         [
@@ -501,10 +743,10 @@
     });
 
     // 10. Chronological rail travel bead ([data-travel="x|y"])
-    sl.querySelectorAll('[data-travel]').forEach(el => {
+    q('[data-travel]').forEach(el => {
       const axis = (el.getAttribute('data-travel') || 'x').toLowerCase();
       const dist = parseFloat(el.dataset.travelDist || '800');
-      const delay = baseDelay + beatDelay(el, 320);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 100);
       const dur = parseFloat(el.dataset.dur) || 2400;
       const p0 = 'translate3d(0,0,0)';
       const p1 = axis === 'y'
@@ -524,8 +766,8 @@
       ));
     });
 
-    // 11. Single subtle interactive control affordance nudge ([data-nudge="x|y"])
-    sl.querySelectorAll('[data-nudge]').forEach(el => {
+    // 11. Interactive control affordance nudge ([data-nudge="x|y"])
+    q('[data-nudge]').forEach(el => {
       const axis = (el.getAttribute('data-nudge') || 'x').toLowerCase();
       const delay = baseDelay + beatDelay(el, 1100);
       const dur = parseFloat(el.dataset.dur) || 920;
@@ -546,103 +788,66 @@
     });
   }
 
-  // ---------------------------------------------------------------- deferred low-res Canvas 2D FX (MIT lewislulu)
-  let fxRaf = 0;
-  let fxCanvas = null;
-
-  function stopFx() {
-    if (fxRaf) { cancelAnimationFrame(fxRaf); fxRaf = 0; }
-    if (fxCanvas) {
-      const ctx = fxCanvas.getContext('2d');
-      if (ctx) ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
-      fxCanvas = null;
-    }
+  function triggerSubtreePrimitives(el, sl, delay, token) {
+    if (!el || isStatic()) { snapSubtreeFinal(el); return; }
+    runPrimitives(el, sl, delay, token, null, false);
   }
 
-  function startFx(sl, deferMs, token) {
-    stopFx();
-    if (!sl || isStatic()) return;
-    const fx = sl.dataset.fx;
-    if (!fx) return;
+  function animateSlideContent(sl, baseDelay, token, morphedIds) {
+    if (!sl || isStatic()) { snapSlideFinal(sl); return; }
 
-    const boot = () => {
-      if (token !== navToken || isStatic() || slides[cur] !== sl) return;
-      let canvas = sl.querySelector(':scope > canvas.fx-canvas');
-      if (!canvas) {
-        canvas = document.createElement('canvas');
-        canvas.className = 'fx-canvas';
-        // 480x270 logical buffer stretched smoothly by GPU -> 16x cheaper than 1920x1080!
-        canvas.width = 480;
-        canvas.height = 270;
-        canvas.setAttribute('aria-hidden', 'true');
-        const anchor = sl.querySelector(':scope > .scrim, :scope > .asset-slot');
-        if (anchor && anchor.nextSibling) sl.insertBefore(canvas, anchor.nextSibling);
-        else sl.prepend(canvas);
-      }
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      fxCanvas = canvas;
+    // 0a. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
+    const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
+    const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
+    if (focusPlan.length && focusEls.length) {
+      const visited = new Set();
+      const applyStage = activeId => {
+        if (token !== navToken || isStatic()) return;
+        sl.classList.add('is-focusing');
+        for (const el of focusEls) {
+          const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
+          const isAct = ids.includes(activeId);
+          const isVis = !isAct && ids.some(id => visited.has(id));
+          el.classList.toggle('focus-active', isAct);
+          el.classList.toggle('focus-visited', isVis);
+          el.classList.toggle('focus-dim', !isAct && !isVis);
+        }
+      };
+      let maxEnd = 0;
+      focusPlan.forEach((stepItem, idx) => {
+        maxEnd = Math.max(maxEnd, stepItem.end);
+        const startAt = stepItem.start === 0 ? 0 : baseDelay + stepItem.start;
+        if (startAt === 0 && idx === 0) {
+          applyStage(stepItem.id);
+        } else {
+          later(() => {
+            if (token !== navToken || isStatic()) return;
+            for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
+            applyStage(stepItem.id);
+          }, startAt);
+        }
+      });
+      later(() => {
+        if (token !== navToken) return;
+        clearFocusClasses(sl);
+      }, baseDelay + maxEnd);
+    }
 
-      if (fx === 'ambient-dust') {
-        const pts = Array.from({ length: 20 }, (_, i) => ({
-          x: 170 + ((i * 53) % 295),
-          y: (i * 23) % 270,
-          r: 0.7 + (i % 3) * 0.45,
-          vy: -0.07 - (i % 4) * 0.025,
-          vx: -0.04 + (i % 3) * 0.025,
-          ph: i * 0.7,
-          a: 0.22 + (i % 4) * 0.08,
-        }));
-        let last = 0;
-        const draw = now => {
-          fxRaf = requestAnimationFrame(draw);
-          if (now - last < 40) return;
-          last = now;
-          ctx.clearRect(0, 0, 480, 270);
-          for (const p of pts) {
-            p.y += p.vy;
-            p.x += p.vx + Math.sin(now * 0.0008 + p.ph) * 0.04;
-            if (p.y < -4) { p.y = 274; p.x = 170 + Math.random() * 295; }
-            if (p.x < 100) p.x = 472;
-            const alpha = p.a * (0.65 + 0.35 * Math.sin(now * 0.0014 + p.ph));
-            ctx.fillStyle = 'rgba(255,232,188,' + alpha.toFixed(3) + ')';
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        };
-        fxRaf = requestAnimationFrame(draw);
-      } else if (fx === 'soft-aurora') {
-        const orbs = [
-          { x: 365, y: 120, rx: 115, col: '58,217,155', a: 0.11, sp: 0.00055, ph: 0 },
-          { x: 130, y: 210, rx: 95, col: '74,195,250', a: 0.085, sp: 0.00042, ph: 2.1 },
-          { x: 280, y: 220, rx: 85, col: '242,201,107', a: 0.065, sp: 0.00038, ph: 4.2 },
-        ];
-        let last = 0;
-        const draw = now => {
-          fxRaf = requestAnimationFrame(draw);
-          if (now - last < 50) return;
-          last = now;
-          ctx.clearRect(0, 0, 480, 270);
-          for (const o of orbs) {
-            const dx = Math.sin(now * o.sp + o.ph) * 11;
-            const dy = Math.cos(now * o.sp * 0.8 + o.ph) * 7;
-            const a = o.a * (0.78 + 0.22 * Math.sin(now * o.sp * 1.4 + o.ph));
-            const g = ctx.createRadialGradient(o.x + dx, o.y + dy, 0, o.x + dx, o.y + dy, o.rx);
-            g.addColorStop(0, 'rgba(' + o.col + ',' + a.toFixed(3) + ')');
-            g.addColorStop(1, 'rgba(' + o.col + ',0)');
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(o.x + dx, o.y + dy, o.rx, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        };
-        fxRaf = requestAnimationFrame(draw);
-      }
-    };
+    // 0b. Live Causal State Transformation ([data-transform-at="ms"])
+    sl.querySelectorAll('[data-transform-at]').forEach(el => {
+      if (deferredStepOf(el, sl) > 0) return;
+      const ms = parseFloat(el.dataset.transformAt) || 1200;
+      el.classList.remove('transforming');
+      el.classList.add('pre-transform');
+      later(() => {
+        if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
+        el.classList.remove('pre-transform');
+        el.classList.add('transforming');
+        later(() => { el.classList.remove('transforming'); }, 840);
+      }, baseDelay + ms);
+    });
 
-    if (deferMs > 0) later(boot, deferMs);
-    else boot();
+    runPrimitives(sl, sl, baseDelay, token, morphedIds, true);
   }
 
   // ---------------------------------------------------------------- cross-slide Magic Move (MIT open-slide)
@@ -679,6 +884,7 @@
     const s = sr.width ? sr.width / 1920 : 1;
     const fromMap = new Map();
     prev.querySelectorAll('[data-morph]').forEach(el => {
+      if (el.dataset.stepHidden === '1') return;
       const id = el.dataset.morph;
       if (id && !fromMap.has(id)) {
         const box = stageBox(el, sr, s);
@@ -687,11 +893,11 @@
     });
     if (!fromMap.size) return [];
 
-    // Single synchronous measurement pass (no double toggle)
     const wasActive = next.classList.contains('active');
     if (!wasActive) { next.classList.add('active'); next.style.opacity = '0'; }
     const pairs = [];
     next.querySelectorAll('[data-morph]').forEach(toEl => {
+      if (toEl.dataset.stepHidden === '1') return;
       const id = toEl.dataset.morph;
       const from = fromMap.get(id);
       if (!from) return;
@@ -718,7 +924,6 @@
       const toCS = getComputedStyle(toEl);
       const isTextOnly = fromCS.backgroundColor === 'rgba(0, 0, 0, 0)' || fromCS.backgroundColor === 'transparent';
 
-      // Handle gradient-clipped hero text (e.g., Shock +1.8% -> Simulator +1.8%) cleanly
       const fromClip = fromCS.webkitBackgroundClip || fromCS.backgroundClip || '';
       const fromGrad = fromClip.includes('text') && (fromCS.backgroundImage || '').includes('gradient');
       if (fromGrad) {
@@ -799,7 +1004,6 @@
 
   function freezeNow() {
     navToken++;
-    stopFx();
     cleanupFlight(null, slides[cur]);
     if (slides[cur]) {
       slides[cur].classList.add('active');
@@ -808,13 +1012,13 @@
       slides[cur].style.clipPath = '';
       snapSlideFinal(slides[cur]);
     }
+    updateCtrlBar();
   }
 
   // ---------------------------------------------------------------- 6 narrative transition archetypes (60fps GPU)
   function resolveTransition(prev, next, dir, morphPairs) {
     if (next.dataset.appendix === '1' || (prev && prev.dataset.appendix === '1')) return 'modal';
     if (next.dataset.kind === 'shock' && dir > 0 && curtain) return 'shock';
-    // Forward uses next's declared transition; backward mirrors prev's declared transition!
     const declared = dir > 0 ? (next.dataset.transition || '') : (prev && prev.dataset.transition || '');
     if (declared) return declared;
     if (morphPairs.length) return 'morph';
@@ -825,7 +1029,7 @@
     return chChange ? 'push' : 'cross';
   }
 
-  function go(n, instant) {
+  function go(n, instant, opts) {
     n = Math.max(0, Math.min(slides.length - 1, n));
     if (n === cur && !instant) return;
     const prev = cur >= 0 ? slides[cur] : null;
@@ -837,17 +1041,27 @@
     cur = n;
 
     const instantly = Boolean(instant || isStatic() || !prev || prev === next);
+
+    // Initialize target step on incoming slide BEFORE morph collection or paint
+    const maxS = getMaxStep(next);
+    let targetStep = 0;
+    if (isStatic() || (opts && opts.step === 'final')) targetStep = maxS;
+    else if (opts && typeof opts.step === 'number') targetStep = Math.max(0, Math.min(maxS, opts.step));
+    else if (dir < 0 && prev && prev !== next && !instant) targetStep = maxS;
+    applySlideStep(next, targetStep, 0, true, token);
+
     const morphPairs = (!instantly && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
 
-    stopFx();
     cleanupFlight(instantly ? null : prev, next);
 
     if (prev && prev !== next) {
       stage.dispatchEvent(new CustomEvent('deck:slideleave', { detail: { index: prevIdx, slide: prev, next } }));
     }
 
+    syncSurface(next);
     setNav(next);
     showNotes(next);
+    updateCtrlBar();
     try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
 
     if (instantly) {
@@ -857,10 +1071,10 @@
       next.style.opacity = '';
       next.style.transform = '';
       next.style.clipPath = '';
-      snapSlideFinal(next);
+      if (isStatic()) snapSlideFinal(next);
+      else snapSubtreeFinal(next);
       stage.offsetWidth;
       requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
-      if (!isStatic()) startFx(next, 180, token);
     } else {
       const kind = resolveTransition(prev, next, dir, morphPairs);
       const cfg = slideMotion(next);
@@ -875,6 +1089,7 @@
 
       if (kind === 'shock' && curtain) {
         stage.classList.add('hide-nav');
+        stage.classList.remove('show-side-nav');
         prev.classList.remove('active');
         prev.classList.add('leaving');
         const cIn = trackAnim(curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' }));
@@ -894,12 +1109,10 @@
                 { duration: 860, delay: 90, easing: EASE_SPRING, fill: 'backwards' }
               ));
             }
-            animateSlideContent(next, 240, token, null);
-            startFx(next, 620, token);
+            if (targetStep === 0) animateSlideContent(next, 240, token, null);
           }, 220);
         }, () => {});
       } else {
-        // Hold outgoing slide opacity:1 underneath so background NEVER flashes
         prev.classList.remove('active');
         prev.classList.add('leaving', 'in-flight');
         next.classList.add('active', 'in-flight');
@@ -918,7 +1131,6 @@
             if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 780));
             contentDelay = 300;
           } else {
-            // Reverse iris: incoming dark tablet sits behind while warm clay contracts smoothly into the tablet!
             prev.style.zIndex = '5';
             next.style.zIndex = '4';
             const aOut = trackAnim(prev.animate(
@@ -1004,8 +1216,10 @@
           contentDelay = 120;
         }
 
-        animateSlideContent(next, contentDelay, token, morphedIds);
-        startFx(next, 620, token);
+        // Only run slide-entry choreography when landing at step 0 (not when backing into final step)
+        if (targetStep === 0) {
+          animateSlideContent(next, contentDelay, token, morphedIds);
+        }
 
         Promise.all(waits).then(() => {
           if (token !== navToken) return;
@@ -1028,28 +1242,45 @@
     }
 
     if (typeof window.__deckFit === 'function') window.__deckFit();
-    const detail = { index: cur, slide: next, prev, instant: instantly, staticMode: isStatic() };
+    const detail = {
+      index: cur,
+      slide: next,
+      prev,
+      instant: instantly,
+      staticMode: isStatic(),
+      surface: stage.dataset.activeSurface,
+      step: curStep,
+      totalSteps: maxS,
+    };
     stage.dispatchEvent(new CustomEvent('deck:slideenter', { detail }));
     stage.dispatchEvent(new CustomEvent('deck:slidechange', { detail }));
   }
 
   function step(d) {
     if (isApp(cur)) { back(); return; }
+    const sl = slides[cur];
+    const maxS = getMaxStep(sl);
+    if (!isStatic() && maxS > 0) {
+      if (d > 0 && curStep < maxS) { setStep(curStep + 1, 1); return; }
+      if (d < 0 && curStep > 0) { setStep(curStep - 1, -1); return; }
+    }
     let n = cur + d;
     while (n >= 0 && n < slides.length && isApp(n)) n += d;
-    if (n >= 0 && n < slides.length) go(n);
+    if (n >= 0 && n < slides.length) {
+      go(n, false, d < 0 ? { step: 'final' } : { step: 0 });
+    }
   }
 
   function openLink(id) {
     const n = slides.findIndex(s => s.dataset.appendix === '1' && s.dataset.id === id);
     if (n < 0) return;
     if (!isApp(cur)) returnTo.push(cur);
-    go(n);
+    go(n, false, { step: 0 });
   }
 
   function back() {
     const n = returnTo.length ? returnTo.pop() : 0;
-    go(n);
+    go(n, false, { step: 'final' });
   }
 
   function toggleLowPower(force) {
@@ -1059,7 +1290,7 @@
       freezeNow();
       toast('已切換靜態省電模式（按 B 恢復動態）');
     } else {
-      startFx(slides[cur], 120, navToken);
+      updateCtrlBar();
       toast('已恢復動態播放');
     }
     stage.dispatchEvent(new CustomEvent('deck:lowpower', { detail: { lowPower } }));
@@ -1070,12 +1301,12 @@
     stillMode = Boolean(flag);
     document.documentElement.classList.toggle('still', stillMode);
     if (stillMode) freezeNow();
-    else startFx(slides[cur], 120, navToken);
+    else updateCtrlBar();
     stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: stillMode } }));
   }
 
   // ---------------------------------------------------------------- input handling (keyboard + click + mobile swipe)
-  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], input, select, textarea, label, #notes, a, button:not(.back):not([data-link])';
+  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], #ctrl-bar, #nav-side, input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
 
   addEventListener('keydown', e => {
     const k = e.key;
@@ -1087,13 +1318,13 @@
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); step(1); }
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); step(-1); }
     else if (k === 'Escape' && isApp(cur)) { e.preventDefault(); back(); }
-    else if (k === 'Home') go(0);
-    else if (k === 'End') go(slides.length - 1);
+    else if (k === 'Home') go(0, false, { step: 0 });
+    else if (k === 'End') go(slides.length - 1, false, { step: 0 });
     else if (k === 'b' || k === 'B') { e.preventDefault(); toggleLowPower(); }
     else if (k === 'f' || k === 'F') {
       document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
     }
-    else if ((k === 'n' || k === 'N') && notesEl) notesEl.classList.toggle('show');
+    else if ((k === 'n' || k === 'N') && notesEl) { notesEl.classList.toggle('show'); updateCtrlBar(); }
     else if (k === 'p' || k === 'P') print();
   });
 
@@ -1114,6 +1345,7 @@
       if (e.touches.length !== 1 || e.target.closest(INTERACTIVE_SEL)) { swiping = false; return; }
       tx = e.touches[0].clientX;
       ty = e.touches[0].clientY;
+      if (ty >= innerHeight - 80) setCtrlBarVisible(true, false);
       swiping = true;
     }, { passive: true });
     viewportEl.addEventListener('touchend', e => {
@@ -1130,16 +1362,23 @@
   if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
 
   window.__deck = {
-    go: (n, instant = true) => go(n, instant),
+    go: (n, instant = true, opts) => go(n, instant, opts),
     step,
+    setStep,
     openLink,
     back,
     setStill,
     toggleLowPower,
+    setCtrlBarVisible,
     isStatic,
     stage,
     count: slides.length,
+    navMode: deckNavMode,
+    stageMode: deckStageMode,
     get index() { return cur; },
+    get stepIndex() { return curStep; },
+    get stepTotal() { return getMaxStep(slides[cur]); },
+    get activeSurface() { return stage.dataset.activeSurface || ''; },
     get slides() { return slides; },
     get lowPower() { return lowPower; },
   };

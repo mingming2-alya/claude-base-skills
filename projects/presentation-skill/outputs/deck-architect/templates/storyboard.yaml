@@ -9,8 +9,10 @@ meta:
   presenter: 王小明 · 產品部         # 封面講者（可省略）
   date: 2026.12                      # 封面日期（可省略）
   delivery: talk                     # talk（上台講）/ discuss（會議討論）/ read（自己讀）/ auto（自動播放）
+  stage_mode: pitch                  # briefing（匯報）/ pitch（提案）/ keynote（發表會）
+  # nav_mode: top-bar                # top-bar（頂列）/ minimal-side（右側錨點）/ divider-only（僅扉頁；keynote 預設）
   style: counsel                     # Gate 2 選定後填入：counsel / apple / illustration / ...
-  mode: light                        # Gate 2 選定後填入：light / dark
+  mode: light                        # Gate 2 選定後填入：light / dark（單頁可用 surface: dark|light|split|photo 覆寫）
   palette: 貼題綠                    # Gate 2 選定的三組 OKLCH 配色之一（寫進 deck.css）
   minutes: 15                        # 總時長（分鐘），lint 會檢查時間預算與節奏
   pages: 12                          # 頁數上限（含封面與自動目錄，不含附件頁），可省略

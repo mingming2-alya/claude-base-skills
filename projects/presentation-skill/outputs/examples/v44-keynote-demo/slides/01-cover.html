@@ -1,0 +1,90 @@
+<style>
+.slide .video-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.slide .video-bg .media-video-shell {
+  width: 100%;
+  height: 100%;
+}
+.slide .video-bg .media-video-ctrl {
+  left: auto;
+  right: 96px;
+  bottom: 44px;
+  width: 390px;
+}
+.slide .cover-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(95deg, rgba(13, 17, 23, 0.92) 0%, rgba(13, 17, 23, 0.72) 52%, rgba(13, 17, 23, 0.25) 100%);
+}
+.slide .hero-wrap {
+  position: absolute;
+  left: 112px;
+  top: 230px;
+  max-width: 1040px;
+  z-index: 3;
+}
+.slide .kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font: 700 22px/1 var(--font-label);
+  letter-spacing: 0.14em;
+  color: var(--accent-text);
+  margin-bottom: 34px;
+}
+.slide .kicker i {
+  width: 32px;
+  height: 2px;
+  background: var(--accent);
+  display: inline-block;
+}
+.slide h1 {
+  font: 900 132px/1.02 var(--font-display);
+  letter-spacing: -0.03em;
+  color: var(--fg);
+}
+.slide .sub {
+  margin-top: 32px;
+  font: 500 40px/1.4 var(--font-body);
+  color: var(--fg-2);
+}
+.slide .meta-foot {
+  position: absolute;
+  left: 112px;
+  bottom: 72px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  font: 500 22px/1 var(--font-label);
+  color: var(--fg-3);
+}
+.slide .meta-foot b {
+  color: var(--fg);
+  font-weight: 700;
+  margin-right: 10px;
+}
+</style>
+<section class="slide canvas" data-surface="dark" data-fx="ambient-dust">
+  <div class="video-bg" data-layer="bg">
+    <video data-slide-video data-autoplay data-loop poster="assets/cover-poster.png" src="media/opener-loop.webm"></video>
+  </div>
+  <div class="cover-scrim" aria-hidden="true"></div>
+
+  <div class="hero-wrap">
+    <div class="kicker" data-beat="1" data-from="left"><i></i>2026 年度聲學發表</div>
+    <h1 data-beat="1" data-from="up" data-fit="phrase">WaveCore S1</h1>
+    <p class="sub" data-beat="2" data-from="up">把嘈雜留在門外，只留真實人聲</p>
+  </div>
+
+  <div class="meta-foot" data-beat="3" data-from="up">
+    <span><b>海潮聲學</b>產品團隊</span>
+    <span>2026.12</span>
+    <span>三大章節 · 腔體 / 演算法 / 體驗</span>
+  </div>
+</section>

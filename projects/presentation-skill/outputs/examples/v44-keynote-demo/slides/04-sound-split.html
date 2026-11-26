@@ -1,0 +1,141 @@
+<style>
+.slide .split-wrap {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 35% 65%;
+}
+.slide .split-anchor {
+  padding: 96px 68px 80px 92px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.slide .anchor-kicker {
+  font: 700 20px/1 var(--font-label);
+  letter-spacing: 0.14em;
+  color: var(--split-dark-accent);
+}
+.slide .anchor-title {
+  margin-top: 24px;
+  font: 900 76px/1.08 var(--font-display);
+  letter-spacing: -0.02em;
+  color: var(--split-dark-fg);
+}
+.slide .anchor-desc {
+  margin-top: 26px;
+  font: 400 26px/1.55 var(--font-body);
+  color: var(--split-dark-fg-2);
+}
+.slide .anchor-meta {
+  padding-top: 28px;
+  border-top: 1px solid rgba(242, 240, 235, 0.16);
+  font: 500 20px/1.5 var(--font-body);
+  color: var(--split-dark-fg-2);
+}
+.slide .anchor-meta b {
+  display: block;
+  color: var(--split-dark-fg);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.slide .split-main {
+  padding: 88px 104px 72px 84px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.slide .main-lead {
+  font: 700 36px/1.35 var(--font-display);
+  color: var(--fg);
+}
+.slide .audio-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 28px;
+}
+.slide .rule-list {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+}
+.slide .rule-row {
+  padding: 26px 0;
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: 270px 1fr;
+  align-items: baseline;
+  gap: 28px;
+}
+.slide .rule-row:last-child {
+  border-bottom: 1px solid var(--line);
+}
+.slide .r-num {
+  font: 900 54px/1 var(--font-number);
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.slide .r-num.em {
+  color: var(--accent-text);
+}
+.slide .r-text {
+  font: 600 25px/1.4 var(--font-body);
+  color: var(--fg);
+}
+.slide .r-text small {
+  display: block;
+  margin-top: 4px;
+  font: 400 20px/1.4 var(--font-body);
+  color: var(--fg-3);
+}
+.slide .src {
+  font: 400 18px/1.3 var(--font-label);
+  color: var(--fg-3);
+}
+</style>
+<section class="slide canvas" data-surface="split" data-transition="push">
+  <div class="split-wrap">
+    <aside class="split-anchor">
+      <div>
+        <div class="anchor-kicker">02 · 降噪演算法 · 感官實證</div>
+        <h2 class="anchor-title" data-role="title">捷運車廂親耳實測</h2>
+        <p class="anchor-desc">無需抽象想像：直接點擊右側兩段同場域實錄音檔，一鍵切換對比降噪前後。</p>
+      </div>
+      <div class="anchor-meta">
+        <b>測試邊界（透明揭露）</b>
+        −42 dB 針對 80–400 Hz 低頻；高頻突發尖音採耳塞被動隔音輔助。
+      </div>
+    </aside>
+
+    <main class="split-main">
+      <div>
+        <p class="main-lead" data-role="summary">同一段車廂實錄，降噪後低頻底噪由 <mark class="em">78 降至 36 dB</mark>。</p>
+        <div class="audio-stack" data-beat="2" data-from="up">
+          <audio data-sound-demo data-label="A｜未開啟降噪（捷運車廂原音 78 dB）" data-duration="2" src="media/demo-ambient.wav"></audio>
+          <audio data-sound-demo data-label="B｜開啟 WaveCore ANC（低頻抑制 −42 dB）" data-duration="2" src="media/demo-anc.wav"></audio>
+        </div>
+      </div>
+
+      <div class="rule-list" data-stagger="70" data-beat="3">
+        <div class="rule-row">
+          <div class="r-num em">78 → 36 dB</div>
+          <div class="r-text">車廂低頻轟鳴直降 42 dB<small>80–400 Hz 輪軌與空調主頻段即時抑制</small></div>
+        </div>
+        <div class="rule-row">
+          <div class="r-num">99.2%</div>
+          <div class="r-text">真實人聲語音清晰度保留<small>報站廣播與對談頻段零金屬悶音</small></div>
+        </div>
+        <div class="rule-row">
+          <div class="r-num">38 hr</div>
+          <div class="r-text">開啟 ANC 全天候綜合續航<small>單次 9.5 小時，搭配充電盒一週免充電</small></div>
+        </div>
+      </div>
+
+      <p class="src" data-role="source">資料來源：台北捷運板南線實地收音（80–400 Hz 頻段，續航 38 hr 含充電盒）</p>
+    </main>
+  </div>
+</section>
