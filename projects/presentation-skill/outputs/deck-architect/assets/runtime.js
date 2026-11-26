@@ -40,6 +40,7 @@
   const params = new URLSearchParams(location.search);
   let stillMode = params.get('still') === '1' || params.has('still');
   const hideCtrlMode = params.get('hide-ctrl') === '1';
+  const noScaleMode = params.get('noscale') === '1';
   let lowPower = false;
   const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
   let reduce = reduceMQ.matches;
@@ -47,12 +48,32 @@
 
   if (stillMode) document.documentElement.classList.add('still');
   if (hideCtrlMode) document.documentElement.classList.add('hide-ctrl');
+  if (noScaleMode) document.documentElement.classList.add('noscale');
 
   const isStatic = () => Boolean(stillMode || lowPower || reduce);
   const DECK = window.DECK || {};
   const M = DECK.motion || 'horizontal';
   const deckStageMode = DECK.stageMode || document.documentElement.dataset.stageMode || '';
   const deckNavMode = DECK.navMode || document.documentElement.dataset.navMode || (deckStageMode === 'keynote' ? 'divider-only' : 'top-bar');
+
+  // Centralized overlay & Esc priority registry (Order-Within-Flexibility: zero shortcut clashes)
+  const overlays = [];
+  function registerOverlay(spec) {
+    overlays.push(spec);
+    overlays.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  }
+  function hasNavLock() {
+    return overlays.some(o => o.lockNav && typeof o.isOpen === 'function' && o.isOpen());
+  }
+  function closeTopOverlay() {
+    for (const o of overlays) {
+      if (typeof o.isOpen === 'function' && o.isOpen()) {
+        if (typeof o.close === 'function') o.close();
+        return true;
+      }
+    }
+    return false;
+  }
 
   // Apple critically damped & expo-out compositor curves (2-keyframe GPU-only -> locked 60/120fps)
   const EASE_SPRING = 'cubic-bezier(0.22, 1, 0.36, 1)';
@@ -106,6 +127,7 @@
   });
 
   function fit() {
+    if (noScaleMode) { stage.style.transform = 'none'; return; }
     const s = Math.min(innerWidth / 1920, innerHeight / 1080);
     stage.style.transform = 'scale(' + s + ')';
   }
@@ -287,6 +309,35 @@
     if (cbNotesBtn && notesEl) cbNotesBtn.classList.toggle('is-on', notesEl.classList.contains('show'));
     if (cbStaticBtn) cbStaticBtn.classList.toggle('is-on', lowPower);
     if (cbFsBtn) cbFsBtn.classList.toggle('is-on', Boolean(document.fullscreenElement));
+  }
+
+  const cbExtButtons = new Map();
+  let cbExtSep = null;
+  function addCtrlButton(spec) {
+    if (!ctrlBar || !spec || !spec.id) return null;
+    if (cbExtButtons.has(spec.id)) return cbExtButtons.get(spec.id);
+    if (!cbExtSep) {
+      cbExtSep = document.createElement('span');
+      cbExtSep.className = 'cb-sep';
+      cbExtSep.setAttribute('aria-hidden', 'true');
+      ctrlBar.appendChild(cbExtSep);
+    }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'cb-btn';
+    btn.dataset.cbExt = spec.id;
+    btn.textContent = spec.label || spec.id;
+    if (spec.title) {
+      btn.title = spec.title;
+      btn.setAttribute('aria-label', spec.title);
+    }
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (typeof spec.onClick === 'function') spec.onClick(btn);
+    });
+    ctrlBar.appendChild(btn);
+    cbExtButtons.set(spec.id, btn);
+    return btn;
   }
 
   ctrlBar.addEventListener('mouseenter', () => { ctrlHover = true; clearTimeout(ctrlHideTimer); });
@@ -1306,7 +1357,7 @@
   }
 
   // ---------------------------------------------------------------- input handling (keyboard + click + mobile swipe)
-  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], #ctrl-bar, #nav-side, input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
+  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], #ctrl-bar, #nav-side, #deck-grid, #deck-annotator, #deck-lightbox, [data-compare-slider], [data-zoomable], [data-ref], input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
 
   addEventListener('keydown', e => {
     const k = e.key;
@@ -1315,9 +1366,14 @@
       if (k === 'Escape') document.activeElement.blur();
       return;
     }
+    if (k === 'Escape') {
+      if (closeTopOverlay()) { e.preventDefault(); return; }
+      if (isApp(cur)) { e.preventDefault(); back(); return; }
+      return;
+    }
+    if (hasNavLock()) return;
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); step(1); }
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); step(-1); }
-    else if (k === 'Escape' && isApp(cur)) { e.preventDefault(); back(); }
     else if (k === 'Home') go(0, false, { step: 0 });
     else if (k === 'End') go(slides.length - 1, false, { step: 0 });
     else if (k === 'b' || k === 'B') { e.preventDefault(); toggleLowPower(); }
@@ -1330,6 +1386,7 @@
 
   const clickTarget = viewportEl || window;
   clickTarget.addEventListener('click', e => {
+    if (hasNavLock()) return;
     if (e.target.closest(INTERACTIVE_SEL)) return;
     const b = e.target.closest('.back');
     if (b) { back(); return; }
@@ -1342,14 +1399,14 @@
   if (viewportEl) {
     let tx = 0, ty = 0, swiping = false;
     viewportEl.addEventListener('touchstart', e => {
-      if (e.touches.length !== 1 || e.target.closest(INTERACTIVE_SEL)) { swiping = false; return; }
+      if (hasNavLock() || e.touches.length !== 1 || e.target.closest(INTERACTIVE_SEL)) { swiping = false; return; }
       tx = e.touches[0].clientX;
       ty = e.touches[0].clientY;
       if (ty >= innerHeight - 80) setCtrlBarVisible(true, false);
       swiping = true;
     }, { passive: true });
     viewportEl.addEventListener('touchend', e => {
-      if (!swiping || !e.changedTouches.length) return;
+      if (!swiping || hasNavLock() || !e.changedTouches.length) return;
       swiping = false;
       const dx = e.changedTouches[0].clientX - tx;
       const dy = e.changedTouches[0].clientY - ty;
@@ -1370,11 +1427,18 @@
     setStill,
     toggleLowPower,
     setCtrlBarVisible,
+    registerOverlay,
+    hasNavLock,
+    closeTopOverlay,
+    addCtrlButton,
+    toast,
     isStatic,
+    isApp,
     stage,
     count: slides.length,
     navMode: deckNavMode,
     stageMode: deckStageMode,
+    noScaleMode,
     get index() { return cur; },
     get stepIndex() { return curStep; },
     get stepTotal() { return getMaxStep(slides[cur]); },

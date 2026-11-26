@@ -1018,16 +1018,34 @@ async function runMotionAudit(driver, filePath) {
     await driver.wait(140);
     const fRes = await driver.evaluate(i => {
       const root = window.__deck.slides[i].querySelector('[data-flow-carousel]');
+      const mode = (root.getAttribute('data-flow-carousel') || 'vertical').trim().toLowerCase();
       const tabs = [...root.querySelectorAll('[data-fc-idx]')];
-      const before = root.dataset.activeIndex;
-      const targetTab = tabs[1] || tabs[0];
-      targetTab.click();
-      const after = root.dataset.activeIndex;
-      const stayed = window.__deck.index === i;
-      tabs[0].click();
-      return { before, after, stayed };
+      if (tabs.length >= 2) {
+        const before = root.dataset.activeIndex;
+        tabs[1].click();
+        const after = root.dataset.activeIndex;
+        const stayed = window.__deck.index === i;
+        tabs[0].click();
+        return { mode, ok: stayed && before !== after };
+      }
+      const nextScrub = root.querySelector('[data-fc-act="next"]');
+      if (nextScrub) {
+        const before = root.dataset.activeIndex;
+        nextScrub.click();
+        const after = root.dataset.activeIndex;
+        const stayed = window.__deck.index === i;
+        return { mode, ok: stayed && before !== after };
+      }
+      if (mode === 'chat' && root._flowCarousel) {
+        root._flowCarousel.apply(0);
+        const c0 = root.querySelectorAll('.is-shown').length;
+        root._flowCarousel.apply(1);
+        const c1 = root.querySelectorAll('.is-shown').length;
+        return { mode, ok: c0 === 1 && c1 === 2 && window.__deck.index === i };
+      }
+      return { mode, ok: Boolean(root._flowCarousel) };
     }, fi);
-    if (fRes.stayed && fRes.before !== fRes.after) mwParts.push(`活流程輪播（第 ${fi + 1} 頁）切換不誤翻頁`);
+    if (fRes.ok) mwParts.push(`活流程輪播（第 ${fi + 1} 頁 ${fRes.mode}）切換不誤翻頁`);
     else failures.push(`第 ${fi + 1} 頁活流程輪播異常：${JSON.stringify(fRes)}`);
   }
   if (mediaWidgetTargets.covers.length) {
@@ -1048,6 +1066,134 @@ async function runMotionAudit(driver, filePath) {
   }
   if (mwParts.length) {
     results.push(`多媒體與原生輪播原語（${mwParts.join('、')}）：通過`);
+  }
+
+  // 12. v4.5 Layer 1 Presenter Chrome (grid-overview G, annotator A / laser L, speaker-view S)
+  const presenterParts = [];
+  const pCheck = await driver.evaluate(() => {
+    const out = { grid: null, annotator: null, speaker: null };
+    if (window.__deckGrid) {
+      window.__deckGrid.open();
+      const opened = window.__deckGrid.isOpen() && window.__deck.hasNavLock();
+      const closedByEsc = window.__deck.closeTopOverlay() && !window.__deckGrid.isOpen() && !window.__deck.hasNavLock();
+      out.grid = opened && closedByEsc;
+    }
+    if (window.__deckAnnotator) {
+      window.__deckAnnotator.setDrawing(true);
+      const drawLock = window.__deckAnnotator.isDrawing && window.__deck.hasNavLock();
+      const escExit = window.__deck.closeTopOverlay() && !window.__deckAnnotator.isDrawing && !window.__deck.hasNavLock();
+      window.__deckAnnotator.setLaser(true);
+      const laserFree = window.__deckAnnotator.isLaser && !window.__deck.hasNavLock();
+      window.__deckAnnotator.setLaser(false);
+      out.annotator = drawLock && escExit && laserFree;
+    }
+    if (window.__deckSpeaker) {
+      const p = window.__deckSpeaker.getPayload();
+      out.speaker = Boolean(p && p.type === 'state' && p.current && p.total === window.__deck.count && window.__deckSpeaker.channelName);
+    }
+    return out;
+  });
+  if (pCheck.grid !== null) {
+    if (pCheck.grid) presenterParts.push('總覽矩陣 G');
+    else failures.push('Layer 1 總覽矩陣（G）開啟／鎖定／Esc 關閉異常');
+  }
+  if (pCheck.annotator !== null) {
+    if (pCheck.annotator) presenterParts.push('畫筆標註 A 與雷射筆 L');
+    else failures.push('Layer 1 畫筆標註（A）／雷射筆（L）鎖定或退出異常');
+  }
+  if (pCheck.speaker !== null) {
+    if (pCheck.speaker) presenterParts.push('雙螢幕講者同步 S');
+    else failures.push('Layer 1 講者模式（S）狀態同步 payload 異常');
+  }
+  if (presenterParts.length) {
+    results.push(`Layer 1 講者臨場工具（${presenterParts.join('、')}）：通過（快捷鍵鎖定與 Esc 層級退出正常）`);
+  }
+
+  // 13. v4.5 Layer 2 Content Persuasion Modules (linked-highlight, compare-slider, code-stage, visual-flair, sound-ab)
+  const v45Parts = [];
+  const v45Targets = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    const find = sel => sls.findIndex(sl => Boolean(sl.querySelector(sel)));
+    return {
+      ref: find('[data-ref]'),
+      compare: find('[data-compare-slider]'),
+      code: find('[data-code-stage]'),
+      zoom: find('[data-zoomable]'),
+      soundAb: find('[data-sound-ab]'),
+    };
+  });
+  if (v45Targets.ref >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), v45Targets.ref);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const sl = window.__deck.slides[i];
+      const first = sl.querySelector('[data-ref]');
+      first.click();
+      const hit = sl.classList.contains('is-ref-linking') && first.classList.contains('is-ref-hit') && window.__deck.index === i;
+      first.click();
+      const cleared = !sl.classList.contains('is-ref-linking');
+      return hit && cleared;
+    }, v45Targets.ref);
+    if (ok) v45Parts.push(`文圖聯動（第 ${v45Targets.ref + 1} 頁）`);
+    else failures.push(`第 ${v45Targets.ref + 1} 頁文圖聯動 [data-ref] 異常`);
+  }
+  if (v45Targets.compare >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), v45Targets.compare);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const el = window.__deck.slides[i].querySelector('[data-compare-slider]');
+      if (!el || !el._compareSlider) return false;
+      el._compareSlider.setPos(74);
+      const moved = el.dataset.pos === '74';
+      el._compareSlider.reset();
+      return moved;
+    }, v45Targets.compare);
+    if (ok) v45Parts.push(`前後對比拉桿（第 ${v45Targets.compare + 1} 頁）`);
+    else failures.push(`第 ${v45Targets.compare + 1} 頁前後對比拉桿 [data-compare-slider] 異常`);
+  }
+  if (v45Targets.code >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true, { step: 0 }), v45Targets.code);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const el = window.__deck.slides[i].querySelector('[data-code-stage]');
+      const lines = el ? el.querySelectorAll('.cs-line').length : 0;
+      const toks = el ? el.querySelectorAll('.tok-kw, .tok-fn, .tok-str').length : 0;
+      return lines > 0 && toks > 0;
+    }, v45Targets.code);
+    if (ok) v45Parts.push(`程式碼聚焦舞台（第 ${v45Targets.code + 1} 頁）`);
+    else failures.push(`第 ${v45Targets.code + 1} 頁程式碼舞台 [data-code-stage] 渲染異常`);
+  }
+  if (v45Targets.zoom >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), v45Targets.zoom);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const el = window.__deck.slides[i].querySelector('[data-zoomable]');
+      el.click();
+      const lb = document.getElementById('deck-lightbox');
+      const opened = Boolean(lb && lb.classList.contains('open') && window.__deck.hasNavLock());
+      const closed = window.__deck.closeTopOverlay() && lb && !lb.classList.contains('open');
+      return opened && closed;
+    }, v45Targets.zoom);
+    if (ok) v45Parts.push(`圖表燈箱放大（第 ${v45Targets.zoom + 1} 頁）`);
+    else failures.push(`第 ${v45Targets.zoom + 1} 頁 [data-zoomable] 燈箱異常`);
+  }
+  if (v45Targets.soundAb >= 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), v45Targets.soundAb);
+    await driver.wait(100);
+    const ok = await driver.evaluate(i => {
+      const el = window.__deck.slides[i].querySelector('[data-sound-ab]');
+      const btns = el ? [...el.querySelectorAll('.sound-ab-btn')] : [];
+      if (btns.length < 2) return false;
+      btns[1].click();
+      const switched = el.dataset.activeTrack === '1' && window.__deck.index === i;
+      btns[0].click();
+      return switched && el.dataset.activeTrack === '0';
+    }, v45Targets.soundAb);
+    if (ok) v45Parts.push(`音訊 A/B 同步切換（第 ${v45Targets.soundAb + 1} 頁）`);
+    else failures.push(`第 ${v45Targets.soundAb + 1} 頁 [data-sound-ab] 異常`);
+  }
+  if (v45Parts.length) {
+    results.push(`v4.5 說服力互動模組（${v45Parts.join('、')}）：通過`);
   }
 
   const jsErrs = driver.getErrors();

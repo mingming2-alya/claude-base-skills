@@ -1,0 +1,79 @@
+<section class="slide canvas" data-surface="light">
+  <style>
+    .slide .grid { flex: 1; display: grid; grid-template-columns: 520px minmax(0, 1fr); gap: 44px; align-items: center; }
+    .slide .list { display: flex; flex-direction: column; gap: 18px; }
+    .slide .ref-card {
+      padding: 24px 26px; border-radius: 18px;
+      border: 1px solid var(--line); background: var(--bg-2);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .slide .ref-card strong { font: 800 24px/1.25 var(--font-body); color: var(--fg); }
+    .slide .ref-card p { font: 500 20px/1.45 var(--font-body); color: var(--fg-2); }
+    .slide .ref-card .tag { font: 700 18px/1 var(--font-number); color: var(--accent-text); }
+    .slide .diag-wrap {
+      border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2);
+      padding: 28px; height: 100%; display: flex; align-items: center; justify-content: center;
+    }
+    .slide .diag-wrap svg { width: 100%; height: auto; max-height: 600px; }
+  </style>
+  <div class="hd">
+    <div>
+      <div class="eyebrow">01 · ARCHITECTURE ANATOMY</div>
+      <h2 class="title" data-role="title">三段式邊緣架構</h2>
+    </div>
+    <span class="chip">移上／點擊左側卡片與右側節點雙向聯動 · 點圖放大</span>
+  </div>
+  <div class="grid">
+    <div class="list">
+      <div class="ref-card" data-ref="ingest" data-spotlight-hover>
+        <span class="tag">01 · INGEST</span>
+        <strong>零拷貝訊號擷取</strong>
+        <p>直接透過 DMA 寫入環形緩衝區，省去 4.1 ms 記憶體複製耗時。</p>
+      </div>
+      <div class="ref-card" data-ref="router" data-spotlight-hover>
+        <span class="tag">02 · ROUTER</span>
+        <strong>動態算力路由層</strong>
+        <p>依幀複雜度即時切換輕量／精準量化分支，維持 8.4 ms 穩定輸出。</p>
+      </div>
+      <div class="ref-card" data-ref="guard" data-spotlight-hover>
+        <span class="tag">03 · GUARD</span>
+        <strong>確定性品質閘門</strong>
+        <p>內建信心度校驗與降級保底，異常輸入不阻塞主迴圈。</p>
+      </div>
+    </div>
+    <div class="diag-wrap" data-zoomable data-zoom-caption="Kestrel 2.0 三段式邊緣管線架構（DMA 零拷貝 → 動態算力路由 → 品質閘門）">
+      <svg viewBox="0 0 960 440" role="img" aria-label="三段式邊緣架構圖">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+            <path d="M0,1 L9,5 L0,9 z" fill="#0F766E"/>
+          </marker>
+        </defs>
+        <path d="M295 220 L355 220" stroke="#0F766E" stroke-width="4" fill="none" marker-end="url(#arr)" data-draw/>
+        <path d="M605 220 L665 220" stroke="#0F766E" stroke-width="4" fill="none" marker-end="url(#arr)" data-draw/>
+
+        <g data-ref="ingest">
+          <rect x="35" y="110" width="260" height="220" rx="22" fill="#ECFDF5" stroke="#0F766E" stroke-width="3"/>
+          <text x="165" y="175" text-anchor="middle" font-size="22" font-weight="700" fill="#0F766E">01 INGEST</text>
+          <text x="165" y="222" text-anchor="middle" font-size="28" font-weight="900" fill="#141923">DMA 零拷貝</text>
+          <text x="165" y="270" text-anchor="middle" font-size="20" fill="#334155">Ring Buffer · 1.2 ms</text>
+        </g>
+
+        <g data-ref="router">
+          <rect x="355" y="90" width="250" height="260" rx="22" fill="#F0F9FF" stroke="#0369A1" stroke-width="3"/>
+          <text x="480" y="155" text-anchor="middle" font-size="22" font-weight="700" fill="#0369A1">02 ROUTER</text>
+          <text x="480" y="205" text-anchor="middle" font-size="28" font-weight="900" fill="#141923">動態算力路由</text>
+          <text x="480" y="255" text-anchor="middle" font-size="20" fill="#334155">FP16 / INT8 自適應</text>
+          <text x="480" y="295" text-anchor="middle" font-size="20" font-weight="700" fill="#0F766E">5.8 ms 核心推論</text>
+        </g>
+
+        <g data-ref="guard">
+          <rect x="665" y="110" width="260" height="220" rx="22" fill="#FFFBEB" stroke="#B45309" stroke-width="3"/>
+          <text x="795" y="175" text-anchor="middle" font-size="22" font-weight="700" fill="#B45309">03 GUARD</text>
+          <text x="795" y="222" text-anchor="middle" font-size="28" font-weight="900" fill="#141923">品質校驗閘門</text>
+          <text x="795" y="270" text-anchor="middle" font-size="20" fill="#334155">SLA 保底 · 1.4 ms</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <div class="foot-note">提示：點擊右側架構圖可開啟滿版燈箱放大（按 Esc 退出）；總延遲 1.2 + 5.8 + 1.4 = 8.4 ms。</div>
+</section>

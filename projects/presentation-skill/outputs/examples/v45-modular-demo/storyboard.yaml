@@ -1,0 +1,94 @@
+meta:
+  title: Kestrel 2.0 邊緣推論引擎
+  subtitle: 從高延遲管線到毫秒級自適應架構
+  presenter: 系統架構組 · 技術發表範例
+  date: 2026.11
+  delivery: talk
+  stage_mode: keynote
+  nav_mode: minimal-side
+  presenter_tools: [grid, annotator, speaker]
+  modules:
+    - ambient-fx
+    - components
+    - live-controls
+    - media
+    - flow-carousel
+    - coverflow
+    - linked-highlight
+    - compare-slider
+    - code-stage
+    - visual-flair
+    - fit
+  style: keynote-modular
+  mode: dark
+  minutes: 10
+  pages: 6
+  lang: zh-Hant
+
+structure:
+  start: 工程團隊熟悉雲端推論，但對邊緣端如何兼顧延遲與準確率仍存疑
+  destination: 同意將核心推論管線升級至 Kestrel 2.0
+  axis: causal
+  direction: 瓶頸解剖 → 關鍵革新 → 實測驗證
+  sensitivity: false
+
+constraints:
+  limitations:
+    - 8.4 ms 延遲為 FP16 量化模型於 15W 邊緣模組之實測基準
+  forbidden:
+    - 絕對零延遲
+  must_include:
+    - 8.4 ms
+
+chapters:
+  - id: arch
+    label: 架構解剖
+    minutes: 3
+  - id: engine
+    label: 核心革新
+    minutes: 4
+  - id: verify
+    label: 實測驗證
+    minutes: 3
+
+slides:
+  - type: cover
+    file: slides/01-cover.html
+    surface: dark
+    notes: 開場歡迎，展示 Kestrel 2.0 定位與生態夥伴跑馬燈。
+
+  - chapter: arch
+    title: 三段式邊緣架構
+    layout: free
+    file: slides/02-linked-arch.html
+    surface: light
+    signature: true
+    notes: 滑鼠移至左側卡片或右側架構節點可雙向高亮；點擊圖表可放大檢視細節。
+
+  - chapter: engine
+    title: 畫面延遲對比
+    layout: free
+    summary: P99 延遲由 27.6 ms 降至 8.4 ms，記憶體佔用減少 62%
+    file: slides/03-compare-slider.html
+    surface: dark
+    source: 內部邊緣壓力測試基準（15W 模組，FP16）
+    notes: 拖曳中央拉桿比較 v1 與 v2 的延遲分布與記憶體佔用。
+
+  - chapter: engine
+    title: 核心排程實作
+    layout: free
+    file: slides/04-code-stage.html
+    surface: light
+    notes: 按空白鍵或右方向鍵依序聚焦三段程式碼邏輯。
+
+  - chapter: verify
+    title: 即時降噪實測台
+    layout: free
+    file: slides/05-controls-audio.html
+    surface: dark
+    notes: 現場切換情境預設與 A/B 同步音軌對比；註明 8.4 ms 為 15W FP16 基準。
+
+  - type: closing
+    file: slides/06-closing-chat.html
+    surface: dark
+    notes: 展示邊緣 Agent 實機回應流並收尾。

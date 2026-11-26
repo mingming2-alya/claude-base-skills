@@ -86,13 +86,16 @@
 8. **視覺與影音資產盤點 ＋ 缺口點破（Gap-Naming）＋ 按需引擎能力對齊**
    - 綜合 Pre-Flight 偵察結果，一次盤點：使用者手邊已有哪些真實資產（產品照、CAD 爆炸圖、團隊／現場照片、錄屏、影片、音檔、客戶逐字原話）？
    - **點破缺口（Gap-Naming）**：若某核心頁需要實物視覺、現場照或案例卻無現成檔案，明確與使用者議定補救路徑——①使用者補供、②授權 AI 生無字實物／隱喻底圖、③改以 HTML5 原生互動流程模擬、或 ④果斷精簡該段。
-   - **關鍵對齊（決定下游按需注入哪些模組）**：由於 `deck-architect` v4.4 採**按需模組化注入（未用到即 0 KB）**，Step 1 必須把具體的呈現期待收斂到明確的能力開關並寫進 `brief.md`：
-     - 需要現場試算／拖曳參數推演 → 啟用 `live-controls`
-     - 需要真實影片或實測音檔對比 → 啟用 `media`（確認外連相對路徑與海報）
-     - 需要動態展示產品／AI 步驟流程 → 啟用 `flow-carousel`
-     - 需要多張實拍／場域照片 3D 展示 → 啟用 `coverflow`
-     - 需要商務進度表／年度總覽／目錄頁 → 啟用 `components`
-     - 需要微妙氛圍光暈／微塵 → 啟用 `ambient-fx`
+   - **關鍵對齊（決定下游按需注入哪些模組，完整選用表見 `references/modules-catalog.md`）**：`deck-architect` v4.5 採**三層細粒度按需注入（未用到即 0 KB）**，Step 1 必須把具體呈現期待收斂到明確的能力開關並寫進 `brief.md`：
+     - 現場試算／切換方案推演 → `live-controls`（滑桿／分段膠囊／開關／情境預設／重設）
+     - 真實影片（含片段循環）或實測音檔／A-B 降噪對比 → `media`
+     - 動態展示產品步驟、系統事件回放或 AI Agent 對話流 → `flow-carousel`（`vertical|horizontal|stepper|chat`）
+     - 多張實拍 3D 展示或客戶 Logo 跑馬燈 → `coverflow`（含 `marquee`）
+     - 複雜架構圖文雙向對照／點擊放大檢視 → `linked-highlight`＋`visual-flair`（`data-zoomable`）
+     - 改版前後／效能優化前後視覺直觀拉桿對比 → `compare-slider`
+     - 技術演講程式碼逐段聚焦解說 → `code-stage`（可搭 `data-step`）
+     - 商務進度表／年度總覽／瀏覽器與手機外框 → `components`（單檔細粒度注入）
+     - `pitch`/`keynote` 封面微動態氛圍 → `ambient-fx`（6 種單特效按需注入；`briefing` 禁用）
      - 切忌不問需求就硬塞花俏模組，也絕不在未對齊期待前就默默跳過該啟用的體驗。
 
 ---

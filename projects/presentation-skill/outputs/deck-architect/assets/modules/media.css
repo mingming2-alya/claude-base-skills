@@ -1,5 +1,5 @@
-/* deck-architect v4.4 On-Demand Module: media
- * External <video data-slide-video> & <audio data-sound-demo> presentation primitives.
+/* deck-architect v4.5 On-Demand Module: media
+ * External <video data-slide-video>, <audio data-sound-demo>, and [data-sound-ab] A/B switcher.
  * Injected by assemble.py only when slides include media primitives.
  */
 
@@ -24,7 +24,7 @@
   z-index: 8;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 10px 16px;
   border-radius: 999px;
   background: rgba(14, 17, 23, 0.78);
@@ -48,9 +48,9 @@
   color: #F2F0EB;
   height: 38px;
   min-width: 38px;
-  padding: 0 14px;
+  padding: 0 13px;
   border-radius: 999px;
-  font: 700 18px/1 var(--font-label);
+  font: 700 17px/1 var(--font-label);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -134,9 +134,10 @@ audio[data-sound-demo] {
 }
 .sound-head {
   display: flex;
-  align-items: baseline;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px 12px;
 }
 .sound-label {
   font: 700 22px/1.25 var(--font-body);
@@ -176,6 +177,33 @@ audio[data-sound-demo] {
 .sound-demo-bar.is-playing .sound-wave i {
   animation: deck-wave-dance var(--wd, 720ms) ease-in-out infinite;
   animation-delay: var(--wdel, 0ms);
+}
+
+/* Synchronized A/B track switcher ([data-sound-ab]) */
+.sound-ab-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.sound-ab-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--fg-2);
+  font: 700 18px/1 var(--font-label);
+  padding: 8px 14px;
+  border-radius: 999px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+}
+.sound-ab-btn.is-active {
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 /* Static / print: keep poster & clean static waveform, hide interactive overlays */

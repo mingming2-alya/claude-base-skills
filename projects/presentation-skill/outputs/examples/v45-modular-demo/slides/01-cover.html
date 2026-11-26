@@ -1,0 +1,40 @@
+<section class="slide canvas" data-surface="dark" data-fx="constellation">
+  <style>
+    .slide { justify-content: space-between; }
+    .slide .c-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
+    .slide .c-hero { max-width: 1280px; position: relative; z-index: 2; }
+    .slide .c-hero p.sub { margin-top: 24px; font: 500 28px/1.45 var(--font-body); color: var(--fg-2); max-width: 880px; }
+    .slide .c-kpis { display: flex; gap: 56px; margin-top: 44px; }
+    .slide .c-kpi .v { font: 800 56px/1 var(--font-number); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+    .slide .c-kpi .l { margin-top: 8px; font: 500 20px/1.3 var(--font-body); color: var(--fg-2); }
+    .slide .c-foot { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 14px; }
+    .slide .c-mlab { font: 600 18px/1 var(--font-label); color: var(--fg-3); letter-spacing: 0.08em; }
+  </style>
+  <div class="c-top">
+    <span class="chip">KESTREL RUNTIME · V2.0 RELEASE</span>
+    <span class="chip">系統架構組 · 2026.11</span>
+  </div>
+  <div class="c-hero">
+    <div class="eyebrow">EDGE INFERENCE ARCHITECTURE</div>
+    <h1 class="hero rv" data-fit="phrase">Kestrel 2.0 邊緣推論引擎</h1>
+    <p class="sub rv">在 15W 邊緣裝置上達成 <strong style="color:var(--accent-text)">8.4 ms</strong> 穩定回應，無須依賴雲端回傳即可完成多模態即時排程。</p>
+    <div class="c-kpis" data-stagger="80">
+      <div class="c-kpi"><div class="v" data-count>8.4 ms</div><div class="l">P99 邊緣端推論延遲</div></div>
+      <div class="c-kpi"><div class="v" data-count>-62%</div><div class="l">峰值記憶體佔用</div></div>
+      <div class="c-kpi"><div class="v" data-count>15W</div><div class="l">無風扇模組功耗上限</div></div>
+    </div>
+  </div>
+  <div class="c-foot">
+    <div class="c-mlab">ECOSYSTEM BENCHMARK PARTNERS（虛構範例夥伴）</div>
+    <div data-marquee data-speed="24">
+      <div class="mq-track">
+        <span class="mq-item">Nordic Grid Labs</span>
+        <span class="mq-item">Aether Robotics</span>
+        <span class="mq-item">Kuroda Optics</span>
+        <span class="mq-item">Solstice Bio</span>
+        <span class="mq-item">Vela Autonomous</span>
+        <span class="mq-item">Helios Sensorics</span>
+      </div>
+    </div>
+  </div>
+</section>

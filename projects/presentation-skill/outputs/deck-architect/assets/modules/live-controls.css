@@ -1,5 +1,6 @@
-/* deck-architect v4.4 On-Demand Module: live-controls
- * Injected by assemble.py only when slides contain .live-ctrl or range inputs.
+/* deck-architect v4.5 On-Demand Module: live-controls
+ * Injected by assemble.py only when slides contain .live-ctrl, range inputs,
+ * [data-segmented], [data-toggle], [data-presets], or [data-reset].
  */
 .live-ctrl {
   user-select: none;
@@ -34,5 +35,118 @@
   transform: scale(1.14);
 }
 .live-ctrl input[type="range"]:focus-visible {
-  box-shadow: 0 0 0 3px rgba(75, 226, 165, 0.45);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #4BE2A5) 45%, transparent);
+}
+
+/* Segmented pill control ([data-segmented]) */
+[data-segmented] {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--bg-2, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--line);
+}
+[data-segmented] > button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--fg-2);
+  font: 600 18px/1 var(--font-label);
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease, transform .15s ease;
+}
+[data-segmented] > button:hover {
+  color: var(--fg);
+}
+[data-segmented] > button.is-active,
+[data-segmented] > button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Toggle switch ([data-toggle]) */
+[data-toggle] {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 14px 6px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-2, rgba(255, 255, 255, 0.05));
+  color: var(--fg);
+  font: 600 18px/1 var(--font-label);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+[data-toggle]::before {
+  content: "";
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--line);
+  position: relative;
+  flex: none;
+  box-shadow: inset 18px 0 0 0 transparent;
+  transition: background .22s ease;
+}
+[data-toggle]::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate3d(3px, 0, 0);
+  transition: transform .22s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+[data-toggle] {
+  position: relative;
+}
+[data-toggle].is-on::before,
+[data-toggle][aria-checked="true"]::before {
+  background: var(--accent);
+}
+[data-toggle].is-on::after,
+[data-toggle][aria-checked="true"]::after {
+  transform: translate3d(21px, 0, 0);
+}
+
+/* Preset buttons ([data-presets]) & Reset button ([data-reset]) */
+[data-presets] {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+[data-presets] > button,
+[data-reset] {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--bg-2, transparent);
+  color: var(--fg-2);
+  font: 600 18px/1 var(--font-label);
+  padding: 10px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color .2s ease, color .2s ease, background .2s ease, transform .15s ease;
+}
+[data-presets] > button:hover,
+[data-reset]:hover {
+  border-color: var(--accent);
+  color: var(--fg);
+}
+[data-presets] > button.is-active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, var(--bg-2));
+  color: var(--fg);
+}
+[data-reset]:active,
+[data-presets] > button:active {
+  transform: scale(0.96);
 }

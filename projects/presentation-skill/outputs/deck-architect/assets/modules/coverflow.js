@@ -1,5 +1,6 @@
-/* deck-architect v4.4 On-Demand Module: coverflow
- * Pure GPU 3D perspective CoverFlow carousel ([data-coverflow]).
+/* deck-architect v4.5 On-Demand Module: coverflow & gallery
+ *  - Pure GPU 3D perspective CoverFlow carousel ([data-coverflow]) + optional [data-cf-lightbox] preview
+ *  - Seamless infinite marquee logo/card wall ([data-marquee]) with clean static/print grid fallback
  */
 (function () {
   const deck = window.__deck;
@@ -7,6 +8,50 @@
 
   const instances = [];
 
+  // Shared CoverFlow Lightbox (registered in Layer 0 overlay registry)
+  let lbEl = null;
+  function ensureLightbox() {
+    if (lbEl) return lbEl;
+    lbEl = document.createElement('div');
+    lbEl.id = 'cf-lightbox';
+    lbEl.className = 'live-ctrl';
+    lbEl.innerHTML =
+      '<div class="cfl-box">' +
+        '<button type="button" class="cfl-close" aria-label="關閉預覽">×</button>' +
+        '<div class="cfl-media"></div>' +
+        '<div class="cfl-cap"></div>' +
+      '</div>';
+    document.body.appendChild(lbEl);
+    const close = () => lbEl.classList.remove('open');
+    lbEl.querySelector('.cfl-close').addEventListener('click', e => { e.stopPropagation(); close(); });
+    lbEl.addEventListener('click', e => { if (e.target === lbEl) close(); });
+    if (typeof deck.registerOverlay === 'function') {
+      deck.registerOverlay({
+        id: 'cf-lightbox',
+        priority: 80,
+        lockNav: true,
+        isOpen: () => lbEl.classList.contains('open'),
+        close,
+      });
+    }
+    return lbEl;
+  }
+
+  function openLightbox(item) {
+    if (deck.isStatic()) return;
+    const lb = ensureLightbox();
+    const mediaSlot = lb.querySelector('.cfl-media');
+    const capSlot = lb.querySelector('.cfl-cap');
+    mediaSlot.innerHTML = '';
+    const media = item.querySelector('img, svg');
+    if (media) mediaSlot.appendChild(media.cloneNode(true));
+    const cap = item.querySelector('figcaption');
+    capSlot.textContent = cap ? cap.textContent.trim() : '';
+    capSlot.style.display = capSlot.textContent ? '' : 'none';
+    lb.classList.add('open');
+  }
+
+  // ---- CoverFlow instances
   document.querySelectorAll('[data-coverflow]').forEach(root => {
     root.classList.add('live-ctrl');
     const items = [...root.querySelectorAll('.cf-item')];
@@ -18,6 +63,7 @@
     const intervalMs = Math.max(1500, parseInt(root.dataset.interval || '3800', 10) || 3800);
     const autoplay = root.dataset.autoplay !== 'false';
     const spreadX = parseFloat(root.dataset.spreadX || '410');
+    const enableLightbox = root.hasAttribute('data-cf-lightbox');
 
     const dotsHost = root.querySelector('.cf-dots');
     const prevBtn = root.querySelector('.cf-prev');
@@ -84,7 +130,12 @@
     items.forEach((el, i) => {
       el.addEventListener('click', e => {
         e.stopPropagation();
-        if (i !== idx) { layout(i); schedule(); }
+        if (i !== idx) {
+          layout(i);
+          schedule();
+        } else if (enableLightbox) {
+          openLightbox(el);
+        }
       });
     });
     dots.forEach((dot, i) => {
@@ -106,6 +157,22 @@
     instances.push(api);
   });
 
+  // ---- Seamless Marquee ([data-marquee])
+  document.querySelectorAll('[data-marquee]').forEach(root => {
+    const track = root.querySelector('.mq-track');
+    if (!track || track.dataset.mqCloned === '1') return;
+    const speed = parseFloat(root.dataset.speed || '26');
+    if (Number.isFinite(speed) && speed > 2) root.style.setProperty('--mq-speed', speed + 's');
+    const originals = [...track.children];
+    originals.forEach(node => {
+      const clone = node.cloneNode(true);
+      clone.classList.add('mq-dup');
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
+    track.dataset.mqCloned = '1';
+  });
+
   function syncForSlide(sl, staticMode) {
     for (const inst of instances) {
       if (staticMode) {
@@ -122,6 +189,7 @@
   deck.stage.addEventListener('deck:slideenter', ({ detail }) => syncForSlide(detail.slide, detail.staticMode));
   deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
     for (const inst of instances) if (inst.slide === detail.slide) inst.stop();
+    if (lbEl) lbEl.classList.remove('open');
   });
   deck.stage.addEventListener('deck:still', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.still));
   deck.stage.addEventListener('deck:lowpower', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.lowPower));

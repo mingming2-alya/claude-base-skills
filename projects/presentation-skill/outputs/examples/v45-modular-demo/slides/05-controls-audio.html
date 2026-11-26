@@ -1,0 +1,95 @@
+<section class="slide canvas" data-surface="dark">
+  <style>
+    .slide .bench { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: stretch; }
+    .slide .panel {
+      padding: 32px 34px; border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2);
+      display: flex; flex-direction: column; justify-content: space-between; gap: 22px;
+    }
+    .slide .panel h3 { font: 800 28px/1.25 var(--font-body); color: var(--fg); }
+    .slide .ctrl-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+    .slide .readout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .slide .metric {
+      padding: 20px 22px; border-radius: 16px; border: 1px solid var(--line); background: var(--bg);
+    }
+    .slide .metric .v { font: 800 44px/1.1 var(--font-number); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+    .slide .metric .l { margin-top: 6px; font: 500 18px/1.3 var(--font-body); color: var(--fg-2); }
+  </style>
+  <div class="hd">
+    <div>
+      <div class="eyebrow">04 · LIVE BENCH &amp; A/B AUDIO</div>
+      <h2 class="title" data-role="title">即時降噪實測台</h2>
+    </div>
+    <span class="chip">現場調整邊緣推論參數 ＋ 同步切換 A/B 音軌</span>
+  </div>
+  <div class="bench">
+    <div class="panel live-ctrl" data-reset-scope>
+      <div>
+        <h3>參數試算控制台</h3>
+        <p style="margin-top:8px;color:var(--fg-2);font-size:20px">切換量化精度與邊緣快取，即時預估延遲與功耗。</p>
+      </div>
+      <div class="ctrl-row">
+        <div id="k-mode" data-segmented>
+          <button type="button" data-val="fp16" class="is-active">FP16 精準</button>
+          <button type="button" data-val="int8">INT8 極速</button>
+        </div>
+        <button id="k-cache" type="button" data-toggle class="is-on">DMA 零拷貝</button>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:20px;margin-bottom:8px">
+          <span>並發串流數</span><strong id="k-streams-val">4 路</strong>
+        </div>
+        <input id="k-streams" type="range" min="1" max="8" value="4">
+      </div>
+      <div class="ctrl-row">
+        <div data-presets>
+          <button type="button" data-preset='{"#k-mode":"fp16","#k-cache":true,"#k-streams":4}'>15W 標準</button>
+          <button type="button" data-preset='{"#k-mode":"int8","#k-cache":true,"#k-streams":8}'>滿載 8 路</button>
+        </div>
+        <button type="button" data-reset>還原預設</button>
+      </div>
+      <div class="readout">
+        <div class="metric"><div class="v" id="k-lat">8.4 ms</div><div class="l">預估 P99 延遲</div></div>
+        <div class="metric"><div class="v" id="k-watt">14.2 W</div><div class="l">模組總功耗</div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div>
+        <h3>同步 A/B 抗噪實測</h3>
+        <p style="margin-top:8px;color:var(--fg-2);font-size:20px">播放期間直接切換 A／B 按鈕，兩條音軌鎖定同一時間點無縫切換。</p>
+      </div>
+      <div data-sound-ab data-label="邊緣麥克風收音對比（模擬測試音）" data-duration="2">
+        <audio data-sound-demo data-label="A 原始含噪" src="media/raw.wav"></audio>
+        <audio data-sound-demo data-label="B Kestrel 降噪" src="media/clean.wav"></audio>
+      </div>
+      <div class="metric" data-tilt="3" data-spotlight-hover>
+        <div class="v">+18.6 dB</div>
+        <div class="l">邊緣即時訊噪比改善（模型常駐記憶體僅 38 MB）</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot-note">口徑說明：8.4 ms 延遲為 FP16 量化模型於 15W 邊緣模組之實測基準；翻頁自動停播音訊並歸零。</div>
+  <script>
+    const seg = slide.querySelector('#k-mode');
+    const tog = slide.querySelector('#k-cache');
+    const rng = slide.querySelector('#k-streams');
+    const sVal = slide.querySelector('#k-streams-val');
+    const latEl = slide.querySelector('#k-lat');
+    const wattEl = slide.querySelector('#k-watt');
+    function recalc() {
+      const n = parseInt(rng.value, 10) || 4;
+      const mode = seg.dataset.value || 'fp16';
+      const zeroCopy = tog.dataset.checked !== '0';
+      sVal.textContent = n + ' 路';
+      const base = mode === 'int8' ? 4.8 : 6.4;
+      const lat = base + n * (mode === 'int8' ? 0.35 : 0.5) + (zeroCopy ? 0 : 4.1);
+      const watt = (mode === 'int8' ? 8.2 : 10.6) + n * 0.9;
+      latEl.textContent = lat.toFixed(1) + ' ms';
+      wattEl.textContent = watt.toFixed(1) + ' W';
+    }
+    rng.addEventListener('input', recalc);
+    seg.addEventListener('change', recalc);
+    tog.addEventListener('change', recalc);
+    setTimeout(recalc, 0);
+  </script>
+</section>

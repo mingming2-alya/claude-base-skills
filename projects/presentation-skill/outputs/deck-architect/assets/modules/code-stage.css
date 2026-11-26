@@ -1,0 +1,108 @@
+/* deck-architect v4.5 On-Demand Module: code-stage
+ * Zero-dependency syntax highlighting, data-step line spotlighting ([data-code-stage]),
+ * and optional terminal typewriter ([data-typewriter]).
+ */
+[data-code-stage] {
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--code-bg, #11151E);
+  color: var(--code-fg, #E6EDF3);
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+[data-surface="light"] [data-code-stage] {
+  background: var(--code-bg, #F4F6FA);
+  color: var(--code-fg, #1E293B);
+}
+[data-code-stage] .cs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  font: 600 18px/1 var(--font-label);
+  color: rgba(230, 237, 243, 0.72);
+}
+[data-surface="light"] [data-code-stage] .cs-head {
+  border-bottom-color: rgba(15, 23, 42, 0.10);
+  color: rgba(30, 41, 59, 0.65);
+}
+[data-code-stage] .cs-dots {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+[data-code-stage] .cs-dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+}
+[data-code-stage] pre {
+  margin: 0;
+  padding: 18px 0;
+  overflow: hidden;
+  font-size: var(--code-size, 21px);
+  line-height: 1.55;
+  white-space: pre;
+}
+[data-code-stage] .cs-line {
+  display: flex;
+  align-items: baseline;
+  padding: 2px 24px 2px 0;
+  border-left: 3px solid transparent;
+  transition: opacity .26s ease, background .26s ease, border-color .26s ease;
+}
+[data-code-stage] .cs-ln {
+  flex: none;
+  width: 52px;
+  padding-right: 16px;
+  text-align: right;
+  user-select: none;
+  opacity: 0.36;
+  font-variant-numeric: tabular-nums;
+}
+[data-code-stage] .cs-txt {
+  flex: 1;
+  min-width: 0;
+}
+[data-code-stage].has-focus .cs-line {
+  opacity: 0.32;
+}
+[data-code-stage].has-focus .cs-line.is-hl {
+  opacity: 1;
+  border-left-color: var(--accent, #4BE2A5);
+  background: color-mix(in srgb, var(--accent, #4BE2A5) 11%, transparent);
+}
+[data-surface="light"] [data-code-stage].has-focus .cs-line.is-hl {
+  background: color-mix(in srgb, var(--accent, #0F766E) 8%, transparent);
+}
+
+/* Lightweight syntax token palette (WCAG AA >= 5:1 on both dark and light surfaces) */
+[data-code-stage] .tok-kw { color: #D8B4FE; font-weight: 600; }
+[data-code-stage] .tok-str { color: #A6E3A1; }
+[data-code-stage] .tok-num { color: #FDBA74; }
+[data-code-stage] .tok-cm { color: #94A3B8; font-style: italic; }
+[data-code-stage] .tok-fn { color: #93C5FD; }
+[data-surface="light"] [data-code-stage] .tok-kw { color: #5B21B6; }
+[data-surface="light"] [data-code-stage] .tok-str { color: #0E5A52; }
+[data-surface="light"] [data-code-stage] .tok-num { color: #9A3412; }
+[data-surface="light"] [data-code-stage] .tok-cm { color: #475569; }
+[data-surface="light"] [data-code-stage] .tok-fn { color: #1E3A8A; }
+
+/* Typewriter cursor */
+[data-typewriter].is-typing::after {
+  content: "▍";
+  display: inline-block;
+  margin-left: 2px;
+  color: var(--accent);
+}
+html.still [data-typewriter]::after,
+body.low-power [data-typewriter]::after {
+  display: none !important;
+}
+@media print {
+  [data-code-stage].has-focus .cs-line { opacity: 0.55; }
+  [data-typewriter]::after { display: none !important; }
+}

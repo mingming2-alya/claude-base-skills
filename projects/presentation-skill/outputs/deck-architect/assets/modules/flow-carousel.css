@@ -1,6 +1,6 @@
-/* deck-architect v4.4 On-Demand Module: flow-carousel
- * Lightweight HTML5 native live product workflow card carousel ([data-flow-carousel]).
- * Pure GPU transform/opacity transitions, interactive tabs, zero video bloat.
+/* deck-architect v4.5 On-Demand Module: flow-carousel
+ * Lightweight HTML5 native workflow carousels ([data-flow-carousel="vertical|horizontal|stepper|chat"]).
+ * Pure GPU transform/opacity transitions, interactive tabs/scrubber, deterministic static fallback.
  */
 .flow-carousel {
   display: grid;
@@ -121,15 +121,200 @@
   z-index: 2;
 }
 
-/* Static / print: snap cleanly to primary card with zero motion artifacts */
+/* Mode 2: horizontal */
+[data-flow-carousel="horizontal"] {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: stretch;
+}
+[data-flow-carousel="horizontal"] .fc-tabs {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+[data-flow-carousel="horizontal"] .fc-tab {
+  flex: 1 1 0;
+  padding: 16px 20px;
+}
+[data-flow-carousel="horizontal"] .fc-tab.is-active {
+  transform: translate3d(0, -3px, 0);
+}
+[data-flow-carousel="horizontal"] .fc-card {
+  transform: translate3d(106%, 0, 0) scale(0.96);
+}
+[data-flow-carousel="horizontal"] .fc-card.is-prev {
+  transform: translate3d(-104%, 0, 0) scale(0.95);
+}
+[data-flow-carousel="horizontal"] .fc-card.is-next {
+  transform: translate3d(104%, 0, 0) scale(0.95);
+}
+[data-flow-carousel="horizontal"] .fc-card.is-active {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* Mode 3: stepper (event replay + target node highlight + bottom scrubber) */
+[data-flow-carousel="stepper"] {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: stretch;
+}
+[data-flow-carousel="stepper"] .fc-viewport {
+  height: var(--fc-height, 210px);
+}
+[data-flow-carousel="stepper"] .fc-card {
+  padding: 24px 30px;
+  transform: translate3d(36px, 0, 0);
+}
+[data-flow-carousel="stepper"] .fc-card.is-prev {
+  opacity: 0;
+  transform: translate3d(-36px, 0, 0);
+}
+[data-flow-carousel="stepper"] .fc-card.is-next {
+  opacity: 0;
+  transform: translate3d(36px, 0, 0);
+}
+[data-flow-carousel="stepper"] .fc-card.is-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.fc-scrubber {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+}
+.fc-scrub-btn {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font: 700 18px/1 var(--font-label);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease;
+}
+.fc-scrub-btn:hover { border-color: var(--accent); }
+.fc-scrub-dots {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fc-scrub-dot {
+  appearance: none;
+  border: none;
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  cursor: pointer;
+  transition: background .24s ease, transform .2s ease;
+}
+.fc-scrub-dot.is-past {
+  background: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+.fc-scrub-dot.is-active {
+  background: var(--accent);
+  transform: scaleY(1.4);
+}
+.fc-scrub-pos {
+  font: 700 18px/1 var(--font-number);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-2);
+  white-space: nowrap;
+}
+
+/* Stepper diagram target node highlight contract */
+[data-node] {
+  transition: opacity .28s ease, transform .28s cubic-bezier(0.22, 1, 0.36, 1), filter .28s ease;
+}
+[data-node].is-step-dim {
+  opacity: 0.34;
+}
+[data-node].is-step-active {
+  opacity: 1;
+  filter: drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 55%, transparent));
+}
+
+/* Mode 4: chat (AI / Agent progressive message stream) */
+[data-flow-carousel="chat"] {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: stretch;
+  padding: 24px 28px;
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+}
+[data-flow-carousel="chat"] .fc-chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+[data-flow-carousel="chat"] [data-fc-msg],
+[data-flow-carousel="chat"] [data-fc-card] {
+  position: relative;
+  inset: auto;
+  max-width: 84%;
+  padding: 18px 22px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+  font: 500 21px/1.45 var(--font-body);
+  opacity: 0;
+  transform: translate3d(0, 14px, 0) scale(0.98);
+  pointer-events: none;
+  transition: opacity .36s ease, transform .42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+[data-flow-carousel="chat"] [data-role="user"] {
+  align-self: flex-end;
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg));
+}
+[data-flow-carousel="chat"] [data-role="assistant"],
+[data-flow-carousel="chat"] [data-role="tool"] {
+  align-self: flex-start;
+}
+[data-flow-carousel="chat"] [data-fc-msg].is-shown,
+[data-flow-carousel="chat"] [data-fc-card].is-shown {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  pointer-events: auto;
+}
+
+/* Static / print: snap cleanly to deterministic final state */
 html.still .flow-carousel .fc-card,
-body.low-power .flow-carousel .fc-card {
+body.low-power .flow-carousel .fc-card,
+html.still [data-flow-carousel="chat"] [data-fc-msg],
+html.still [data-flow-carousel="chat"] [data-fc-card],
+body.low-power [data-flow-carousel="chat"] [data-fc-msg],
+body.low-power [data-flow-carousel="chat"] [data-fc-card] {
   transition: none !important;
 }
-html.still .flow-carousel .fc-card:not(.is-active),
-body.low-power .flow-carousel .fc-card:not(.is-active) {
+html.still [data-flow-carousel]:not([data-flow-carousel="chat"]) .fc-card:not(.is-active),
+body.low-power [data-flow-carousel]:not([data-flow-carousel="chat"]) .fc-card:not(.is-active) {
   visibility: hidden !important;
   opacity: 0 !important;
+}
+html.still [data-flow-carousel="chat"] [data-fc-msg],
+html.still [data-flow-carousel="chat"] [data-fc-card],
+body.low-power [data-flow-carousel="chat"] [data-fc-msg],
+body.low-power [data-flow-carousel="chat"] [data-fc-card] {
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: auto !important;
 }
 html.still .flow-carousel .fc-tab::after,
 body.low-power .flow-carousel .fc-tab::after {
@@ -137,6 +322,9 @@ body.low-power .flow-carousel .fc-tab::after {
   opacity: 0 !important;
 }
 @media print {
-  .flow-carousel .fc-card:not(.is-active) { display: none !important; }
-  .flow-carousel .fc-tab::after { display: none !important; }
+  [data-flow-carousel]:not([data-flow-carousel="chat"]) .fc-card:not(.is-active) { display: none !important; }
+  [data-flow-carousel="chat"] [data-fc-msg],
+  [data-flow-carousel="chat"] [data-fc-card] { opacity: 1 !important; transform: none !important; }
+  .flow-carousel .fc-tab::after,
+  .fc-scrubber { display: none !important; }
 }

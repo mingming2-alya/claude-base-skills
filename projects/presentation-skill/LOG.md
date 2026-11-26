@@ -1443,3 +1443,27 @@
   - **文件同步與重打包**：更新 `SKILL.md`、`references/motion-system.md`、`references/visual-guidance.md`、`references/grill.md`、`templates/brief.md`、`templates/storyboard.yaml`；重新打包 `outputs/deck-architect.skill`（38 檔，166.3 KB，零 `__pycache__`）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/{shell.css,runtime.js,modules/*},scripts/{assemble.py,check.mjs,deck_model.py,lint.py},references/{motion-system.md,visual-guidance.md,grill.md},templates/{brief.md,storyboard.yaml}}`、`outputs/deck-architect.skill`、`outputs/examples/v44-keynote-demo/`、`outputs/examples/v4-alive-demo/`、`outputs/examples/v4-demo/`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：交由使用者審閱 v4.4 引擎實作與範例，決定進行真實簡報 PK 複驗或推進 Phase D。
+
+## 2026-11-25｜`deck-architect` v4.5 完成：10 Repo 二次盤點 ＋ 三層按需架構（「亂中有序」治理）＋ 三批能力全面實作與驗證
+
+- **背景與盤點（`inputs/modular-capabilities-audit.md`）**：
+  - 使用者指示重查 GitHub 簡報技能，聚焦兩件事：① 深化既有 7 項按需模組使其更全面靈活；② 補齊高價值 Nice-to-Have。
+  - 透過 `gh api` 實查 10 個標竿 Repo（`lewislulu/html-ppt-skill`、`nicobailon/visual-explainer`、`stackblitz/bolt-slides`、`zarazhangrui/frontend-slides`、`open-slide/open-slide`、`alchaincyf/huashu-design`、`borjaperfra/beatdeck`、`Jane-xiaoer/paper-collage-ppt`、`emilkowalski/skills` 皆 MIT；`op7418/guizang-ppt-skill` AGPL-3.0 僅參考公開概念、零抄碼）。
+  - 透過互動表單與使用者對齊 **「亂中有序」五支柱治理** 與三批完整實作範圍，獲得一次到位全面核准。
+- **核心治理與三層架構落地**：
+  - **Layer 0 核心輕底盤（`assets/shell.css`、`assets/runtime.js`）**：新增中央 Overlay 優先級註冊表（`registerOverlay` / `hasNavLock` / `closeTopOverlay`，確保 `Esc` 依 `annotator(90) > lightbox(80) > grid(70) > appendix` 退出且開啟期間鎖定翻頁）、`addCtrlButton` 動態底控列擴充 API 與 `?noscale=1` 1:1 匯出模式。
+  - **Layer 1 講者臨場工具（`assets/presenter/`）**：`grid-overview.{css,js}`（`G` 鍵 16:9 縮圖矩陣跳頁）、`annotator.{css,js}`（`A` 鍵 1920×1080 座標鎖定 SVG 畫筆／螢光筆＋`C` 清除＋`L` 鍵雷射筆）、`speaker-view.js`（`S` 鍵 `BroadcastChannel`＋`localStorage` 雙螢幕講者台）。依 `delivery` 自動載入（`talk`/`discuss` 全開、`read`/`auto` 僅 `grid`），支援 `meta.presenter_tools` 覆寫。
+  - **Layer 2 細粒度按需內容模組（未用到 0 KB）**：
+    - **Batch 1（深化原有 7 項）**：`components/*` 拆成 6 支單檔（新增 `device-frame.css` 支援瀏覽器／手機／平板框）；`modules/fx/*` 拆成 `base.css`+`core.js`+6 支讀色票單特效插件（`ambient-dust`/`soft-aurora`/`constellation`/`data-stream`/`orbit-ring`/`confetti-burst`）；`live-controls.{css,js}` 補齊 `[data-segmented]`、`[data-toggle]`、`[data-presets]`、`[data-reset]`；`media.{css,js}` 補齊影片 `data-start`/`data-end` 片段循環、`data-rate` 倍速、全螢幕與 `[data-sound-ab]` 同步 A/B 音軌切換；`flow-carousel.{css,js}` 擴為 `vertical|horizontal|stepper|chat` 4 模式（含 `[data-node]` 聯動與底部時間軸）；`coverflow.{css,js}` 補齊 `[data-marquee]` 無縫跑馬燈（靜態自動折為網格）與 `[data-cf-lightbox]`；`fit.js` 新增 `data-fit="box"` 容器防爆框。移除舊版整包 `components.css` 與 `ambient-fx.{css,js}`。
+    - **Batch 3（新增 4 項說服力模組）**：`linked-highlight.{css,js}`（`[data-ref]` 文圖雙向聯動）、`compare-slider.{css,js}`（`[data-compare-slider]` GPU 前後拉桿）、`code-stage.{css,js}`（零依賴語法上色＋`data-step-lines` 步進行聚焦＋`[data-typewriter]`）、`visual-flair.{css,js}`（`[data-zoomable]` 燈箱＋`[data-tilt]`≤5°＋`[data-spotlight-hover]`）。
+  - **軟性防呆與漸進揭露手冊**：`scripts/assemble.py` 與 `lint.py` 新增單頁多主角衝突、`stage_mode` 預算超額與 `meta.modules` 白名單漂移之 `[WARN]` 檢查；新增 `references/modules-catalog.md` 一頁決策表與 3 本按需子手冊 `references/modules/{media-and-gallery,interactive-explainers,presenter-and-fx}.md`，同步更新 `SKILL.md`、`motion-system.md`、`grill.md`、`templates/{brief.md,storyboard.yaml}`。
+- **實測過程抓出並順手根治之細節**：
+  - 修正 `assemble.py` 元件偵測正規式 `\bcmp\b` 誤匹配 `cmp-box` 的邊界問題，改採 CSS 識別符安全邊界 `(?<![-\w])`。
+  - 透過像素 WCAG 實測微調 `code-stage.css` 淺／深色語法色票與底色透明度、`device-frame.css` 網址列字級至 18px，並為 `media.css` `.sound-ab-btn` 補上 `white-space: nowrap` 防窄欄折行。
+- **驗證與打包**：
+  - `scripts/check.mjs --motion` 擴充至 **13 項**（新增 Check 12 Layer 1 講者工具與 Check 13 v4.5 說服力模組實測）。
+  - 全新虛構示範 `outputs/examples/v45-modular-demo/`（6 頁）：`lint.py` 0 錯 0 警、`check.mjs --jpg --motion` 靜態（最低 **`4.84:1`**）＋全部動態全 ✅、6 張 JPG 目視檢核通過。
+  - 既有三範例零回歸全綠：`v44-keynote-demo`（`4.53:1`，省 61.0 KB）、`v4-alive-demo`（`4.70:1`，省 **105.1 KB**）、`v4-demo`（`4.81:1`，省 **115.9 KB**）；軟性防呆與 `delivery=read` 單元斷言全部通過。
+  - 重新打包 `outputs/deck-architect.skill`（**67 檔，220.9 KB**，零 `__pycache__`）。
+- **同步的檔案**：`inputs/modular-capabilities-audit.md`、`outputs/deck-architect/{SKILL.md,assets/{shell.css,runtime.js,fit.js,components/*,presenter/*,modules/*,modules/fx/*},scripts/{deck_model.py,lint.py,assemble.py,check.mjs},references/{modules-catalog.md,modules/*,motion-system.md,grill.md},templates/{brief.md,storyboard.yaml}}`、`outputs/deck-architect.skill`、`outputs/examples/{v45-modular-demo/,v44-keynote-demo/,v4-alive-demo/,v4-demo/}`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+- **下一步**：交由使用者審閱 v4.5 完整能力與範例，決定進行 Phase C.2 真實簡報 PK 複驗或推進 Phase D。

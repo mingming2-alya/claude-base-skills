@@ -1,0 +1,50 @@
+<section class="slide canvas" data-surface="dark">
+  <style>
+    .slide .cmp-box { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 18px; }
+    .slide .slider-host { width: 100%; height: 610px; }
+  </style>
+  <div class="hd">
+    <div>
+      <div class="eyebrow">02 · BEFORE / AFTER TELEMETRY</div>
+      <h2 class="title" data-role="title">畫面延遲對比</h2>
+    </div>
+    <span class="chip">左右拖曳中央拉桿即時比對 v1 與 v2</span>
+  </div>
+  <div class="cmp-box">
+    <div class="slider-host" data-compare-slider data-initial="50">
+      <div data-cs-before data-label="Kestrel v1.0 · P99 27.6 ms">
+        <svg viewBox="0 0 1712 610" role="img" aria-label="v1 延遲曲線">
+          <rect width="1712" height="610" fill="#1A1520"/>
+          <g stroke="rgba(255,255,255,0.08)" stroke-width="1">
+            <line x1="120" y1="140" x2="1590" y2="140"/>
+            <line x1="120" y1="260" x2="1590" y2="260"/>
+            <line x1="120" y1="380" x2="1590" y2="380"/>
+            <line x1="120" y1="500" x2="1590" y2="500"/>
+          </g>
+          <path d="M120 330 L260 290 L410 185 L560 340 L710 165 L860 280 L1010 155 L1160 310 L1310 190 L1460 270 L1590 220"
+                fill="none" stroke="#F87171" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="1200" y="112" font-size="30" font-weight="800" fill="#FCA5A5">v1.0 峰值抖動：27.6 ms</text>
+          <text x="1200" y="152" font-size="22" fill="#E2E8F0">同步複製造成頻繁 GC 停頓</text>
+          <text x="120" y="555" font-size="22" fill="#CBD5E1">記憶體峰值：1.84 GB · 15W 基準測試</text>
+        </svg>
+      </div>
+      <div data-cs-after data-label="Kestrel v2.0 · P99 8.4 ms">
+        <svg viewBox="0 0 1712 610" role="img" aria-label="v2 延遲曲線">
+          <rect width="1712" height="610" fill="#0F1C22"/>
+          <g stroke="rgba(255,255,255,0.08)" stroke-width="1">
+            <line x1="120" y1="140" x2="1590" y2="140"/>
+            <line x1="120" y1="260" x2="1590" y2="260"/>
+            <line x1="120" y1="380" x2="1590" y2="380"/>
+            <line x1="120" y1="500" x2="1590" y2="500"/>
+          </g>
+          <path d="M120 438 L260 432 L410 426 L560 435 L710 424 L860 430 L1010 422 L1160 432 L1310 426 L1460 429 L1590 425"
+                fill="none" stroke="#34D399" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="120" y="112" font-size="30" font-weight="800" fill="#6EE7B7">v2.0 穩定延遲：8.4 ms</text>
+          <text x="120" y="152" font-size="22" fill="#E2E8F0">零拷貝環形緩衝消除抖動尖峰</text>
+          <text x="120" y="555" font-size="22" fill="#CBD5E1">記憶體峰值：0.70 GB（-62%）· 15W 基準測試</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="foot-note">資料來源：內部邊緣壓力測試基準（15W 模組，FP16 量化模型，N=10,000 幀）。</div>
+</section>

@@ -1,0 +1,92 @@
+/* deck-architect v4.5 Fine-Grained Component: status-table (weekly progress overview) */
+.slide.status .st-head {
+  position: absolute;
+  left: 80px;
+  right: 80px;
+  top: 44px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 36px;
+}
+.slide.status .st-head .title {
+  font: var(--title-weight) 54px/1.15 var(--font-display);
+  letter-spacing: var(--title-tracking);
+}
+.slide.status .legend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font: 500 20px/1 var(--font-label);
+  color: var(--fg-3);
+  white-space: nowrap;
+}
+.slide.status .legend span { display: inline-flex; align-items: center; gap: 8px; }
+.slide.status .st-body {
+  position: absolute;
+  left: 80px;
+  right: 80px;
+  top: 136px;
+  bottom: 84px;
+  overflow: hidden;
+}
+.slide.status .st-summary {
+  list-style: none;
+  margin-bottom: 18px;
+  padding: 4px 0 4px 22px;
+  border-left: 3px solid var(--accent);
+  display: grid;
+  gap: 6px;
+}
+.slide.status .st-summary li { font: 500 23px/1.45 var(--font-body); }
+.slide.status .status-table {
+  width: 100%;
+  border-collapse: collapse;
+  font: 400 21px/1.25 var(--font-body);
+}
+.slide.status .status-table th {
+  font: 600 20px/1.2 var(--font-label);
+  color: var(--fg-3);
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--line);
+}
+.slide.status .status-table td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--line-2);
+  vertical-align: middle;
+}
+.slide.status .status-table tr.grp td {
+  font: 700 22px/1.2 var(--font-display);
+  padding-top: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.slide.status .g-note { margin-left: 14px; font: 400 20px/1 var(--font-label); color: var(--fg-3); }
+.slide.status .c-name { font-weight: 600; min-width: 260px; }
+.slide.status .c-owner { color: var(--fg-3); white-space: nowrap; }
+.slide.status .st { white-space: nowrap; color: var(--fg-3); }
+.slide.status .st i, .slide.status .legend i {
+  width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: middle;
+}
+.slide.status .st-done i, .slide.status .legend .st-done { background: var(--fg); }
+.slide.status .st-done { color: var(--fg); }
+.slide.status .st-doing i, .slide.status .legend .st-doing { background: var(--accent); }
+.slide.status .st-doing { color: var(--fg); font-weight: 600; }
+.slide.status .st-target i, .slide.status .legend .st-target { background: transparent; border: 2px solid var(--fg-3); }
+.slide.status .st-na i { display: none; }
+.slide.status .c-prog { white-space: nowrap; font-weight: 600; font-variant-numeric: tabular-nums; }
+.slide.status .bar {
+  display: inline-block; width: 88px; height: 8px; background: var(--line-2);
+  margin-right: 10px; vertical-align: middle; overflow: hidden;
+}
+.slide.status .bar span { display: block; height: 100%; background: var(--fg); }
+.slide.status .c-risk { white-space: nowrap; }
+.slide.status .dot {
+  display: inline-block; width: 15px; height: 15px; border-radius: 50%; margin-right: 8px; vertical-align: middle;
+}
+.slide.status .dot-red { background: #C82828; }
+.slide.status .dot-yellow { background: #C9820B; }
+.slide.status .dot-green { background: #1E874B; }
+.slide.status tr.rk-red td.c-name { box-shadow: inset 5px 0 0 #C82828; padding-left: 16px; }
+.slide.status .c-sup { color: var(--fg); max-width: 420px; }
+.slide.status .source { left: 80px; }

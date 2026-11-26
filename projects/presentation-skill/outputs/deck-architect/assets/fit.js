@@ -1,7 +1,9 @@
-/* deck-architect v4 typography auto-fit
+/* deck-architect v4.5 typography auto-fit
  *
- * Works on both v4 free-canvas slides ([data-fit="phrase"], [data-fit="figure"])
- * and business components (.key, .shock-text, .closing-text, .cover-title, .number .value, .stats-row .sv).
+ * Supports:
+ *  - [data-fit="phrase"]  : shrink display phrases so punctuation groups stay unbroken
+ *  - [data-fit="figure"]  : uniform shrink for big KPI numbers inside [data-fit-group="figure"]
+ *  - [data-fit="box"]     : auto-shrink container font-size if content overflows its fixed height/width
  */
 (function () {
   function fitPhrases() {
@@ -46,9 +48,25 @@
     });
   }
 
+  function fitBoxes() {
+    document.querySelectorAll('[data-fit="box"]').forEach(function (box) {
+      if (!box.clientHeight || !box.clientWidth) return;
+      box.style.fontSize = '';
+      var base = parseFloat(getComputedStyle(box).fontSize) || 24;
+      var minPx = Math.max(18, parseFloat(box.dataset.fitMin || '18') || 18);
+      var size = base;
+      var guard = 0;
+      while ((box.scrollHeight > box.clientHeight + 2 || box.scrollWidth > box.clientWidth + 2) && size > minPx && guard++ < 14) {
+        size = Math.max(minPx, size * 0.94);
+        box.style.fontSize = size.toFixed(1) + 'px';
+      }
+    });
+  }
+
   function run() {
     fitPhrases();
     fitFigures();
+    fitBoxes();
   }
 
   window.__deckFit = run;

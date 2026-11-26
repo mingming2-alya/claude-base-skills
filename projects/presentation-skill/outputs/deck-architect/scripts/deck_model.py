@@ -73,6 +73,28 @@ COMMON_FIELDS = {
 STAGE_MODES = {"briefing", "pitch", "keynote"}
 NAV_MODES = {"top-bar", "minimal-side", "divider-only"}
 SURFACES = {"dark", "light", "split", "photo"}
+PRESENTER_TOOLS = {"grid", "annotator", "speaker"}
+CONTENT_MODULES = {
+    "components", "ambient-fx", "live-controls", "fit", "media",
+    "flow-carousel", "coverflow", "linked-highlight", "compare-slider",
+    "code-stage", "visual-flair",
+}
+FX_EFFECTS = {
+    "ambient-dust", "soft-aurora", "constellation",
+    "data-stream", "orbit-ring", "confetti-burst",
+}
+
+
+def default_presenter_tools(meta):
+    """Resolve active Layer 1 presenter tools from explicit meta.presenter_tools or delivery mode."""
+    meta = meta or {}
+    explicit = meta.get("presenter_tools")
+    if isinstance(explicit, list):
+        return [str(x).strip().lower() for x in explicit if str(x).strip().lower() in PRESENTER_TOOLS]
+    delivery = str(meta.get("delivery") or "talk").lower()
+    if delivery in ("talk", "discuss"):
+        return ["grid", "annotator", "speaker"]
+    return ["grid"]
 
 LAYOUT_FIELDS = {
     "point": {"key", "support"},

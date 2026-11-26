@@ -1,0 +1,41 @@
+<section class="slide canvas" data-surface="dark" data-fx="confetti-burst">
+  <style>
+    .slide .close-grid { flex: 1; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 48px; align-items: center; position: relative; z-index: 2; }
+    .slide .cta h2 { font: 900 64px/1.12 var(--font-display); color: var(--fg); }
+    .slide .cta p { margin-top: 22px; font: 500 24px/1.5 var(--font-body); color: var(--fg-2); }
+    .slide .cta-pill {
+      margin-top: 32px; display: inline-flex; align-items: center; gap: 12px;
+      padding: 16px 26px; border-radius: 16px;
+      background: var(--accent); color: var(--accent-ink); font: 800 22px/1 var(--font-body);
+    }
+    .slide .device-browser { background: var(--bg-2); }
+    .slide .device-browser .db-body { padding: 20px; }
+    .slide .chat-wrap { border: none; background: transparent; padding: 0; }
+  </style>
+  <div class="hd" style="position:relative;z-index:2">
+    <div>
+      <div class="eyebrow">NEXT STEP · EDGE AGENT LIVE STREAM</div>
+    </div>
+    <span class="chip">按 G 開啟總覽 · A 畫筆 · L 雷射 · S 雙螢幕講者台</span>
+  </div>
+  <div class="close-grid">
+    <div class="cta">
+      <h2>準備好升級至<br><span style="color:var(--accent-text)">Kestrel 2.0</span>？</h2>
+      <p>本週啟動第一批 3 條產線邊緣節點灰度切換，兩週內完成 8.4 ms 穩定度驗收。</p>
+      <div class="cta-pill">核准 Q4 邊緣管線升級排程 →</div>
+    </div>
+    <div class="device-browser">
+      <div class="db-bar"><i></i><i></i><i></i><span>kestrel-edge-console.local</span></div>
+      <div class="db-body">
+        <div class="chat-wrap" data-flow-carousel="chat" data-interval="1100">
+          <div class="fc-chat-list">
+            <div data-fc-msg data-role="user">檢視產線 #03 邊緣模組過去 1 小時推論健康度</div>
+            <div data-fc-msg data-role="tool">kestrel.metrics(node="line-03") → P99 8.4 ms · 記憶體 0.70 GB · 0 超時</div>
+            <div data-fc-msg data-role="assistant">全數 4 路串流皆在 15W 預算內穩定運行，已就緒可切換至正式排程。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="foot-note" style="position:relative;z-index:2">感謝聆聽 · 歡迎現場提問（可直接按 G 跳轉任意章節或按 A 在架構圖上標註）。</div>
+</section>

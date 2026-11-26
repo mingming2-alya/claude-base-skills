@@ -63,9 +63,9 @@
 
 ---
 
-## 5. v4.4 雙軌引擎與 7 項按需自動注入模組（已實作）
+## 5. v4.5 三層按需引擎架構（Layer 0 輕底盤 ＋ Layer 1 講者工具 ＋ Layer 2 按需內容模組）
 
-v4.4 輕底盤引擎將**核心基礎設施**與**可選專項能力**徹底解耦：`assemble.py` 會自動掃描組裝後的投影片 HTML，**僅將實際用到的模組注入 `deck.html`（未用到即 0 KB 零負擔）**，並寫入 `window.DECK.modules`。
+v4.5 輕底盤引擎將**核心基礎設施**、**講者臨場工具**與**內容說服模組**徹底解耦：`assemble.py` 會依 `delivery`／`meta.presenter_tools` 掛載 Layer 1，並細粒度掃描投影片 HTML，**僅將實際用到的 Layer 2 模組（甚至單一特效與單一元件 CSS）注入 `deck.html`，未用到即 0 KB 零負擔**，並寫入 `window.DECK.modules` 與 `window.DECK.presenterTools`。
 
 ### 5.1 核心雙軌擴充（常駐於 `shell.css` ＋ `runtime.js`）
 1. **單頁明暗極性（`data-surface="dark|light|split|photo"`）**：
@@ -79,17 +79,18 @@ v4.4 輕底盤引擎將**核心基礎設施**與**可選專項能力**徹底解�
    - 步進區塊內部的 `data-draw`、`data-wipe`、`data-count`、`data-pop` 會延遲至該步點擊才觸發。
    - 尾步後按 `→` 翻下頁；往回翻進前頁時自動落於該頁終態（step N），步進中按 `←` 逐層回退；`?still=1`、`B` 鍵與列印自動展開最終態並隱藏已退場圖層。
 
-### 5.2 七項按需自動注入模組（`assets/modules/`，`assemble.py` 掃描掛載）
+### 5.2 三層細粒度按需自動注入架構（v4.5 升級，完整對照見 `references/modules-catalog.md`）
 
-| 模組 | 觸發語法／條件 | 能力摘要 |
-|---|---|---|
-| `components` | 含自動生成商務頁或 `.cmp/.status/.overview/.toc` | `components.css`（純自由畫布簡報省 **17.6 KB**） |
-| `ambient-fx` | `data-fx="ambient-dust\|soft-aurora"` | 延遲啟動 `480×270` Canvas 2D 氛圍層（透過 `#stage` 生命週期事件解耦） |
-| `live-controls` | `.live-ctrl` 或 `<input type="range">` | 現場互動試算滑桿樣式（核心保留點擊隔離） |
-| `fit` | `data-fit="phrase\|figure"` 或商務元件頁 | 斷行與巨數自動縮放 `fit.js` |
-| `media` | `<video data-slide-video>` 或 `<audio data-sound-demo>` | 外連相對路徑**不轉 Base64**（僅內嵌 `poster`）、翻頁／靜態自動停播歸零；音檔自動渲染 36 條動態波形＋A/B 互斥播停 |
-| `flow-carousel` | `[data-flow-carousel]`（含 `.fc-tabs` 與 `.fc-card`） | 輕量 HTML5 原生垂直活產品流程輪播卡（自動輪播／點擊切換／懸停暫停／靜態定格） |
-| `coverflow` | `[data-coverflow]`（含 `.cf-stage` 與 `.cf-item`） | 純 GPU 3D 透視照片 CoverFlow 輪播（點擊聚焦／前後鈕／圓點指示／靜態置中展開） |
+- **Layer 1 講者臨場工具（`assets/presenter/`）**：`grid`（`G` 16:9 總覽）、`annotator`（`A` 畫筆／`L` 雷射／`C` 清除）、`speaker`（`S` 雙螢幕講者同步）；依 `delivery` 自動載入或由 `meta.presenter_tools` 覆寫。
+- **Layer 2 內容說服模組（掃描 HTML 細粒度注入，未用到 0 KB）**：
+  - `components/*`（單檔注入 `status-table`／`pillars`／`toc`／`cmp-fallback`／`device-frame`）
+  - `ambient-fx/*`（單特效注入 6 種讀色票 Canvas：`ambient-dust`／`soft-aurora`／`constellation`／`data-stream`／`orbit-ring`／`confetti-burst`）
+  - `live-controls`（滑桿／`[data-segmented]`／`[data-toggle]`／`[data-presets]`／`[data-reset]`）、`fit`（含 `data-fit="box"` 與 `?noscale=1`）
+  - `media`（影片 `data-start`/`data-end`/`data-rate`/全螢幕 ＋ 音檔/`[data-sound-ab]` 同步 A/B 切換）
+  - `flow-carousel`（`vertical|horizontal|stepper|chat` 4 模式）、`coverflow`（3D 輪播＋燈箱＋`[data-marquee]`）
+  - `linked-highlight`（`[data-ref]` 文圖雙向聯動）、`compare-slider`（`[data-compare-slider]` 前後拉桿）、`code-stage`（`[data-code-stage]` 步進程式碼聚焦＋`[data-typewriter]`）、`visual-flair`（`[data-zoomable]` 燈箱＋`[data-tilt]`≤5°＋`[data-spotlight-hover]`）。
+
+> 撰寫各模組詳細 HTML 語法與場合預算上限時，請按需查閱 `references/modules-catalog.md` 與 `references/modules/` 子手冊。
 
 ---
 

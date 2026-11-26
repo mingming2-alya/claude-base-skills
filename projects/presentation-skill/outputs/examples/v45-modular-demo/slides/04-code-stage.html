@@ -1,0 +1,53 @@
+<section class="slide canvas" data-surface="light">
+  <style>
+    .slide .code-grid { flex: 1; display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 40px; align-items: start; }
+    .slide .step-cards { display: flex; flex-direction: column; gap: 18px; }
+    .slide .sc {
+      padding: 22px 26px; border-radius: 18px; border: 1px solid var(--line); background: var(--bg-2);
+    }
+    .slide .sc strong { display: block; font: 800 22px/1.3 var(--font-body); color: var(--fg); margin-bottom: 6px; }
+    .slide .sc p { font: 500 20px/1.45 var(--font-body); color: var(--fg-2); }
+    .slide .term {
+      margin-top: 16px; padding: 16px 22px; border-radius: 14px;
+      background: #141923; color: #6EE7B7; font: 600 20px/1.4 ui-monospace, SFMono-Regular, monospace;
+    }
+  </style>
+  <div class="hd">
+    <div>
+      <div class="eyebrow">03 · STEP-SYNCED CODE SPOTLIGHT</div>
+      <h2 class="title" data-role="title">核心排程實作</h2>
+    </div>
+    <span class="chip">按空白鍵逐步聚焦三段核心程式碼</span>
+  </div>
+  <div class="code-grid">
+    <div>
+      <div data-code-stage data-title="kestrel_scheduler.ts" data-lang="ts" data-step-lines="0:1-2; 1:3-5; 2:6-8">
+        <pre><code>export async function inferFrame(buf: RingView, budgetMs = 8.4) {
+  const frame = buf.borrowZeroCopy(); // zero heap allocation
+  const complexity = estimateEntropy(frame);
+  const branch = complexity &gt; 0.65 ? "fp16-accurate" : "int8-fast";
+  const pred = await runEngine(branch, frame, budgetMs);
+  if (pred.confidence &lt; 0.82) return fallbackSafeResult(frame);
+  buf.release(frame);
+  return pred;
+}</code></pre>
+      </div>
+      <div class="term"><span data-typewriter data-tw-speed="24">$ kestrel bench --profile 15w-fp16  # P99=8.4ms · zero GC pause</span></div>
+    </div>
+    <div class="step-cards">
+      <div class="sc">
+        <strong>① 零拷貝借用（Lines 1–2）</strong>
+        <p>直接對齊 DMA 環形緩衝視圖，不在熱路徑建立暫存物件。</p>
+      </div>
+      <div class="sc" data-step="1">
+        <strong>② 自適應精度分支（Lines 3–5）</strong>
+        <p>依畫面熵值動態挑選 FP16 或 INT8，兼顧準確率與 8.4 ms 預算。</p>
+      </div>
+      <div class="sc" data-step="2">
+        <strong>③ 確定性保底釋放（Lines 6–8）</strong>
+        <p>低信心度立即走安全保底並釋放槽位，避免尾端延遲雪崩。</p>
+      </div>
+    </div>
+  </div>
+  <div class="foot-note">零依賴語法上色與 data-step 同步；?still=1 與列印時自動展開所有註解並呈現完整指令。</div>
+</section>

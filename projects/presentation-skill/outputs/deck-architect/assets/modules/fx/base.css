@@ -1,5 +1,5 @@
-/* deck-architect v4.4 On-Demand Module: ambient-fx
- * Injected by assemble.py only when slides declare [data-fx="ambient-dust|soft-aurora"].
+/* deck-architect v4.5 On-Demand Module: ambient-fx base
+ * Injected by assemble.py only when slides declare [data-fx].
  */
 .fx-canvas {
   position: absolute;

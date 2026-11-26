@@ -1,0 +1,30 @@
+/* deck-architect v4.5 Fine-Grained Component: shared chrome for deterministic business slides */
+.slide.cmp,
+.slide.status,
+.slide.overview,
+.slide.toc {
+  font-size: 28px;
+  line-height: 1.65;
+}
+
+.slide.cmp .source,
+.slide.status .source,
+.slide.overview .source {
+  position: absolute;
+  left: 96px;
+  bottom: 36px;
+  font: 400 19px/1.3 var(--font-label);
+  color: var(--fg-3);
+  z-index: 5;
+}
+
+.slide.cmp .foot,
+.slide.status .pageno {
+  position: absolute;
+  right: 96px;
+  bottom: 36px;
+  font: 500 19px/1 var(--font-label);
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+  z-index: 5;
+}

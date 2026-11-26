@@ -98,6 +98,9 @@ html, body {
   overflow: hidden;
   background: var(--bg);
 }
+html.noscale, html.noscale body { overflow: auto; }
+html.noscale #viewport { position: static; display: block; width: 1920px; height: 1080px; }
+html.noscale #stage { transform: none !important; }
 
 /* ---------------------------------------------------------------- per-slide polarity (v4.4 data-surface) */
 .slide[data-surface="light"] {

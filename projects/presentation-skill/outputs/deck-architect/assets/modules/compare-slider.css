@@ -1,0 +1,89 @@
+/* deck-architect v4.5 On-Demand Module: compare-slider
+ * Before / After draggable visual comparison ([data-compare-slider]).
+ * Pure GPU clip-path divider; snaps to data-initial (default 50%) in ?still=1 / print.
+ */
+[data-compare-slider] {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--bg-2);
+  user-select: none;
+  touch-action: none;
+  --cs-pos: 50%;
+}
+[data-compare-slider] [data-cs-before],
+[data-compare-slider] [data-cs-after] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+[data-compare-slider] [data-cs-before] > img,
+[data-compare-slider] [data-cs-after] > img,
+[data-compare-slider] [data-cs-before] > svg,
+[data-compare-slider] [data-cs-after] > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+[data-compare-slider] [data-cs-after] {
+  clip-path: inset(0 calc(100% - var(--cs-pos)) 0 0);
+  will-change: clip-path;
+}
+[data-compare-slider] .cs-badge {
+  position: absolute;
+  top: 18px;
+  z-index: 4;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(14, 17, 24, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #F4F2EC;
+  font: 700 18px/1 var(--font-label);
+  pointer-events: none;
+}
+[data-compare-slider] .cs-badge-after { left: 18px; }
+[data-compare-slider] .cs-badge-before { right: 18px; }
+
+[data-compare-slider] .cs-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--cs-pos);
+  width: 3px;
+  margin-left: -1.5px;
+  background: #fff;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.55);
+  z-index: 6;
+  cursor: ew-resize;
+}
+[data-compare-slider] .cs-knob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  margin-left: -24px;
+  margin-top: -24px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: var(--accent, #4BE2A5);
+  color: var(--accent-ink, #0B0F17);
+  font: 800 20px/1 var(--font-label);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  cursor: ew-resize;
+}
+[data-compare-slider] .cs-knob:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+@media print {
+  [data-compare-slider] .cs-knob { box-shadow: none; }
+}

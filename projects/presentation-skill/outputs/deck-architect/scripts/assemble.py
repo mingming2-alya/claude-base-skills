@@ -30,7 +30,8 @@ ASSETS_DIR = SKILL_ROOT / "assets"
 sys.path.insert(0, str(HERE))
 
 from deck_model import (  # noqa: E402
-    AXES, EMPH_RE, StoryboardError, load, main_slides, toc_mode,
+    AXES, EMPH_RE, FX_EFFECTS, StoryboardError, default_presenter_tools, load,
+    main_slides, toc_mode,
 )
 from lint import lint  # noqa: E402
 
@@ -722,29 +723,30 @@ def render_component_slide(rec, data, idx, total, ch_sources):
     )
 
 
-# ----------------------------------------------------------------------------- deck assembly & 7-module on-demand injector
+# ----------------------------------------------------------------------------- deck assembly & 3-layer on-demand injector
 SHELL_CSS = (ASSETS_DIR / "shell.css").read_text(encoding="utf-8")
 RUNTIME_JS = (ASSETS_DIR / "runtime.js").read_text(encoding="utf-8")
 
-# Declarative on-demand module registry: 0 bytes injected when a deck does not use a module.
-OPTIONAL_MODULES = [
-    (
-        "components",
-        lambda ctx: ctx["component_count"] > 0 or bool(re.search(r'\bclass="[^"]*\b(?:cmp|status|overview|toc)\b', ctx["html"])),
-        "components.css",
-        None,
-    ),
-    (
-        "ambient-fx",
-        lambda ctx: "data-fx=" in ctx["html"],
-        "modules/ambient-fx.css",
-        "modules/ambient-fx.js",
-    ),
+PRESENTER_ASSETS = {
+    "grid": ("presenter/grid-overview.css", "presenter/grid-overview.js", "G 總覽"),
+    "annotator": ("presenter/annotator.css", "presenter/annotator.js", "A 畫筆 · L 雷射"),
+    "speaker": (None, "presenter/speaker-view.js", "S 講者"),
+}
+
+COMPONENT_PARTS = [
+    ("status-table", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])(?:status-table|slide\b[^"]*(?<![-\w])status)(?![-\w])', h)), "components/status-table.css"),
+    ("pillars", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])(?:pillars|slide\b[^"]*(?<![-\w])overview)(?![-\w])', h)), "components/pillars.css"),
+    ("toc", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])(?:toc-list|slide\b[^"]*(?<![-\w])toc)(?![-\w])', h)), "components/toc.css"),
+    ("cmp-fallback", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])cmp(?![-\w])', h)), "components/cmp-fallback.css"),
+    ("device-frame", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])device-(?:browser|phone|tablet|frame)(?![-\w])', h)), "components/device-frame.css"),
+]
+
+CONTENT_MODULES = [
     (
         "live-controls",
-        lambda ctx: bool(re.search(r'\blive-ctrl\b|<input\b[^>]*type=["\']range["\']', ctx["html"])),
+        lambda ctx: bool(re.search(r'\blive-ctrl\b|<input\b[^>]*type=["\']range["\']|\bdata-(?:segmented|toggle|presets|reset)\b', ctx["html"])),
         "modules/live-controls.css",
-        None,
+        "modules/live-controls.js",
     ),
     (
         "fit",
@@ -754,7 +756,7 @@ OPTIONAL_MODULES = [
     ),
     (
         "media",
-        lambda ctx: bool(re.search(r'\bdata-(?:slide-video|sound-demo)\b', ctx["html"])),
+        lambda ctx: bool(re.search(r'\bdata-(?:slide-video|sound-demo|sound-ab)\b', ctx["html"])),
         "modules/media.css",
         "modules/media.js",
     ),
@@ -766,34 +768,196 @@ OPTIONAL_MODULES = [
     ),
     (
         "coverflow",
-        lambda ctx: "data-coverflow" in ctx["html"],
+        lambda ctx: bool(re.search(r'\bdata-(?:coverflow|marquee)\b', ctx["html"])),
         "modules/coverflow.css",
         "modules/coverflow.js",
     ),
+    (
+        "linked-highlight",
+        lambda ctx: "data-ref=" in ctx["html"],
+        "modules/linked-highlight.css",
+        "modules/linked-highlight.js",
+    ),
+    (
+        "compare-slider",
+        lambda ctx: "data-compare-slider" in ctx["html"],
+        "modules/compare-slider.css",
+        "modules/compare-slider.js",
+    ),
+    (
+        "code-stage",
+        lambda ctx: bool(re.search(r'\bdata-(?:code-stage|typewriter)\b', ctx["html"])),
+        "modules/code-stage.css",
+        "modules/code-stage.js",
+    ),
+    (
+        "visual-flair",
+        lambda ctx: bool(re.search(r'\bdata-(?:zoomable|tilt|spotlight-hover)\b', ctx["html"])),
+        "modules/visual-flair.css",
+        "modules/visual-flair.js",
+    ),
 ]
 
+HERO_MODULE_DETECTORS = [
+    ("flow-carousel", re.compile(r'\bdata-flow-carousel\b')),
+    ("coverflow", re.compile(r'\bdata-coverflow\b')),
+    ("compare-slider", re.compile(r'\bdata-compare-slider\b')),
+    ("slide-video", re.compile(r'\bdata-slide-video\b')),
+    ("code-stage", re.compile(r'\bdata-code-stage\b')),
+]
 
-def _collect_optional_modules(slides_html, component_count):
+DATA_FX_RE = re.compile(r'\bdata-fx="([^"]+)"')
+
+
+def _read_asset(rel):
+    p = ASSETS_DIR / rel
+    return p.read_text(encoding="utf-8") if p.is_file() else ""
+
+
+def _size_asset(rel):
+    if not rel:
+        return 0
+    p = ASSETS_DIR / rel
+    return p.stat().st_size if p.is_file() else 0
+
+
+def _collect_layered_assets(slides_html, slides_list, component_count, meta):
+    """3-Layer fine-grained on-demand injection + Order-Within-Flexibility soft guardrails."""
     ctx = {"html": slides_html, "component_count": component_count}
-    used, skipped = [], []
     css_parts, js_parts = [], []
+    used_mods, skipped_mods = [], []
+    used_components, used_fx = [], []
     saved_bytes = 0
-    for name, pred, css_rel, js_rel in OPTIONAL_MODULES:
-        css_path = ASSETS_DIR / css_rel if css_rel else None
-        js_path = ASSETS_DIR / js_rel if js_rel else None
-        if pred(ctx):
-            used.append(name)
-            if css_path and css_path.is_file():
-                css_parts.append(css_path.read_text(encoding="utf-8"))
-            if js_path and js_path.is_file():
-                js_parts.append(js_path.read_text(encoding="utf-8"))
+    gov_warnings = []
+
+    # ---- Layer 1: Presenter Chrome (delivery default or explicit meta.presenter_tools)
+    presenter_tools = default_presenter_tools(meta)
+    hint_extras = []
+    for name, (css_rel, js_rel, hint_txt) in PRESENTER_ASSETS.items():
+        if name in presenter_tools:
+            if css_rel:
+                css_parts.append(_read_asset(css_rel))
+            if js_rel:
+                js_parts.append(_read_asset(js_rel))
+            hint_extras.append(hint_txt)
         else:
-            skipped.append(name)
-            if css_path and css_path.is_file():
-                saved_bytes += css_path.stat().st_size
-            if js_path and js_path.is_file():
-                saved_bytes += js_path.stat().st_size
-    return used, skipped, saved_bytes, "\n".join(css_parts), "\n".join(js_parts)
+            saved_bytes += _size_asset(css_rel) + _size_asset(js_rel)
+
+    # ---- Layer 2a: Fine-grained Component CSS (assets/components/*)
+    needs_shared = False
+    for cname, pred, css_rel in COMPONENT_PARTS:
+        if pred(slides_html):
+            used_components.append(cname)
+            if cname != "device-frame":
+                needs_shared = True
+        else:
+            saved_bytes += _size_asset(css_rel)
+    if used_components:
+        used_mods.append("components(" + "+".join(used_components) + ")")
+        if needs_shared:
+            css_parts.append(_read_asset("components/shared.css"))
+        else:
+            saved_bytes += _size_asset("components/shared.css")
+        for cname, _, css_rel in COMPONENT_PARTS:
+            if cname in used_components:
+                css_parts.append(_read_asset(css_rel))
+    else:
+        skipped_mods.append("components")
+        saved_bytes += _size_asset("components/shared.css")
+
+    # ---- Layer 2b: Per-effect Ambient FX (assets/modules/fx/*)
+    fx_hits = []
+    for m in DATA_FX_RE.finditer(slides_html):
+        fx_name = m.group(1).strip()
+        if fx_name and fx_name not in fx_hits:
+            fx_hits.append(fx_name)
+    valid_fx = [f for f in fx_hits if f in FX_EFFECTS]
+    unknown_fx = [f for f in fx_hits if f not in FX_EFFECTS]
+    for uf in unknown_fx:
+        gov_warnings.append(f"[WARN]  ambient-fx: 未登錄的 data-fx=\"{uf}\"（可用：{', '.join(sorted(FX_EFFECTS))}）。")
+    if valid_fx:
+        used_fx = valid_fx
+        used_mods.append("ambient-fx(" + "+".join(valid_fx) + ")")
+        css_parts.append(_read_asset("modules/fx/base.css"))
+        js_parts.append(_read_asset("modules/fx/core.js"))
+        for fx_name in FX_EFFECTS:
+            rel = f"modules/fx/{fx_name}.js"
+            if fx_name in valid_fx:
+                js_parts.append(_read_asset(rel))
+            else:
+                saved_bytes += _size_asset(rel)
+    else:
+        skipped_mods.append("ambient-fx")
+        saved_bytes += _size_asset("modules/fx/base.css") + _size_asset("modules/fx/core.js")
+        for fx_name in FX_EFFECTS:
+            saved_bytes += _size_asset(f"modules/fx/{fx_name}.js")
+
+    # ---- Layer 2c: Content Modules
+    used_mod_keys = set()
+    if used_components:
+        used_mod_keys.add("components")
+    if valid_fx:
+        used_mod_keys.add("ambient-fx")
+    for name, pred, css_rel, js_rel in CONTENT_MODULES:
+        if pred(ctx):
+            used_mods.append(name)
+            used_mod_keys.add(name)
+            if css_rel:
+                css_parts.append(_read_asset(css_rel))
+            if js_rel:
+                js_parts.append(_read_asset(js_rel))
+        else:
+            skipped_mods.append(name)
+            saved_bytes += _size_asset(css_rel) + _size_asset(js_rel)
+
+    # ---- Soft Governance Guardrails (non-blocking [WARN])
+    stage_mode = str(meta.get("stage_mode") or "").lower()
+    fx_slide_count = 0
+    for idx, sl_html in enumerate(slides_list, 1):
+        heroes = [hname for hname, pat in HERO_MODULE_DETECTORS if pat.search(sl_html)]
+        if len(heroes) >= 2:
+            gov_warnings.append(
+                f"[WARN]  s-{idx}: 單頁同時出現多個主角級互動模組（{', '.join(heroes)}），建議每頁保留 1 個主要焦點。"
+            )
+        if DATA_FX_RE.search(sl_html):
+            fx_slide_count += 1
+        if stage_mode == "briefing":
+            b_viol = []
+            if DATA_FX_RE.search(sl_html):
+                b_viol.append("ambient-fx")
+            if "data-coverflow" in sl_html:
+                b_viol.append("coverflow")
+            if "data-tilt" in sl_html:
+                b_viol.append("data-tilt")
+            if b_viol:
+                gov_warnings.append(
+                    f"[WARN]  s-{idx}: stage_mode=briefing 不建議使用高氛圍裝飾模組（{', '.join(b_viol)}）。"
+                )
+    if stage_mode == "pitch" and fx_slide_count > 1:
+        gov_warnings.append(
+            f"[WARN]  stage_mode=pitch: 全份簡報有 {fx_slide_count} 頁使用 ambient-fx（建議最多 1 頁，通常僅封面）。"
+        )
+
+    declared = meta.get("modules")
+    if isinstance(declared, list):
+        allow = {str(x).strip().lower() for x in declared}
+        extras = sorted(m for m in used_mod_keys if m not in allow and m not in ("fit", "components"))
+        if extras:
+            gov_warnings.append(
+                f"[WARN]  meta.modules: 投影片使用了未宣告於白名單的模組（{', '.join(extras)}）；已自動注入，建議同步更新 storyboard.yaml。"
+            )
+
+    return {
+        "presenter_tools": presenter_tools,
+        "hint_extras": hint_extras,
+        "used_mods": used_mods,
+        "skipped_mods": skipped_mods,
+        "used_fx": used_fx,
+        "saved_bytes": saved_bytes,
+        "module_css": "\n".join(p for p in css_parts if p),
+        "module_js": "\n".join(p for p in js_parts if p),
+        "warnings": gov_warnings,
+    }
 
 
 PAGE_TPL = """<!doctype html>
@@ -819,7 +983,7 @@ PAGE_TPL = """<!doctype html>
 </div></div>
 <div id="notes"></div>
 <div id="toast" role="status" aria-live="polite"></div>
-<div id="hint">← → 翻頁 · F 全螢幕 · N 備註 · B 靜態 · P 列印</div>
+<div id="hint">{hint_text}</div>
 <script>window.DECK={deck_json};</script>
 <script>{slide_js}</script>
 <script>{runtime_js}</script>
@@ -870,11 +1034,15 @@ def assemble_deck(data, base_dir):
 
     slides_joined = "\n".join(slides_html)
     component_count = len(records) - free_count
-    used_mods, skipped_mods, saved_bytes, module_css, module_js = _collect_optional_modules(slides_joined, component_count)
+    layers = _collect_layered_assets(slides_joined, slides_html, component_count, meta)
+    for w in layers["warnings"]:
+        print(w)
 
     motion = motion_for(data["structure"])
     stage_mode = str(meta.get("stage_mode") or "").lower()
     nav_mode = str(meta.get("nav_mode") or ("divider-only" if stage_mode == "keynote" else "top-bar")).lower()
+
+    hint_base = ["← → 翻頁", "F 全螢幕", "N 備註", "B 靜態"] + layers["hint_extras"] + ["P 列印"]
 
     deck_json = {
         "title": re.sub(r"==", "", str(meta.get("title", "Deck"))),
@@ -882,7 +1050,9 @@ def assemble_deck(data, base_dir):
         "mode": str(meta.get("mode") or ""),
         "stageMode": stage_mode,
         "navMode": nav_mode,
-        "modules": used_mods,
+        "presenterTools": layers["presenter_tools"],
+        "modules": layers["used_mods"],
+        "fx": layers["used_fx"],
         "chapters": [c["label"] for c in data["chapters"]],
         "tabs": [
             [(s.get("tab") or s.get("title")) for s in ch_sources[i]]
@@ -903,24 +1073,27 @@ def assemble_deck(data, base_dir):
         title=esc(deck_json["title"]),
         fonts=collect_fonts(*font_sources),
         shell_css=SHELL_CSS,
-        module_css=module_css,
+        module_css=layers["module_css"],
         deck_css=deck_css,
         slide_css="\n".join(slide_css_parts),
         slides=slides_joined,
+        hint_text=" · ".join(hint_base),
         deck_json=json.dumps(deck_json, ensure_ascii=False),
         slide_js="\n".join(slide_js_parts),
         runtime_js=RUNTIME_JS,
-        module_js=module_js,
+        module_js=layers["module_js"],
     )
     return html_out, {
         "total": len(records),
         "free": free_count,
         "component": component_count,
         "slots": found_slots,
-        "modules": used_mods,
-        "skipped_modules": skipped_mods,
-        "saved_bytes": saved_bytes,
+        "presenter_tools": layers["presenter_tools"],
+        "modules": layers["used_mods"],
+        "skipped_modules": layers["skipped_mods"],
+        "saved_bytes": layers["saved_bytes"],
         "media": media_refs,
+        "warnings": layers["warnings"],
     }
 
 
@@ -1024,10 +1197,12 @@ def main():
 
     out.write_text(html_out, encoding="utf-8")
     print(f"\n已組裝：{out}（共 {stats['total']} 頁：自由畫布 {stats['free']} 頁、商務／自動元件 {stats['component']} 頁）")
+    pt_str = ", ".join(stats["presenter_tools"]) if stats["presenter_tools"] else "無"
     used_str = ", ".join(stats["modules"]) if stats["modules"] else "無（純輕底盤）"
     skip_str = ", ".join(stats["skipped_modules"]) if stats["skipped_modules"] else "無"
     saved_kb = stats["saved_bytes"] / 1024
-    print(f"按需模組：已注入 [{used_str}]｜略過 [{skip_str}]（省下 {saved_kb:.1f} KB）")
+    print(f"講者工具（Layer 1）：[{pt_str}]")
+    print(f"內容模組（Layer 2）：已注入 [{used_str}]｜略過 [{skip_str}]（省下 {saved_kb:.1f} KB）")
     if stats["media"]:
         ok_m = sum(1 for x in stats["media"] if x["exists"])
         print(f"外連影音：共 {len(stats['media'])} 筆（{ok_m} 筆本機檔案存在，保持相對路徑未轉 Base64）")

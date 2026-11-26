@@ -1,0 +1,109 @@
+/* deck-architect v4.5 Layer 1 Presenter Chrome: annotator (A key) & laser pointer (L key) */
+#deck-annotator {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 62;
+  pointer-events: none;
+}
+#deck-annotator.is-drawing {
+  pointer-events: auto;
+  cursor: crosshair;
+}
+#deck-annotator > svg.da-svg {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  display: block;
+}
+#deck-annotator-bar {
+  position: fixed;
+  top: 18px;
+  right: 24px;
+  z-index: 92;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(14, 17, 24, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #F4F2EC;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  font: 600 13px/1 var(--font-label, system-ui, sans-serif);
+}
+#deck-annotator-bar.show {
+  display: inline-flex;
+}
+#deck-annotator-bar .dab-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: rgba(244, 242, 236, 0.84);
+  padding: 7px 11px;
+  border-radius: 999px;
+  font: 600 13px/1 var(--font-label, system-ui, sans-serif);
+  cursor: pointer;
+}
+#deck-annotator-bar .dab-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+#deck-annotator-bar .dab-btn.is-on {
+  background: var(--accent, #4BE2A5);
+  color: var(--accent-ink, #0B0F17);
+}
+#deck-annotator-bar .dab-swatch {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  padding: 0;
+}
+#deck-annotator-bar .dab-swatch.is-on {
+  border-color: #fff;
+  transform: scale(1.16);
+}
+#deck-annotator-bar .dab-sep {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#deck-laser {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #ff3b5c 38%, rgba(255, 59, 92, 0.45) 68%, rgba(255, 59, 92, 0) 100%);
+  box-shadow: 0 0 18px 6px rgba(255, 59, 92, 0.65);
+  z-index: 64;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-100px, -100px, 0);
+  transition: opacity .16s ease;
+}
+#deck-laser.is-on {
+  opacity: 1;
+}
+
+html.still #deck-annotator,
+html.still #deck-annotator-bar,
+html.still #deck-laser {
+  display: none !important;
+}
+@media print {
+  #deck-annotator,
+  #deck-annotator-bar,
+  #deck-laser { display: none !important; }
+}

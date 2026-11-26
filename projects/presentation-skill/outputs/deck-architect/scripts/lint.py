@@ -14,12 +14,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from deck_model import (  # noqa: E402
-    AXES, CELL_STATES, COMMON_FIELDS, DELIVERY_MODES, DENSE_LAYOUTS, EMPH_RE,
-    LAYOUT_FIELDS, LAYOUTS, NAV_MODES, RISK_LEVELS, SIMPLIFIED_CHARS,
-    SLIDE_TYPES, STAGE_MODES, SURFACES, TRANSITION_PHRASES, StoryboardError,
-    all_slide_texts_with_notes, appendix_slides, capacity_problems,
-    char_limit_for, emphasis_count, load, main_slides, page_breakdown,
-    slide_texts, toc_mode, visible_len,
+    AXES, CELL_STATES, COMMON_FIELDS, CONTENT_MODULES, DELIVERY_MODES,
+    DENSE_LAYOUTS, EMPH_RE, LAYOUT_FIELDS, LAYOUTS, NAV_MODES,
+    PRESENTER_TOOLS, RISK_LEVELS, SIMPLIFIED_CHARS, SLIDE_TYPES, STAGE_MODES,
+    SURFACES, TRANSITION_PHRASES, StoryboardError, all_slide_texts_with_notes,
+    appendix_slides, capacity_problems, char_limit_for, emphasis_count, load,
+    main_slides, page_breakdown, slide_texts, toc_mode, visible_len,
 )
 
 CJK = re.compile(r"[\u3400-\u9fff]")
@@ -85,6 +85,26 @@ def lint(data):
     nav_mode = str(meta.get("nav_mode") or "").lower()
     if nav_mode and nav_mode not in NAV_MODES:
         E("meta.nav_mode", f"必須是 {', '.join(sorted(NAV_MODES))} 之一（目前：{nav_mode!r}）。")
+    ptools = meta.get("presenter_tools")
+    if ptools is not None:
+        if not isinstance(ptools, list):
+            E("meta.presenter_tools", "必須是 list（例如 [grid, annotator, speaker] 或 []）。")
+        else:
+            bad_pt = [str(x) for x in ptools if str(x).lower() not in PRESENTER_TOOLS]
+            if bad_pt:
+                E("meta.presenter_tools", f"不認得的講者工具：{', '.join(bad_pt)}（可用：{', '.join(sorted(PRESENTER_TOOLS))}）。")
+    declared_mods = meta.get("modules")
+    if declared_mods is not None:
+        if not isinstance(declared_mods, list):
+            E("meta.modules", "必須是 list（模組白名單，例如 [media, code-stage]）。")
+        else:
+            bad_m = [str(x) for x in declared_mods if str(x).lower() not in CONTENT_MODULES]
+            if bad_m:
+                W("meta.modules", f"包含未登錄模組名稱：{', '.join(bad_m)}（可用：{', '.join(sorted(CONTENT_MODULES))}）。")
+            if stage_mode == "briefing":
+                over = [str(x) for x in declared_mods if str(x).lower() in ("ambient-fx", "coverflow")]
+                if over:
+                    W("meta.modules", f"stage_mode 為 briefing（決策簡報），不建議啟用氛圍／娛樂模組：{', '.join(over)}。")
 
     # ---- structure: the core of this skill
     for k, hint in (("start", "聽眾現在知道什麼、在意什麼"), ("destination", "聽完要相信或做什麼")):

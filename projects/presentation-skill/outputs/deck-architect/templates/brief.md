@@ -22,7 +22,8 @@
 - **去框化比例**：高紀律結構化卡片（`briefing`）／ 半去框化（`pitch`）／ 高去框化 ≥40–50% 無圓角框（`keynote`）
 - **導航殼層（`nav_mode`）**：`top-bar` ／ `minimal-side` ／ `divider-only`（大扉頁定位＋系列頁局部側邊錨點）
 - **節拍控制**：全自動視覺指引（`0-step`）／ 雙軌（自動指引 ＋ 關鍵懸念／多層換幕頁 `data-step`）
-- **預期啟用按需模組（`assemble.py` 掃描掛載，未用到 0 KB）**：勾選與需求對齊者——`[ ] components`（進度表／總覽／目錄）、`[ ] ambient-fx`（微塵／極光）、`[ ] live-controls`（互動試算滑桿）、`[ ] media`（外連影片／實測音檔）、`[ ] flow-carousel`（HTML5 活流程輪播）、`[ ] coverflow`（3D 照片輪播）、`[ ] fit`（自動縮字）
+- **Layer 1 講者臨場工具（`presenter_tools`）**：預設依 `delivery` 自動掛載（`talk`/`discuss`＝`grid`＋`annotator`＋`speaker`；`read`/`auto`＝僅 `grid`），需要覆寫請註明
+- **預期啟用 Layer 2 按需內容模組（見 `references/modules-catalog.md`，未用到 0 KB）**：`[ ] components`（進度表／總覽／目錄／裝置框）、`[ ] ambient-fx`（6 種氛圍特效）、`[ ] live-controls`（滑桿／分段膠囊／開關／預設／重設）、`[ ] media`（影片片段循環／實測音檔／A-B 音軌切換）、`[ ] flow-carousel`（`vertical|horizontal|stepper|chat`）、`[ ] coverflow`（3D 輪播／`marquee` 跑馬燈）、`[ ] linked-highlight`（文圖雙向聯動）、`[ ] compare-slider`（前後對比拉桿）、`[ ] code-stage`（程式碼聚焦＋打字機）、`[ ] visual-flair`（圖表點擊放大燈箱／微傾角）、`[ ] fit`（自動縮字）
 
 ## 3. 一句話核心訊息與承重母題
 - **一句話核心訊息**：<若聽眾只記得一句話>

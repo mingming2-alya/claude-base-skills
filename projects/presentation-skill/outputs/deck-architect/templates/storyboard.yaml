@@ -11,6 +11,8 @@ meta:
   delivery: talk                     # talk（上台講）/ discuss（會議討論）/ read（自己讀）/ auto（自動播放）
   stage_mode: pitch                  # briefing（匯報）/ pitch（提案）/ keynote（發表會）
   # nav_mode: top-bar                # top-bar（頂列）/ minimal-side（右側錨點）/ divider-only（僅扉頁；keynote 預設）
+  # presenter_tools: [grid, annotator, speaker]  # Layer 1 講者工具（talk/discuss 預設全開；read/auto 預設僅 grid；[] 關閉）
+  # modules: [media, linked-highlight]           # 可選白名單：若投影片誤用未宣告模組，assemble.py 會印 [WARN]
   style: counsel                     # Gate 2 選定後填入：counsel / apple / illustration / ...
   mode: light                        # Gate 2 選定後填入：light / dark（單頁可用 surface: dark|light|split|photo 覆寫）
   palette: 貼題綠                    # Gate 2 選定的三組 OKLCH 配色之一（寫進 deck.css）
