@@ -5,7 +5,7 @@
 [data-compare-slider] {
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: var(--card-radius, 20px);
   border: 1px solid var(--line);
   background: var(--bg-2);
   user-select: none;
@@ -38,7 +38,7 @@
   top: 18px;
   z-index: 4;
   padding: 7px 14px;
-  border-radius: 999px;
+  border-radius: var(--ctrl-radius, 999px);
   background: rgba(14, 17, 24, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: #F4F2EC;

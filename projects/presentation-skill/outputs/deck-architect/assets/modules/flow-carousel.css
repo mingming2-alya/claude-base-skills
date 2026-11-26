@@ -18,7 +18,7 @@
   appearance: none;
   text-align: left;
   padding: 20px 24px;
-  border-radius: 16px;
+  border-radius: var(--card-radius, 16px);
   border: 1px solid var(--line-2);
   background: transparent;
   color: var(--fg-2);
@@ -84,12 +84,12 @@
   position: relative;
   height: var(--fc-height, 560px);
   overflow: hidden;
-  border-radius: 22px;
+  border-radius: var(--card-radius, 22px);
 }
 .flow-carousel .fc-card {
   position: absolute;
   inset: 0;
-  border-radius: 22px;
+  border-radius: var(--card-radius, 22px);
   border: 1px solid var(--line);
   background: var(--bg-2);
   padding: 36px 40px;
@@ -184,7 +184,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
-  border-radius: 999px;
+  border-radius: var(--ctrl-radius, 999px);
   border: 1px solid var(--line);
   background: var(--bg-2);
 }
@@ -253,7 +253,7 @@
   gap: 16px;
   align-items: stretch;
   padding: 24px 28px;
-  border-radius: 22px;
+  border-radius: var(--card-radius, 22px);
   border: 1px solid var(--line);
   background: var(--bg-2);
 }
@@ -268,7 +268,7 @@
   inset: auto;
   max-width: 84%;
   padding: 18px 22px;
-  border-radius: 18px;
+  border-radius: var(--card-radius, 18px);
   border: 1px solid var(--line);
   background: var(--bg);
   color: var(--fg);
@@ -321,10 +321,16 @@ body.low-power .flow-carousel .fc-tab::after {
   animation: none !important;
   opacity: 0 !important;
 }
+html.still [data-node],
+body.low-power [data-node] {
+  opacity: 1 !important;
+  filter: none !important;
+}
 @media print {
   [data-flow-carousel]:not([data-flow-carousel="chat"]) .fc-card:not(.is-active) { display: none !important; }
   [data-flow-carousel="chat"] [data-fc-msg],
   [data-flow-carousel="chat"] [data-fc-card] { opacity: 1 !important; transform: none !important; }
+  [data-node] { opacity: 1 !important; filter: none !important; }
   .flow-carousel .fc-tab::after,
   .fc-scrubber { display: none !important; }
 }

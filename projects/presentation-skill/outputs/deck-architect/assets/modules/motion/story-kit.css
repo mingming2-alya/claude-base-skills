@@ -23,11 +23,14 @@
 [data-popup-fold].is-folded [data-pop-layer] {
   transform: rotateX(-78deg) translateY(16px) scale(0.92);
   opacity: 0;
+  transition: none !important;
+  transition-delay: 0s !important;
 }
 [data-popup-fold].is-folded [data-pop-tag] {
   transform: translateY(10px) scale(0.84);
   opacity: 0;
-  transition-delay: 0s;
+  transition: none !important;
+  transition-delay: 0s !important;
 }
 
 /* 2. Chat Scenario Theater (Typing Pulse + Tactile Bubble Pop) */
@@ -80,10 +83,12 @@
 .cr-typing i {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--accent, #0D6B4F);
+}
+.cr-typing.is-on i {
   animation: cr-dot 0.9s infinite ease-in-out;
 }
-.cr-typing i:nth-child(2) { animation-delay: 0.16s; }
-.cr-typing i:nth-child(3) { animation-delay: 0.32s; }
+.cr-typing.is-on i:nth-child(2) { animation-delay: 0.16s; }
+.cr-typing.is-on i:nth-child(3) { animation-delay: 0.32s; }
 @keyframes cr-dot {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
   40% { transform: translateY(-4px); opacity: 1; }

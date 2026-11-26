@@ -8,6 +8,9 @@
   const deck = window.__deck;
   if (!deck || !deck.stage) return;
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+  const isReduced = () => (typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : deck.isStatic());
+
   const WAVE_HEIGHTS = [
     0.22, 0.44, 0.68, 0.38, 0.84, 0.56, 0.94, 0.48, 0.72, 0.34, 0.88, 0.62,
     0.42, 0.96, 0.66, 0.50, 0.78, 0.36, 0.90, 0.58, 0.44, 0.82, 0.64, 0.32,
@@ -152,7 +155,7 @@
       };
 
       const togglePlay = () => {
-        if (deck.isStatic()) return;
+        if (isStill()) return;
         if (video.paused || video.ended) {
           if (endSec !== null && (video.currentTime < startSec || video.currentTime >= endSec)) {
             try { video.currentTime = startSec; } catch (_) {}
@@ -207,6 +210,7 @@
   document.querySelectorAll('[data-sound-ab]').forEach((box, idx) => {
     const tracks = [...box.querySelectorAll('audio[data-sound-demo]')];
     if (tracks.length < 2) return;
+    tracks.forEach(t => { if (!t.preload || t.preload === 'none') t.preload = 'metadata'; });
     box.classList.add('live-ctrl');
     const fallbackDur = parseFloat(box.dataset.duration || tracks[0].dataset.duration || '0');
     const title = box.dataset.label || '音訊 A/B 同步對比';
@@ -262,6 +266,23 @@
       syncAB();
     };
 
+    const seekAndResume = (trackEl, pos, shouldPlay) => {
+      const apply = () => {
+        try { trackEl.currentTime = pos; } catch (_) {}
+        if (shouldPlay && !isStill()) {
+          const p = trackEl.play();
+          if (p && typeof p.catch === 'function') p.catch(() => {});
+        }
+        syncAB();
+      };
+      if (trackEl.readyState >= 1) {
+        apply();
+      } else {
+        trackEl.addEventListener('loadedmetadata', apply, { once: true });
+        try { trackEl.load(); } catch (_) {}
+      }
+    };
+
     const switchTrack = nextIdx => {
       if (nextIdx === activeIdx) return;
       const prev = activeTrack();
@@ -270,17 +291,13 @@
       try { prev.pause(); } catch (_) {}
       activeIdx = nextIdx;
       const next = activeTrack();
-      try { next.currentTime = pos; } catch (_) {}
-      if (wasPlaying && !deck.isStatic()) {
-        const p = next.play();
-        if (p && typeof p.catch === 'function') p.catch(() => {});
-      }
+      seekAndResume(next, pos, wasPlaying);
       syncAB();
     };
 
     playBtn.addEventListener('click', e => {
       e.stopPropagation();
-      if (deck.isStatic()) return;
+      if (isStill()) return;
       const cur = activeTrack();
       if (cur.paused || cur.ended) {
         const sl = box.closest('.slide');
@@ -309,7 +326,7 @@
       const r = wave.getBoundingClientRect();
       const ratio = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
       const tPos = ratio * dur;
-      tracks.forEach(t => { try { t.currentTime = tPos; } catch (_) {} });
+      tracks.forEach(t => { try { if (t.readyState >= 1) t.currentTime = tPos; } catch (_) {} });
       syncAB();
     });
 
@@ -359,7 +376,7 @@
 
     btn.addEventListener('click', e => {
       e.stopPropagation();
-      if (deck.isStatic()) return;
+      if (isStill()) return;
       if (audio.paused || audio.ended) {
         const sl = audio.closest('.slide');
         if (sl) {
@@ -391,9 +408,11 @@
   });
 
   // ---- Lifecycle hooks
-  function enterSlide(sl, staticMode) {
-    if (!sl || staticMode) { stopAllMedia(); return; }
+  function autoplayVisibleVideos(sl) {
+    if (!sl || isReduced()) return;
     sl.querySelectorAll('video[data-slide-video][data-autoplay]').forEach(v => {
+      if (v.closest('[data-step-hidden="1"]')) return;
+      if (!v.paused && !v.ended) return;
       v.muted = true;
       try { v.currentTime = videoStart(v); } catch (_) {}
       const p = v.play();
@@ -401,12 +420,25 @@
     });
   }
 
+  function enterSlide(sl, reduced) {
+    if (!sl || reduced || isReduced()) { stopAllMedia(); return; }
+    autoplayVisibleVideos(sl);
+  }
+
   deck.stage.addEventListener('deck:slideleave', ({ detail }) => stopSlideMedia(detail.slide));
-  deck.stage.addEventListener('deck:slideenter', ({ detail }) => enterSlide(detail.slide, detail.staticMode));
+  deck.stage.addEventListener('deck:slideenter', ({ detail }) => enterSlide(detail.slide, detail.reducedMotion || detail.staticMode));
+  deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+    if (!detail.slide || isReduced()) return;
+    if (detail.dir >= 0) autoplayVisibleVideos(detail.slide);
+    detail.slide.querySelectorAll('video[data-slide-video]').forEach(v => {
+      if (v.closest('[data-step-hidden="1"]') && !v.paused) { try { v.pause(); } catch (_) {} }
+    });
+  });
   deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) stopAllMedia(); });
   deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) stopAllMedia(); });
+  deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => { if (detail.reduced) stopAllMedia(); });
 
-  if (!deck.isStatic() && deck.slides[deck.index]) {
+  if (!isReduced() && deck.slides[deck.index]) {
     enterSlide(deck.slides[deck.index], false);
   }
 })();

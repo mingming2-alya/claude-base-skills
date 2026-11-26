@@ -490,6 +490,40 @@ def lint(data, base_dir=None):
                 E(where, f"有 {em} 處重點。每頁最多一處，到處強調等於沒強調。保留最重要的一個，或拆頁。")
 
             chars = sum(visible_len(x) for x in texts) - visible_len(title)
+            if is_free_file and base_dir is not None and not is_appendix and layout not in DENSE_LAYOUTS:
+                frag_path = None
+                if s.get("file"):
+                    cand = (Path(base_dir) / s["file"]).resolve()
+                    if cand.is_file():
+                        frag_path = cand
+                else:
+                    sdir = Path(base_dir) / "slides"
+                    if sdir.is_dir():
+                        sid = s.get("id")
+                        if sid and (sdir / f"{sid}.html").is_file():
+                            frag_path = sdir / f"{sid}.html"
+                        else:
+                            for pat in (f"{n:02d}.html", f"{n:02d}-*.html"):
+                                ms = sorted(sdir.glob(pat))
+                                if ms:
+                                    frag_path = ms[0]
+                                    break
+                if frag_path is not None:
+                    try:
+                        frag_raw = frag_path.read_text(encoding="utf-8")
+                        frag_txt = re.sub(r"<(style|script|svg|nav)\b[^>]*>.*?</\1>", " ", frag_raw, flags=re.S | re.I)
+                        frag_txt = re.sub(r"<!--.*?-->", " ", frag_txt, flags=re.S)
+                        frag_txt = re.sub(
+                            r"<([a-z0-9-]+)\b[^>]*\b(?:data-role=[\"']source[\"']|aria-hidden=[\"']true[\"'])[^>]*>.*?</\1>",
+                            " ", frag_txt, flags=re.S | re.I,
+                        )
+                        frag_txt = re.sub(r"<[^>]+>", " ", frag_txt)
+                        frag_txt = _html.unescape(frag_txt)
+                        html_chars = max(0, len(re.sub(r"\s+", "", frag_txt)) - len(re.sub(r"\s+", "", title)))
+                        if html_chars > chars:
+                            chars = html_chars
+                    except Exception:
+                        pass
             if chars > char_limit and not is_appendix and layout not in DENSE_LAYOUTS:
                 W(where, f"內容約 {chars} 字，超過「{delivery_label}」建議上限 {char_limit} 字（{delivery_note}）。")
 
@@ -599,7 +633,9 @@ def lint(data, base_dir=None):
         (n, s) for n, s in enumerate(slides, 1)
         if isinstance(s, dict) and not s.get("appendix") and s.get("type", "content") == "content"
     ]
+    style_chosen = bool(meta.get("style"))
     dir_count = 0
+    missing_arch = []
     for n, s in content_main:
         d = s.get("director")
         if d is None:
@@ -610,19 +646,52 @@ def lint(data, base_dir=None):
             dir_count += 1
             if not d.get("hero"):
                 W(f"slides[{n}].director", "缺少 hero（這頁最吸睛的視覺主角是什麼，對應 brief 的說服載體）。")
+            if style_chosen and not d.get("archetype"):
+                missing_arch.append(n)
     if stage_mode in ("pitch", "keynote") and len(content_main) >= 4 and dir_count == 0:
         I("slides.director", f"stage_mode={stage_mode} 目前尚未填寫逐頁 director.hero（這頁的視覺主角）；建議至少替關鍵頁補齊，避免 Step 4 退回純文字卡片。archetype／choreo 等 Step 3a 選定風格後再補。")
+    if style_chosen and missing_arch:
+        I("slides.director", f"已選定風格（style={meta.get('style')}），但第 {', '.join(str(x) for x in missing_arch[:6])} 頁的 director 尚未補齊 archetype（構圖原型），建議於 Step 3a 補上以確保相鄰節奏多樣。")
 
-    # ---- visual rhythm: adjacent slides should vary unless in same series
+    # ---- Post-Step 3a keynote bipolar surface rhythm check (<= 5 consecutive same-surface slides)
+    if style_chosen and stage_mode == "keynote" and len(content_main) >= 6:
+        default_surf = str(meta.get("mode") or "dark").strip().lower()
+        streak_surf, streak_len = None, 0
+        max_surf_streak = (None, 0)
+        for n, s in content_main:
+            surf = str(s.get("surface") or default_surf).strip().lower()
+            if surf == streak_surf:
+                streak_len += 1
+            else:
+                streak_surf, streak_len = surf, 1
+            if streak_len > max_surf_streak[1]:
+                max_surf_streak = (surf, streak_len)
+        if max_surf_streak[1] > 5:
+            W("slides.surface", f"stage_mode=keynote 出現連續 {max_surf_streak[1]} 頁同為 {max_surf_streak[0]} 底（建議連續同極性 ≤ 5 頁，穿插 1 頁對比明暗或分割呼吸頁）。")
+
+    # ---- visual rhythm: adjacent slides should vary unless in same series (supports director.archetype on free/scene slides)
     flow = [(n, s) for n, s in enumerate(slides, 1) if isinstance(s, dict) and not s.get("appendix")]
-    shape_of = lambda s: (s.get("layout") or "free", s.get("visual") or s.get("variant") or "")  # noqa: E731
+
+    def shape_of(s):
+        lay = s.get("layout") or "free"
+        if lay in ("free", "scene"):
+            d = s.get("director")
+            arch = str(d.get("archetype") or "").strip().lower() if isinstance(d, dict) else ""
+            return ("archetype", arch) if arch else None
+        return (lay, str(s.get("visual") or s.get("variant") or ""))
+
     prev = None
     for n, s in flow:
-        if s.get("type", "content") != "content" or s.get("layout") in ("pillars", "status-table", "free", "scene"):
+        if s.get("type", "content") != "content" or s.get("layout") in ("pillars", "status-table"):
             prev = None
             continue
-        if prev and shape_of(prev) == shape_of(s) and not (s.get("series") and s.get("series") == prev.get("series")):
-            W(f"slides[{n}]", f"和上一頁同為 {shape_of(s)[0]}（{shape_of(s)[1] or '預設'}）。相鄰兩頁應變化視覺呈現；"
+        cur_shape = shape_of(s)
+        if cur_shape is None:
+            prev = None
+            continue
+        if prev and shape_of(prev) == cur_shape and not (s.get("series") and s.get("series") == prev.get("series")):
+            label = f"構圖原型「{cur_shape[1]}」" if cur_shape[0] == "archetype" else f"{cur_shape[0]}（{cur_shape[1] or '預設'}）"
+            W(f"slides[{n}]", f"和上一頁同為 {label}。相鄰兩頁應變化視覺呈現；"
                               "若這幾頁本來就是同類內容，請寫上同一個 series。")
         prev = s
 
@@ -634,7 +703,7 @@ def lint(data, base_dir=None):
         if len(pages) == 1:
             I(f"slides[{pages[0][0]}]", f"series「{name}」只有這一頁。series 是給「同一類、要長得一樣」的多頁用的。")
         else:
-            kinds = {shape_of(s) for _, s in pages}
+            kinds = {shape_of(s) for _, s in pages if shape_of(s) is not None}
             if len(kinds) > 1:
                 W(f"series「{name}」", "同一個系列的頁面用了不同結構，同一系列建議維持一致視覺語言。")
 

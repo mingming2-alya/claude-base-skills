@@ -14,10 +14,10 @@
     .slide .ref-row.is-ref-hit { border-left-color: var(--accent); }
     .slide .ref-row strong { display: block; font: 800 26px/1.2 var(--font-body); color: var(--fg); }
     .slide .ref-row span { display: block; margin-top: 8px; font: 600 20px/1.4 var(--font-body); color: var(--fg-2); }
-    .slide .diag { padding: 30px 34px; border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2); display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
+    .slide .diag { padding: 30px 34px; border-radius: var(--card-radius, 22px); border: 1px solid var(--line); background: var(--bg-2); display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
     .slide .diag svg { width: 100%; height: auto; }
     .slide .budget { display: grid; grid-template-columns: 14.3fr 69fr 16.7fr; gap: 8px; }
-    .slide .budget b { display: block; padding: 10px 14px; border-radius: 10px; font: 800 18px/1 var(--font-number); color: var(--fg); background: var(--bg); border: 1px solid var(--line); }
+    .slide .budget b { display: block; padding: 10px 14px; border-radius: var(--ctrl-radius, 10px); font: 800 18px/1 var(--font-number); color: var(--fg); background: var(--bg); border: 1px solid var(--line); }
     .slide .budget b.core { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
   </style>
   <header class="hd">
@@ -32,10 +32,11 @@
     </div>
     <div class="diag" data-zoomable data-zoom-caption="完整三段式邊緣架構（按 Esc 退出放大）">
       <svg viewBox="0 0 960 360" role="img" aria-label="三段式架構圖">
-        <path d="M292 180 L356 180" stroke="var(--accent)" stroke-width="4" fill="none" data-draw/>
-        <path d="M604 180 L668 180" stroke="var(--accent)" stroke-width="4" fill="none" data-draw data-delay="260"/>
-        <circle cx="356" cy="180" r="6" fill="var(--accent)" data-pop data-delay="520"/>
-        <circle cx="668" cy="180" r="6" fill="var(--accent)" data-pop data-delay="780"/>
+        <!-- 線先到、點後綻：draw(180+380=560) -> pop(580)；draw(480+380=860) -> pop(880) -->
+        <path d="M292 180 L356 180" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" fill="none" data-draw data-delay="180" data-dur="380"/>
+        <path d="M604 180 L668 180" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" fill="none" data-draw data-delay="480" data-dur="380"/>
+        <circle cx="356" cy="180" r="6" fill="var(--accent)" data-pop data-delay="580"/>
+        <circle cx="668" cy="180" r="6" fill="var(--accent)" data-pop data-delay="880"/>
         <g data-ref="ingest"><rect x="32" y="92" width="260" height="176" rx="16" fill="var(--bg)" stroke="var(--line)" stroke-width="2.5"/><text x="162" y="168" text-anchor="middle" font-size="25" font-weight="800" fill="var(--fg)">DMA 零拷貝</text><text x="162" y="214" text-anchor="middle" font-size="20" fill="var(--fg-2)">1.2 ms · Ring Buffer</text></g>
         <g data-ref="router"><rect x="356" y="64" width="248" height="232" rx="18" fill="var(--bg)" stroke="var(--accent)" stroke-width="3.5"/><text x="480" y="158" text-anchor="middle" font-size="26" font-weight="900" fill="var(--fg)">動態算力路由</text><text x="480" y="206" text-anchor="middle" font-size="22" font-weight="800" fill="var(--accent-text)">5.8 ms 核心推論</text></g>
         <g data-ref="guard"><rect x="668" y="92" width="260" height="176" rx="16" fill="var(--bg)" stroke="var(--line)" stroke-width="2.5"/><text x="798" y="168" text-anchor="middle" font-size="25" font-weight="800" fill="var(--fg)">品質校驗閘門</text><text x="798" y="214" text-anchor="middle" font-size="20" fill="var(--fg-2)">1.4 ms · SLA 保底</text></g>

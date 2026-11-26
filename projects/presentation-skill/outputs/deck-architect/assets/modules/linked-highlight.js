@@ -6,6 +6,8 @@
   const deck = window.__deck;
   if (!deck || !deck.stage) return;
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+
   function idsOf(el) {
     return (el.dataset.ref || '').split(/[\s,]+/).filter(Boolean);
   }
@@ -16,7 +18,7 @@
     let lockedIds = null;
 
     function apply(activeIds, locked) {
-      if (deck.isStatic() || !activeIds || !activeIds.length) {
+      if (isStill() || !activeIds || !activeIds.length) {
         sl.classList.remove('is-ref-linking');
         refs.forEach(el => el.classList.remove('is-ref-hit', 'is-ref-dim', 'is-ref-locked'));
         return;
@@ -38,7 +40,7 @@
     refs.forEach(el => {
       el.classList.add('live-ctrl');
       el.addEventListener('mouseenter', () => {
-        if (lockedIds || deck.isStatic()) return;
+        if (lockedIds || isStill()) return;
         apply(idsOf(el), false);
       });
       el.addEventListener('mouseleave', () => {
@@ -47,7 +49,7 @@
       });
       el.addEventListener('click', e => {
         e.stopPropagation();
-        if (deck.isStatic()) return;
+        if (isStill()) return;
         const ids = idsOf(el);
         const same = lockedIds && ids.length === lockedIds.length && ids.every((v, i) => v === lockedIds[i]);
         if (same) {
@@ -68,5 +70,4 @@
 
   deck.stage.addEventListener('deck:slideleave', ({ detail }) => clearSlide(detail.slide));
   deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) deck.slides.forEach(clearSlide); });
-  deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) deck.slides.forEach(clearSlide); });
 })();

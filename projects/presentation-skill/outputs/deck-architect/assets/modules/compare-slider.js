@@ -55,10 +55,12 @@
       setPos(((clientX - r.left) / r.width) * 100);
     }
 
+    const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+
     let dragging = false;
     root.addEventListener('pointerdown', e => {
       e.stopPropagation();
-      if (deck.isStatic()) return;
+      if (isStill()) return;
       dragging = true;
       root.setPointerCapture(e.pointerId);
       updateFromClientX(e.clientX);
@@ -78,7 +80,7 @@
     root.addEventListener('click', e => e.stopPropagation());
 
     knob.addEventListener('keydown', e => {
-      if (deck.isStatic()) return;
+      if (isStill()) return;
       if (e.key === 'ArrowLeft') { e.preventDefault(); e.stopPropagation(); setPos(pct - 5); }
       else if (e.key === 'ArrowRight') { e.preventDefault(); e.stopPropagation(); setPos(pct + 5); }
     });
@@ -91,8 +93,5 @@
 
   deck.stage.addEventListener('deck:still', ({ detail }) => {
     if (detail.still) instances.forEach(i => i.reset());
-  });
-  deck.stage.addEventListener('deck:lowpower', ({ detail }) => {
-    if (detail.lowPower) instances.forEach(i => i.reset());
   });
 })();

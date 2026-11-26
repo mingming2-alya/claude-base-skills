@@ -1,18 +1,15 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.8.2 主柱一六項缺口修補 ✅ ＋ 主柱二四大維度深度稽核完成）**：
+> **最新接手點（2026-11-26｜`deck-architect` v4.9.0 主柱二全量檢修 22 項全數收官 ✅）**：
 >
-> - **已完成主柱一 6 項修補（v4.8.2，`30dc93b`）**：
->   1. **Round 0 先問既有素材＋起手狀態三分流＋Proposal-First**（`references/grill.md`、`templates/brief.md`、`SKILL.md`）。
->   2. **主受眾 vs 次受眾分層**（`grill.md`、`templates/brief.md`）。
->   3. **30 秒口述邏輯鏈（Story Spine）＋逐章頁數配額**（`grill.md`、`structure.md`、`templates/brief.md`、`lint.py` 標準 `[ERROR]`／快速 `[WARN]`）。
->   4. **架構級排除清單（Out of Scope）**（`grill.md`、`structure.md`、`templates/brief.md`、`lint.py` `[WARN]`）。
->   5. **Step 1b → 1a 合法回退機制（3 觸發條件）**（`grill.md`、`SKILL.md`）。
->   6. **Step 4 分身補回 `brief.md` 第 1／8 節上下文**（`SKILL.md`）。
->   - 驗證：`v4-alive-demo/brief.md` 0 錯 0 警；4 組標準／快速模式變體斷言與 `v48-regression` 全過；重打包 `outputs/deck-architect.skill`（83 檔，373.0 KB，SHA-256 逐位元一致）。
-> - **已完成主柱二全歷史與程式碼級深度稽核（`inputs/pillar2-audit-v482.md`）**：
->   - 橫跨「視覺引導／靜態美感上限／動態系統／三層模組化注入」逐行審計＋OKLCH 數值驗算＋無頭 Chrome CDP 實測，定位 **10 項 P0 破約缺陷**（`runtime.js` WAAPI `fill:'forwards'` 打斷黑屏／回翻隱形、`isStatic()` 誤殺無障礙與講者工具、`#s-N` 作用域打爆 `G` 總覽縮圖與 Layer 2 權重、`speaker-view` HTTP 雙發跳兩頁、活頁 `P` 列印無 `beforeprint`、`style-library.html` 1.24:1／2.54:1／2.69:1 對比破功與 Apple 視線退步、`BEAT_MS` 40–120ms 違反閱讀窗＋三支配方回退 B.3 前、`assemble.py` `<!-- /slot -->` 魔術註解卡死換圖、`SKILL.md:116` 漏 `styles/<selected>.md`、`code-stage.css` 夾帶禁用紫 `#D8B4FE`/`#5B21B6`）、**11 項 P1 結構與套件缺陷**與 **3 項 P2 細節**。
-> - **下一步**：待使用者決定修補範圍（建議先修批次 A P0 急診或 A＋B 一次到位），再進真實簡報 PK。
+> - **已完成主柱二全部 22 項稽核修補（批次 A＋B＋C，見 `inputs/pillar2-audit-v482.md`）**：
+>   - **批次 A（P0 急診）**：`runtime.js` WAAPI `fill:'forwards'` 播完與打斷全清零（消除 `shock` 黑屏、`iris`/`sheet-up` 回翻隱形）＋`isStill()` vs `isReducedMotion()` 正交拆層（`B`/減少動態不再癱瘓 `G`/`A`/`L`/`S` 與互動控件）＋`BEAT_MS` 重校 `{1:120, 2:1480, 3:2840, 4:4200}`（保留 0.76s 靜止閱讀窗＋支援 `data-beat-gap`）＋活頁 `beforeprint`/`afterprint` 全步展開與復原；`assemble.py` 以 `[data-slide-scope="s-N"]`（根節點 `.slide[data-slide-scope="s-N"]`）取代 `#s-N` 並補齊裸選擇器／`@keyframes` 作用域＋`grid-overview` 移除 `display: flex !important` 讓總覽縮圖樣式 100% 保真；`assemble.py` `_replace_slots` 改平衡 `<div>` 掃描（不再依賴未記錄 `<!-- /slot -->`）；`speaker-view.js` 採 BroadcastChannel 優先＋`seenCmdIds` 去重消除雙發跳兩頁；`code-stage.css` `.tok-kw` 去除禁用紫（改 `#F87171`/`#B42318`）；`SKILL.md` Step 4 分身補回 `styles/<selected>.md`；`style-library.html` 四卡淺深雙底對比／≥18px／Apple 深色玻璃與左動作→右結果動線／Illustration `motion-story` 立體書翻折全數修復；`recipes/{bento-causal,linked-diagram,interactive-proof}.md` 完整回寫 Phase B.3.1/B.3.2 時序、語意聚光與平衡版面。
+>   - **批次 B（P1 引擎與模組閉環）**：`runtime.js` 接通 `--enter-easing` 與 `DECK.motion` 軸線運鏡、`[data-transform-at]` 移入 `runPrimitives()`、`setStep()` 清理 focus、鍵盤搶先接管與 `metaKey||ctrlKey||altKey` 過濾、Magic Move 防誤量與漸層字保護；4 套風格動態套件修補（`story-kit` `.is-folded` 瞬時歸位與 `.cr-typing.is-on`、`counsel-kit` 滾輪延遲＋FLIP 除舞台縮放＋`rr-anchor`＋GPU `scaleX`＋離頁清 `rack-focus`、`apple-kit` 疊卡除縮放防競態＋DOM 保留式 `spotlight-sweep`/`colorize-wipe`、`workday-kit` 雙層 rAF 追蹤＋GPU `scaleX`＋離頁收合 `bento-expand`）；`device-frame.css` 補齊 `.device-phone`/`.device-tablet`；4 支模組 CSS（`code-stage`/`live-controls`/`media`/`coverflow`）接通 `html[data-mode]`；Layer 1 `hasNavLock()` 互斥、`annotator` 雷射不鎖死、390px `#ctrl-bar` 與 `#deck-annotator-bar` 零裁切、`visual-flair` 燈箱作用域與去重 `id`＋光暈除縮放；`fit.js` `data-fit-base-px` 與自由畫布 `phrase` 自動分句；`assemble.py` 去註解／單雙引號／非根 `data-fx` 警告／確定性排序／未用 `meta.modules` 警告／`--sheet` `style_css`＋真 `tabs`＋媒體路徑重寫。
+>   - **批次 C（P1/P2 品管與上限升級）**：`check.mjs` 升至 **17 項**（新增 WAAPI 防鎖死、Check 6 拍長／偷跑／SVG 線點時序、Check 12 `G` 縮圖保真、Check 15 390px `#ctrl-bar` 實測、Check 17 活頁 `beforeprint`/`afterprint`、Liveliness 去框編輯頁免罰與擴充控件偵測、OKLCH 近似純黑白警告）；`lint.py` 補自由畫布 HTML 字數、`director.archetype` 相鄰多樣性、`keynote` 同極性連頁警告；`oklch.py` 補 `L < 0.12`/`L > 0.992` 近似純黑白、`bg`/`bg2`/`alert` 禁紫與 `--style` 風格帶檢核；`templates/deck.css` 載入三語音字體（含 `Noto Serif TC`）＋中文零負字距＋列印上邊距歸零；`counsel` 0px `--card-radius`/`--ctrl-radius` 貫徹至模組與配方；P2 修補跑馬燈無縫銜接、`sound-ab` `loadedmetadata` 續播、彩帶吃主題色票。
+> - **驗證結果**：Python 專項單測 `27/27` 全過；無頭 Chromium CDP 瀏覽器實測 `34/34` 全過（含 `style-library.html` 淺深雙底 8/8 零 `<18px` 零 WCAG 違規＋26/26 引擎／講者／模組／套件實測，零 JS 錯誤）；全 5 份 v4 範例重跑 `lint.py`＋`assemble.py`＋`check.mjs --jpg --motion` 全 0 ❌（`v48-regression` `5.12:1`、`v45-modular-demo` `4.84:1`、`v44-keynote-demo` `4.53:1`、`v4-alive-demo` `4.70:1`、`v4-demo` `4.81:1`）＋`v4-demo/samples --sheet` 3 張全過＋`v4-alive-demo/brief.md` 0 錯 0 警；重打包 `outputs/deck-architect.skill`（83 檔，361.0 KB，SHA-256 逐位元一致）。
+> - **下一步**：主柱一（v4.8.2）與主柱二（v4.9.0）檢修皆已全數收官，待使用者提供一份**真實簡報需求**跑完整 Step 1a→Step 6 PK 驗證，跑完再決定是否進 Phase D。
+>
+> - **前一段（v4.8.2 主柱一六項修補，`30dc93b` ✅）**：補齊 Round 0 起手三分流＋Proposal-First、主／次受眾分層、30 秒口述邏輯鏈（Story Spine）＋逐章頁數配額、架構級排除清單（Out of Scope）、Step 1b→1a 合法回退三觸發、Step 4 分身補回 `brief.md` 第 1／8 節上下文。
 > - **前一段（v4.8.1 外部稽核修補定案 ✅）**：
 >
 > - 依外部稽核評估（`inputs/external-audit-c2bfaf8-review.md`）與使用者拍板（「好的請修改！」），**完成 13 項有效修補**（保留 `grid-overview.js` 刪 `id` 實測無礙，維持標準模式三候選含破框）：
@@ -48,7 +45,7 @@ _最後更新：2026-11-26_
    - 每個段落結束就同步：`STATUS.md`、`LOG.md`、commit、push。
    - Stop hook 會檢查有沒有沒推的變更。
    - **所有要問使用者的問題一律用互動表單（AskUserQuestion）**。每題能單獨看懂，題目互不依賴，一題最多 4 個選項；收斂型決策題把推薦選項放第一個標「（推薦）」並寫理由，發散型腦力激盪題（如故事種子）不標「（推薦）」避免錨定。
-4. 驗證腳本：`scripts/lint.py` 可檢查 `storyboard.yaml`（含自由畫布 `slides/*.html` 約束與語言）與 `brief.md`；`scripts/check.mjs` 支援 Playwright 與系統 Chromium CDP 自動退路，加 `--motion` 可執行最多 **16 項**動態與行動實測＋生動度稽核（含風格契合、可見導航對比與 `meta.mode` 極性防呆）。改動底盤或腳本後，先跑 `outputs/examples/v48-regression/`（見該資料夾 README）。執行 `lint.py`/`assemble.py` 若遇 pyenv 缺 PyYAML，改用 `/usr/bin/python3`。
+4. 驗證腳本：`scripts/lint.py` 可檢查 `storyboard.yaml`（含自由畫布 `slides/*.html` 約束、字數、`director.archetype` 與語言）與 `brief.md`；`scripts/check.mjs` 支援 Playwright 與系統 Chromium CDP 自動退路，加 `--motion` 可執行最多 **17 項**動態與行動實測＋生動度稽核（含 WAAPI 防鎖死、聚光與線點時序、`G` 縮圖保真、390px `#ctrl-bar`、活頁 `beforeprint`/`afterprint`、去框編輯頁免罰與風格契合）。改動底盤或腳本後，先跑 `outputs/examples/v48-regression/`（見該資料夾 README）。執行 `lint.py`/`assemble.py` 若遇 pyenv 缺 PyYAML，改用 `/usr/bin/python3`。
 
 ## 階段與進度
 
@@ -60,7 +57,7 @@ _最後更新：2026-11-26_
 | **Phase B 預研** | **動態技術路線研究與定案**：實查 14 個 GitHub Repo（`inputs/motion-research.md`），定案 **方案 1｜分層混合** | ✅ 定案 |
 | **Phase B / B.2 / B.3** | **反寫靜態工藝與原則 #26 ＋ 60fps 動態引擎 ＋ 視覺指引規格與原語（v4.3）**：`v4-alive-demo` 8 頁靜態＋7 項動態實測全過 | ✅ |
 | **Phase C.1** | **真實旗艦標竿對照 ＋ v4.4-spec 規格與 Grill v2 全面升級**：三段式舞台光譜、設計樹 Grill v2（融合 `mattpocock/skills`）、原則 #27–#30、9 份核心規格反寫並重打包 | ✅ |
-| **Phase C.2** | **v4.4→v4.8.1 全系統升級、兩大主柱終審與外部稽核全量修補**：Step 1a/1b 顧問標竿＋故事種子＋破框敘事、主柱邊界、建議附理由、主題類型總表、brief＋自由畫布 HTML lint、三層按需引擎＋4 套風格動態套件、`meta.mode` 零權重串接、正確 `boot()` 啟動與首頁進場、Step 3b 片段樣張＋三組色票對照、16 項動態行動實測＋導航對比與極性防呆 | ✅ 定案 → 下一步：真實簡報 PK |
+| **Phase C.2** | **v4.4→v4.9.0 全系統升級、兩大主柱終審與全量檢修**：主柱一（Round 0 起手三分流、主／次受眾、30 秒邏輯鏈、Out of Scope、1b→1a 回退、brief＋HTML lint）＋主柱二 22 項檢修（WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]` 作用域與 `G` 縮圖保真、`speaker-view` 去重、活頁列印、平衡換圖、`BEAT_MS` 與三配方／圖鑑校正、4 套件與模組極性／縮放）＋17 項動態行動實測 | ✅ 定案 → 下一步：真實簡報 PK |
 | **Phase D** | **多元風格庫全面成形**：補齊其餘 8 款「靜態×動態一體」Style DNA（各含淺深規則與風格動態套件並上架 `style-library.html`）、整理插畫 15 種畫風配方表、外觀帳本 | 未開始（等真實簡報 PK 後決定） |
 | **Phase E** | **交付、修改閉環與記憶**：成品按 `E` 改字回寫、畫面上點選留言修改、文字可編輯 PPTX 匯出、品味記憶與獨立評審、評估搬進 `skills/` 正式安裝（註：雙螢幕講者模式 `S` 鍵已提前於 v4.5 完成） | 未開始 |
 
@@ -92,9 +89,9 @@ _最後更新：2026-11-26_
 
 | 路徑 | 內容 |
 |---|---|
-| `outputs/deck-architect/` | **v4.8.2 完整版 Skill 原始碼（83 檔）**：兩大主柱流程（含 Round 0 起手三分流、主／次受眾、30 秒邏輯鏈、Out of Scope、1b→1a 回退）＋三層按需引擎（`boot()` 啟動與 `meta.mode` 零權重串接）＋4 套風格動態套件＋`templates/deck.css`＋Step 3b 片段樣張與三組色票對照＋brief／storyboard／HTML 自由畫布 lint＋16 項動態行動實測＋導航對比／極性防呆與風格契合稽核 |
-| `outputs/deck-architect.skill` | v4.8.2 打包檔（373.0 KB，83 檔，零 `__pycache__`，SHA-256 逐位元一致） |
-| `outputs/examples/v48-regression/` | v4.8/v4.8.1 引擎回歸測試簡報（4 套套件 11 原語、`unlisted`、聚光復原、`templates/deck.css`；9 頁全過，最低 `5.12:1`）。改底盤或腳本後先跑這份 |
+| `outputs/deck-architect/` | **v4.9.0 完整版 Skill 原始碼（83 檔）**：主柱一顧問流程（Round 0 起手三分流、主／次受眾、30 秒邏輯鏈、Out of Scope、1b→1a 回退）＋主柱二三層按需引擎（WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]` 作用域、活頁 `beforeprint` 列印、`boot()` 與 `meta.mode` 零權重串接）＋4 套風格動態套件＋`templates/deck.css` 三語音＋`style-library.html` 雙底達標＋Step 3b 片段樣張＋brief／storyboard／HTML 自由畫布 lint＋17 項動態行動實測＋雙門檻 Liveliness 稽核 |
+| `outputs/deck-architect.skill` | v4.9.0 打包檔（361.0 KB，83 檔，零 `__pycache__`，SHA-256 逐位元一致） |
+| `outputs/examples/v48-regression/` | v4.8–v4.9 引擎回歸測試簡報（4 套套件 11 原語、`unlisted`、聚光復原、`templates/deck.css`；9 頁全過，最低 `5.12:1`）。改底盤或腳本後先跑這份 |
 | `outputs/examples/v4-alive-demo/brief.md` | 示範用 brief（依既有虛構範例事後補寫，示範格式與 brief lint，不是主柱一實測紀錄） |
 | `outputs/examples/v45-modular-demo/` | v4.5/v4.6 三層引擎與全部新／升級模組虛構技術示範（6 頁，最低對比 `4.84:1`） |
 | `outputs/examples/v44-keynote-demo/` | Phase C.2 v4.4 旗艦五大新能力虛構示範（7 頁，最低對比 `4.53:1`） |
@@ -103,7 +100,7 @@ _最後更新：2026-11-26_
 | `outputs/examples/v4-demo/` | Phase A 初版虛構端到端範例（8 頁，最低 `4.81:1`；`samples/` 舊版獨立樣張 `--sheet` 相容通過） |
 | `outputs/examples/{example,annual-section,layout-catalogue,progress-overview,test4}/` | v3 時代舊範例（如 `theme: editorial` 等舊欄位），只保留參考，不代表現行流程 |
 | `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–34 條（被取代的舊條目已加註） |
-| `inputs/pillar2-audit-v482.md` | v4.8.2 主柱二（視覺引導／靜態／動態／模組化注入）全歷史與程式碼＋Chrome CDP 深度稽核報告（10 項 P0、11 項 P1、3 項 P2 與三批次修補藍圖） |
+| `inputs/pillar2-audit-v482.md` | v4.8.2 主柱二（視覺引導／靜態／動態／模組化注入）全歷史與程式碼＋Chrome CDP 深度稽核報告（22 項已於 v4.9.0 全數修補收官） |
 | `inputs/external-audit-c2bfaf8.md`、`inputs/external-audit-c2bfaf8-review.md` | v4.8 外部唯讀稽核報告與逐條評估（13 項有效項目已於 v4.8.1 全數修補） |
 | `inputs/modular-capabilities-audit.md` | 10 個 GitHub 簡報 Skill 二次盤點：按需模組深化與漏網 Nice-to-Have 報告 |
 | `inputs/phase-c-teardown-learnings.md` | Phase C 旗艦標竿對照與 `mattpocock/skills` 始祖回溯研究筆記（去敏版） |
@@ -128,9 +125,12 @@ _最後更新：2026-11-26_
 - **顏色一律交給瀏覽器換算（2026-11-26）**：`check.mjs` 與 `assets/modules/fx/core.js` 量文字／特效顏色時皆透過 1×1 `<canvas>` 取 sRGB，不再只靠字串正規解析；OKLCH、`color(srgb …)`、`color-mix()` 才量得準。漸層字的 OKLCH 色標另由 Node 換算。
 - **零權重 `meta.mode` 串接（2026-11-26 v4.8.1）**：`shell.css` 以 `:where(:root)` 與 `:where(html[data-mode="light"|"dark"])` 把 `--bg`/`--fg`/`--accent` 接到 `deck.css` 的 `--light-*`/`--dark-*`，讓無 `data-surface` 的封面／結尾／內建頁自動吃整份簡報的極性與色票，同時維持舊版直接覆寫 `:root` 的向後相容。
 - **腳本載入與 `boot()` 契約（2026-11-26 v4.8.1）**：`assemble.py` 固定按 `DECK → runtime_js → module_js → slide_js → window.__deck.boot()` 順序輸出，確保所有模組與頁內腳本在首頁 `deck:slideenter` 觸發前已就緒。
-- **自由畫布 HTML 同受 `lint.py` 把關（2026-11-26 v4.8.1）**：`lint.py` 會掃描對應的 `slides/*.html` 可見文字，地雷詞（`constraints.forbidden`）同樣報 `[ERROR]` 並擋下組裝。
+- **`[data-slide-scope="s-N"]` 作用域契約（2026-11-26 v4.9.0）**：`assemble.py` 捨棄會碾壓 Layer 2 的 `#s-N` ID 選擇器，改為根節點 `.slide[data-slide-scope="s-N"]`（與 `deck.css` `.slide.canvas` 同權重靠後勝出）與子孫 `[data-slide-scope="s-N"] .x`，同時自動處理 `html[...]`/`body.low-power` 祖先條件、裸選擇器與 `@keyframes` `sN_` 前綴；`grid-overview` 刪 `id` 仍保留 `data-slide-scope`，縮圖樣式 100% 保真。
+- **`isStill()` vs `isReducedMotion()` 正交分層（2026-11-26 v4.9.0）**：`isStill()` 僅對 `?still=1` 無頭截圖為真（鎖互動、藏 Chrome）；`isReducedMotion()` 對 `?still=1`、`B` 省電與 `prefers-reduced-motion: reduce` 為真（只停裝飾動效、改瞬切終態，完整保留 `G`/`A`/`L`/`S` 與互動控件）。
+- **WAAPI `fill: 'forwards'` 必須主動 `cancel()`（2026-11-26 v4.9.0）**：WAAPI `forwards` 權重高於 inline style；`runtime.js` 透過 `persistedAnims` 與 `cancelElementAnims()` 在收尾與打斷時徹底清零，避免 `shock` 黑幕卡死或 `iris`/`sheet-up` 回翻隱形。
+- **自由畫布 HTML 同受 `lint.py` 把關（2026-11-26 v4.8.1 / v4.9.0）**：`lint.py` 會掃描對應的 `slides/*.html` 可見文字（含去標籤／空白之字數統計與地雷詞 `[ERROR]`）並檢核 `director.archetype` 相鄰多樣性。
 - **聚光排程的 token 要分頁（2026-11-26）**：`runtime.js` 的聚光排程用每頁各自的 token（`WeakMap`），清前一頁不能動到下一頁；否則換頁後會卡在第 1 拍、其餘卡片一直壓暗。
-- **配方要搭 `templates/deck.css`（2026-11-26）**：配方依賴 `.slide.canvas`、`.hd`、`.title`、`.sub`；`top-bar` 導航留白（124／156px）僅套用在無內嵌導航的 `[data-kind="content"]` 頁，不誤推封面／震撼／結尾。滿版分割頁（如 `editorial-drama` 型態 A）加 `nav: none`。
+- **配方要搭 `templates/deck.css`（2026-11-26）**：配方依賴 `.slide.canvas`、`.hd`、`.title`、`.sub`；`top-bar` 導航留白（124／156px）僅套用在無內嵌導航的 `[data-kind="content"]` 頁，不誤推封面／震撼／結尾；列印時頂部留白歸零。滿版分割頁（如 `editorial-drama` 型態 A）加 `nav: none`。
 - **離線字體**：載不到 Google Fonts 時由系統字體頂替，`check.mjs` 只列提示；字體度量差異不再讓 `cover-inner`／`closing-inner` 誤報溢出（改由畫布邊界檢查）。
 - **輕底盤零權重規則**：`shell.css` 對自由畫布子元素的預設 `z-index` 使用 `:where(...)` 零權重，絕不覆寫 `.back` 或投影片自訂定位。
 - **SVG `<defs>` ID 隔離**：`assemble.py` 自動替每頁 `<defs>` 內的 `id` 加上 `s{idx}_` 前綴並同步改寫 `url(#...)`／`href="#..."`，防止多頁組裝後 `clipPath`／濾鏡撞名。

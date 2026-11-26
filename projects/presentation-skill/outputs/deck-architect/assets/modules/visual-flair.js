@@ -39,12 +39,19 @@
     return lb;
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+  const isReduced = () => (typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : deck.isStatic());
+  const getScale = () => (typeof deck.stageScale === 'function' ? deck.stageScale() : 1) || 1;
+
   document.querySelectorAll('[data-zoomable]').forEach(el => {
     el.classList.add('live-ctrl');
     el.addEventListener('click', e => {
       e.stopPropagation();
-      if (deck.isStatic()) return;
+      if (isStill()) return;
       const modal = ensureLightbox();
+      const sl = el.closest('.slide');
+      const surf = (sl && sl.dataset.surface) || deck.activeSurface || 'dark';
+      modal.dataset.surface = surf;
       const slot = modal.querySelector('.dlb-content');
       const cap = modal.querySelector('.dlb-cap');
       slot.innerHTML = '';
@@ -52,7 +59,16 @@
       const clone = target.cloneNode(true);
       clone.removeAttribute('id');
       clone.removeAttribute('data-zoomable');
-      slot.appendChild(clone);
+      clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      if (sl && sl.dataset.slideScope) {
+        const wrap = document.createElement('div');
+        wrap.className = 'dlb-scope';
+        wrap.dataset.slideScope = sl.dataset.slideScope;
+        wrap.appendChild(clone);
+        slot.appendChild(wrap);
+      } else {
+        slot.appendChild(clone);
+      }
       const caption = el.dataset.zoomCaption || el.getAttribute('aria-label') || el.getAttribute('alt') || '';
       cap.textContent = caption;
       cap.style.display = caption ? '' : 'none';
@@ -64,7 +80,7 @@
   document.querySelectorAll('[data-tilt]').forEach(el => {
     const maxDeg = Math.min(5, Math.max(1, parseFloat(el.dataset.tilt || '4') || 4));
     el.addEventListener('pointermove', e => {
-      if (deck.isStatic()) return;
+      if (isReduced()) return;
       const r = el.getBoundingClientRect();
       if (!r.width || !r.height) return;
       const nx = ((e.clientX - r.left) / r.width - 0.5) * 2;
@@ -81,19 +97,33 @@
   // ---- 3. Spotlight hover ([data-spotlight-hover])
   document.querySelectorAll('[data-spotlight-hover]').forEach(el => {
     el.addEventListener('pointermove', e => {
-      if (deck.isStatic()) return;
+      if (isReduced()) return;
       const r = el.getBoundingClientRect();
       if (!r.width || !r.height) return;
-      el.style.setProperty('--mx', (e.clientX - r.left).toFixed(1) + 'px');
-      el.style.setProperty('--my', (e.clientY - r.top).toFixed(1) + 'px');
+      const s = getScale();
+      el.style.setProperty('--mx', ((e.clientX - r.left) / s).toFixed(1) + 'px');
+      el.style.setProperty('--my', ((e.clientY - r.top) / s).toFixed(1) + 'px');
     });
   });
 
+  function clearTilts() {
+    document.querySelectorAll('[data-tilt]').forEach(el => { el.style.transform = ''; });
+  }
+
   deck.stage.addEventListener('deck:slideleave', () => {
     if (lb) lb.classList.remove('open');
-    document.querySelectorAll('[data-tilt]').forEach(el => { el.style.transform = ''; });
+    clearTilts();
   });
   deck.stage.addEventListener('deck:still', ({ detail }) => {
-    if (detail.still && lb) lb.classList.remove('open');
+    if (detail.still) {
+      if (lb) lb.classList.remove('open');
+      clearTilts();
+    }
+  });
+  deck.stage.addEventListener('deck:lowpower', ({ detail }) => {
+    if (detail.lowPower) clearTilts();
+  });
+  deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => {
+    if (detail.reduced) clearTilts();
   });
 })();

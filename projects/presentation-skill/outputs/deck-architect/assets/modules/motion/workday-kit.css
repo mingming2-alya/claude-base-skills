@@ -4,7 +4,7 @@
 [data-ruler-progress] {
   position: relative;
   padding: 18px 22px 18px;
-  border-radius: 16px;
+  border-radius: var(--card-radius, 16px);
   background: var(--bg-2, #E6E2DA);
   border: 1px solid var(--line, rgba(22, 25, 34, 0.16));
   color: var(--fg, #141619);
@@ -29,24 +29,25 @@
 .rp-track {
   position: relative;
   height: 36px;
-  border-radius: 10px;
+  border-radius: var(--ctrl-radius, 10px);
   background: var(--line-2, rgba(128, 128, 128, 0.16));
   overflow: visible;
 }
 .rp-fill {
   position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--rp-pct, 0%);
-  border-radius: 10px 0 0 10px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--accent, #0D6B4F) 24%, transparent), color-mix(in srgb, var(--accent, #0D6B4F) 48%, transparent));
-  border-right: 3px solid var(--accent, #0D6B4F);
-  transition: width .78s cubic-bezier(0.2, 0.9, 0.25, 1);
-  will-change: width;
+  inset: 0;
+  width: 100%;
+  border-radius: var(--ctrl-radius, 10px);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent, #0D6B4F) 24%, transparent), color-mix(in srgb, var(--accent, #0D6B4F) 52%, transparent));
+  transform-origin: left center;
+  transform: scaleX(var(--rp-scale, 0));
+  transition: transform .78s cubic-bezier(0.2, 0.9, 0.25, 1);
+  will-change: transform;
 }
 .rp-ticks {
   position: absolute;
   inset: 0;
-  border-radius: 10px;
+  border-radius: var(--ctrl-radius, 10px);
   background: repeating-linear-gradient(
     90deg,
     transparent 0,
@@ -123,8 +124,18 @@ html.still [data-bento-expand] [data-bento-detail],
 body.low-power [data-bento-expand] [data-bento-detail] {
   transition: none !important;
 }
+html.still [data-bento-expand].has-open [data-bento-item]:not(.is-open) {
+  opacity: 1 !important;
+  transform: none !important;
+}
 @media (prefers-reduced-motion: reduce), print {
   .rp-fill, [data-bento-expand] [data-bento-item], [data-bento-expand] [data-bento-detail] {
     transition: none !important;
+  }
+}
+@media print {
+  [data-bento-expand].has-open [data-bento-item]:not(.is-open) {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }

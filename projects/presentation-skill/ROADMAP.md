@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.8.2 主柱一六項結構缺口修補 ✅）**：在 v4.8.1 外部稽核 13 項全量修補與全範例回歸的基礎上，補齊主柱一（Step 1a／1b／Step 4 交接）六項第一性原理缺口——Round 0 先問既有素材＋起手狀態三分流＋重提案輕審問（Proposal-First）、主受眾 vs 次受眾分層、30 秒口述邏輯鏈（Story Spine）＋逐章頁數配額（`lint.py` 標準 `[ERROR]`／快速 `[WARN]`）、架構級排除清單（Out of Scope）、Step 1b → 1a 合法回退三觸發、Step 4 分身補回 `brief.md` 第 1／8 節上下文。同步更新 `v4-alive-demo/brief.md` 並通過全套 lint 驗證，重打包 `outputs/deck-architect.skill`（83 檔，373.0 KB，SHA-256 逐位元一致）。**下一步：完成主柱二（視覺引導／靜態／動態／模組化注入）深度體檢，並拿真實簡報跑完整流程 PK（先於 Phase D）。**
+> **最新接手點（2026-11-26｜`deck-architect` v4.9.0 主柱二 22 項全量檢修收官 ✅）**：繼 v4.8.2 主柱一六項結構修補後，完成 `inputs/pillar2-audit-v482.md` 全部 22 項（批次 A＋B＋C）主柱二檢修——修復 WAAPI `fill:'forwards'` 打斷鎖死、`isStill()`/`isReducedMotion()` 正交拆層、`[data-slide-scope]` 作用域與 `G` 縮圖保真、`speaker-view` 去重、活頁 `beforeprint`/`afterprint` 列印、平衡換圖解析、`BEAT_MS` 閱讀窗與三支配方／`style-library.html` 回寫、`code-stage.css` 去紫、4 套動態套件縮放與生命週期、4 支模組極性、`device-frame` 類名、390px `#ctrl-bar` 零裁切，並將 `check.mjs --motion` 升至 **17 項**（含去框編輯頁免罰與視覺指引時序檢核）＋強化 `lint.py`/`oklch.py`。驗證：Python 單測 27/27、Chrome CDP 瀏覽器實測 34/34（含 `style-library.html` 淺深雙底 8/8）、全 5 份 v4 範例＋`--sheet` 零 ❌、重打包 `outputs/deck-architect.skill`（83 檔，361.0 KB，SHA-256 逐位元一致）。**下一步：拿真實簡報跑完整 Step 1a→Step 6 PK（先於 Phase D）。**
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。
@@ -28,19 +28,19 @@
 
 - [x] **風格方向與首批定調（原 2a–2b）**：12 款風格清單定案（`inputs/style-list-v5.md`）；OKLCH「鎖規則、不鎖色碼、全淺深雙底」用色系統（`outputs/deck-architect/styles/color-system.md`）；首批四款（`counsel`、`apple`、`illustration` 15 種畫風、`workday` 現代 Bento）完整 Style DNA ＋ 互動圖鑑 `assets/style-library.html` 已就緒
 - [x] **內容結構與容量基礎（原 v3.0 資產沿用）**：14 種結構＋5 種圖表結構、容量規則、`series`、`lint.py`；已轉為 `references/content-shapes.md` 內容形狀指南
-- [x] **三層細粒度按需架構＋亂中有序治理（Phase A / C.2 / v4.5–v4.7.6）**：Layer 0 輕底盤（含 `unlisted: true`）＋Layer 1 3 項講者工具（`G`/`A`/`L`/`S`）＋Layer 2 11 項細粒度內容模組與 4 套風格動態套件（未用到 0 KB）＋軟性 `[WARN]` 場合與風格跨界防呆
+- [x] **三層細粒度按需架構＋亂中有序治理（Phase A / C.2 / v4.5–v4.9.0）**：Layer 0 輕底盤（含 `unlisted: true`、`[data-slide-scope]` 作用域、`isStill()`/`isReducedMotion()` 正交分層）＋Layer 1 3 項講者工具（`G`/`A`/`L`/`S`）＋Layer 2 11 項細粒度內容模組與 4 套風格動態套件（未用到 0 KB）＋軟性 `[WARN]` 場合與風格跨界防呆
 - [~] **多元風格憲法庫 Style DNA**：已就緒 4 款並上架 `style-library.html`；其餘 8 款＋主題智能配對與外觀帳本於 Phase D 補齊
-- [x] **圖像層真實無字 AI 融合＋自動單檔內嵌**：支援真實無字 AI 底圖 × HTML 真文字融合（含反左右割裂生圖規範）、`.asset-slot[data-slot]` 自動換圖、`assemble.py` 本機靜態圖與影片海報自動 Base64 內嵌與 `IMAGE_UPGRADE.md` 清單
-- [x] **HTML 核心動態、視覺指引（主柱二核心）與導演閉環**：60fps 原生核心＋單頁極性＋`nav_mode`＋`data-step`＋三層按需模組＋4 套風格動態套件（淺深雙底與靜態契約實測過關）＋5 支黃金工藝配方＋底盤自動搶先接管＋`check.mjs --motion` 16 項實測＋Liveliness Audit 全部落地驗證
-- [x] **排版細節與雙門檻品管**：下限（像素 WCAG 對比、漸層字、主標題≥總結、SVG 重複 ID、16 項動態與行動實測）＋ 上限（依 `stage_mode` 調檔之 Liveliness Audit 生動度與反單調稽核）
+- [x] **圖像層真實無字 AI 融合＋自動單檔內嵌**：支援真實無字 AI 底圖 × HTML 真文字融合（含反左右割裂生圖規範）、`.asset-slot[data-slot]` 平衡換圖解析、`assemble.py` 本機靜態圖與影片海報自動 Base64 內嵌與 `IMAGE_UPGRADE.md` 清單
+- [x] **HTML 核心動態、視覺指引（主柱二核心）與導演閉環**：60fps 原生核心＋單頁極性＋`nav_mode`＋`data-step`＋三層按需模組＋4 套風格動態套件（淺深雙底與靜態契約實測過關）＋5 支黃金工藝配方＋底盤自動搶先接管＋`check.mjs --motion` 17 項實測＋Liveliness Audit 全部落地驗證
+- [x] **排版細節與雙門檻品管**：下限（像素 WCAG 對比、漸層字、主標題≥總結、SVG 重複 ID、OKLCH 近似純黑白／禁紫檢核、17 項動態與行動實測含活頁列印）＋ 上限（依 `stage_mode` 調檔之 Liveliness Audit 生動度與反單調稽核，免罰去框高工藝頁）
 
 ### ③ 全流程（從頭到尾）
 
-- [x] Step 1a 架構與敘事脈絡腦力激盪（⛔ 關卡 1a，先收故事種子）→ Step 1b 內容細節與說服載體腦力激盪（⛔ 關卡 1b）→ `brief.md`（只記內容與場合：標竿盲點、故事種子、三個候選、反方回應、說服載體、亮點頁與減法清單；`lint.py brief.md` 檢查有沒有做到；快速模式自動合併）
+- [x] Step 1a 架構與敘事脈絡腦力激盪（⛔ 關卡 1a，含 Round 0 起手三分流、主／次受眾、故事種子、30 秒邏輯鏈與 Out of Scope）→ Step 1b 內容細節與說服載體腦力激盪（⛔ 關卡 1b，含 1b→1a 合法回退）→ `brief.md`（只記內容與場合；`lint.py brief.md` 檢查有沒有做到；快速模式自動合併）
 - [x] 架構展開＋逐頁視覺主角 `director.hero` → storyboard → lint（版型配方與轉場等選完風格才補）
 - [x] 兩階段視覺關卡 Gate 2（v4.8）：Step 3a 依 `contexts.md`〈主題類型總表〉與說服載體選風格，同時確認明暗、去框比例、導航（場合只校準、不淘汰）→ Agent 依風格版面語法補齊分鏡 → Step 3b 單風格 2–3 張極致樣張＋3 組 OKLCH 配色（確認後直接沿用為 Step 4 活範本）
 - [x] 製作 → `deck.html`（>6 頁每 3–4 頁乾淨分身精雕＋三層細粒度按需注入＋軟性防呆）
-- [~] 品管：下限像素 WCAG＋16 項動態行動實測＋上限 Liveliness Audit 已完成；獨立評審留待 Phase E
+- [~] 品管：下限像素 WCAG＋17 項動態行動實測＋上限 Liveliness Audit 已完成；獨立評審留待 Phase E
 - [~] 交付（Phase E）：**雙螢幕講者模式（`S`）＋總覽（`G`）＋畫筆雷射（`A`/`L`）＋`?noscale=1` 已提前完成**；文字可編輯 PPTX 匯出留待 Phase E
 - [ ] 修改（Phase E）：在成品上按 `E` 直接改字回寫、畫面上點選留言讓 Agent 一次改完
 - [ ] 記憶（Phase D–E）：外觀帳本、品味記憶、常用風格與模板
@@ -62,7 +62,7 @@
 | **A** | **地基對齊與輕底盤 v4** | 解凍 `deck-architect`：套用原則 #12–#25、清掉 11-14 實測待辦；建立「輕底盤、強自由」的 `deck-shell`；把 `render.cjs` 真實像素 WCAG 檢查併入 `check.mjs`；把首批 Style DNA 與三組 OKLCH 配色接進單一視覺關卡 Gate 2 | 新架構可在虛構範例上由輕底盤＋自由編排跑通 Gate 2 到成品，並通過統一 `check.mjs`（`outputs/examples/v4-demo/`＋`v4-visual-benchmark/` 靜態上限重練與原則 #26 減字全數通過） | ✅ |
 | **B / B.2 / B.3** | **注入 HTML 獨有的「活」與視覺指引** | 反寫四大靜態視覺工藝與原則 #26（`styles/workday.md`、`references/motion-system.md`、`references/visual-guidance.md`）；以方案 1 分層混合架構完成 60fps 純 GPU 動態核心、6 種敘事切頁、三數齊飛 Magic Move、**Phase B.3 三層聚光壓暗／因果現場演變／真描線與目標波紋／互動因果回饋**、`B` 鍵／`?still=1` 靜態凍結與 `check.mjs --motion` 7 項自動實測 | 8 頁完整單檔範例 `outputs/examples/v4-alive-demo/deck.html` 靜態對比全數通過（最低 `4.70:1`）、7 項 `--motion` 動態與視覺指引實測全部 ✅、390px 手機實測順滑清晰，同時保持 100% 離線雙擊可播 | ✅ |
 | **C.1** | **Phase C 標竿對照與 v4.4-spec 規格升級** | 以真實 43 頁旗艦 PPTX 對照 Phase C 21 頁 HTML 初版，回溯 `mattpocock/skills` 始祖機制，反寫三段式舞台光譜（`briefing`/`pitch`/`keynote`）、設計樹 Grill v2、標準模式必給破框候選、Grounding 與說服載體地圖、原則 #27–#30，重打包 `deck-architect.skill` | 9 份核心規格檔＋去敏研究筆記同步入庫，既有範例 `lint.py` 0 錯 0 警通過 | ✅ |
-| **C.2** | **v4.4→v4.8 兩大主柱終審與最終檢查、三層引擎與導演閉環升級 🎯** | 實作三層細粒度按需引擎（`G/A/L/S`＋11 項內容模組＋4 套風格動態套件＋`unlisted` 支援）、Step 1a/1b 顧問標竿與破框敘事腦力激盪、Step 2 `director:` 分鏡、Step 3a 主題優先 `style-library.html` 圖鑑→3b 單風格極致活範本、Step 4 >6 頁乾淨分身＋5 支高工藝配方、Step 5 16 項動態行動實測＋Liveliness Audit | 引擎、兩大主柱終審與最終檢查、4 套風格動態套件與聚光復原實測、4 個既有範例＋`v48-regression` 零回歸並重打包 ✅；使用者已拍板下一步先跑真實簡報 PK（重點看主柱一的顧問品質） | 🟡 引擎與流程就緒／下一步真實簡報 PK |
+| **C.2** | **v4.4→v4.9.0 兩大主柱終審與全量檢修、三層引擎與導演閉環升級 🎯** | 實作三層細粒度按需引擎（`G/A/L/S`＋11 項內容模組＋4 套風格動態套件＋`unlisted` 支援）、主柱一（Step 1a/1b 顧問標竿＋Round 0／主次受眾／30 秒邏輯鏈／Out of Scope／1b→1a 回退）＋主柱二（22 項全量檢修：WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]`、`speaker-view` 去重、活頁列印、圖鑑與三配方對齊 B.3、4 套件與模組極性／縮放）＋Step 5 17 項動態行動實測＋Liveliness Audit | 引擎、主柱一 6 項與主柱二 22 項全量檢修（Python 27/27、Browser CDP 34/34）、5 份 v4 範例＋`--sheet` 零回歸並重打包 ✅；下一步跑真實簡報 PK | 🟡 引擎與流程就緒／下一步真實簡報 PK |
 | **D** | **多元風格庫全面成形** | 依驗證過的 Style DNA 格式補齊其餘 8 款風格（積木構成、水彩水墨、書卷刻本、孔版小誌、摩登金、攝影雜誌、年輕潮流、在地懷舊，各含淺深規則與動效個性並上架 `style-library.html`）；整理插畫 15 種畫風配方與生圖公式；建立「主題→風格智能配對」與外觀帳本 | 面對不同主題（商務／發表／活動／文化／科普）的簡報，風格圖鑑與樣張都能端出截然不同、貼題驚豔的方向且不撞款 | |
 | **E** | **交付、修改閉環與越用越省事** | 成品上按 `E` 直接改字並回寫、畫面上點選留言修改；文字可編輯 PPTX 匯出；品味記憶與獨立評審；評估搬進 `skills/` 由 `install.sh` 全域安裝（雙螢幕講者模式已於 v4.5 完成） | 完整覆蓋日常製作→修改→上台→交付閉環，重複使用明顯更省事 | |
 

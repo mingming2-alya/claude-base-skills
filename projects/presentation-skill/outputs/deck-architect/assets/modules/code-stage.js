@@ -122,12 +122,28 @@
     stages.push(api);
   });
 
+  const isReduced = () => (typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : deck.isStatic());
+
+  function reqStepOf(el, sl) {
+    const host = el.closest('[data-step], [data-step-only]');
+    if (!host || !sl || !sl.contains(host)) return 0;
+    if (host.dataset.stepOnly !== undefined) return parseInt(host.dataset.stepOnly, 10) || 0;
+    return parseInt(host.dataset.step || '0', 10) || 0;
+  }
+
   // Optional terminal typewriter ([data-typewriter])
   const twTimers = new Set();
   const typewriters = [...document.querySelectorAll('[data-typewriter]')].map(el => {
     const full = el.textContent;
+    const slide = el.closest('.slide');
     el.dataset.twFull = full;
-    return { el, full, slide: el.closest('.slide'), speed: Math.max(12, parseInt(el.dataset.twSpeed || '28', 10) || 28) };
+    return {
+      el,
+      full,
+      slide,
+      reqStep: reqStepOf(el, slide),
+      speed: Math.max(12, parseInt(el.dataset.twSpeed || '28', 10) || 28),
+    };
   });
 
   function stopTypewriters(snapFull) {
@@ -139,47 +155,62 @@
     });
   }
 
-  function runTypewritersFor(sl, staticMode) {
+  function startSingleTypewriter(tw, sl, delayMs) {
+    tw.el.textContent = '';
+    tw.el.classList.add('is-typing');
+    let pos = 0;
+    const tick = () => {
+      if (isReduced() || deck.slides[deck.index] !== sl) {
+        tw.el.textContent = tw.full;
+        tw.el.classList.remove('is-typing');
+        return;
+      }
+      pos++;
+      tw.el.textContent = tw.full.slice(0, pos);
+      if (pos < tw.full.length) {
+        const id = setTimeout(() => { twTimers.delete(id); tick(); }, tw.speed);
+        twTimers.add(id);
+      } else {
+        tw.el.classList.remove('is-typing');
+      }
+    };
+    const initId = setTimeout(() => { twTimers.delete(initId); tick(); }, delayMs);
+    twTimers.add(initId);
+  }
+
+  function runTypewritersFor(sl, staticMode, stepIdx, enterDelay, restAtFinal) {
     stopTypewriters(true);
-    if (!sl || staticMode) return;
+    if (!sl || staticMode || isReduced() || restAtFinal) return;
+    const baseDelay = Math.max(180, (enterDelay || 0) + 100);
     typewriters.forEach(tw => {
-      if (tw.slide !== sl) return;
-      tw.el.textContent = '';
-      tw.el.classList.add('is-typing');
-      let pos = 0;
-      const tick = () => {
-        if (deck.isStatic() || deck.slides[deck.index] !== sl) {
-          tw.el.textContent = tw.full;
-          tw.el.classList.remove('is-typing');
-          return;
-        }
-        pos++;
-        tw.el.textContent = tw.full.slice(0, pos);
-        if (pos < tw.full.length) {
-          const id = setTimeout(() => { twTimers.delete(id); tick(); }, tw.speed);
-          twTimers.add(id);
-        } else {
-          tw.el.classList.remove('is-typing');
-        }
-      };
-      const initId = setTimeout(() => { twTimers.delete(initId); tick(); }, 220);
-      twTimers.add(initId);
+      if (tw.slide !== sl || tw.reqStep > (stepIdx || 0)) return;
+      startSingleTypewriter(tw, sl, baseDelay);
     });
   }
 
   deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
     stages.forEach(s => { if (s.slide === detail.slide) s.syncStep(detail.step || 0); });
-    runTypewritersFor(detail.slide, detail.staticMode);
+    runTypewritersFor(detail.slide, detail.reducedMotion || detail.staticMode, detail.step || 0, detail.enterDelay || 0, detail.restAtFinal);
   });
   deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
     stages.forEach(s => { if (s.slide === detail.slide) s.syncStep(detail.step || 0); });
+    if (isReduced() || detail.dir < 0) {
+      stopTypewriters(true);
+      return;
+    }
+    typewriters.forEach(tw => {
+      if (tw.slide === detail.slide && tw.reqStep === detail.step) {
+        startSingleTypewriter(tw, detail.slide, 80);
+      }
+    });
   });
   deck.stage.addEventListener('deck:slideleave', () => stopTypewriters(true));
   deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) stopTypewriters(true); });
   deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) stopTypewriters(true); });
+  deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => { if (detail.reduced) stopTypewriters(true); });
 
   if (deck.slides[deck.index]) {
     stages.forEach(s => { if (s.slide === deck.slides[deck.index]) s.syncStep(deck.stepIndex || 0); });
-    runTypewritersFor(deck.slides[deck.index], deck.isStatic());
+    runTypewritersFor(deck.slides[deck.index], isReduced(), deck.stepIndex || 0, 120, false);
   }
 })();

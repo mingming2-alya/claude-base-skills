@@ -361,6 +361,38 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
       const d = __cx.getImageData(0, 0, 1, 1).data;
       return [d[0], d[1], d[2], d[3] / 255];
     };
+    const rgbToOklch = (r, g, b) => {
+      const f = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+      const lr = f(r), lg = f(g), lb = f(b);
+      const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb);
+      const m = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb);
+      const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb);
+      const L = 0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s;
+      const A = 1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s;
+      const B = 0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s;
+      const C = Math.hypot(A, B);
+      const H = ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360;
+      return [L, C, H];
+    };
+    const isPurpleRgb = rgba => {
+      if (!rgba || rgba[3] < 0.5) return false;
+      const [, C, H] = rgbToOklch(rgba[0], rgba[1], rgba[2]);
+      return C >= 0.04 && H >= 280 && H <= 335;
+    };
+
+    // 0. OKLCH color hygiene: warn on pure #FFFFFF/#000000 slide bg or banned purple accent/tokens
+    const slCs = getComputedStyle(sl);
+    const bgRgba = toRgba(slCs.backgroundColor);
+    if (bgRgba && bgRgba[3] >= 0.9 && (!slCs.backgroundImage || slCs.backgroundImage === 'none')) {
+      const [bL, bC] = rgbToOklch(bgRgba[0], bgRgba[1], bgRgba[2]);
+      if ((bL > 0.992 && bC < 0.004) || (bL < 0.12 && bC < 0.004)) {
+        warnings.push(`投影片底色過於接近純白／純黑（OKLCH L=${bL.toFixed(3)}, C=${bC.toFixed(3)}），建議帶入微妙色溫`);
+      }
+    }
+    const accentVal = slCs.getPropertyValue('--accent').trim();
+    if (accentVal && isPurpleRgb(toRgba(accentVal))) {
+      warnings.push(`偵測到禁用紫色主調 --accent (${accentVal}，OKLCH H 280–335, C >= 0.04)`);
+    }
 
     // 1. Duplicate IDs inside SVGs of the active slide
     const seenIds = new Set();
@@ -650,15 +682,16 @@ async function runSheetMode(driver, samplesDir) {
 async function runMotionAudit(driver, filePath) {
   const results = [];
   const failures = [];
+  const warnings = [];
   driver.clearErrors();
   await driver.setViewport(1920, 1080);
   await driver.goto(pathToFileURL(filePath).href);
   await driver.wait(280);
 
   const count = await driver.evaluate(() => window.__deck ? window.__deck.count : 0);
-  if (!count) return { results: [], failures: ['找不到 window.__deck API'] };
+  if (!count) return { results: [], failures: ['找不到 window.__deck API'], warnings: [] };
 
-  // 1. Rapid-fire zero-lockout interruption test
+  // 1. Rapid-fire zero-lockout interruption test + WAAPI fill:forwards cleanup verification
   const mainCount = await driver.evaluate(() => window.__deck.slides.filter(s => s.dataset.appendix !== '1').length);
   if (mainCount >= 4) {
     await driver.evaluate(() => window.__deck.go(0, true));
@@ -683,6 +716,59 @@ async function runMotionAudit(driver, filePath) {
     } else {
       failures.push(`連按打斷異常：index=${rapid.idx}, stepIdx=${rapid.stepIdx}, morphLeft=${rapid.morphLeft}, hiddenMorph=${rapid.hiddenMorph}, actives=${rapid.actives}, leavings=${rapid.leavings}, staleBgFocus=${rapid.staleBgFocus}`);
     }
+  }
+
+  // 1b. WAAPI fill:forwards lock check (shock interruption during 220ms curtain pause; reverse iris/sheet-up return)
+  const waapiTargets = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    let shock = -1, rev = -1, revKind = '';
+    for (let i = 1; i < sls.length; i++) {
+      if (sls[i].dataset.appendix === '1') continue;
+      if (shock < 0 && sls[i].dataset.kind === 'shock') shock = i;
+      const tr = (sls[i].dataset.transition || '').trim();
+      if (rev < 0 && (tr === 'iris' || tr === 'sheet-up')) { rev = i; revKind = tr; }
+    }
+    return { shock, rev, revKind };
+  });
+  const waapiParts = [];
+  if (waapiTargets.shock > 0) {
+    await driver.evaluate(i => window.__deck.go(i - 1, true), waapiTargets.shock);
+    await driver.wait(60);
+    await driver.evaluate(i => window.__deck.go(i, false), waapiTargets.shock);
+    await driver.wait(210); // Right inside the 220ms black-curtain hold after cIn finished
+    await driver.evaluate(() => window.__deck.go(0, false));
+    await driver.wait(520);
+    const curtainState = await driver.evaluate(() => {
+      const c = document.getElementById('curtain');
+      if (!c) return { op: 0, anims: 0 };
+      return { op: parseFloat(getComputedStyle(c).opacity) || 0, anims: c.getAnimations().length };
+    });
+    if (curtainState.op <= 0.02 && curtainState.anims === 0) {
+      waapiParts.push(`shock 黑幕中斷（第 ${waapiTargets.shock + 1} 頁）`);
+    } else {
+      failures.push(`WAAPI 殘留鎖死：打斷 shock（第 ${waapiTargets.shock + 1} 頁）後 #curtain 停留在 opacity=${curtainState.op} / anims=${curtainState.anims}`);
+    }
+  }
+  if (waapiTargets.rev > 0) {
+    await driver.evaluate(i => window.__deck.go(i, true), waapiTargets.rev);
+    await driver.wait(60);
+    await driver.evaluate(i => window.__deck.go(i - 1, false), waapiTargets.rev);
+    await driver.wait(820);
+    await driver.evaluate(i => window.__deck.go(i, true), waapiTargets.rev);
+    await driver.wait(80);
+    const revState = await driver.evaluate(i => {
+      const sl = window.__deck.slides[i];
+      const cs = getComputedStyle(sl);
+      return { anims: sl.getAnimations().length, clip: cs.clipPath, transform: cs.transform, op: parseFloat(cs.opacity) || 0 };
+    }, waapiTargets.rev);
+    if (revState.anims === 0 && (revState.clip === 'none' || !revState.clip) && (revState.transform === 'none' || !revState.transform) && revState.op >= 0.98) {
+      waapiParts.push(`${waapiTargets.revKind} 回翻重進（第 ${waapiTargets.rev + 1} 頁）`);
+    } else {
+      failures.push(`WAAPI 殘留鎖死：${waapiTargets.revKind} 回翻再瞬切第 ${waapiTargets.rev + 1} 頁後殘留 ${JSON.stringify(revState)}`);
+    }
+  }
+  if (waapiParts.length) {
+    results.push(`WAAPI fill:forwards 防鎖死檢核（${waapiParts.join('、')}）：通過（零黑幕／零裁剪歸零／零殘留動畫）`);
   }
 
   // 2. Magic Move mount & cleanup round-trip
@@ -798,19 +884,58 @@ async function runMotionAudit(driver, filePath) {
     }
   }
 
-  // 6. Phase B.3 Visual Guidance round-trip (focus-plan dimming & causal transform-at settle cleanly to 100%)
+  // 6. Phase B.3 Visual Guidance round-trip + beat duration / off-focus leak / SVG pop-vs-draw order checks
   const guidanceTargets = await driver.evaluate(() => {
     const sls = window.__deck.slides;
     const out = [];
+    const timingWarns = [];
     for (let i = 0; i < sls.length; i++) {
       const plan = sls[i].dataset.focusPlan || '';
       const hasTransform = Boolean(sls[i].querySelector('[data-transform-at]'));
+      // Check SVG data-pop vs data-draw arrival order on every slide
+      for (const svg of sls[i].querySelectorAll('svg')) {
+        const draws = [...svg.querySelectorAll('[data-draw]')].filter(el => el.getAttribute('data-draw') !== 'ring');
+        const pops = [...svg.querySelectorAll('[data-pop]')];
+        if (draws.length === 1 && pops.length >= 1) {
+          const dDel = parseFloat(draws[0].dataset.delay || '280') || 0;
+          const dDur = parseFloat(draws[0].dataset.dur || '880') || 880;
+          const dArr = dDel + dDur;
+          for (const p of pops) {
+            const pDel = parseFloat(p.dataset.delay || '320') || 0;
+            if (pDel > dDel && pDel + 120 < dArr) {
+              timingWarns.push(`第 ${i + 1} 頁 SVG [data-pop]（${pDel}ms）早於 [data-draw] 抵達（${dArr}ms），建議線到點再綻`);
+              break;
+            }
+          }
+        }
+      }
       if (!plan && !hasTransform) continue;
+      const beats = [];
       let minStart = Infinity;
       let maxEnd = 0;
-      for (const m of plan.matchAll(/@(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)/g)) {
-        minStart = Math.min(minStart, parseFloat(m[1]));
-        maxEnd = Math.max(maxEnd, parseFloat(m[2]));
+      for (const m of plan.matchAll(/([^\s@,]+)@(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)/g)) {
+        const st = parseFloat(m[2]), en = parseFloat(m[3]);
+        beats.push({ id: m[1], start: st, end: en, dur: en - st });
+        minStart = Math.min(minStart, st);
+        maxEnd = Math.max(maxEnd, en);
+      }
+      for (const b of beats) {
+        if (b.dur < 1100) {
+          timingWarns.push(`第 ${i + 1} 頁 focus-plan 節拍 ${b.id} 僅 ${b.dur}ms（建議 1300–1800ms 保留靜止閱讀窗）`);
+        }
+      }
+      if (beats.length > 1) {
+        const firstId = beats[0].id;
+        for (const fEl of sls[i].querySelectorAll('[data-focus]')) {
+          const fIds = (fEl.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
+          if (!fIds.length || fIds.includes(firstId)) continue;
+          const earlyKids = [...fEl.querySelectorAll('[data-count], [data-grow], [data-draw]')].filter(
+            k => k.dataset.delay === undefined && k.dataset.beat === undefined && !k.closest('[data-step], [data-step-only]')
+          );
+          if (earlyKids.length) {
+            timingWarns.push(`第 ${i + 1} 頁 data-focus="${fEl.dataset.focus}" 內有 ${earlyKids.length} 個子原語未設 data-delay，恐於壓暗階段偷跑`);
+          }
+        }
       }
       if (!Number.isFinite(minStart)) minStart = 0;
       for (const el of sls[i].querySelectorAll('[data-transform-at]')) {
@@ -818,11 +943,12 @@ async function runMotionAudit(driver, filePath) {
       }
       out.push({ idx: i, hasPlan: Boolean(plan), hasTransform, minStart, maxEnd });
     }
-    return out;
+    return { out, timingWarns };
   });
-  if (guidanceTargets.length) {
+  warnings.push(...guidanceTargets.timingWarns);
+  if (guidanceTargets.out.length) {
     const checkedSlides = [];
-    for (const gt of guidanceTargets) {
+    for (const gt of guidanceTargets.out) {
       const fromIdx = gt.idx === 0 ? Math.min(1, count - 1) : gt.idx - 1;
       await driver.evaluate(i => window.__deck.go(i, true), fromIdx);
       await driver.wait(60);
@@ -856,7 +982,7 @@ async function runMotionAudit(driver, filePath) {
         failures.push(`第 ${gt.idx + 1} 頁視覺指引復原異常：mid=${JSON.stringify(mid)}, end=${JSON.stringify(end)}`);
       }
     }
-    if (checkedSlides.length === guidanceTargets.length) {
+    if (checkedSlides.length === guidanceTargets.out.length) {
       results.push(`視覺指引聚光壓暗／因果演變（${checkedSlides.join('、')}）：通過（演繹期間明確聚焦，結束 100% 復原零殘留）`);
     }
   }
@@ -1177,15 +1303,29 @@ async function runMotionAudit(driver, filePath) {
     results.push(`多媒體與原生輪播原語（${mwParts.join('、')}）：通過`);
   }
 
-  // 12. v4.5 Layer 1 Presenter Chrome (grid-overview G, annotator A / laser L, speaker-view S)
+  // 12. v4.5 Layer 1 Presenter Chrome (grid-overview G + scoped thumbnail fidelity, annotator A / laser L, speaker-view S)
   const presenterParts = [];
   const pCheck = await driver.evaluate(() => {
-    const out = { grid: null, annotator: null, speaker: null };
+    const out = { grid: null, gridStyleOk: true, annotator: null, speaker: null };
     if (window.__deckGrid) {
       window.__deckGrid.open();
       const opened = window.__deckGrid.isOpen() && window.__deck.hasNavLock();
+      // Verify free-canvas thumbnails preserve [data-slide-scope] styling instead of collapsing to bare HTML
+      const freeIdx = window.__deck.slides.findIndex(s => s.hasAttribute('data-slide-scope') && s.querySelector('h1, h2'));
+      if (freeIdx >= 0) {
+        const origH = window.__deck.slides[freeIdx].querySelector('h1, h2');
+        const thumbSlide = document.querySelector(`#deck-grid .dg-card[data-slide-idx="${freeIdx}"] .dg-thumb-stage .slide`);
+        const thumbH = thumbSlide ? thumbSlide.querySelector('h1, h2') : null;
+        if (!thumbSlide || !thumbSlide.hasAttribute('data-slide-scope') || !thumbH) {
+          out.gridStyleOk = false;
+        } else {
+          const origFs = parseFloat(getComputedStyle(origH).fontSize) || 0;
+          const thumbFs = parseFloat(getComputedStyle(thumbH).fontSize) || 0;
+          if (origFs > 32 && Math.abs(origFs - thumbFs) > 3) out.gridStyleOk = false;
+        }
+      }
       const closedByEsc = window.__deck.closeTopOverlay() && !window.__deckGrid.isOpen() && !window.__deck.hasNavLock();
-      out.grid = opened && closedByEsc;
+      out.grid = opened && closedByEsc && out.gridStyleOk;
     }
     if (window.__deckAnnotator) {
       window.__deckAnnotator.setDrawing(true);
@@ -1204,8 +1344,8 @@ async function runMotionAudit(driver, filePath) {
     return out;
   });
   if (pCheck.grid !== null) {
-    if (pCheck.grid) presenterParts.push('總覽矩陣 G');
-    else failures.push('Layer 1 總覽矩陣（G）開啟／鎖定／Esc 關閉異常');
+    if (pCheck.grid) presenterParts.push('總覽矩陣 G（含縮圖樣式保真）');
+    else failures.push(`Layer 1 總覽矩陣（G）開啟／鎖定／縮圖作用域異常（gridStyleOk=${pCheck.gridStyleOk}）`);
   }
   if (pCheck.annotator !== null) {
     if (pCheck.annotator) presenterParts.push('畫筆標註 A 與雷射筆 L');
@@ -1313,7 +1453,7 @@ async function runMotionAudit(driver, filePath) {
       if (sl.dataset.appendix === '1') return;
       const els = sl.querySelectorAll('*');
       for (const el of els) {
-        if (el.closest('[data-marquee], .cr-typing, .tw-cursor, .fx-canvas, .ap-live-dot')) continue;
+        if (el.closest('[data-marquee], .cr-typing.is-on, .tw-cursor, .fx-canvas, .ap-live-dot')) continue;
         const st = getComputedStyle(el);
         if (st.animationName && st.animationName !== 'none' && st.animationIterationCount === 'infinite') {
           bad.push(`第 ${idx + 1} 頁 <${el.tagName.toLowerCase()}> (${st.animationName})`);
@@ -1329,7 +1469,7 @@ async function runMotionAudit(driver, filePath) {
     results.push('閱讀期靜止檢核（反永動干擾／畫完就安靜）：通過');
   }
 
-  // 15. Mobile 390px viewport sanity check (Takeaway #6: zero horizontal overflow & stage scaled cleanly)
+  // 15. Mobile 390px viewport sanity check (stage fit + #ctrl-bar horizontal fit without clipping)
   await driver.setViewport(390, 844);
   await driver.wait(160);
   const mobileRes = await driver.evaluate(() => {
@@ -1337,14 +1477,23 @@ async function runMotionAudit(driver, filePath) {
     const st = document.getElementById('stage');
     const r = st ? st.getBoundingClientRect() : null;
     const okBox = Boolean(r && r.width > 200 && r.width <= window.innerWidth + 2 && r.height > 100);
-    return { overflow, okBox, w: r ? Math.round(r.width) : 0 };
+    let ctrlOk = true, ctrlW = 0;
+    const cb = document.getElementById('ctrl-bar');
+    if (cb && typeof window.__deck.setCtrlBarVisible === 'function') {
+      window.__deck.setCtrlBarVisible(true, true);
+      const cr = cb.getBoundingClientRect();
+      ctrlW = Math.round(cr.width);
+      ctrlOk = cr.left >= -1 && cr.right <= window.innerWidth + 1;
+      window.__deck.setCtrlBarVisible(false, false);
+    }
+    return { overflow, okBox, w: r ? Math.round(r.width) : 0, ctrlOk, ctrlW };
   });
   await driver.setViewport(1920, 1080);
   await driver.wait(120);
-  if (mobileRes.overflow <= 1 && mobileRes.okBox) {
-    results.push(`390px 手機縮放實測（橫向溢出 0px、舞台實寬 ${mobileRes.w}px）：通過`);
+  if (mobileRes.overflow <= 1 && mobileRes.okBox && mobileRes.ctrlOk) {
+    results.push(`390px 手機縮放與控制條實測（橫向溢出 0px、舞台 ${mobileRes.w}px、控制條 ${mobileRes.ctrlW}px 零裁切）：通過`);
   } else {
-    failures.push(`390px 手機實測異常（橫向溢出 ${mobileRes.overflow}px、舞台實寬 ${mobileRes.w}px）`);
+    failures.push(`390px 手機實測異常（橫向溢出 ${mobileRes.overflow}px、舞台實寬 ${mobileRes.w}px、控制條寬 ${mobileRes.ctrlW}px ctrlOk=${mobileRes.ctrlOk}）`);
   }
 
   // 16. v4.7 Style Motion Kits functional & low-power/still contract verification
@@ -1486,9 +1635,46 @@ async function runMotionAudit(driver, filePath) {
     results.push(`v4.7 風格動態套件實測（${kitParts.join('、')}）：通過（互動零誤翻、低耗電與靜態契約正常）`);
   }
 
+  // 17. Live beforeprint / afterprint (without ?still=1): expand all data-step slides, clear transient focus/transform, restore after print
+  const printTarget = await driver.evaluate(() => {
+    const sls = window.__deck.slides;
+    const stepIdx = sls.findIndex(s => s.dataset.appendix !== '1' && s.querySelector('[data-step], [data-step-only]'));
+    return { slideIdx: stepIdx >= 0 ? stepIdx : 0, hasStep: stepIdx >= 0 };
+  });
+  await driver.evaluate(i => { window.__deck.go(i, true, { step: 0 }); }, printTarget.slideIdx);
+  await driver.wait(80);
+  const printRes = await driver.evaluate(() => {
+    const preIdx = window.__deck.index;
+    const preStep = window.__deck.stepIndex || 0;
+    window.dispatchEvent(new Event('beforeprint'));
+    const sls = window.__deck.slides;
+    let unexpanded = 0;
+    let staleFocus = 0;
+    for (const sl of sls) {
+      const nums = [...sl.querySelectorAll('[data-step], [data-step-only]')]
+        .flatMap(el => [el.dataset.step, el.dataset.stepOnly, el.dataset.stepHide].map(v => parseInt(v || '0', 10)))
+        .filter(n => !isNaN(n) && n > 0);
+      const maxS = nums.length ? Math.max(...nums) : 0;
+      if (maxS > 0 && Number(sl.dataset.currentStep || 0) !== maxS) unexpanded++;
+      if (sl.classList.contains('is-focusing') || sl.querySelector('.focus-dim, .pre-transform')) staleFocus++;
+    }
+    window.dispatchEvent(new Event('afterprint'));
+    const postIdx = window.__deck.index;
+    const postStep = window.__deck.stepIndex || 0;
+    return {
+      ok: unexpanded === 0 && staleFocus === 0 && postIdx === preIdx && postStep === preStep,
+      unexpanded, staleFocus, preIdx, postIdx, preStep, postStep,
+    };
+  });
+  if (printRes.ok) {
+    results.push(`活頁列印事件測試（beforeprint / afterprint${printTarget.hasStep ? `，含第 ${printTarget.slideIdx + 1} 頁多步展開與復原` : ''}）：通過`);
+  } else {
+    failures.push(`活頁列印事件異常：unexpanded=${printRes.unexpanded}, staleFocus=${printRes.staleFocus}, idx=${printRes.preIdx}->${printRes.postIdx}, step=${printRes.preStep}->${printRes.postStep}`);
+  }
+
   const jsErrs = driver.getErrors();
   for (const e of jsErrs) failures.push(`動態測試期間腳本錯誤：${e}`);
-  return { results, failures };
+  return { results, failures, warnings };
 }
 
 async function runDeckOrSingleMode(driver, targetFile, opts) {
@@ -1556,12 +1742,23 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
       ...['ruler-progress', 'bento-expand', 'rank-race', 'odometer', 'rack-focus', 'split-mask',
         'spotlight-sweep', 'depth-deck', 'colorize-wipe', 'popup-fold', 'chat-replay']
         .map(id => [id, sl => Boolean(sl.querySelector(`[data-${id}]`))]),
-      ['interactive-module', sl => Boolean(sl.querySelector('[data-flow-carousel], [data-coverflow], [data-marquee], [data-compare-slider], [data-code-stage], [data-ref], [data-sound-ab], [data-sound-demo], [data-slide-video], .live-ctrl input[type="range"], [data-segmented]'))],
+      ['interactive-module', sl => Boolean(sl.querySelector('[data-flow-carousel], [data-coverflow], [data-marquee], [data-compare-slider], [data-code-stage], [data-ref], [data-sound-ab], [data-sound-demo], [data-slide-video], .live-ctrl input[type="range"], [data-segmented], [data-toggle], [data-presets], [data-zoomable], [data-typewriter]'))],
     ];
     let visualCount = 0;
     let maxFlatStreak = 0;
     let curFlatStreak = 0;
     const flatSlides = [];
+    const countVisibleChars = root => {
+      let chars = 0;
+      const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      let node;
+      while ((node = tw.nextNode())) {
+        const p = node.parentElement;
+        if (!p || /^(STYLE|SCRIPT|NOSCRIPT|SVG)$/i.test(p.tagName) || p.closest('style, script, svg, nav, [data-auto-nav], [data-role="source"], .snav')) continue;
+        chars += (node.nodeValue || '').replace(/\s+/g, '').length;
+      }
+      return chars;
+    };
     sls.forEach((sl, idx) => {
       for (const [name, fn] of primChecks) if (fn(sl)) primitives.add(name);
       const kind = sl.dataset.kind || 'content';
@@ -1571,8 +1768,17 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
         const w = parseFloat(g.getAttribute('width') || '0') || (vb[2] || 0);
         return w >= 120;
       });
-      const hasMediaOrWidget = Boolean(sl.querySelector('img, .asset-slot, video, audio, table, [data-flow-carousel], [data-coverflow], [data-compare-slider], [data-code-stage], [data-ref], [data-marquee], [data-ruler-progress], [data-bento-expand], [data-rank-race], [data-depth-deck], [data-colorize-wipe], [data-popup-fold], [data-chat-replay], .pillars, .device-browser, .device-frame, .live-ctrl input[type="range"]'));
-      const isVisual = hasBigSvg || hasMediaOrWidget;
+      const hasMediaOrWidget = Boolean(sl.querySelector('img, .asset-slot, video, audio, table, [data-flow-carousel], [data-coverflow], [data-compare-slider], [data-code-stage], [data-ref], [data-marquee], [data-ruler-progress], [data-bento-expand], [data-rank-race], [data-odometer], [data-rack-focus], [data-split-mask], [data-spotlight-sweep], [data-depth-deck], [data-colorize-wipe], [data-popup-fold], [data-chat-replay], [data-zoomable], [data-typewriter], [data-sound-ab], [data-sound-demo], [data-toggle], [data-presets], .pillars, .device-browser, .device-frame, .device-phone, .device-tablet, .live-ctrl input[type="range"]'));
+      const headings = [...sl.querySelectorAll('h1, h2, [data-role="title"]')];
+      const maxHeadingPx = headings.reduce((m, el) => Math.max(m, parseFloat(getComputedStyle(el).fontSize) || 0), 0);
+      const bodyEl = sl.querySelector('p:not([data-role="source"]), li, .lead, .sub');
+      const bodyPx = bodyEl ? (parseFloat(getComputedStyle(bodyEl).fontSize) || 24) : 24;
+      const visChars = countVisibleChars(sl);
+      // Anti-card-itis fairness: frameless editorial spreads (35/65 split, quote chamber, giant display typography) count as visual craft
+      const isEditorialCraft = sl.dataset.surface === 'split'
+        || Boolean(sl.querySelector('blockquote, [data-archetype]'))
+        || (maxHeadingPx >= 68 && bodyPx > 0 && maxHeadingPx / bodyPx >= 2.8 && visChars <= 70);
+      const isVisual = hasBigSvg || hasMediaOrWidget || isEditorialCraft;
       const hasMotion = primChecks.some(([, fn]) => fn(sl));
       contentSlides.push({ slideNum: idx + 1, isVisual, hasMotion });
       if (isVisual) {
@@ -1667,6 +1873,7 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
   if (motionReport) {
     lines.push('## 動態互動檢核（`--motion`）');
     for (const r of motionReport.results) lines.push(`- ✅ ${r}`);
+    for (const w of (motionReport.warnings || [])) lines.push(`- ⚠️ [WARN] ${w}`);
     for (const f of motionReport.failures) lines.push(`- ❌ ${f}`);
     lines.push('');
   }

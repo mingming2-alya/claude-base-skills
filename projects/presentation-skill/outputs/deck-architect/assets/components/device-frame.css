@@ -4,11 +4,11 @@
  */
 .device-frame,
 .device-browser {
-  border-radius: 18px;
+  border-radius: var(--card-radius, 18px);
   border: 1px solid var(--line);
   background: var(--bg-2);
   overflow: hidden;
-  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.24);
+  box-shadow: var(--card-shadow, 0 24px 56px rgba(0, 0, 0, 0.24));
   display: flex;
   flex-direction: column;
 }
@@ -53,10 +53,18 @@
   position: relative;
   overflow: hidden;
 }
+.device-frame[data-device="phone"],
+.device-phone {
+  position: relative;
+  border-radius: var(--card-radius, 40px);
+  border: 6px solid color-mix(in srgb, var(--fg) 24%, var(--bg-2));
+  background: var(--bg-2);
+  box-shadow: var(--card-shadow, 0 24px 56px rgba(0, 0, 0, 0.26));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 .device-frame[data-device="phone"] {
-  border-radius: 40px;
-  border-width: 6px;
-  border-color: color-mix(in srgb, var(--fg) 24%, var(--bg-2));
   padding-top: 18px;
 }
 .device-frame[data-device="phone"]::before {
@@ -68,8 +76,43 @@
   border-radius: 999px;
   background: rgba(12, 15, 21, 0.85);
 }
-.device-frame[data-device="tablet"] {
-  border-radius: 28px;
-  border-width: 8px;
-  border-color: color-mix(in srgb, var(--fg) 22%, var(--bg-2));
+.device-phone .dp-notch {
+  flex: none;
+  width: 96px;
+  height: 22px;
+  margin: 12px auto 8px;
+  border-radius: 999px;
+  background: rgba(12, 15, 21, 0.88);
+}
+.device-phone .dp-screen {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+.device-frame[data-device="tablet"],
+.device-tablet {
+  position: relative;
+  border-radius: var(--card-radius, 28px);
+  border: 8px solid color-mix(in srgb, var(--fg) 22%, var(--bg-2));
+  background: var(--bg-2);
+  box-shadow: var(--card-shadow, 0 24px 56px rgba(0, 0, 0, 0.24));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.device-tablet .dt-screen {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+.device-phone .dp-screen > img,
+.device-phone .dp-screen > video,
+.device-tablet .dt-screen > img,
+.device-tablet .dt-screen > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

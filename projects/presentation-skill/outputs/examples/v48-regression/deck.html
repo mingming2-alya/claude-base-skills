@@ -58,8 +58,8 @@
   --quote-weight: 600;
   --number-weight: 900;
   --numeral-weight: 700;
-  --display-tracking: -0.02em;
-  --title-tracking: -0.01em;
+  --display-tracking: 0;
+  --title-tracking: 0;
   --label-tracking: 0.02em;
 
   /* Flexible navigation placement tokens (styles may override) */
@@ -74,10 +74,9 @@
   --nav-accent: var(--accent);
   --nav-border: var(--line-2);
 
-  /* 60fps motion personality tokens (spring | crisp | tactile) */
+  /* 60fps motion personality tokens (spring | crisp | tactile); styles may override --enter-easing */
   --motion-mode: spring;
   --spring-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
   --stagger-base: 64;
   --morph-ms: 780;
 }
@@ -117,6 +116,13 @@
   --nav-active: var(--dark-fg, #F0EFEA);
   --nav-accent: var(--dark-accent, #3ED49C);
   --nav-border: var(--dark-line-2, rgba(240, 239, 234, .14));
+}
+
+/* Enforce counsel architectural zero-radius / zero-shadow law across Layer 2 modules & recipes */
+:where(html[data-style="counsel"]) {
+  --card-radius: 0px;
+  --ctrl-radius: 0px;
+  --card-shadow: none;
 }
 
 html, body {
@@ -424,6 +430,7 @@ mark.em {
   opacity: 0;
   z-index: 4;
 }
+:where([data-ripple], [data-travel]) { opacity: 0; }
 
 /* ---------------------------------------------------------------- navigation modes (top-bar / minimal-side / divider-only) */
 #nav {
@@ -684,6 +691,9 @@ mark.em {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  max-width: calc(100vw - 16px);
+  overflow-x: auto;
+  scrollbar-width: none;
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(15, 18, 24, 0.88);
@@ -695,6 +705,7 @@ mark.em {
   pointer-events: none;
   transition: opacity .24s ease, transform .24s cubic-bezier(0.22, 1, 0.36, 1);
 }
+#ctrl-bar::-webkit-scrollbar { display: none; }
 #ctrl-bar.visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
@@ -710,12 +721,20 @@ mark.em {
   padding: 0 10px;
   border-radius: 999px;
   font: 600 13px/1 var(--font-sans-fallback);
+  white-space: nowrap;
+  flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
   cursor: pointer;
   transition: background .16s ease, color .16s ease;
+}
+@media (max-width: 720px) {
+  #ctrl-bar { gap: 4px; padding: 5px 8px; bottom: 10px; }
+  #ctrl-bar .cb-btn { padding: 0 7px; font-size: 12px; height: 28px; min-width: 28px; }
+  #ctrl-bar .cb-pos { padding: 0 5px; font-size: 12px; }
+  #ctrl-bar .cb-sep { display: none; }
 }
 #ctrl-bar .cb-btn:hover { background: rgba(255, 255, 255, 0.12); color: #FFFFFF; }
 #ctrl-bar .cb-btn.is-on { background: rgba(62, 212, 156, 0.22); color: #7BF0C3; }
@@ -838,9 +857,11 @@ body.hide-ctrl #deck-progress {
     transform: none !important;
     clip-path: none !important;
   }
-  .slide * { animation: none !important; }
+  .slide * { animation: none !important; transition: none !important; }
+  .slide [data-focus] { opacity: 1 !important; transform: none !important; box-shadow: none !important; }
   .slide [data-step-hidden="1"] { display: none !important; }
-  .slide [data-step]:not([data-step-hidden="1"]) { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .slide [data-step]:not([data-step-hidden="1"]),
+  .slide [data-step-only]:not([data-step-hidden="1"]) { opacity: 1 !important; visibility: visible !important; transform: none !important; }
   .toc li.off { opacity: .28 !important; }
   .snav {
     display: flex;
@@ -964,16 +985,21 @@ body.hide-ctrl #deck-progress {
   pointer-events: none;
 }
 #deck-grid .dg-thumb-stage .slide {
-  display: flex !important;
   opacity: 1 !important;
   visibility: visible !important;
   position: absolute !important;
   inset: 0 !important;
   transform: none !important;
+  clip-path: none !important;
 }
 #deck-grid .dg-thumb-stage [data-step-hidden="1"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+#deck-grid .dg-thumb-stage [data-focus] {
   opacity: 1 !important;
-  visibility: visible !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 #deck-grid .dg-meta {
   display: flex;
@@ -1039,6 +1065,9 @@ html.still #deck-grid { display: none !important; }
   z-index: 92;
   display: none;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: calc(100vw - 16px);
   gap: 8px;
   padding: 8px 14px;
   border-radius: 999px;
@@ -1052,6 +1081,16 @@ html.still #deck-grid { display: none !important; }
 }
 #deck-annotator-bar.show {
   display: inline-flex;
+}
+@media (max-width: 720px) {
+  #deck-annotator-bar {
+    top: 10px;
+    right: 8px;
+    left: 8px;
+    border-radius: 16px;
+    padding: 6px 10px;
+    gap: 5px;
+  }
 }
 #deck-annotator-bar .dab-btn {
   appearance: none;
@@ -1268,7 +1307,7 @@ html.still #deck-laser {
 [data-ruler-progress] {
   position: relative;
   padding: 18px 22px 18px;
-  border-radius: 16px;
+  border-radius: var(--card-radius, 16px);
   background: var(--bg-2, #E6E2DA);
   border: 1px solid var(--line, rgba(22, 25, 34, 0.16));
   color: var(--fg, #141619);
@@ -1293,24 +1332,25 @@ html.still #deck-laser {
 .rp-track {
   position: relative;
   height: 36px;
-  border-radius: 10px;
+  border-radius: var(--ctrl-radius, 10px);
   background: var(--line-2, rgba(128, 128, 128, 0.16));
   overflow: visible;
 }
 .rp-fill {
   position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--rp-pct, 0%);
-  border-radius: 10px 0 0 10px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--accent, #0D6B4F) 24%, transparent), color-mix(in srgb, var(--accent, #0D6B4F) 48%, transparent));
-  border-right: 3px solid var(--accent, #0D6B4F);
-  transition: width .78s cubic-bezier(0.2, 0.9, 0.25, 1);
-  will-change: width;
+  inset: 0;
+  width: 100%;
+  border-radius: var(--ctrl-radius, 10px);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent, #0D6B4F) 24%, transparent), color-mix(in srgb, var(--accent, #0D6B4F) 52%, transparent));
+  transform-origin: left center;
+  transform: scaleX(var(--rp-scale, 0));
+  transition: transform .78s cubic-bezier(0.2, 0.9, 0.25, 1);
+  will-change: transform;
 }
 .rp-ticks {
   position: absolute;
   inset: 0;
-  border-radius: 10px;
+  border-radius: var(--ctrl-radius, 10px);
   background: repeating-linear-gradient(
     90deg,
     transparent 0,
@@ -1387,9 +1427,19 @@ html.still [data-bento-expand] [data-bento-detail],
 body.low-power [data-bento-expand] [data-bento-detail] {
   transition: none !important;
 }
+html.still [data-bento-expand].has-open [data-bento-item]:not(.is-open) {
+  opacity: 1 !important;
+  transform: none !important;
+}
 @media (prefers-reduced-motion: reduce), print {
   .rp-fill, [data-bento-expand] [data-bento-item], [data-bento-expand] [data-bento-detail] {
     transition: none !important;
+  }
+}
+@media print {
+  [data-bento-expand].has-open [data-bento-item]:not(.is-open) {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -1429,10 +1479,13 @@ body.low-power [data-bento-expand] [data-bento-detail] {
 .rr-bar-wrap { height: 12px; border-radius: var(--radius, 0px); background: color-mix(in srgb, currentColor 14%, transparent); overflow: hidden; }
 .rr-bar {
   height: 100%;
+  width: 100%;
   border-radius: var(--radius, 0px);
   background: color-mix(in srgb, currentColor 38%, transparent);
-  width: var(--rr-w, 50%);
-  transition: width .72s cubic-bezier(0.16, 1, 0.3, 1), background-color .35s ease;
+  transform-origin: left center;
+  transform: scaleX(var(--rr-scale, 0.5));
+  transition: transform .72s cubic-bezier(0.16, 1, 0.3, 1), background-color .35s ease;
+  will-change: transform;
 }
 [data-rank-item].is-leader .rr-bar { background: var(--accent, #0D6B4F); }
 .rr-score {
@@ -1572,7 +1625,7 @@ body.low-power [data-rack-focus].has-focus [data-rf-item]:not(.is-focused) {
 [data-depth-deck] [data-deck-card] {
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: var(--card-radius, 18px);
   cursor: grab;
   transform-origin: center bottom;
   transition:
@@ -1594,7 +1647,7 @@ body.low-power [data-rack-focus].has-focus [data-rf-item]:not(.is-focused) {
 [data-colorize-wipe] {
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--card-radius, 16px);
 }
 [data-colorize-wipe] .cw-mono {
   position: relative;
@@ -1659,6 +1712,8 @@ body.low-power [data-colorize-wipe] .cw-beam {
   [data-split-mask] .sm-inner,
   [data-depth-deck] [data-deck-card],
   [data-colorize-wipe] .cw-color { transition: none !important; }
+  [data-split-mask].is-primed .sm-inner { transform: none !important; opacity: 1 !important; }
+  [data-depth-deck] [data-deck-card] { filter: none !important; }
   [data-spotlight-sweep] .sp-base { opacity: 1 !important; }
   [data-spotlight-sweep] .sp-lit, [data-spotlight-sweep] .sp-cone { display: none !important; }
   [data-colorize-wipe] .cw-mono { filter: none !important; opacity: 1 !important; }
@@ -1690,11 +1745,14 @@ body.low-power [data-colorize-wipe] .cw-beam {
 [data-popup-fold].is-folded [data-pop-layer] {
   transform: rotateX(-78deg) translateY(16px) scale(0.92);
   opacity: 0;
+  transition: none !important;
+  transition-delay: 0s !important;
 }
 [data-popup-fold].is-folded [data-pop-tag] {
   transform: translateY(10px) scale(0.84);
   opacity: 0;
-  transition-delay: 0s;
+  transition: none !important;
+  transition-delay: 0s !important;
 }
 
 /* 2. Chat Scenario Theater (Typing Pulse + Tactile Bubble Pop) */
@@ -1747,10 +1805,12 @@ body.low-power [data-colorize-wipe] .cw-beam {
 .cr-typing i {
   width: 6px; height: 6px; border-radius: 50%;
   background: var(--accent, #0D6B4F);
+}
+.cr-typing.is-on i {
   animation: cr-dot 0.9s infinite ease-in-out;
 }
-.cr-typing i:nth-child(2) { animation-delay: 0.16s; }
-.cr-typing i:nth-child(3) { animation-delay: 0.32s; }
+.cr-typing.is-on i:nth-child(2) { animation-delay: 0.16s; }
+.cr-typing.is-on i:nth-child(3) { animation-delay: 0.32s; }
 @keyframes cr-dot {
   0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
   40% { transform: translateY(-4px); opacity: 1; }
@@ -1861,66 +1921,66 @@ p.lead {
 }
 
 /* 02-workday.html */
-#s-2 .grid2{ flex: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
-    #s-2 .bx{ display: grid; gap: 18px; }
-    #s-2 .bx .card{ padding: 24px 28px; border-radius: 20px; border: 1px solid var(--line); background: var(--bg-2); }
-    #s-2 .bx h4{ font: 800 28px/1.25 var(--font-body); color: var(--fg); }
-    #s-2 .bx p{ font: 600 22px/1.4 var(--font-body); color: var(--fg-2); }
+[data-slide-scope="s-2"] .grid2{ flex: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+    [data-slide-scope="s-2"] .bx{ display: grid; gap: 18px; }
+    [data-slide-scope="s-2"] .bx .card{ padding: 24px 28px; border-radius: 20px; border: 1px solid var(--line); background: var(--bg-2); }
+    [data-slide-scope="s-2"] .bx h4{ font: 800 28px/1.25 var(--font-body); color: var(--fg); }
+    [data-slide-scope="s-2"] .bx p{ font: 600 22px/1.4 var(--font-body); color: var(--fg-2); }
 /* 03-counsel.html */
-#s-3 .grid2{ flex: 1; display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 56px; align-items: center; }
-    #s-3 .big-num{ font: 900 120px/1 var(--font-number); color: var(--accent-text); }
-    #s-3 .rf{ display: grid; gap: 14px; margin-top: 28px; }
-    #s-3 .rf .card{ padding: 18px 24px; border: 1px solid var(--line); background: var(--bg-2); font: 700 24px/1.3 var(--font-body); color: var(--fg); }
+[data-slide-scope="s-3"] .grid2{ flex: 1; display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 56px; align-items: center; }
+    [data-slide-scope="s-3"] .big-num{ font: 900 120px/1 var(--font-number); color: var(--accent-text); }
+    [data-slide-scope="s-3"] .rf{ display: grid; gap: 14px; margin-top: 28px; }
+    [data-slide-scope="s-3"] .rf .card{ padding: 18px 24px; border: 1px solid var(--line); background: var(--bg-2); font: 700 24px/1.3 var(--font-body); color: var(--fg); }
 /* 03b-bento-focus.html */
-#s-4 .bento{ flex: 1; display: grid; grid-template-columns: 0.94fr 1.06fr; gap: 36px; align-items: stretch; }
-    #s-4 .spine{ display: flex; flex-direction: column; }
-    #s-4 .card{ padding: 26px 32px; border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2); }
-    #s-4 .risk{ border: 1.5px solid color-mix(in srgb, var(--alert, #C03C1E) 45%, transparent); flex: 1.1; display: flex; flex-direction: column; justify-content: space-between; }
-    #s-4 .act{ border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent); flex: 0.95; display: flex; flex-direction: column; justify-content: space-between; }
-    #s-4 .arrow-gap{ height: 48px; display: flex; align-items: center; justify-content: center; }
-    #s-4 .gantt{ display: grid; grid-template-columns: 72px 1fr; gap: 14px 16px; align-items: center; margin-top: 14px; }
-    #s-4 .track{ height: 22px; border-radius: 999px; background: var(--line-2); overflow: hidden; display: flex; }
-    #s-4 .done{ background: var(--fg); height: 100%; }
-    #s-4 .delay{ background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--alert,#C03C1E) 36%, transparent) 0 7px, transparent 7px 14px); border: 2px dashed var(--alert, #C03C1E); border-radius: 0 999px 999px 0; height: 100%; }
-    #s-4 .opts{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
-    #s-4 .opt{ padding: 18px 20px; border-radius: 16px; background: var(--bg); border: 1.5px solid var(--line); }
-    #s-4 .opt.rec{ border-color: var(--accent); }
-    #s-4 .opt strong{ display: block; font: 800 24px/1.2 var(--font-body); color: var(--fg); }
-    #s-4 .opt span{ display: block; margin-top: 6px; font: 600 19px/1.3 var(--font-body); color: var(--fg-2); }
-    #s-4 .healthy{ display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
-    #s-4 .bar{ height: 12px; border-radius: 999px; background: var(--line-2); overflow: hidden; margin-top: 10px; }
-    #s-4 .bar > i{ display: block; height: 100%; border-radius: 999px; background: var(--accent); }
-    #s-4 .chead{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    #s-4 .chead h3{ font: 800 28px/1.2 var(--font-body); color: var(--fg); }
-    #s-4 .pill{ padding: 5px 14px; border-radius: 999px; font: 800 18px/1 var(--font-label); }
-    #s-4 .pill.risk{ background: var(--alert, #C03C1E); color: #FFF8F5; border: none; flex: none; }
-    #s-4 .pill.ok{ background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-text); }
+[data-slide-scope="s-4"] .bento{ flex: 1; display: grid; grid-template-columns: 0.94fr 1.06fr; gap: 36px; align-items: stretch; }
+    [data-slide-scope="s-4"] .spine{ display: flex; flex-direction: column; }
+    [data-slide-scope="s-4"] .card{ padding: 26px 32px; border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2); }
+    [data-slide-scope="s-4"] .risk{ border: 1.5px solid color-mix(in srgb, var(--alert, #C03C1E) 45%, transparent); flex: 1.1; display: flex; flex-direction: column; justify-content: space-between; }
+    [data-slide-scope="s-4"] .act{ border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent); flex: 0.95; display: flex; flex-direction: column; justify-content: space-between; }
+    [data-slide-scope="s-4"] .arrow-gap{ height: 48px; display: flex; align-items: center; justify-content: center; }
+    [data-slide-scope="s-4"] .gantt{ display: grid; grid-template-columns: 72px 1fr; gap: 14px 16px; align-items: center; margin-top: 14px; }
+    [data-slide-scope="s-4"] .track{ height: 22px; border-radius: 999px; background: var(--line-2); overflow: hidden; display: flex; }
+    [data-slide-scope="s-4"] .done{ background: var(--fg); height: 100%; }
+    [data-slide-scope="s-4"] .delay{ background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--alert,#C03C1E) 36%, transparent) 0 7px, transparent 7px 14px); border: 2px dashed var(--alert, #C03C1E); border-radius: 0 999px 999px 0; height: 100%; }
+    [data-slide-scope="s-4"] .opts{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    [data-slide-scope="s-4"] .opt{ padding: 18px 20px; border-radius: 16px; background: var(--bg); border: 1.5px solid var(--line); }
+    [data-slide-scope="s-4"] .opt.rec{ border-color: var(--accent); }
+    [data-slide-scope="s-4"] .opt strong{ display: block; font: 800 24px/1.2 var(--font-body); color: var(--fg); }
+    [data-slide-scope="s-4"] .opt span{ display: block; margin-top: 6px; font: 600 19px/1.3 var(--font-body); color: var(--fg-2); }
+    [data-slide-scope="s-4"] .healthy{ display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+    [data-slide-scope="s-4"] .bar{ height: 12px; border-radius: 999px; background: var(--line-2); overflow: hidden; margin-top: 10px; }
+    [data-slide-scope="s-4"] .bar > i{ display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+    [data-slide-scope="s-4"] .chead{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    [data-slide-scope="s-4"] .chead h3{ font: 800 28px/1.2 var(--font-body); color: var(--fg); }
+    [data-slide-scope="s-4"] .pill{ padding: 5px 14px; border-radius: 999px; font: 800 18px/1 var(--font-label); }
+    [data-slide-scope="s-4"] .pill.risk{ background: var(--alert, #C03C1E); color: #FFF8F5; border: none; flex: none; }
+    [data-slide-scope="s-4"] .pill.ok{ background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-text); }
 /* 04-editorial.html */
-#s-5{ padding: 0 !important; display: grid !important; grid-template-columns: 35% 65%; }
-    #s-5 .anchor{ background: var(--dark-bg, #141821); color: var(--dark-fg, #F4F2EC); padding: 92px 64px; display: flex; flex-direction: column; justify-content: space-between; }
-    #s-5 .anchor h2{ font: 900 58px/1.15 var(--font-display); }
-    #s-5 .rows{ background: var(--light-bg, #F6F5F0); color: var(--light-fg, #171A20); padding: 92px 84px; display: flex; flex-direction: column; justify-content: center; }
-    #s-5 .row{ display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: baseline; padding: 34px 0; border-bottom: 1px solid rgba(23,26,32,0.14); }
-    #s-5 .row:last-child{ border-bottom: none; }
-    #s-5 .num{ font: 900 56px/1 var(--font-number); color: var(--light-accent-text, #0F766E); }
-    #s-5 .txt strong{ display: block; font: 800 30px/1.25 var(--font-body); }
+.slide[data-slide-scope="s-5"]{ padding: 0 !important; display: grid !important; grid-template-columns: 35% 65%; }
+    [data-slide-scope="s-5"] .anchor{ background: var(--dark-bg, #141821); color: var(--dark-fg, #F4F2EC); padding: 92px 64px; display: flex; flex-direction: column; justify-content: space-between; }
+    [data-slide-scope="s-5"] .anchor h2{ font: 900 58px/1.15 var(--font-display); }
+    [data-slide-scope="s-5"] .rows{ background: var(--light-bg, #F6F5F0); color: var(--light-fg, #171A20); padding: 92px 84px; display: flex; flex-direction: column; justify-content: center; }
+    [data-slide-scope="s-5"] .row{ display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: baseline; padding: 34px 0; border-bottom: 1px solid rgba(23,26,32,0.14); }
+    [data-slide-scope="s-5"] .row:last-child{ border-bottom: none; }
+    [data-slide-scope="s-5"] .num{ font: 900 56px/1 var(--font-number); color: var(--light-accent-text, #0F766E); }
+    [data-slide-scope="s-5"] .txt strong{ display: block; font: 800 30px/1.25 var(--font-body); }
 /* 05-apple.html */
-#s-6 .grid2{ flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
-    #s-6 .claim{ font: 900 64px/1.15 var(--font-display); color: var(--fg); }
-    #s-6 .sweep{ margin-top: 36px; font: 800 40px/1.2 var(--font-display); color: var(--fg); }
-    #s-6 [data-deck-card]{ font: 700 26px/1.3 var(--font-body); }
-    #s-6 .wipe{ margin-top: 28px; height: 150px; border-radius: 18px; background: linear-gradient(120deg, var(--accent), var(--bg-2)); }
+[data-slide-scope="s-6"] .grid2{ flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    [data-slide-scope="s-6"] .claim{ font: 900 64px/1.15 var(--font-display); color: var(--fg); }
+    [data-slide-scope="s-6"] .sweep{ margin-top: 36px; font: 800 40px/1.2 var(--font-display); color: var(--fg); }
+    [data-slide-scope="s-6"] [data-deck-card]{ font: 700 26px/1.3 var(--font-body); }
+    [data-slide-scope="s-6"] .wipe{ margin-top: 28px; height: 150px; border-radius: 18px; background: linear-gradient(120deg, var(--accent), var(--bg-2)); }
 /* 06-story.html */
-#s-7 .grid2{ flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
-    #s-7 [data-pop-layer] h4{ font: 800 34px/1.25 var(--font-body); color: var(--fg); }
-    #s-7 [data-pop-tag]{ font: 700 22px/1.3 var(--font-body); color: var(--fg-2); }
+[data-slide-scope="s-7"] .grid2{ flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    [data-slide-scope="s-7"] [data-pop-layer] h4{ font: 800 34px/1.25 var(--font-body); color: var(--fg); }
+    [data-slide-scope="s-7"] [data-pop-tag]{ font: 700 22px/1.3 var(--font-body); color: var(--fg-2); }
 </style>
 </head>
 <body>
 <div id="viewport"><div id="stage">
 <div id="nav"></div><div id="tabs"></div>
 <section class="slide cmp cover" id="s-1" data-kind="cover" data-chi="-1" data-notes=""><div class="cover-inner"><h1 class="cover-title rv" data-fit="phrase">引擎回歸測試</h1><p class="cover-sub rv">四套風格動態原語與藏牌章節</p></div><div class="route rv" style="--n:2"><div class="who"><i>2026.11</i>deck-architect 品管</div><div><i>01</i>工作與顧問</div><div><i>02</i>發表與故事</div></div></section>
-<section class="slide canvas" data-surface="light" id="s-2" data-kind="content" data-chi="0" data-tab="0" data-tabs="4" data-notes="測試 ruler-progress 與 bento-expand。">
+<section class="slide canvas" data-surface="light" id="s-2" data-slide-scope="s-2" data-kind="content" data-chi="0" data-tab="0" data-tabs="4" data-notes="測試 ruler-progress 與 bento-expand。">
   
   <header class="hd">
     <h2 class="title" data-role="title">進度刻度</h2>
@@ -1934,7 +1994,7 @@ p.lead {
     </div>
   </div>
 </section>
-<section class="slide canvas" data-surface="light" id="s-3" data-kind="content" data-chi="0" data-tab="1" data-tabs="4" data-notes="測試 rank-race、odometer 與 rack-focus。">
+<section class="slide canvas" data-surface="light" id="s-3" data-slide-scope="s-3" data-kind="content" data-chi="0" data-tab="1" data-tabs="4" data-notes="測試 rank-race、odometer 與 rack-focus。">
   
   <header class="hd">
     <h2 class="title" data-role="title">方案排名</h2>
@@ -1954,7 +2014,7 @@ p.lead {
     </div>
   </div>
 </section>
-<section class="slide canvas" data-surface="light" data-focus-plan="1@0-1750, 2@1750-3500, 3@3500-5100" id="s-4" data-kind="content" data-chi="0" data-tab="2" data-tabs="4" data-notes="測試 bento-causal 配方的 data-focus-plan 三拍聚光，演完要 100% 復原（v4.8 修掉換頁後卡在第 1 拍的問題）。">
+<section class="slide canvas" data-surface="light" data-focus-plan="1@0-1750, 2@1750-3500, 3@3500-5100" id="s-4" data-slide-scope="s-4" data-kind="content" data-chi="0" data-tab="2" data-tabs="4" data-notes="測試 bento-causal 配方的 data-focus-plan 三拍聚光，演完要 100% 復原（v4.8 修掉換頁後卡在第 1 拍的問題）。">
   
   <header class="hd">
     <h2 class="title" data-role="title">本季進度與風險</h2>
@@ -1994,7 +2054,7 @@ p.lead {
     </div>
   </div>
 </section>
-<section class="slide canvas" data-surface="split" id="s-5" data-kind="content" data-chi="0" data-tab="3" data-tabs="4" data-notes="測試 editorial-drama 型態 A（兩層字版本）在 templates/deck.css 下的排版。延遲從 27.6 ms 下降 70%；15W 無風扇裝置可全速常駐；品質閘門自動保底。" data-nav="none">
+<section class="slide canvas" data-surface="split" id="s-5" data-slide-scope="s-5" data-kind="content" data-chi="0" data-tab="3" data-tabs="4" data-notes="測試 editorial-drama 型態 A（兩層字版本）在 templates/deck.css 下的排版。延遲從 27.6 ms 下降 70%；15W 無風扇裝置可全速常駐；品質閘門自動保底。" data-nav="none">
   
   <div class="anchor">
     <h2 data-role="title">三個里程碑</h2>
@@ -2006,7 +2066,7 @@ p.lead {
     <div class="row" data-step="2"><div class="num" data-count>99.4%</div><div class="txt"><strong>三條產線連續零超時</strong></div></div>
   </div>
 </section>
-<section class="slide canvas" data-surface="dark" id="s-6" data-kind="content" data-chi="1" data-tab="0" data-tabs="2" data-notes="測試 split-mask、spotlight-sweep、depth-deck 與 colorize-wipe。">
+<section class="slide canvas" data-surface="dark" id="s-6" data-slide-scope="s-6" data-kind="content" data-chi="1" data-tab="0" data-tabs="2" data-notes="測試 split-mask、spotlight-sweep、depth-deck 與 colorize-wipe。">
   
   <header class="hd">
     <h2 class="title" data-role="title">產品亮點</h2>
@@ -2026,7 +2086,7 @@ p.lead {
     </div>
   </div>
 </section>
-<section class="slide canvas" data-surface="light" id="s-7" data-kind="content" data-chi="1" data-tab="1" data-tabs="2" data-notes="測試 popup-fold 與 chat-replay。">
+<section class="slide canvas" data-surface="light" id="s-7" data-slide-scope="s-7" data-kind="content" data-chi="1" data-tab="1" data-tabs="2" data-notes="測試 popup-fold 與 chat-replay。">
   
   <header class="hd">
     <h2 class="title" data-role="title">使用者故事</h2>
@@ -2039,7 +2099,7 @@ p.lead {
     </div>
   </div>
 </section>
-<section class="slide canvas" data-surface="dark" id="s-8" data-kind="content" data-chi="-1" data-tab="0" data-tabs="1" data-notes="測試 unlisted 章節不會出現在封面路線、目錄與常駐導航。" data-unlisted="1" data-nav="none">
+<section class="slide canvas" data-surface="dark" id="s-8" data-slide-scope="s-8" data-kind="content" data-chi="-1" data-tab="0" data-tabs="1" data-notes="測試 unlisted 章節不會出現在封面路線、目錄與常駐導航。" data-unlisted="1" data-nav="none">
   <header class="hd">
     <h2 class="title" data-role="title">還有一件事</h2>
   </header>
@@ -2099,13 +2159,32 @@ p.lead {
   let lowPower = false;
   const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
   let reduce = reduceMQ.matches;
-  if (reduceMQ.addEventListener) reduceMQ.addEventListener('change', e => { reduce = e.matches; if (reduce) freezeNow(); });
 
   if (stillMode) document.documentElement.classList.add('still');
   if (hideCtrlMode) document.documentElement.classList.add('hide-ctrl');
   if (noScaleMode) document.documentElement.classList.add('noscale');
 
-  const isStatic = () => Boolean(stillMode || lowPower || reduce);
+  // Orthogonal modes:
+  //  - isStill(): true ONLY in ?still=1 capture mode (freezes chrome & disables interactive chrome)
+  //  - isReducedMotion(): true in ?still=1, B low-power, or prefers-reduced-motion (suppresses motion/autoplay while keeping presenter & interactive controls usable)
+  const isStill = () => Boolean(stillMode);
+  const isReducedMotion = () => Boolean(stillMode || lowPower || reduce);
+  const isStatic = isReducedMotion; // backwards-compatible alias
+
+  const stageScale = () => {
+    const r = stage.getBoundingClientRect();
+    return r.width ? r.width / 1920 : 1;
+  };
+
+  if (reduceMQ.addEventListener) {
+    reduceMQ.addEventListener('change', e => {
+      reduce = e.matches;
+      if (reduce) freezeNow();
+      stage.dispatchEvent(new CustomEvent('deck:reducedmotion', {
+        detail: { reduced: isReducedMotion(), reduce },
+      }));
+    });
+  }
   const DECK = window.DECK || {};
   const M = DECK.motion || 'horizontal';
   const deckStageMode = DECK.stageMode || document.documentElement.dataset.stageMode || '';
@@ -2141,6 +2220,7 @@ p.lead {
   let toastTimer = null;
   const returnTo = [];
   const activeAnims = new Set();
+  const persistedAnims = new Set();
   const activeTimers = new Set();
   const activeRafs = new Set();
   const hiddenMorphEls = new Set();
@@ -2149,9 +2229,17 @@ p.lead {
   const isApp = i => slides[i] && slides[i].dataset.appendix === '1';
   const mainIndices = slides.map((_, i) => i).filter(i => !isApp(i));
 
-  function trackAnim(anim) {
+  function cancelAnim(anim) {
+    if (!anim) return;
+    activeAnims.delete(anim);
+    persistedAnims.delete(anim);
+    try { anim.cancel(); } catch (_) {}
+  }
+
+  function trackAnim(anim, persist) {
     if (!anim) return anim;
     activeAnims.add(anim);
+    if (persist) persistedAnims.add(anim);
     const done = () => activeAnims.delete(anim);
     anim.finished.then(done, done);
     return anim;
@@ -2428,7 +2516,8 @@ p.lead {
     const mode = (sl.dataset.motionMode || cs.getPropertyValue('--motion-mode') || 'spring').trim();
     const staggerBase = parseFloat(cs.getPropertyValue('--stagger-base')) || 46;
     const morphMs = parseFloat(cs.getPropertyValue('--morph-ms')) || 680;
-    const ease = mode === 'crisp' ? EASE_CRISP : EASE_SPRING;
+    const rawEase = cs.getPropertyValue('--enter-easing').trim();
+    const ease = rawEase || (mode === 'crisp' ? EASE_CRISP : EASE_SPRING);
     return { mode, staggerBase, morphMs, ease };
   }
 
@@ -2464,7 +2553,7 @@ p.lead {
 
   function cancelElStepAnim(el) {
     const prev = stepAnims.get(el);
-    if (prev) { try { prev.cancel(); } catch (_) {} stepAnims.delete(el); }
+    if (prev) { cancelAnim(prev); stepAnims.delete(el); }
   }
 
   function stepFromTransform(el) {
@@ -2477,7 +2566,7 @@ p.lead {
     return 'translate3d(0,22px,0)';
   }
 
-  function applySlideStep(sl, targetStep, dir, instant, token) {
+  function applySlideStep(sl, targetStep, dir, silent, token) {
     if (!sl) return;
     const maxS = getMaxStep(sl);
     const k = Math.max(0, Math.min(maxS, targetStep));
@@ -2492,7 +2581,7 @@ p.lead {
 
       cancelElStepAnim(el);
 
-      if (instant || isStatic() || el.dataset.stepHidden === undefined) {
+      if (silent || isReducedMotion() || el.dataset.stepHidden === undefined) {
         el.dataset.stepHidden = nowVis ? '0' : '1';
         if (nowVis) snapSubtreeFinal(el);
         return;
@@ -2511,19 +2600,19 @@ p.lead {
         const anim = trackAnim(el.animate(
           [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translate3d(0,-10px,0)' }],
           { duration: 220, easing: 'ease-out', fill: 'forwards' }
-        ));
+        ), true);
         stepAnims.set(el, anim);
         anim.finished.then(() => {
           if (token === navToken && Number(sl.dataset.currentStep) === k) {
             el.dataset.stepHidden = '1';
-            try { anim.cancel(); } catch (_) {}
           }
+          cancelAnim(anim);
         }, () => {});
       }
     });
 
     updateCtrlBar();
-    if (!instant) {
+    if (!silent) {
       stage.dispatchEvent(new CustomEvent('deck:stepchange', {
         detail: { index: cur, slide: sl, step: curStep, totalSteps: maxS, dir },
       }));
@@ -2537,7 +2626,8 @@ p.lead {
     if (!maxS) return 0;
     const nextK = Math.max(0, Math.min(maxS, k));
     if (nextK === curStep) return curStep;
-    applySlideStep(sl, nextK, dir, isStatic(), navToken);
+    clearFocus(sl);
+    applySlideStep(sl, nextK, dir, false, navToken);
     return curStep;
   }
 
@@ -2635,11 +2725,11 @@ p.lead {
     });
   }
 
-  function snapSlideFinal(sl) {
+  function snapSlideFinal(sl, expandSteps = true) {
     if (!sl) return;
     clearGuidanceState(sl);
     const maxS = getMaxStep(sl);
-    if (maxS > 0) {
+    if (expandSteps && maxS > 0) {
       sl.dataset.currentStep = String(maxS);
       if (slides[cur] === sl) curStep = maxS;
       sl.querySelectorAll(STEP_SEL).forEach(el => {
@@ -2662,11 +2752,19 @@ p.lead {
     return out.sort((a, b) => a.start - b.start);
   }
 
-  const BEAT_MS = { '1': 120, '2': 760, '3': 1480, '4': 2200 };
-  function beatDelay(el, fallback) {
+  // Calibrated to Visual Guidance spec: 1.3-1.8s per beat (600ms reveal + 760ms still reading window)
+  const BEAT_MS = { '1': 120, '2': 1480, '3': 2840, '4': 4200 };
+  function beatDelay(el, fallback, sl) {
     if (el.dataset.delay !== undefined) return parseFloat(el.dataset.delay) || 0;
     const b = el.dataset.beat;
-    if (b && BEAT_MS[b] !== undefined) return BEAT_MS[b];
+    if (b) {
+      const n = parseInt(b, 10);
+      if (sl && sl.dataset.beatGap && n >= 1) {
+        const gap = parseFloat(sl.dataset.beatGap) || 1360;
+        return 120 + (n - 1) * gap;
+      }
+      if (BEAT_MS[b] !== undefined) return BEAT_MS[b];
+    }
     return fallback;
   }
 
@@ -2680,11 +2778,24 @@ p.lead {
       return skipDeferred ? list.filter(el => deferredStepOf(el, sl) === 0) : list;
     };
 
+    // 0. Live Causal State Transformation ([data-transform-at="ms"]) — works at slide entry & inside data-step
+    q('[data-transform-at]').forEach(el => {
+      const ms = parseFloat(el.dataset.transformAt) || 1200;
+      el.classList.remove('transforming');
+      el.classList.add('pre-transform');
+      later(() => {
+        if (token !== navToken || isReducedMotion()) { el.classList.remove('pre-transform', 'transforming'); return; }
+        el.classList.remove('pre-transform');
+        el.classList.add('transforming');
+        later(() => { el.classList.remove('transforming'); }, 840);
+      }, baseDelay + ms);
+    });
+
     // 1. Non-uniform staggered groups ([data-stagger])
     const staggeredSet = new Set();
     q('[data-stagger]').forEach(group => {
       const stepMs = parseFloat(group.getAttribute('data-stagger')) || cfg.staggerBase;
-      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40);
+      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40, sl);
       const items = [...group.children].filter(el => el.nodeType === 1);
       items.forEach((el, i) => {
         staggeredSet.add(el);
@@ -2709,7 +2820,7 @@ p.lead {
       if (el.parentElement && el.parentElement.closest('.rv, [data-stagger]')) return;
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
       if (!skipDeferred && el === root) return; // root already animated by applySlideStep
-      const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)));
+      const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)), sl);
       const dir = el.dataset.from || 'up';
       const fromT = dir === 'left' ? 'translate3d(-24px,0,0)'
         : dir === 'right' ? 'translate3d(24px,0,0)'
@@ -2725,9 +2836,9 @@ p.lead {
     // 3. Mobile-visible high-contrast spotlight cues ([data-spotlight])
     q('[data-spotlight]').forEach(el => {
       el.classList.remove('spot-pulse');
-      const d = baseDelay + beatDelay(el, skipDeferred ? 540 : 120);
+      const d = baseDelay + beatDelay(el, skipDeferred ? 540 : 120, sl);
       later(() => {
-        if (token !== navToken || isStatic()) return;
+        if (token !== navToken || isReducedMotion()) return;
         el.classList.add('spot-pulse');
         later(() => el.classList.remove('spot-pulse'), 1320);
       }, d);
@@ -2746,7 +2857,7 @@ p.lead {
       const dec = numRaw.includes('.') ? numRaw.split('.')[1].length : 0;
       const target = parseFloat(numRaw.replace(/,/g, ''));
       const dur = parseFloat(el.dataset.dur) || 820;
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60, sl);
       const fmt = v => {
         let s = dec > 0 ? v.toFixed(dec) : String(Math.round(v));
         if (hasComma) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -2757,7 +2868,7 @@ p.lead {
       let lastPaint = 0;
       const tick = now => {
         activeRafs.delete(id);
-        if (token !== navToken || isStatic()) { tn.nodeValue = finalStr; return; }
+        if (token !== navToken || isReducedMotion()) { tn.nodeValue = finalStr; return; }
         if (now < startAt) { id = requestAnimationFrame(tick); activeRafs.add(id); return; }
         const p = Math.min(1, (now - startAt) / dur);
         if (p >= 1) { tn.nodeValue = finalStr; return; }
@@ -2775,7 +2886,7 @@ p.lead {
 
     // 5. True SVG stroke draw & progress rings ([data-draw])
     q('[data-draw]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80, sl);
       const dur = parseFloat(el.dataset.dur) || 880;
       if (el.getAttribute('data-draw') === 'ring') {
         const circ = parseFloat(el.dataset.circ || '0');
@@ -2805,7 +2916,7 @@ p.lead {
     // 6. Directional bar growth ([data-grow="x|x-left|y|y-down"])
     q('[data-grow]').forEach((el, idx) => {
       const dir = (el.getAttribute('data-grow') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65);
+      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65, sl);
       const dur = parseFloat(el.dataset.dur) || 720;
       if (el instanceof SVGElement) el.style.transformBox = 'fill-box';
       if (dir === 'x-left') {
@@ -2826,7 +2937,7 @@ p.lead {
     // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"])
     q('[data-wipe]').forEach(el => {
       const dir = (el.getAttribute('data-wipe') || 'right').toLowerCase();
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60, sl);
       const dur = parseFloat(el.dataset.dur) || 540;
       const fromClip = dir === 'left' ? 'inset(0 0 0 100%)'
         : dir === 'down' ? 'inset(0 0 100% 0)'
@@ -2840,7 +2951,7 @@ p.lead {
 
     // 8. Endpoint dot / arrowhead / badge crisp pop ([data-pop])
     q('[data-pop]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120, sl);
       const dur = parseFloat(el.dataset.dur) || 340;
       if (el instanceof SVGElement) {
         el.style.transformBox = 'fill-box';
@@ -2854,23 +2965,24 @@ p.lead {
 
     // 9. Target-lock concentric ripple ([data-ripple])
     q('[data-ripple]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 560 : 160);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 560 : 160, sl);
       const dur = parseFloat(el.dataset.dur) || 1050;
-      trackAnim(el.animate(
+      const anim = trackAnim(el.animate(
         [
           { opacity: 0, transform: 'scale(0.35)' },
           { opacity: 0.92, transform: 'scale(0.88)', offset: 0.16 },
           { opacity: 0, transform: 'scale(2.85)' },
         ],
         { duration: dur, delay, easing: EASE_SPRING, fill: 'both' }
-      ));
+      ), true);
+      anim.finished.then(() => cancelAnim(anim), () => {});
     });
 
     // 10. Chronological rail travel bead ([data-travel="x|y"])
     q('[data-travel]').forEach(el => {
       const axis = (el.getAttribute('data-travel') || 'x').toLowerCase();
       const dist = parseFloat(el.dataset.travelDist || '800');
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 100);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 100, sl);
       const dur = parseFloat(el.dataset.dur) || 2400;
       const p0 = 'translate3d(0,0,0)';
       const p1 = axis === 'y'
@@ -2879,7 +2991,7 @@ p.lead {
       const p2 = axis === 'y'
         ? 'translate3d(0,' + dist + 'px,0)'
         : 'translate3d(' + dist + 'px,0,0)';
-      trackAnim(el.animate(
+      const anim = trackAnim(el.animate(
         [
           { opacity: 0, transform: p0 + ' scale(0.5)' },
           { opacity: 1, transform: p1 + ' scale(1)', offset: 0.05 },
@@ -2887,13 +2999,14 @@ p.lead {
           { opacity: 0, transform: p2 + ' scale(0.55)' },
         ],
         { duration: dur, delay, easing: 'cubic-bezier(0.25, 0.06, 0.25, 1)', fill: 'both' }
-      ));
+      ), true);
+      anim.finished.then(() => cancelAnim(anim), () => {});
     });
 
     // 11. Interactive control affordance nudge ([data-nudge="x|y"])
     q('[data-nudge]').forEach(el => {
       const axis = (el.getAttribute('data-nudge') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 1100);
+      const delay = baseDelay + beatDelay(el, 1100, sl);
       const dur = parseFloat(el.dataset.dur) || 920;
       const frames = axis === 'y'
         ? [
@@ -2913,21 +3026,21 @@ p.lead {
   }
 
   function triggerSubtreePrimitives(el, sl, delay, token) {
-    if (!el || isStatic()) { snapSubtreeFinal(el); return; }
+    if (!el || isReducedMotion()) { snapSubtreeFinal(el); return; }
     runPrimitives(el, sl, delay, token, null, false);
   }
 
   function animateSlideContent(sl, baseDelay, token, morphedIds) {
-    if (!sl || isStatic()) { snapSlideFinal(sl); return; }
+    if (!sl || isReducedMotion()) { snapSlideFinal(sl, isStill()); return; }
 
-    // 0a. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
+    // 0. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
     const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
     const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
     if (focusPlan.length && focusEls.length) {
       const myFocusToken = bumpFocus(sl);
       const visited = new Set();
       const applyStage = activeId => {
-        if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
+        if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isReducedMotion()) return;
         sl.classList.add('is-focusing');
         for (const el of focusEls) {
           const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
@@ -2946,7 +3059,7 @@ p.lead {
           applyStage(stepItem.id);
         } else {
           later(() => {
-            if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
+            if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isReducedMotion()) return;
             for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
             applyStage(stepItem.id);
           }, startAt);
@@ -2957,20 +3070,6 @@ p.lead {
         clearFocusClasses(sl);
       }, baseDelay + maxEnd);
     }
-
-    // 0b. Live Causal State Transformation ([data-transform-at="ms"])
-    sl.querySelectorAll('[data-transform-at]').forEach(el => {
-      if (deferredStepOf(el, sl) > 0) return;
-      const ms = parseFloat(el.dataset.transformAt) || 1200;
-      el.classList.remove('transforming');
-      el.classList.add('pre-transform');
-      later(() => {
-        if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
-        el.classList.remove('pre-transform');
-        el.classList.add('transforming');
-        later(() => { el.classList.remove('transforming'); }, 840);
-      }, baseDelay + ms);
-    });
 
     runPrimitives(sl, sl, baseDelay, token, morphedIds, true);
   }
@@ -2991,7 +3090,11 @@ p.lead {
     ];
     for (const p of props) dst.style[p] = cs[p];
     dst.style.margin = '0';
-    dst.style.whiteSpace = 'nowrap';
+    const lh = parseFloat(cs.lineHeight) || (parseFloat(cs.fontSize) || 16) * 1.25;
+    const srcRect = src.getBoundingClientRect();
+    if (srcRect.height <= lh * 1.45 * stageScale()) {
+      dst.style.whiteSpace = 'nowrap';
+    }
     const srcKids = src.children, dstKids = dst.children;
     for (let i = 0; i < Math.min(srcKids.length, dstKids.length); i++) {
       const kcs = getComputedStyle(srcKids[i]);
@@ -3006,10 +3109,10 @@ p.lead {
   function collectMorphPairs(prev, next) {
     if (!prev || !next || prev === next) return [];
     const sr = stage.getBoundingClientRect();
-    const s = sr.width ? sr.width / 1920 : 1;
+    const s = stageScale();
     const fromMap = new Map();
     prev.querySelectorAll('[data-morph]').forEach(el => {
-      if (el.dataset.stepHidden === '1') return;
+      if (el.closest('[data-step-hidden="1"]')) return;
       const id = el.dataset.morph;
       if (id && !fromMap.has(id)) {
         const box = stageBox(el, sr, s);
@@ -3022,7 +3125,7 @@ p.lead {
     if (!wasActive) { next.classList.add('active'); next.style.opacity = '0'; }
     const pairs = [];
     next.querySelectorAll('[data-morph]').forEach(toEl => {
-      if (toEl.dataset.stepHidden === '1') return;
+      if (toEl.closest('[data-step-hidden="1"]')) return;
       const id = toEl.dataset.morph;
       const from = fromMap.get(id);
       if (!from) return;
@@ -3051,10 +3154,19 @@ p.lead {
 
       const fromClip = fromCS.webkitBackgroundClip || fromCS.backgroundClip || '';
       const fromGrad = fromClip.includes('text') && (fromCS.backgroundImage || '').includes('gradient');
+      const toClip = toCS.webkitBackgroundClip || toCS.backgroundClip || '';
+      const toGrad = toClip.includes('text') && (toCS.backgroundImage || '').includes('gradient');
       if (fromGrad) {
-        clone.style.color = toCS.color;
-        clone.style.webkitTextFillColor = toCS.color;
-        clone.style.background = 'none';
+        if (!toGrad) {
+          clone.style.color = toCS.color;
+          clone.style.webkitTextFillColor = toCS.color;
+          clone.style.background = 'none';
+        } else {
+          clone.style.backgroundImage = fromCS.backgroundImage;
+          clone.style.backgroundClip = 'text';
+          clone.style.webkitBackgroundClip = 'text';
+          clone.style.webkitTextFillColor = 'transparent';
+        }
       }
 
       clone.style.position = 'absolute';
@@ -3082,30 +3194,39 @@ p.lead {
           { transform: 'translate3d(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px,0) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')' },
         ],
         { duration: morphDur, easing: EASE_CINEMA, fill: 'forwards' }
-      ));
+      ), true);
       anims.push(aMove.finished);
 
-      if (!fromGrad && fromCS.color !== toCS.color) {
-        trackAnim(clone.animate([{ color: fromCS.color }, { color: toCS.color }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+      if (!fromGrad && !toGrad && fromCS.color !== toCS.color) {
+        trackAnim(clone.animate([{ color: fromCS.color }, { color: toCS.color }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
       }
       if (!isTextOnly && fromCS.backgroundColor !== toCS.backgroundColor) {
-        trackAnim(clone.animate([{ backgroundColor: fromCS.backgroundColor }, { backgroundColor: toCS.backgroundColor }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+        trackAnim(clone.animate([{ backgroundColor: fromCS.backgroundColor }, { backgroundColor: toCS.backgroundColor }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
       }
       for (let i = 0; i < clone.children.length; i++) {
         const fc = getComputedStyle(fromEl.children[i]).color;
         const tc = toEl.children[i] ? getComputedStyle(toEl.children[i]).color : toCS.color;
         if (fc !== tc) {
-          trackAnim(clone.children[i].animate([{ color: fc }, { color: tc }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+          trackAnim(clone.children[i].animate([{ color: fc }, { color: tc }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
         }
       }
     }
     return anims;
   }
 
-  // ---------------------------------------------------------------- flight cleanup (zero lockout!)
+  // ---------------------------------------------------------------- flight cleanup (zero lockout, zero WAAPI fill:forwards leak!)
+  function cancelElementAnims(el) {
+    if (!el || typeof el.getAnimations !== 'function') return;
+    for (const a of el.getAnimations()) {
+      try { a.cancel(); } catch (_) {}
+    }
+  }
+
   function cleanupFlight(keepPrev, keepNext) {
     for (const a of activeAnims) { try { a.cancel(); } catch (_) {} }
     activeAnims.clear();
+    for (const a of persistedAnims) { try { a.cancel(); } catch (_) {} }
+    persistedAnims.clear();
     for (const id of activeTimers) clearTimeout(id);
     activeTimers.clear();
     for (const id of activeRafs) cancelAnimationFrame(id);
@@ -3113,8 +3234,12 @@ p.lead {
     morphLayer.innerHTML = '';
     for (const el of hiddenMorphEls) el.style.visibility = '';
     hiddenMorphEls.clear();
-    if (curtain) curtain.style.opacity = '0';
+    if (curtain) {
+      cancelElementAnims(curtain);
+      curtain.style.opacity = '0';
+    }
     for (const sl of slides) {
+      cancelElementAnims(sl);
       sl.classList.remove('in-flight');
       sl.style.zIndex = '';
       if (sl !== keepPrev) clearGuidanceState(sl);
@@ -3127,7 +3252,7 @@ p.lead {
     }
   }
 
-  function freezeNow() {
+  function freezeNow(expandSteps = false) {
     navToken++;
     cleanupFlight(null, slides[cur]);
     if (slides[cur]) {
@@ -3135,7 +3260,7 @@ p.lead {
       slides[cur].style.opacity = '';
       slides[cur].style.transform = '';
       slides[cur].style.clipPath = '';
-      snapSlideFinal(slides[cur]);
+      snapSlideFinal(slides[cur], expandSteps);
     }
     updateCtrlBar();
   }
@@ -3151,7 +3276,12 @@ p.lead {
       next.dataset.kind === 'toc' || prev.dataset.kind === 'toc' ||
       (next.dataset.chi !== prev.dataset.chi && Number(next.dataset.chi) >= 0 && Number(prev.dataset.chi) >= 0)
     );
-    return chChange ? 'push' : 'cross';
+    if (chChange) {
+      if (M === 'vertical') return 'push-y';
+      if (M === 'zoom-in' || M === 'zoom-out') return 'zoom-rise';
+      return 'push';
+    }
+    return 'cross';
   }
 
   function go(n, instant, opts) {
@@ -3165,16 +3295,22 @@ p.lead {
     const token = ++navToken;
     cur = n;
 
-    const skipTransition = Boolean(instant || isStatic() || !prev || prev === next);
-    const animateInitial = Boolean(!prev && !instant && !isStatic());
+    const skipTransition = Boolean(instant || isReducedMotion() || !prev || prev === next);
+    const animateInitial = Boolean(!prev && !instant && !isReducedMotion());
 
     // Initialize target step on incoming slide BEFORE morph collection or paint
+    // Only ?still=1 (or explicit opts.step='final') forces step expansion; B/reduced-motion preserves stepping
     const maxS = getMaxStep(next);
     let targetStep = 0;
-    if (isStatic() || (opts && opts.step === 'final')) targetStep = maxS;
+    if (isStill() || (opts && opts.step === 'final')) targetStep = maxS;
     else if (opts && typeof opts.step === 'number') targetStep = Math.max(0, Math.min(maxS, opts.step));
     else if (dir < 0 && prev && prev !== next && !instant) targetStep = maxS;
     applySlideStep(next, targetStep, 0, true, token);
+
+    // Clear lingering transition WAAPI locks on incoming slide BEFORE measuring morph target boxes
+    cancelElementAnims(next);
+    next.style.transform = '';
+    next.style.clipPath = '';
 
     const morphPairs = (!skipTransition && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
 
@@ -3190,6 +3326,11 @@ p.lead {
     updateCtrlBar();
     try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
 
+    // Fit incoming slide BEFORE animateSlideContent zeroes [data-count] text nodes
+    if (typeof window.__deckFit === 'function') window.__deckFit(next);
+
+    let enterDelay = 0;
+
     if (skipTransition) {
       stage.classList.add('no-trans');
       if (prev && prev !== next) prev.classList.remove('active', 'leaving');
@@ -3197,8 +3338,9 @@ p.lead {
       next.style.opacity = '';
       next.style.transform = '';
       next.style.clipPath = '';
-      if (isStatic()) snapSlideFinal(next);
-      else if (animateInitial && targetStep === 0) animateSlideContent(next, 60, token, null);
+      if (isStill()) snapSlideFinal(next, true);
+      else if (isReducedMotion()) snapSlideFinal(next, false);
+      else if (animateInitial && targetStep === 0) { enterDelay = 60; animateSlideContent(next, 60, token, null); }
       else snapSubtreeFinal(next);
       stage.offsetWidth;
       requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
@@ -3215,20 +3357,26 @@ p.lead {
       next.style.clipPath = '';
 
       if (kind === 'shock' && curtain) {
+        enterDelay = 420;
         stage.classList.add('hide-nav');
         stage.classList.remove('show-side-nav');
         prev.classList.remove('active');
         prev.classList.add('leaving');
-        const cIn = trackAnim(curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' }));
+        const cIn = trackAnim(curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' }), true);
         cIn.finished.then(() => {
-          if (token !== navToken) return;
+          if (token !== navToken) { cancelAnim(cIn); return; }
+          curtain.style.opacity = '1';
+          cancelAnim(cIn);
           prev.classList.remove('leaving', 'active');
           clearGuidanceState(prev);
           next.classList.add('active');
           later(() => {
             if (token !== navToken) return;
-            const cOut = trackAnim(curtain.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 280, fill: 'forwards' }));
-            cOut.finished.then(() => { if (token === navToken) { curtain.style.opacity = '0'; cOut.cancel(); } }, () => {});
+            const cOut = trackAnim(curtain.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 280, fill: 'forwards' }), true);
+            cOut.finished.then(() => {
+              if (token === navToken) curtain.style.opacity = '0';
+              cancelAnim(cOut);
+            }, () => {});
             const st = next.querySelector('.shock-text, [data-role="shock"], h1');
             if (st) {
               trackAnim(st.animate(
@@ -3245,6 +3393,7 @@ p.lead {
         next.classList.add('active', 'in-flight');
 
         const waits = [];
+        const forwardsAnims = [];
         let contentDelay = 160;
 
         if (kind === 'iris') {
@@ -3263,7 +3412,8 @@ p.lead {
             const aOut = trackAnim(prev.animate(
               [{ clipPath: 'circle(145% at ' + origin + ')' }, { clipPath: 'circle(0% at ' + origin + ')' }],
               { duration: 640, easing: EASE_CINEMA, fill: 'forwards' }
-            ));
+            ), true);
+            forwardsAnims.push(aOut);
             waits.push(aOut.finished);
             if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 680));
             contentDelay = 200;
@@ -3277,6 +3427,20 @@ p.lead {
           ));
           const aIn = trackAnim(next.animate(
             [{ transform: 'translate3d(' + sx + ',0,0)' }, { transform: 'translate3d(0,0,0)' }],
+            { duration: 640, easing: EASE_CINEMA }
+          ));
+          waits.push(aOut.finished, aIn.finished);
+          if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 740));
+          contentDelay = 260;
+        } else if (kind === 'push-y') {
+          const sy = dir > 0 ? '100%' : '-100%';
+          const oy = dir > 0 ? '-14%' : '14%';
+          const aOut = trackAnim(prev.animate(
+            [{ transform: 'translate3d(0,0,0)' }, { transform: 'translate3d(0,' + oy + ',0)' }],
+            { duration: 640, easing: EASE_CINEMA }
+          ));
+          const aIn = trackAnim(next.animate(
+            [{ transform: 'translate3d(0,' + sy + ',0)' }, { transform: 'translate3d(0,0,0)' }],
             { duration: 640, easing: EASE_CINEMA }
           ));
           waits.push(aOut.finished, aIn.finished);
@@ -3299,7 +3463,8 @@ p.lead {
             const aOut = trackAnim(prev.animate(
               [{ transform: 'translate3d(0,0,0)' }, { transform: 'translate3d(0,100%,0)' }],
               { duration: 560, easing: EASE_CINEMA, fill: 'forwards' }
-            ));
+            ), true);
+            forwardsAnims.push(aOut);
             const aIn = trackAnim(next.animate(
               [{ transform: 'scale(0.95)', opacity: 0.75 }, { transform: 'scale(1)', opacity: 1 }],
               { duration: 560, easing: EASE_CINEMA }
@@ -3343,6 +3508,8 @@ p.lead {
           contentDelay = 120;
         }
 
+        enterDelay = contentDelay;
+
         // Only run slide-entry choreography when landing at step 0 (not when backing into final step)
         if (targetStep === 0) {
           animateSlideContent(next, contentDelay, token, morphedIds);
@@ -3357,9 +3524,13 @@ p.lead {
             hiddenMorphEls.delete(fromEl);
             hiddenMorphEls.delete(toEl);
           }
+          // Hide prev BEFORE canceling forwards animations so there is zero 1-frame flash
           prev.classList.remove('leaving', 'active', 'in-flight');
           prev.style.zIndex = '';
+          prev.style.transform = '';
           prev.style.clipPath = '';
+          forwardsAnims.forEach(cancelAnim);
+          cancelElementAnims(prev);
           clearGuidanceState(prev);
           next.classList.remove('in-flight');
           next.style.zIndex = '';
@@ -3368,13 +3539,18 @@ p.lead {
       }
     }
 
-    if (typeof window.__deckFit === 'function') window.__deckFit();
+    const restAtFinal = Boolean(maxS > 0 && targetStep === maxS && (dir < 0 || (opts && opts.step === 'final')));
     const detail = {
       index: cur,
       slide: next,
       prev,
+      dir,
       instant: skipTransition,
       initial: animateInitial,
+      enterDelay,
+      restAtFinal,
+      still: isStill(),
+      reducedMotion: isReducedMotion(),
       staticMode: isStatic(),
       surface: stage.dataset.activeSurface,
       step: curStep,
@@ -3388,7 +3564,7 @@ p.lead {
     if (isApp(cur)) { back(); return; }
     const sl = slides[cur];
     const maxS = getMaxStep(sl);
-    if (!isStatic() && maxS > 0) {
+    if (!isStill() && maxS > 0) {
       if (d > 0 && curStep < maxS) { setStep(curStep + 1, 1); return; }
       if (d < 0 && curStep > 0) { setStep(curStep - 1, -1); return; }
     }
@@ -3415,26 +3591,48 @@ p.lead {
     lowPower = typeof force === 'boolean' ? force : !lowPower;
     document.body.classList.toggle('low-power', lowPower);
     if (lowPower) {
-      freezeNow();
+      freezeNow(false);
       toast('已切換靜態省電模式（按 B 恢復動態）');
     } else {
       updateCtrlBar();
       toast('已恢復動態播放');
     }
     stage.dispatchEvent(new CustomEvent('deck:lowpower', { detail: { lowPower } }));
+    stage.dispatchEvent(new CustomEvent('deck:reducedmotion', { detail: { reduced: isReducedMotion(), lowPower } }));
     return lowPower;
   }
 
   function setStill(flag) {
     stillMode = Boolean(flag);
     document.documentElement.classList.toggle('still', stillMode);
-    if (stillMode) freezeNow();
+    if (stillMode) freezeNow(true);
     else updateCtrlBar();
     stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: stillMode } }));
+    stage.dispatchEvent(new CustomEvent('deck:reducedmotion', { detail: { reduced: isReducedMotion(), still: stillMode } }));
   }
 
+  // ---------------------------------------------------------------- live beforeprint / afterprint (P / Ctrl+P without ?still=1)
+  let printSnapshot = null;
+  addEventListener('beforeprint', () => {
+    if (printSnapshot) return;
+    printSnapshot = { cur, curStep };
+    navToken++;
+    cleanupFlight(null, null);
+    slides.forEach(sl => snapSlideFinal(sl, true));
+    stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true, printing: true } }));
+  });
+  addEventListener('afterprint', () => {
+    if (!printSnapshot) return;
+    const snap = printSnapshot;
+    printSnapshot = null;
+    if (snap.cur >= 0 && snap.cur < slides.length) {
+      go(snap.cur, true, { step: snap.curStep });
+    }
+    stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: stillMode, printing: false } }));
+  });
+
   // ---------------------------------------------------------------- input handling (keyboard + click + mobile swipe)
-  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], #ctrl-bar, #nav-side, #deck-grid, #deck-annotator, #deck-lightbox, [data-compare-slider], [data-zoomable], [data-ref], input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
+  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], [data-bento-item], [data-rf-item], [data-popup-fold], [data-deck-card], #ctrl-bar, #nav-side, #deck-grid, #deck-annotator, #deck-lightbox, [data-compare-slider], [data-zoomable], [data-ref], input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
 
   addEventListener('keydown', e => {
     const k = e.key;
@@ -3443,6 +3641,7 @@ p.lead {
       if (k === 'Escape') document.activeElement.blur();
       return;
     }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (k === 'Escape') {
       if (closeTopOverlay()) { e.preventDefault(); return; }
       if (isApp(cur)) { e.preventDefault(); back(); return; }
@@ -3496,13 +3695,13 @@ p.lead {
     if (booted) return;
     booted = true;
     const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
-    // Play slide-1 entrance choreography in live mode; snap instantly when static (?still=1 / reduced-motion)
-    go(start - 1, isStatic());
+    // Play slide-1 entrance choreography in live mode; snap instantly when reduced-motion / ?still=1
+    go(start - 1, isReducedMotion());
     if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
   }
 
-  // Auto-takeover: early interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
-  const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], input, select, textarea, button:not(.back):not([data-link])';
+  // Auto-takeover: early pointer or keyboard interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
+  const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], [data-bento-item], [data-rf-item], [data-popup-fold], [data-deck-card], input, select, textarea, button:not(.back):not([data-link])';
   const handleEarlyTakeover = e => {
     const sl = slides[cur];
     if (!sl || !sl.classList.contains('is-focusing')) return;
@@ -3512,6 +3711,11 @@ p.lead {
   };
   stage.addEventListener('pointerdown', handleEarlyTakeover, true);
   stage.addEventListener('input', handleEarlyTakeover, true);
+  stage.addEventListener('keydown', e => {
+    if (['Enter', ' ', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      handleEarlyTakeover(e);
+    }
+  }, true);
 
   window.__deck = {
     go: (n, instant = true, opts) => go(n, instant, opts),
@@ -3529,7 +3733,10 @@ p.lead {
     closeTopOverlay,
     addCtrlButton,
     toast,
+    isStill,
+    isReducedMotion,
     isStatic,
+    stageScale,
     isApp,
     stage,
     count: slides.length,
@@ -3576,6 +3783,53 @@ p.lead {
     });
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+
+  function sanitizeCloneToFinal(clone) {
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    clone.querySelectorAll('canvas.fx-canvas, video, audio').forEach(n => n.remove());
+    clone.classList.add('active');
+    clone.classList.remove('leaving', 'in-flight', 'is-focusing');
+    clone.style.opacity = '';
+    clone.style.transform = '';
+    clone.style.clipPath = '';
+    clone.style.visibility = '';
+    clone.style.zIndex = '';
+    clone.querySelectorAll('.focus-dim, .focus-active, .focus-visited, .pre-transform, .transforming, .spot-pulse, .is-primed, .is-folded, .has-open, .is-open, .is-rf-dim, .is-rf-focus, .is-step-dim').forEach(n => {
+      n.classList.remove('focus-dim', 'focus-active', 'focus-visited', 'pre-transform', 'transforming', 'spot-pulse', 'is-primed', 'is-folded', 'has-open', 'is-open', 'is-rf-dim', 'is-rf-focus', 'is-step-dim');
+    });
+    clone.querySelectorAll('[data-count]').forEach(el => {
+      if (el.dataset.countFinal !== undefined) {
+        for (const n of el.childNodes) {
+          if (n.nodeType === 3 && /\d/.test(n.nodeValue)) { n.nodeValue = el.dataset.countFinal; break; }
+        }
+      }
+    });
+    clone.querySelectorAll('[data-odometer]').forEach(el => {
+      if (el.dataset.odoRaw) el.textContent = el.dataset.odoRaw;
+    });
+    // Snap data-step / data-step-hide / data-step-only cleanly to final step
+    let maxS = 0;
+    const stepEls = clone.querySelectorAll('[data-step], [data-step-hide], [data-step-only]');
+    stepEls.forEach(el => {
+      if (el.dataset.step !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.step, 10) || 0);
+      if (el.dataset.stepHide !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.stepHide, 10) || 0);
+      if (el.dataset.stepOnly !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.stepOnly, 10) || 0);
+    });
+    stepEls.forEach(el => {
+      let show = 0, hide = Infinity;
+      if (el.dataset.stepOnly !== undefined) {
+        const k = parseInt(el.dataset.stepOnly, 10) || 0;
+        show = k; hide = k + 1;
+      } else {
+        if (el.dataset.step !== undefined) show = parseInt(el.dataset.step, 10) || 0;
+        if (el.dataset.stepHide !== undefined) hide = parseInt(el.dataset.stepHide, 10) || Infinity;
+      }
+      el.dataset.stepHidden = (maxS >= show && maxS < hide) ? '0' : '1';
+    });
+  }
+
   function buildGrid() {
     if (gridEl) return gridEl;
     gridEl = document.createElement('div');
@@ -3608,11 +3862,7 @@ p.lead {
       const miniStage = document.createElement('div');
       miniStage.className = 'dg-thumb-stage';
       const clone = sl.cloneNode(true);
-      clone.removeAttribute('id');
-      clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
-      clone.querySelectorAll('canvas.fx-canvas, video, audio').forEach(n => n.remove());
-      clone.classList.add('active');
-      clone.classList.remove('leaving', 'in-flight', 'is-focusing');
+      sanitizeCloneToFinal(clone);
       miniStage.appendChild(clone);
       thumb.appendChild(miniStage);
 
@@ -3642,7 +3892,7 @@ p.lead {
   }
 
   function open() {
-    if (deck.isStatic()) return;
+    if (isStill()) return;
     buildGrid();
     cards.forEach((c, i) => c.classList.toggle('is-current', i === deck.index));
     gridEl.classList.add('open');
@@ -3678,7 +3928,8 @@ p.lead {
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'g' || e.key === 'G') {
-      if (deck.isStatic()) return;
+      if (isStill()) return;
+      if (!isOpen() && typeof deck.hasNavLock === 'function' && deck.hasNavLock()) return;
       e.preventDefault();
       toggle();
     }
@@ -3762,8 +4013,10 @@ p.lead {
     }
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+
   function setDrawing(flag) {
-    if (deck.isStatic()) flag = false;
+    if (isStill()) flag = false;
     drawingMode = Boolean(flag);
     layer.classList.toggle('is-drawing', drawingMode);
     bar.classList.toggle('show', drawingMode);
@@ -3775,7 +4028,7 @@ p.lead {
   }
 
   function setLaser(flag) {
-    if (deck.isStatic()) flag = false;
+    if (isStill()) flag = false;
     laserMode = Boolean(flag);
     laser.classList.toggle('is-on', laserMode);
     if (laserMode) {
@@ -3890,20 +4143,22 @@ p.lead {
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const lockedOther = !drawingMode && typeof deck.hasNavLock === 'function' && deck.hasNavLock();
     if (e.key === 'a' || e.key === 'A') {
-      if (deck.isStatic()) return;
+      if (isStill() || lockedOther) return;
       e.preventDefault();
       setDrawing(!drawingMode);
     } else if (e.key === 'l' || e.key === 'L') {
-      if (deck.isStatic()) return;
+      if (isStill() || lockedOther) return;
       e.preventDefault();
       setLaser(!laserMode);
-    } else if ((e.key === 'c' || e.key === 'C') && (drawingMode || (strokesBySlide.get(deck.index) || []).length)) {
+    } else if ((e.key === 'c' || e.key === 'C') && !lockedOther && (drawingMode || (strokesBySlide.get(deck.index) || []).length)) {
       e.preventDefault();
       clearCurrent();
     }
   });
 
+  deck.stage.addEventListener('deck:slideleave', finishStroke);
   deck.stage.addEventListener('deck:slideenter', renderSlideStrokes);
   deck.stage.addEventListener('deck:still', ({ detail }) => {
     if (detail.still) { setDrawing(false); setLaser(false); }
@@ -3984,12 +4239,18 @@ p.lead {
     };
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+  const seenCmdIds = new Set();
+
   function broadcast() {
     const payload = buildPayload();
+    let bcSent = false;
     if (bc) {
-      try { bc.postMessage(payload); } catch (_) {}
+      try { bc.postMessage(payload); bcSent = true; } catch (_) {}
     }
-    try { localStorage.setItem(channelName, JSON.stringify(payload)); } catch (_) {}
+    if (!bcSent) {
+      try { localStorage.setItem(channelName, JSON.stringify(payload)); } catch (_) {}
+    }
     if (popup && !popup.closed && typeof popup.__onDeckState === 'function') {
       try { popup.__onDeckState(payload); } catch (_) {}
     }
@@ -3998,6 +4259,11 @@ p.lead {
 
   function handleIncoming(msg) {
     if (!msg || typeof msg !== 'object') return;
+    if (msg.id) {
+      if (seenCmdIds.has(msg.id)) return;
+      seenCmdIds.add(msg.id);
+      if (seenCmdIds.size > 160) seenCmdIds.clear();
+    }
     if (msg.type === 'hello') broadcast();
     else if (msg.type === 'cmd') {
       if (msg.action === 'next') deck.step(1);
@@ -4051,7 +4317,8 @@ p.lead {
       '(function(){' +
       'var chName=' + JSON.stringify(chName) + ';' +
       'var bc=null;try{bc=new BroadcastChannel(chName)}catch(_){}' +
-      'function send(msg){if(bc)try{bc.postMessage(msg)}catch(_){}try{localStorage.setItem(chName+":cmd",JSON.stringify(Object.assign({ts:Date.now()},msg)))}catch(_){}}' +
+      'var seq=0;' +
+      'function send(msg){var pkt=Object.assign({id:Date.now()+":"+(++seq),ts:Date.now()},msg);var sent=false;if(bc){try{bc.postMessage(pkt);sent=true;}catch(_){}}if(!sent){try{localStorage.setItem(chName+":cmd",JSON.stringify(pkt));}catch(_){}}}' +
       'function render(s){if(!s||s.type!=="state")return;' +
       'var pad=function(n){return(n<10?"0":"")+n};' +
       'document.getElementById("sv-pos").textContent=(s.current&&s.current.appendix)?"附件":(pad(s.mainPos>0?s.mainPos:(s.index+1))+" / "+pad(s.total));' +
@@ -4077,7 +4344,7 @@ p.lead {
   }
 
   function open() {
-    if (deck.isStatic()) return false;
+    if (isStill()) return false;
     if (popup && !popup.closed) {
       popup.focus();
       broadcast();
@@ -4114,7 +4381,7 @@ p.lead {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (typeof deck.hasNavLock === 'function' && deck.hasNavLock()) return;
     if (e.key === 's' || e.key === 'S') {
-      if (deck.isStatic()) return;
+      if (isStill()) return;
       e.preventDefault();
       open();
     }
@@ -4131,20 +4398,72 @@ p.lead {
   };
 })();
 
-/* deck-architect v4.5 typography auto-fit
+/* deck-architect v4.9 typography auto-fit
  *
  * Supports:
- *  - [data-fit="phrase"]  : shrink display phrases so punctuation groups stay unbroken
+ *  - [data-fit="phrase"]  : auto-wraps CJK punctuation clauses into .ph if absent, then shrinks cleanly
  *  - [data-fit="figure"]  : uniform shrink for big KPI numbers inside [data-fit-group="figure"]
  *  - [data-fit="box"]     : auto-shrink container font-size if content overflows its fixed height/width
+ *
+ * Preserves author inline font-size via cached data-fit-base-px, and supports scoped per-slide fitting
+ * via window.__deckFit(slideEl) to avoid full-document layout thrash during slide transitions.
  */
 (function () {
-  function fitPhrases() {
-    document.querySelectorAll('[data-fit="phrase"], .key, .shock-text, .closing-text, .cover-title').forEach(function (el) {
-      var phs = [].slice.call(el.querySelectorAll('.ph'));
+  var CLAUSE_SPLIT = /(?<=[，、；：。！？,;!?])\s*/;
+
+  function cacheBase(el) {
+    if (!el.dataset.fitBasePx) {
+      var cur = parseFloat(getComputedStyle(el).fontSize);
+      if (cur > 0) el.dataset.fitBasePx = String(cur);
+    }
+    var base = parseFloat(el.dataset.fitBasePx || '0');
+    if (base > 0) el.style.fontSize = base + 'px';
+    return base;
+  }
+
+  function ensurePhrases(el) {
+    var existing = [].slice.call(el.querySelectorAll('.ph'));
+    if (existing.length) return existing;
+    if (!el.hasAttribute('data-fit')) return [];
+    // Only auto-split simple display text (text nodes, <mark>, <br>) so complex markup stays untouched
+    for (var i = 0; i < el.childNodes.length; i++) {
+      var n = el.childNodes[i];
+      if (n.nodeType === 1 && n.tagName !== 'MARK' && n.tagName !== 'BR' && n.tagName !== 'SPAN') return [];
+    }
+    var parts = [];
+    var cur = '';
+    el.childNodes.forEach(function (n) {
+      if (n.nodeType === 1 && n.tagName === 'BR') {
+        if (cur) { parts.push(cur); cur = ''; }
+        parts.push('<br>');
+      } else if (n.nodeType === 1) {
+        cur += n.outerHTML;
+      } else if (n.nodeType === 3) {
+        var segs = n.nodeValue.split(CLAUSE_SPLIT);
+        for (var j = 0; j < segs.length; j++) {
+          cur += segs[j].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          if (j < segs.length - 1 && cur.trim()) {
+            parts.push(cur);
+            cur = '';
+          }
+        }
+      }
+    });
+    if (cur) parts.push(cur);
+    var nonBr = parts.filter(function (x) { return x && x !== '<br>'; });
+    if (nonBr.length < 2) return [];
+    el.innerHTML = parts.map(function (x) {
+      return x === '<br>' ? '<br>' : '<span class="ph">' + x + '</span>';
+    }).join('');
+    return [].slice.call(el.querySelectorAll('.ph'));
+  }
+
+  function fitPhrases(scope) {
+    var root = scope || document;
+    root.querySelectorAll('[data-fit="phrase"], .key, .shock-text, .closing-text, .cover-title').forEach(function (el) {
+      var phs = ensurePhrases(el);
       if (!phs.length) return;
-      el.style.fontSize = '';
-      var base = parseFloat(getComputedStyle(el).fontSize);
+      var base = cacheBase(el);
       if (!base) return;
       var size = base;
       function wraps() {
@@ -4153,21 +4472,23 @@ p.lead {
       }
       while (wraps() && size > base * 0.72) {
         size -= base * 0.04;
-        el.style.fontSize = size + 'px';
+        el.style.fontSize = size.toFixed(1) + 'px';
       }
-      if (wraps()) el.style.fontSize = '';
+      if (wraps()) el.style.fontSize = base + 'px';
     });
   }
 
-  function fitFigures() {
-    document.querySelectorAll('.slide').forEach(function (sl) {
+  function fitFigures(scope) {
+    var slideList = scope && scope.classList && scope.classList.contains('slide')
+      ? [scope]
+      : [].slice.call((scope || document).querySelectorAll('.slide'));
+    slideList.forEach(function (sl) {
       var groups = sl.querySelectorAll('[data-fit-group="figure"], .body');
       var list = groups.length ? [].slice.call(groups) : [sl];
       list.forEach(function (box) {
         var els = [].slice.call(box.querySelectorAll('[data-fit="figure"], .number .value, .stats-row .sv'));
         if (!els.length) return;
-        els.forEach(function (e) { e.style.fontSize = ''; });
-        var base = els.map(function (e) { return parseFloat(getComputedStyle(e).fontSize) || 64; });
+        var base = els.map(function (e) { return cacheBase(e) || 64; });
         var k = 1;
         function over() {
           return box.scrollWidth > box.clientWidth + 2 ||
@@ -4175,17 +4496,17 @@ p.lead {
         }
         while (over() && k > 0.5) {
           k -= 0.05;
-          els.forEach(function (e, i) { e.style.fontSize = (base[i] * k) + 'px'; });
+          els.forEach(function (e, i) { e.style.fontSize = (base[i] * k).toFixed(1) + 'px'; });
         }
       });
     });
   }
 
-  function fitBoxes() {
-    document.querySelectorAll('[data-fit="box"]').forEach(function (box) {
+  function fitBoxes(scope) {
+    var root = scope || document;
+    root.querySelectorAll('[data-fit="box"]').forEach(function (box) {
       if (!box.clientHeight || !box.clientWidth) return;
-      box.style.fontSize = '';
-      var base = parseFloat(getComputedStyle(box).fontSize) || 24;
+      var base = cacheBase(box) || 24;
       var minPx = Math.max(18, parseFloat(box.dataset.fitMin || '18') || 18);
       var size = base;
       var guard = 0;
@@ -4196,16 +4517,16 @@ p.lead {
     });
   }
 
-  function run() {
-    fitPhrases();
-    fitFigures();
-    fitBoxes();
+  function run(scope) {
+    fitPhrases(scope);
+    fitFigures(scope);
+    fitBoxes(scope);
   }
 
   window.__deckFit = run;
   run();
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(run);
+    document.fonts.ready.then(function () { run(); });
   }
 })();
 
@@ -4214,7 +4535,12 @@ p.lead {
  */
 (function () {
   const deck = window.__deck;
-  const isStatic = () => (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false);
+  const isReduced = () => (deck && typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false));
+  const enterTimers = new Set();
+  function clearEnterTimers() {
+    enterTimers.forEach(clearTimeout);
+    enterTimers.clear();
+  }
 
   function initRuler(root) {
     if (root._rpInit) return root._rpInit;
@@ -4234,7 +4560,6 @@ p.lead {
       root.querySelector('.rp-label').textContent = label;
     }
     const valEl = root.querySelector('.rp-val');
-    const fillEl = root.querySelector('.rp-fill');
     const targetEl = root.querySelector('.rp-target');
     if (targetEl) {
       targetEl.style.setProperty('--rp-target', Math.max(0, Math.min(100, (goalVal / maxVal) * 100)) + '%');
@@ -4242,27 +4567,43 @@ p.lead {
     }
 
     let rafId = 0;
+    let playRaf1 = 0;
+    let playRaf2 = 0;
+    let hitTimer = 0;
     let curVal = 0;
 
+    function cancelAll() {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      if (playRaf1) { cancelAnimationFrame(playRaf1); playRaf1 = 0; }
+      if (playRaf2) { cancelAnimationFrame(playRaf2); playRaf2 = 0; }
+      if (hitTimer) { clearTimeout(hitTimer); hitTimer = 0; }
+      if (valEl) valEl.classList.remove('is-hit');
+    }
+
+    function setFill(v) {
+      const frac = Math.max(0, Math.min(1, v / maxVal));
+      root.style.setProperty('--rp-scale', frac.toFixed(4));
+      root.style.setProperty('--rp-pct', (frac * 100).toFixed(2) + '%');
+    }
+
     function setImmediate(v) {
-      cancelAnimationFrame(rafId);
+      cancelAll();
       curVal = v;
-      const pct = Math.max(0, Math.min(100, (v / maxVal) * 100));
-      root.style.setProperty('--rp-pct', pct.toFixed(2) + '%');
+      setFill(v);
       if (valEl) valEl.textContent = (Number.isInteger(v) ? v : v.toFixed(1)) + unit;
       root.classList.toggle('is-passed', v >= goalVal);
     }
 
     function animateTo(nextVal) {
-      if (isStatic()) { setImmediate(nextVal); return; }
-      cancelAnimationFrame(rafId);
+      if (isReduced()) { setImmediate(nextVal); return; }
+      cancelAll();
       const start = curVal;
       const diff = nextVal - start;
       const dur = 760;
       const t0 = performance.now();
-      const pct = Math.max(0, Math.min(100, (nextVal / maxVal) * 100));
-      root.style.setProperty('--rp-pct', pct.toFixed(2) + '%');
+      setFill(nextVal);
       function step(now) {
+        if (isReduced()) { setImmediate(nextVal); return; }
         const p = Math.min(1, (now - t0) / dur);
         // Asymmetric ease-out crisp snap
         const e = 1 - Math.pow(1 - p, 3.4);
@@ -4271,11 +4612,12 @@ p.lead {
         if (p < 1) {
           rafId = requestAnimationFrame(step);
         } else {
+          rafId = 0;
           curVal = nextVal;
           if (valEl) {
             valEl.textContent = (Number.isInteger(nextVal) ? nextVal : nextVal.toFixed(1)) + unit;
             valEl.classList.add('is-hit');
-            setTimeout(() => valEl.classList.remove('is-hit'), 260);
+            hitTimer = setTimeout(() => { hitTimer = 0; valEl.classList.remove('is-hit'); }, 260);
           }
           root.classList.toggle('is-passed', nextVal >= goalVal);
         }
@@ -4284,14 +4626,20 @@ p.lead {
     }
 
     function play() {
-      if (isStatic()) { setImmediate(targetVal); return; }
+      if (isReduced()) { setImmediate(targetVal); return; }
       setImmediate(0);
-      requestAnimationFrame(() => requestAnimationFrame(() => animateTo(targetVal)));
+      playRaf1 = requestAnimationFrame(() => {
+        playRaf1 = 0;
+        playRaf2 = requestAnimationFrame(() => {
+          playRaf2 = 0;
+          animateTo(targetVal);
+        });
+      });
     }
 
     root.addEventListener('click', e => e.stopPropagation());
     setImmediate(targetVal);
-    const api = { play, animateTo, setImmediate, stop: () => { cancelAnimationFrame(rafId); setImmediate(targetVal); } };
+    const api = { play, animateTo, setImmediate, stop: () => setImmediate(targetVal) };
     root._rpInit = api;
     return api;
   }
@@ -4328,6 +4676,12 @@ p.lead {
   const rulers = [...document.querySelectorAll('[data-ruler-progress]')].map(initRuler);
   const bentos = [...document.querySelectorAll('[data-bento-expand]')].map(initBento);
 
+  function settleAll(closeBentos) {
+    clearEnterTimers();
+    rulers.forEach(r => r.stop());
+    if (closeBentos) bentos.forEach(b => b.closeAll());
+  }
+
   function stepOf(el, sl) {
     const h = el.closest('[data-step], [data-step-only]');
     return h && sl && sl.contains(h) ? (parseInt(h.dataset.step || h.dataset.stepOnly || '0', 10) || 0) : 0;
@@ -4335,30 +4689,54 @@ p.lead {
 
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       const curStep = detail.step || 0;
-      sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
-        if (el._rpInit && stepOf(el, sl) <= curStep) el._rpInit.play();
-      });
+      if (detail.restAtFinal || detail.reducedMotion || detail.staticMode || isReduced()) {
+        sl.querySelectorAll('[data-ruler-progress]').forEach(el => el._rpInit && el._rpInit.stop());
+        return;
+      }
+      const run = () => {
+        if (deck.slides[deck.index] !== sl || isReduced()) return;
+        sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
+          if (el._rpInit && stepOf(el, sl) <= curStep) el._rpInit.play();
+        });
+      };
+      const delay = detail.enterDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); run(); }, delay);
+        enterTimers.add(id);
+      } else {
+        run();
+      }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
+      if (detail.dir < 0 || isReduced()) {
+        sl.querySelectorAll('[data-ruler-progress]').forEach(el => el._rpInit && el._rpInit.stop());
+        return;
+      }
       sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
         if (el._rpInit && stepOf(el, sl) === detail.step) el._rpInit.play();
       });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       sl.querySelectorAll('[data-ruler-progress]').forEach(el => el._rpInit && el._rpInit.stop());
+      sl.querySelectorAll('[data-bento-expand]').forEach(el => el._beInit && el._beInit.closeAll());
     });
     deck.stage.addEventListener('deck:still', ({ detail }) => {
-      if (detail.still) rulers.forEach(r => r.stop());
+      if (detail.still) settleAll(true);
     });
     deck.stage.addEventListener('deck:lowpower', ({ detail }) => {
-      if (detail.lowPower) rulers.forEach(r => r.stop());
+      if (detail.lowPower) settleAll(false);
+    });
+    deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => {
+      if (detail.reduced) settleAll(false);
     });
   }
   window.__motionKits = window.__motionKits || {};
@@ -4370,17 +4748,25 @@ p.lead {
  */
 (function () {
   const deck = window.__deck;
-  const isStatic = () => (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false);
+  const isReduced = () => (deck && typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false));
+  const getScale = () => (deck && typeof deck.stageScale === 'function' ? deck.stageScale() : 1) || 1;
+  const enterTimers = new Set();
+  function clearEnterTimers() {
+    enterTimers.forEach(clearTimeout);
+    enterTimers.clear();
+  }
 
   /* ---- 1. Rolling Odometer ---- */
   function initOdometer(el) {
     if (el._odoInit) return el._odoInit;
     const initialText = (el.dataset.value || el.textContent || '0').trim();
+    el.dataset.odoRaw = initialText;
     const digits = '0123456789';
     let settleTimer = 0;
 
     function renderStatic(str) {
       clearTimeout(settleTimer);
+      settleTimer = 0;
       el.innerHTML = '';
       el.setAttribute('aria-label', str);
       const fin = document.createElement('span');
@@ -4391,8 +4777,10 @@ p.lead {
 
     function render(text, animate) {
       const str = String(text);
+      el.dataset.odoRaw = str;
       clearTimeout(settleTimer);
-      if (!animate || isStatic()) {
+      settleTimer = 0;
+      if (!animate || isReduced()) {
         renderStatic(str);
         return;
       }
@@ -4432,7 +4820,8 @@ p.lead {
         strip.style.transform = `translateY(-${targetIdx * 1.05}em)`;
       });
       const maxDelay = strips.length ? strips[strips.length - 1].delay : 0;
-      settleTimer = setTimeout(() => renderStatic(str), 880 + maxDelay);
+      // Total finish time for last digit = duration (820 + maxDelay) + delay (maxDelay) + safety buffer
+      settleTimer = setTimeout(() => renderStatic(str), 820 + 2 * maxDelay + 80);
     }
 
     render(initialText, false);
@@ -4451,10 +4840,13 @@ p.lead {
     const items = [...root.querySelectorAll('[data-rank-item]')];
     const maxScore = parseFloat(root.dataset.max || '100');
     const unit = root.dataset.unit || '';
+    const itemParent = items.length ? items[0].parentNode : root;
+    const anchor = document.createComment('rr-anchor');
+    if (items.length && itemParent) itemParent.insertBefore(anchor, items[0]);
 
     function setStage(stageKey, animate) {
       const firstRects = new Map();
-      if (animate && !isStatic()) {
+      if (animate && !isReduced()) {
         items.forEach(it => firstRects.set(it, it.getBoundingClientRect()));
       }
       const scored = items.map(it => {
@@ -4462,26 +4854,37 @@ p.lead {
         return { it, v };
       });
       scored.sort((a, b) => b.v - a.v);
+      let insertAfter = anchor;
       scored.forEach(({ it, v }, idx) => {
-        root.appendChild(it);
+        if (itemParent && insertAfter && insertAfter.parentNode === itemParent) {
+          itemParent.insertBefore(it, insertAfter.nextSibling);
+          insertAfter = it;
+        } else {
+          root.appendChild(it);
+        }
         it.classList.toggle('is-leader', idx === 0);
         const pos = it.querySelector('.rr-pos');
         if (pos) pos.textContent = '#' + (idx + 1);
         const sc = it.querySelector('.rr-score');
         if (sc) sc.textContent = (Number.isInteger(v) ? v : v.toFixed(1)) + unit;
         const bar = it.querySelector('.rr-bar');
-        if (bar) bar.style.setProperty('--rr-w', Math.max(6, Math.min(100, (v / maxScore) * 100)).toFixed(1) + '%');
+        if (bar) {
+          const frac = Math.max(0.06, Math.min(1, v / maxScore));
+          bar.style.setProperty('--rr-scale', frac.toFixed(4));
+          bar.style.setProperty('--rr-w', (frac * 100).toFixed(1) + '%');
+        }
       });
 
-      if (animate && !isStatic()) {
+      if (animate && !isReduced()) {
+        const scale = getScale();
         scored.forEach(({ it }, idx) => {
           const prev = firstRects.get(it);
           const next = it.getBoundingClientRect();
           if (!prev) return;
-          const dy = prev.top - next.top;
+          const dy = (prev.top - next.top) / scale;
           if (Math.abs(dy) > 1) {
             it.style.transition = 'none';
-            it.style.transform = `translateY(${dy}px)`;
+            it.style.transform = `translateY(${dy.toFixed(1)}px)`;
             it.getBoundingClientRect();
             it.style.transition = `transform 680ms cubic-bezier(0.16, 1, 0.3, 1) ${idx * 45}ms`;
             it.style.transform = 'translateY(0)';
@@ -4494,13 +4897,14 @@ p.lead {
     let timer = 0;
     setStage('after', false);
     const api = {
-      show: (stageKey) => { clearTimeout(timer); setStage(stageKey, true); },
-      stop: () => { clearTimeout(timer); setStage('after', false); },
+      show: (stageKey) => { clearTimeout(timer); timer = 0; setStage(stageKey, true); },
+      stop: () => { clearTimeout(timer); timer = 0; setStage('after', false); },
       play: () => {
         clearTimeout(timer);
-        if (isStatic()) { setStage('after', false); return; }
+        timer = 0;
+        if (isReduced()) { setStage('after', false); return; }
         setStage('before', false);
-        timer = setTimeout(() => setStage('after', true), 420);
+        timer = setTimeout(() => { timer = 0; setStage('after', true); }, 420);
       }
     };
     root._rrInit = api;
@@ -4545,6 +4949,7 @@ p.lead {
   const racks = [...document.querySelectorAll('[data-rack-focus]')].map(initRackFocus);
 
   function settleAll() {
+    clearEnterTimers();
     odos.forEach(o => o.set());
     races.forEach(r => r.stop());
     racks.forEach(r => r.clear());
@@ -4557,26 +4962,50 @@ p.lead {
 
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       const curStep = detail.step || 0;
-      sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) <= curStep) el._odoInit.play(); });
-      sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) <= curStep) el._rrInit.play(); });
+      if (detail.restAtFinal || detail.reducedMotion || detail.staticMode || isReduced()) {
+        sl.querySelectorAll('[data-odometer]').forEach(el => el._odoInit && el._odoInit.set());
+        sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.stop());
+        return;
+      }
+      const run = () => {
+        if (deck.slides[deck.index] !== sl || isReduced()) return;
+        sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) <= curStep) el._odoInit.play(); });
+        sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) <= curStep) el._rrInit.play(); });
+      };
+      const delay = detail.enterDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); run(); }, delay);
+        enterTimers.add(id);
+      } else {
+        run();
+      }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
+      if (detail.dir < 0 || isReduced()) {
+        sl.querySelectorAll('[data-odometer]').forEach(el => el._odoInit && el._odoInit.set());
+        sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.stop());
+        return;
+      }
       sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) === detail.step) el._odoInit.play(); });
       sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) === detail.step) el._rrInit.play(); });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       sl.querySelectorAll('[data-odometer]').forEach(el => el._odoInit && el._odoInit.set());
       sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.stop());
+      sl.querySelectorAll('[data-rack-focus]').forEach(el => el._rfInit && el._rfInit.clear());
     });
     deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
     deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });
+    deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => { if (detail.reduced) settleAll(); });
   }
   window.__motionKits = window.__motionKits || {};
   window.__motionKits.counsel = { initOdometer, initRankRace, initRackFocus, odos, races, racks };
@@ -4587,7 +5016,14 @@ p.lead {
  */
 (function () {
   const deck = window.__deck;
-  const isStatic = () => (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false);
+  const isStill = () => (deck && typeof deck.isStill === 'function' ? deck.isStill() : (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false));
+  const isReduced = () => (deck && typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : isStill());
+  const getScale = () => (deck && typeof deck.stageScale === 'function' ? deck.stageScale() : 1) || 1;
+  const enterTimers = new Set();
+  function clearEnterTimers() {
+    enterTimers.forEach(clearTimeout);
+    enterTimers.clear();
+  }
 
   /* ---- 1. Split Mask Reveal ---- */
   function initSplitMask(el) {
@@ -4598,14 +5034,20 @@ p.lead {
         .map((p, i) => `<span class="sm-line"><span class="sm-inner" style="transition-delay:${i * 110}ms">${p}</span></span>`)
         .join('');
     }
+    let rafId = 0;
+    const setFinal = () => {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      el.classList.remove('is-primed');
+    };
     const api = {
       play: () => {
-        if (isStatic()) { el.classList.remove('is-primed'); return; }
+        if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+        if (isReduced()) { el.classList.remove('is-primed'); return; }
         el.classList.add('is-primed');
         el.getBoundingClientRect();
-        requestAnimationFrame(() => el.classList.remove('is-primed'));
+        rafId = requestAnimationFrame(() => { rafId = 0; el.classList.remove('is-primed'); });
       },
-      setFinal: () => el.classList.remove('is-primed')
+      setFinal,
     };
     el._smInit = api;
     return api;
@@ -4616,9 +5058,20 @@ p.lead {
     if (root._spInit) return root._spInit;
     root.classList.add('live-ctrl');
     if (!root.querySelector('.sp-lit')) {
-      const raw = root.innerHTML;
-      root.innerHTML = `<div class="sp-cone"></div><div class="sp-base">${raw}</div><div class="sp-lit" aria-hidden="true">${raw}</div>`;
-      root.querySelectorAll('.sp-lit [id]').forEach(n => n.removeAttribute('id'));
+      const cone = document.createElement('div');
+      cone.className = 'sp-cone';
+      const base = document.createElement('div');
+      base.className = 'sp-base';
+      // Move original nodes (preserving existing listeners/state) instead of innerHTML rebuild
+      while (root.firstChild) base.appendChild(root.firstChild);
+      const lit = base.cloneNode(true);
+      lit.className = 'sp-lit';
+      lit.setAttribute('aria-hidden', 'true');
+      lit.removeAttribute('id');
+      lit.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      root.appendChild(cone);
+      root.appendChild(base);
+      root.appendChild(lit);
     }
     let rafId = 0;
 
@@ -4629,16 +5082,17 @@ p.lead {
 
     function stop() {
       if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      setPos(50, 50);
     }
 
     // Single-pass cinematic sweep (left -> center) then completely STILL for reading
     function start() {
-      stop();
-      if (isStatic()) { setPos(50, 50); return; }
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      if (isReduced()) { setPos(50, 50); return; }
       const dur = 1050;
       const t0 = performance.now();
       function step(now) {
-        if (isStatic()) { stop(); setPos(50, 50); return; }
+        if (isReduced()) { stop(); return; }
         const p = Math.min(1, (now - t0) / dur);
         const e = 1 - Math.pow(1 - p, 3);
         const x = 14 + (50 - 14) * e;
@@ -4655,13 +5109,13 @@ p.lead {
     }
 
     root.addEventListener('pointermove', e => {
-      if (isStatic()) return;
-      stop(); // Immediate user takeover
+      if (isReduced()) return;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
       const r = root.getBoundingClientRect();
       if (!r.width || !r.height) return;
       setPos(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
     });
-    root.addEventListener('pointerleave', () => { stop(); setPos(50, 50); });
+    root.addEventListener('pointerleave', () => { stop(); });
 
     setPos(50, 50);
     const api = { start, stop, setPos };
@@ -4676,6 +5130,8 @@ p.lead {
     const cards = [...root.querySelectorAll('[data-deck-card]')];
     if (!cards.length) return null;
     let order = cards.map((_, i) => i);
+    let tossing = false;
+    let tossTimer = 0;
 
     function layout() {
       const n = order.length;
@@ -4696,13 +5152,16 @@ p.lead {
     }
 
     function next(dir) {
-      if (order.length < 2) return;
+      if (order.length < 2 || tossing) return;
       const front = cards[order[0]];
-      if (!isStatic()) {
+      if (!isReduced()) {
+        tossing = true;
         front.classList.add('is-tossing');
         front.style.transform = `translate3d(${dir * 160}px, -12px, 30px) rotate(${dir * 9}deg) scale(0.95)`;
         front.style.opacity = '0.25';
-        setTimeout(() => {
+        tossTimer = setTimeout(() => {
+          tossTimer = 0;
+          tossing = false;
           front.classList.remove('is-tossing');
           order.push(order.shift());
           layout();
@@ -4713,10 +5172,19 @@ p.lead {
       }
     }
 
+    function reset() {
+      clearTimeout(tossTimer);
+      tossTimer = 0;
+      tossing = false;
+      cards.forEach(c => c.classList.remove('is-tossing', 'is-dragging'));
+      order = cards.map((_, i) => i);
+      layout();
+    }
+
     cards.forEach(card => {
       let startX = 0, dx = 0, dragging = false;
       card.addEventListener('pointerdown', e => {
-        if (card.dataset.depth !== '0' || isStatic()) return;
+        if (card.dataset.depth !== '0' || isStill() || tossing) return;
         e.stopPropagation();
         dragging = true;
         startX = e.clientX;
@@ -4727,8 +5195,8 @@ p.lead {
       card.addEventListener('pointermove', e => {
         if (!dragging) return;
         e.stopPropagation();
-        dx = e.clientX - startX;
-        card.style.transform = `translate3d(${dx}px, ${Math.abs(dx) * -0.06}px, 18px) rotate(${dx * 0.045}deg)`;
+        dx = (e.clientX - startX) / getScale();
+        card.style.transform = `translate3d(${dx.toFixed(1)}px, ${(Math.abs(dx) * -0.06).toFixed(1)}px, 18px) rotate(${(dx * 0.045).toFixed(2)}deg)`;
       });
       const finish = e => {
         if (!dragging) return;
@@ -4749,10 +5217,7 @@ p.lead {
     });
 
     layout();
-    const api = {
-      next: () => next(1),
-      reset: () => { order = cards.map((_, i) => i); layout(); }
-    };
+    const api = { next: () => next(1), reset };
     root._ddInit = api;
     return api;
   }
@@ -4762,17 +5227,37 @@ p.lead {
     if (root._cwInit) return root._cwInit;
     root.classList.add('live-ctrl');
     if (!root.querySelector('.cw-color')) {
-      const inner = root.innerHTML;
-      root.innerHTML = `<div class="cw-mono">${inner}</div><div class="cw-color" aria-hidden="true">${inner}</div><div class="cw-beam"></div>`;
-      root.querySelectorAll('.cw-color [id]').forEach(n => n.removeAttribute('id'));
+      const mono = document.createElement('div');
+      mono.className = 'cw-mono';
+      while (root.firstChild) mono.appendChild(root.firstChild);
+      const color = mono.cloneNode(true);
+      color.className = 'cw-color';
+      color.setAttribute('aria-hidden', 'true');
+      color.removeAttribute('id');
+      color.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      const beam = document.createElement('div');
+      beam.className = 'cw-beam';
+      root.appendChild(mono);
+      root.appendChild(color);
+      root.appendChild(beam);
     }
     let timer = 0;
+    let rafId = 0;
     function setPct(p) {
       root.style.setProperty('--cw-pct', p + '%');
     }
+    function setFinal() {
+      clearTimeout(timer);
+      timer = 0;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      setPct(100);
+      root.classList.remove('is-sweeping');
+    }
     function play() {
       clearTimeout(timer);
-      if (isStatic()) { setPct(100); root.classList.remove('is-sweeping'); return; }
+      timer = 0;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      if (isReduced()) { setFinal(); return; }
       const color = root.querySelector('.cw-color');
       const beam = root.querySelector('.cw-beam');
       if (color) color.style.transition = 'none';
@@ -4782,11 +5267,11 @@ p.lead {
       if (color) color.style.transition = '';
       if (beam) beam.style.transition = '';
       root.classList.add('is-sweeping');
-      requestAnimationFrame(() => setPct(100));
-      timer = setTimeout(() => root.classList.remove('is-sweeping'), 1250);
+      rafId = requestAnimationFrame(() => { rafId = 0; setPct(100); });
+      timer = setTimeout(() => { timer = 0; root.classList.remove('is-sweeping'); }, 1250);
     }
     setPct(100);
-    const api = { play, setFinal: () => { clearTimeout(timer); setPct(100); root.classList.remove('is-sweeping'); } };
+    const api = { play, setFinal };
     root._cwInit = api;
     return api;
   }
@@ -4796,11 +5281,12 @@ p.lead {
   const decks = [...document.querySelectorAll('[data-depth-deck]')].map(initDepthDeck).filter(Boolean);
   const colors = [...document.querySelectorAll('[data-colorize-wipe]')].map(initColorize);
 
-  function settleAll() {
+  function settleAll(resetDecks) {
+    clearEnterTimers();
     splits.forEach(s => s.setFinal());
     spots.forEach(s => s.stop());
     colors.forEach(c => c.setFinal());
-    decks.forEach(d => d.reset());
+    if (resetDecks) decks.forEach(d => d.reset());
   }
 
   function stepOf(el, sl) {
@@ -4810,28 +5296,55 @@ p.lead {
 
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       const curStep = detail.step || 0;
-      sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) <= curStep) el._smInit.play(); });
-      sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) <= curStep) el._spInit.start(); });
-      sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) <= curStep) el._cwInit.play(); });
+      if (detail.restAtFinal || detail.reducedMotion || detail.staticMode || isReduced()) {
+        sl.querySelectorAll('[data-split-mask]').forEach(el => el._smInit && el._smInit.setFinal());
+        sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => el._spInit && el._spInit.stop());
+        sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
+        return;
+      }
+      const run = () => {
+        if (deck.slides[deck.index] !== sl || isReduced()) return;
+        sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) <= curStep) el._smInit.play(); });
+        sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) <= curStep) el._spInit.start(); });
+        sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) <= curStep) el._cwInit.play(); });
+      };
+      const delay = detail.enterDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); run(); }, delay);
+        enterTimers.add(id);
+      } else {
+        run();
+      }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
+      if (detail.dir < 0 || isReduced()) {
+        sl.querySelectorAll('[data-split-mask]').forEach(el => el._smInit && el._smInit.setFinal());
+        sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => el._spInit && el._spInit.stop());
+        sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
+        return;
+      }
       sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) === detail.step) el._smInit.play(); });
       sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) === detail.step) el._spInit.start(); });
       sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) === detail.step) el._cwInit.play(); });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
+      sl.querySelectorAll('[data-split-mask]').forEach(el => el._smInit && el._smInit.setFinal());
       sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => el._spInit && el._spInit.stop());
       sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
+      sl.querySelectorAll('[data-depth-deck]').forEach(el => el._ddInit && el._ddInit.reset());
     });
-    deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
-    deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });
+    deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(true); });
+    deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(false); });
+    deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => { if (detail.reduced) settleAll(false); });
   }
   window.__motionKits = window.__motionKits || {};
   window.__motionKits.apple = { initSplitMask, initSpotlight, initDepthDeck, initColorize, splits, spots, decks, colors };
@@ -4842,27 +5355,51 @@ p.lead {
  */
 (function () {
   const deck = window.__deck;
-  const isStatic = () => (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false);
+  const isReduced = () => (deck && typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false));
+  const enterTimers = new Set();
+  function clearEnterTimers() {
+    enterTimers.forEach(clearTimeout);
+    enterTimers.clear();
+  }
 
   /* ---- 1. Pop-up Book 3D Fold ---- */
   function initPopupFold(root) {
     if (root._pfInit) return root._pfInit;
+    root.classList.add('live-ctrl');
     const layers = [...root.querySelectorAll('[data-pop-layer]')];
     layers.forEach((layer, i) => {
       if (!layer.style.transitionDelay) layer.style.transitionDelay = (i * 120) + 'ms';
     });
+    let foldTimer = 0;
 
+    function unfold() {
+      clearTimeout(foldTimer);
+      foldTimer = 0;
+      root.classList.remove('is-folded');
+    }
+    function fold() {
+      clearTimeout(foldTimer);
+      foldTimer = 0;
+      root.classList.add('is-folded');
+    }
     function play() {
-      if (isStatic()) { root.classList.remove('is-folded'); return; }
+      clearTimeout(foldTimer);
+      foldTimer = 0;
+      if (isReduced()) { root.classList.remove('is-folded'); return; }
       root.classList.add('is-folded');
       root.getBoundingClientRect();
-      setTimeout(() => root.classList.remove('is-folded'), 90);
+      foldTimer = setTimeout(() => {
+        foldTimer = 0;
+        root.classList.remove('is-folded');
+      }, 90);
     }
     function toggle() {
+      clearTimeout(foldTimer);
+      foldTimer = 0;
       root.classList.toggle('is-folded');
     }
 
-    const api = { play, toggle, unfold: () => root.classList.remove('is-folded'), fold: () => root.classList.add('is-folded') };
+    const api = { play, toggle, unfold, fold };
     root._pfInit = api;
     return api;
   }
@@ -4891,7 +5428,7 @@ p.lead {
     }
     function play() {
       clearTimers();
-      if (isStatic()) { showAll(); return; }
+      if (isReduced()) { showAll(); return; }
       msgs.forEach(m => m.classList.add('is-hidden'));
       let t = 180;
       msgs.forEach(m => {
@@ -4917,6 +5454,7 @@ p.lead {
   const chats = [...document.querySelectorAll('[data-chat-replay]')].map(initChatReplay);
 
   function settleAll() {
+    clearEnterTimers();
     folds.forEach(f => f.unfold());
     chats.forEach(c => c.showAll());
   }
@@ -4928,19 +5466,41 @@ p.lead {
 
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       const curStep = detail.step || 0;
-      sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) <= curStep) el._pfInit.play(); });
-      sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) <= curStep) el._crInit.play(); });
+      if (detail.restAtFinal || detail.reducedMotion || detail.staticMode || isReduced()) {
+        sl.querySelectorAll('[data-popup-fold]').forEach(el => el._pfInit && el._pfInit.unfold());
+        sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
+        return;
+      }
+      const run = () => {
+        if (deck.slides[deck.index] !== sl || isReduced()) return;
+        sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) <= curStep) el._pfInit.play(); });
+        sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) <= curStep) el._crInit.play(); });
+      };
+      const delay = detail.enterDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); run(); }, delay);
+        enterTimers.add(id);
+      } else {
+        run();
+      }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
+      if (detail.dir < 0 || isReduced()) {
+        sl.querySelectorAll('[data-popup-fold]').forEach(el => el._pfInit && el._pfInit.unfold());
+        sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
+        return;
+      }
       sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) === detail.step) el._pfInit.play(); });
       sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) === detail.step) el._crInit.play(); });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
@@ -4948,6 +5508,7 @@ p.lead {
     });
     deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
     deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });
+    deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => { if (detail.reduced) settleAll(); });
   }
   window.__motionKits = window.__motionKits || {};
   window.__motionKits.story = { initPopupFold, initChatReplay, folds, chats };

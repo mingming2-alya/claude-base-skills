@@ -48,8 +48,8 @@
   max-width: 92vw;
   max-height: 88vh;
   padding: 28px;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--card-radius, 22px);
+  border: 1px solid var(--line, rgba(255, 255, 255, 0.16));
   background: var(--bg, #12161F);
   color: var(--fg, #F4F2EC);
   box-shadow: 0 40px 110px rgba(0, 0, 0, 0.65);
@@ -59,8 +59,11 @@
   align-items: center;
   gap: 16px;
 }
-#deck-lightbox .dlb-content > img,
-#deck-lightbox .dlb-content > svg {
+#deck-lightbox .dlb-content .dlb-scope {
+  display: contents;
+}
+#deck-lightbox .dlb-content img,
+#deck-lightbox .dlb-content svg {
   display: block;
   max-width: 84vw;
   max-height: 76vh;
@@ -69,7 +72,7 @@
 }
 #deck-lightbox .dlb-cap {
   font: 600 18px/1.4 var(--font-body);
-  color: rgba(244, 242, 236, 0.84);
+  color: var(--fg-2, rgba(244, 242, 236, 0.84));
 }
 #deck-lightbox .dlb-close {
   position: absolute;
@@ -114,7 +117,6 @@
 }
 
 html.still [data-zoomable]::after,
-body.low-power [data-zoomable]::after,
 html.still [data-spotlight-hover]::before,
 body.low-power [data-spotlight-hover]::before,
 html.still #deck-lightbox {

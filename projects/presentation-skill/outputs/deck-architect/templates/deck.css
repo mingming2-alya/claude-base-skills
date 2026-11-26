@@ -1,4 +1,4 @@
-/* @fonts family=Noto+Sans+TC:wght@400;500;700;900 */
+/* @fonts family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;800;900&family=Noto+Serif+TC:wght@600;700;900 */
 /*
  * deck.css 起始範本（deck-architect）
  * - Step 3b 畫樣張前從這份開始：第一段換成選定風格的字體（styles/<id>.md 第 2 節），
@@ -9,12 +9,13 @@
  * - 第一行的 @fonts 註解會被 assemble.py 讀成 Google Fonts 連結；離線時由底盤的系統字體頂替。
  */
 
-/* 1. 字體（換成選定風格的字體聲音） */
+/* 1. 字體（三種聲音預設：無襯線正文 × 幾何數字 × 襯線原話；換成選定風格的字體聲音） */
 :root {
   --font-display: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-label: "Noto Sans TC", "PingFang TC", sans-serif;
-  --font-number: "Noto Sans TC", "PingFang TC", sans-serif;
+  --font-number: "Archivo", "Noto Sans TC", "PingFang TC", sans-serif;
+  --font-quote: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
 }
 
 /* 2. 淺深雙底配色（使用 oklch.py --palette 驗過的 #hex，對比皆 >= 5.9:1；也可手寫 oklch()） */
@@ -53,6 +54,10 @@
 /* 頂部章節列（nav_mode: top-bar）僅對有頂列的正文頁加讓位：124px（單章 >2 頁出現頁籤時 156px）；不誤傷封面／震撼／結尾與內嵌導航頁 */
 html[data-nav-mode="top-bar"] .slide.canvas[data-kind="content"]:not([data-nav]):not(:has([data-auto-nav])) { padding-top: 124px; }
 html[data-nav-mode="top-bar"] .slide.canvas[data-kind="content"]:not([data-nav]):not(:has([data-auto-nav]))[data-tabs]:not([data-tabs="1"]):not([data-tabs="2"]) { padding-top: 156px; }
+@media print {
+  /* 列印隱藏全域 #nav 時還原自由畫布頂距，避免頂部留白空帶 */
+  html[data-nav-mode="top-bar"] .slide.canvas[data-kind="content"]:not([data-nav]):not(:has([data-auto-nav])) { padding-top: 76px !important; }
+}
 .hd {
   display: flex;
   flex-direction: column;
@@ -60,8 +65,8 @@ html[data-nav-mode="top-bar"] .slide.canvas[data-kind="content"]:not([data-nav])
 }
 .hd .title,
 h2.title {
-  font: 900 56px/1.15 var(--font-display);
-  letter-spacing: -0.015em;
+  font: 900 64px/1.12 var(--font-display);
+  letter-spacing: 0;
   color: var(--fg);
 }
 .hd .sub,

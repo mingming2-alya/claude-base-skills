@@ -21,6 +21,7 @@ import base64
 import html
 import json
 import mimetypes
+import os
 import re
 from pathlib import Path
 
@@ -229,12 +230,11 @@ ID_ATTR_RE = re.compile(r'\bid="([^"]+)"')
 STYLE_BLOCK_RE = re.compile(r"<style\b[^>]*>(.*?)</style>", re.S | re.I)
 SCRIPT_BLOCK_RE = re.compile(r"<script\b[^>]*>(.*?)</script>", re.S | re.I)
 BODY_RE = re.compile(r"<body\b[^>]*>(.*?)</body>", re.S | re.I)
-SLIDE_OPEN_RE = re.compile(r"<(section|div)\b([^>]*\bclass=\"[^\"]*\bslide\b[^\"]*\"[^>]*)>", re.I)
+SLIDE_OPEN_RE = re.compile(r"<(section|div)\b([^>]*\bclass=[\"'][^\"']*\bslide\b[^\"']*[\"'][^>]*)>", re.I)
 AUTO_NAV_RE = re.compile(r"(<nav\b[^>]*\bdata-auto-nav\b[^>]*>)(.*?)(</nav>)", re.S | re.I)
-SLOT_RE = re.compile(
-    r'(<div\b[^>]*\bdata-slot="([^"]+)"[^>]*>)(.*?)(</div><!--\s*/slot\s*-->)',
-    re.S | re.I,
-)
+SLOT_OPEN_RE = re.compile(r'<div\b[^>]*\bdata-slot=["\']([^"\']+)["\'][^>]*>', re.I)
+DIV_TOKEN_RE = re.compile(r"<div\b|</div\s*>", re.I)
+TRAIL_SLOT_COMMENT_RE = re.compile(r"\s*<!--\s*/slot\s*-->", re.I)
 
 
 def find_fragment(rec, idx, base_dir):
@@ -305,31 +305,61 @@ def _find_slot_asset(slot_name, mode, assets_dir):
 
 
 def _replace_slots(markup, assets_dir, mode, found_slots):
-    """Swap .asset-slot[data-slot] fallback SVG when an upgraded image exists under assets/."""
-    def repl(m):
-        open_tag, slot_name, inner, close_tag = m.groups()
-        slot_mode_m = re.search(r'\bdata-mode="([^"]+)"', open_tag)
+    """Swap .asset-slot[data-slot] inner markup using balanced <div> scanning (no magic <!-- /slot --> needed)."""
+    out = []
+    pos = 0
+    n = len(markup)
+    while pos < n:
+        m = SLOT_OPEN_RE.search(markup, pos)
+        if not m:
+            out.append(markup[pos:])
+            break
+        out.append(markup[pos:m.start()])
+        open_tag = m.group(0)
+        slot_name = m.group(1).strip()
+        slot_mode_m = re.search(r'\bdata-mode=["\']([^"\']+)["\']', open_tag)
         smode = slot_mode_m.group(1) if slot_mode_m else mode
-        asset = _find_slot_asset(slot_name, smode, assets_dir)
-        found_slots.append({"slot": slot_name, "mode": smode, "upgraded": str(asset.name) if asset else None})
-        if not asset:
-            return m.group(0)
-        mime, _ = mimetypes.guess_type(str(asset))
-        mime = mime or "image/png"
-        b64 = base64.b64encode(asset.read_bytes()).decode("ascii")
-        img = f'<img class="slot-img" src="data:{mime};base64,{b64}" alt="">'
-        return f"{open_tag}{img}{close_tag}"
 
-    # Also record plain data-slot tags without explicit <!-- /slot --> marker for reporting
-    out = SLOT_RE.sub(repl, markup)
-    recorded = {x["slot"] for x in found_slots}
-    for m in re.finditer(r'<div\b[^>]*\bdata-slot="([^"]+)"[^>]*>', out):
-        sn = m.group(1)
-        if sn not in recorded:
-            asset = _find_slot_asset(sn, mode, assets_dir)
-            found_slots.append({"slot": sn, "mode": mode, "upgraded": str(asset.name) if asset else None})
-            recorded.add(sn)
-    return out
+        # Scan forward for matching </div>
+        depth = 1
+        close_start = -1
+        close_end = -1
+        for tm in DIV_TOKEN_RE.finditer(markup, m.end()):
+            tok = tm.group(0).lower()
+            if tok.startswith("</"):
+                depth -= 1
+                if depth == 0:
+                    close_start = tm.start()
+                    close_end = tm.end()
+                    break
+            else:
+                depth += 1
+
+        if close_start == -1:
+            # Unclosed <div>: preserve untouched and record as not upgraded
+            found_slots.append({"slot": slot_name, "mode": smode, "upgraded": None})
+            out.append(open_tag)
+            pos = m.end()
+            continue
+
+        # Consume optional legacy trailing <!-- /slot --> marker
+        tail_m = TRAIL_SLOT_COMMENT_RE.match(markup, close_end)
+        block_end = tail_m.end() if tail_m else close_end
+        close_tag = markup[close_start:close_end]
+
+        asset = _find_slot_asset(slot_name, smode, assets_dir)
+        if asset:
+            mime, _ = mimetypes.guess_type(str(asset))
+            mime = mime or "image/png"
+            b64 = base64.b64encode(asset.read_bytes()).decode("ascii")
+            img = f'<img class="slot-img" src="data:{mime};base64,{b64}" alt="">'
+            out.append(f"{open_tag}{img}{close_tag}")
+            found_slots.append({"slot": slot_name, "mode": smode, "upgraded": str(asset.name)})
+        else:
+            out.append(markup[m.start():block_end])
+            found_slots.append({"slot": slot_name, "mode": smode, "upgraded": None})
+        pos = block_end
+    return "".join(out)
 
 
 def _populate_auto_nav(markup, chapters, chi):
@@ -349,7 +379,7 @@ def _populate_auto_nav(markup, chapters, chi):
 
 IMG_SRC_RE = re.compile(r'(<img\b[^>]*?\bsrc=")([^"]+)(")', re.I)
 VIDEO_POSTER_RE = re.compile(r'(<video\b[^>]*?\bposter=")([^"]+)(")', re.I)
-EXT_MEDIA_SRC_RE = re.compile(r'<(?:video|audio|source)\b[^>]*?\bsrc="([^"]+)"', re.I)
+EXT_MEDIA_SRC_RE = re.compile(r'<(?:video|audio|source)\b[^>]*?\bsrc=["\']([^"\']+)["\']', re.I)
 
 
 def _inline_local_imgs(markup, base_dir):
@@ -399,8 +429,18 @@ def _check_external_media(markup, base_dir, slide_id, media_refs):
             print(f"[WARN]  {slide_id}: 外連影音檔案不存在：{src}（請確認相對路徑與輸出 deck.html 對應）")
 
 
+ANCESTOR_PREFIX_RE = re.compile(r"^((?:html|body|#stage|#viewport)[^\s>+~]*)\s+(.+)$", re.I | re.S)
+SHELL_GLOBAL_RE = re.compile(r"^(?:html|body|#stage|#viewport|#nav|#tabs|#ctrl-bar|#notes|#curtain|#toast|#deck-[\w-]+)\b", re.I)
+
+
 def _scope_selector_list(sel_text, slide_id):
-    """Scope a CSS selector list to #slide_id without breaking html[data-mode]/body.static/body.low-power."""
+    """Scope a CSS selector list to [data-slide-scope="slide_id"] (0,1,0 specificity).
+
+    Using an attribute scope instead of #s-N keeps Layer 2 module state classes uncrushed,
+    preserves full styling inside Grid Overview / Lightbox clones (which strip DOM IDs),
+    and prevents bare selectors (.card, h2) from leaking across parallel-authored slides.
+    """
+    scope_sel = f'[data-slide-scope="{slide_id}"]'
     parts, buf, depth_p, depth_b = [], [], 0, 0
     for ch in sel_text:
         if ch == "(":
@@ -424,18 +464,49 @@ def _scope_selector_list(sel_text, slide_id):
         s = raw_sel.strip()
         if not s:
             continue
-        s = re.sub(r'(?<![\w-])\.slide(?![\w-])', f'#{slide_id}', s)
-        s = re.sub(r':root\b', f'#{slide_id}', s)
-        s = re.sub(r'^\*(?=(?:::(?:before|after)|:(?:before|after))?$)', f'#{slide_id} *', s)
-        s = re.sub(r'^(?:html|body)(?=$|\s)', f'#{slide_id}', s)
+        if re.fullmatch(r'\.slide(?:\.[\w-]+|\[[^\]]+\]|:[a-z-]+(?:\([^)]*\))?)*', s):
+            s = re.sub(r'(?<![\w-])\.slide(?![\w-])', f'.slide{scope_sel}', s)
+        else:
+            s = re.sub(r'(?<![\w-])\.slide(?![\w-])', scope_sel, s)
+        s = re.sub(r':root\b', scope_sel, s)
+        s = re.sub(r'^\*(?=(?:::(?:before|after)|:(?:before|after))?$)', f'{scope_sel} *', s)
+        s = re.sub(r'^(?:html|body)(?=$|\s)', scope_sel, s)
+        if scope_sel not in s:
+            anc = ANCESTOR_PREFIX_RE.match(s)
+            if anc:
+                s = f"{anc.group(1)} {scope_sel} {anc.group(2)}"
+            elif not SHELL_GLOBAL_RE.match(s):
+                s = f"{scope_sel} {s}"
         if s not in seen_norm:
             seen_norm.add(s)
             out.append(lead + s if not out else s)
     return ", ".join(out) if out else sel_text
 
 
+KEYFRAMES_DEF_RE = re.compile(r"(@(?:-\w+-)?keyframes\s+)([A-Za-z_][\w-]*)", re.I)
+ANIM_PROP_RE = re.compile(r"(\banimation(?:-name)?\s*:\s*)([^;{}]+)", re.I)
+
+
+def _scope_keyframes_css(css, slide_id):
+    """Prefix per-slide @keyframes names and matching animation(-name) references to prevent cross-slide collisions."""
+    prefix = slide_id.replace("-", "") + "_"
+    kf_names = {m.group(2) for m in KEYFRAMES_DEF_RE.finditer(css)}
+    if not kf_names:
+        return css
+    css = KEYFRAMES_DEF_RE.sub(lambda m: f"{m.group(1)}{prefix}{m.group(2)}", css)
+    kf_alt = "|".join(re.escape(k) for k in sorted(kf_names, key=len, reverse=True))
+    tok_re = re.compile(rf"(?<![\w-])({kf_alt})(?![\w-])")
+
+    def repl_anim(m):
+        prop, val = m.group(1), m.group(2)
+        return prop + tok_re.sub(lambda tm: prefix + tm.group(1), val)
+
+    return ANIM_PROP_RE.sub(repl_anim, css)
+
+
 def _scope_slide_css(css, slide_id):
-    """Rewrite .slide / :root and bare html / body / * selectors to #slide_id while preserving @keyframes and state selectors."""
+    """Scope selectors to [data-slide-scope=slide_id] and prefix per-slide @keyframes."""
+    css = _scope_keyframes_css(css, slide_id)
     res = []
     buf = []
     i, n = 0, len(css)
@@ -519,9 +590,9 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
     content = _inline_video_posters(content, base_dir)
     _check_external_media(content, base_dir, slide_id, media_refs)
 
-    # Ensure outer <section class="slide canvas" ...> wrapper carries thin-shell data attributes
+    # Ensure outer <section class="slide canvas" ...> wrapper carries thin-shell data attributes + data-slide-scope
     extra_attrs = (
-        f' id="{slide_id}" data-kind="{esc(rec["kind"])}" data-chi="{rec["chi"]}" '
+        f' id="{slide_id}" data-slide-scope="{slide_id}" data-kind="{esc(rec["kind"])}" data-chi="{rec["chi"]}" '
         f'data-tab="{rec.get("tab", 0)}" data-tabs="{rec.get("tabs", 1)}" data-notes="{notes}"'
     )
     if rec.get("appendix"):
@@ -533,9 +604,10 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
     if m:
         tag, attrs = m.group(1), m.group(2)
         if "canvas" not in attrs:
-            attrs = re.sub(r'class="([^"]*)"', r'class="\1 canvas"', attrs, count=1)
-        # Strip any pre-existing id on outer slide element to keep id="s-{idx}" deterministic
-        attrs = re.sub(r'\bid="[^"]*"', "", attrs)
+            attrs = re.sub(r'class=(["\'])([^"\']*)\1', r'class="\2 canvas"', attrs, count=1)
+        # Strip any pre-existing id / data-slide-scope on outer slide element to keep deterministic scoping
+        attrs = re.sub(r'\bid=["\'][^"\']*["\']', "", attrs)
+        attrs = re.sub(r'\bdata-slide-scope=["\'][^"\']*["\']', "", attrs)
         if s.get("surface") and "data-surface=" not in attrs:
             extra_attrs += f' data-surface="{esc(s["surface"])}"'
         if s.get("nav") and "data-nav=" not in attrs:
@@ -560,7 +632,7 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
         back = '<button class="back" type="button">← 返回</button>' if rec.get("appendix") else ""
         content = f'<section class="slide canvas"{extra_attrs}>{back}{content}</section>'
 
-    # Scope per-slide styles cleanly: rewrite `.slide` / `:root` / bare global resets to `#s-{idx}`
+    # Scope per-slide styles cleanly to [data-slide-scope="s-{idx}"] + prefix @keyframes
     scoped_styles = []
     for css in styles:
         css_clean = css.strip()
@@ -854,11 +926,11 @@ PRESENTER_ASSETS = {
 }
 
 COMPONENT_PARTS = [
-    ("status-table", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])(?:status-table|slide\b[^"]*(?<![-\w])status)(?![-\w])', h)), "components/status-table.css"),
-    ("pillars", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])(?:pillars|slide\b[^"]*(?<![-\w])overview)(?![-\w])', h)), "components/pillars.css"),
-    ("toc", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])(?:toc-list|slide\b[^"]*(?<![-\w])toc)(?![-\w])', h)), "components/toc.css"),
-    ("cmp-fallback", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])cmp(?![-\w])', h)), "components/cmp-fallback.css"),
-    ("device-frame", lambda h: bool(re.search(r'\bclass="[^"]*(?<![-\w])device-(?:browser|phone|tablet|frame)(?![-\w])', h)), "components/device-frame.css"),
+    ("status-table", lambda h: bool(re.search(r'\bclass=["\'][^"\']*(?<![-\w])(?:status-table|slide\b[^"\']*(?<![-\w])status)(?![-\w])', h)), "components/status-table.css"),
+    ("pillars", lambda h: bool(re.search(r'\bclass=["\'][^"\']*(?<![-\w])(?:pillars|slide\b[^"\']*(?<![-\w])overview)(?![-\w])', h)), "components/pillars.css"),
+    ("toc", lambda h: bool(re.search(r'\bclass=["\'][^"\']*(?<![-\w])(?:toc-list|slide\b[^"\']*(?<![-\w])toc)(?![-\w])', h)), "components/toc.css"),
+    ("cmp-fallback", lambda h: bool(re.search(r'\bclass=["\'][^"\']*(?<![-\w])cmp(?![-\w])', h)), "components/cmp-fallback.css"),
+    ("device-frame", lambda h: bool(re.search(r'\bclass=["\'][^"\']*(?<![-\w])device-(?:browser|phone|tablet|frame)(?![-\w])', h)), "components/device-frame.css"),
 ]
 
 CONTENT_MODULES = [
@@ -870,7 +942,7 @@ CONTENT_MODULES = [
     ),
     (
         "fit",
-        lambda ctx: ctx["component_count"] > 0 or "data-fit" in ctx["html"],
+        lambda ctx: ctx["component_count"] > 0 or bool(re.search(r'\bdata-fit\b', ctx["html"])),
         None,
         "fit.js",
     ),
@@ -882,7 +954,7 @@ CONTENT_MODULES = [
     ),
     (
         "flow-carousel",
-        lambda ctx: "data-flow-carousel" in ctx["html"],
+        lambda ctx: bool(re.search(r'\bdata-flow-carousel\b', ctx["html"])),
         "modules/flow-carousel.css",
         "modules/flow-carousel.js",
     ),
@@ -894,13 +966,13 @@ CONTENT_MODULES = [
     ),
     (
         "linked-highlight",
-        lambda ctx: "data-ref=" in ctx["html"],
+        lambda ctx: bool(re.search(r'\bdata-ref\s*=', ctx["html"])),
         "modules/linked-highlight.css",
         "modules/linked-highlight.js",
     ),
     (
         "compare-slider",
-        lambda ctx: "data-compare-slider" in ctx["html"],
+        lambda ctx: bool(re.search(r'\bdata-compare-slider\b', ctx["html"])),
         "modules/compare-slider.css",
         "modules/compare-slider.js",
     ),
@@ -952,7 +1024,8 @@ HERO_MODULE_DETECTORS = [
     ("rank-race", re.compile(r'\bdata-rank-race\b')),
 ]
 
-DATA_FX_RE = re.compile(r'\bdata-fx="([^"]+)"')
+HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
+DATA_FX_RE = re.compile(r'\bdata-fx=["\']([^"\']+)["\']')
 
 
 def _read_asset(rel):
@@ -969,7 +1042,9 @@ def _size_asset(rel):
 
 def _collect_layered_assets(slides_html, slides_list, component_count, meta):
     """3-Layer fine-grained on-demand injection + Order-Within-Flexibility soft guardrails."""
-    ctx = {"html": slides_html, "component_count": component_count}
+    clean_html = HTML_COMMENT_RE.sub("", slides_html)
+    clean_slides = [HTML_COMMENT_RE.sub("", s) for s in slides_list]
+    ctx = {"html": clean_html, "component_count": component_count}
     css_parts, js_parts = [], []
     used_mods, skipped_mods = [], []
     used_components, used_fx = [], []
@@ -992,7 +1067,7 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
     # ---- Layer 2a: Fine-grained Component CSS (assets/components/*)
     needs_shared = False
     for cname, pred, css_rel in COMPONENT_PARTS:
-        if pred(slides_html):
+        if pred(clean_html):
             used_components.append(cname)
             if cname != "device-frame":
                 needs_shared = True
@@ -1011,14 +1086,23 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
         skipped_mods.append("components")
         saved_bytes += _size_asset("components/shared.css")
 
-    # ---- Layer 2b: Per-effect Ambient FX (assets/modules/fx/*)
+    # ---- Layer 2b: Per-effect Ambient FX (assets/modules/fx/*) — fx/core.js reads data-fx on root <section class="slide">
     fx_hits = []
-    for m in DATA_FX_RE.finditer(slides_html):
-        fx_name = m.group(1).strip()
-        if fx_name and fx_name not in fx_hits:
-            fx_hits.append(fx_name)
-    valid_fx = [f for f in fx_hits if f in FX_EFFECTS]
-    unknown_fx = [f for f in fx_hits if f not in FX_EFFECTS]
+    for idx_fx, sl_clean in enumerate(clean_slides, 1):
+        root_m = SLIDE_OPEN_RE.search(sl_clean)
+        root_tag = root_m.group(0) if root_m else ""
+        root_fx = [m.group(1).strip() for m in DATA_FX_RE.finditer(root_tag) if m.group(1).strip()]
+        inner_clean = sl_clean[root_m.end():] if root_m else sl_clean
+        inner_fx = [m.group(1).strip() for m in DATA_FX_RE.finditer(inner_clean) if m.group(1).strip()]
+        if inner_fx:
+            gov_warnings.append(
+                f"[WARN]  s-{idx_fx}: data-fx=\"{inner_fx[0]}\" 寫在內層元素而非 <section class=\"slide\"> 根標籤，fx/core.js 不會啟動；請移至 <section class=\"slide\" data-fx=\"...\">。"
+            )
+        for fx_name in root_fx:
+            if fx_name not in fx_hits:
+                fx_hits.append(fx_name)
+    valid_fx = sorted(f for f in fx_hits if f in FX_EFFECTS)
+    unknown_fx = sorted(f for f in fx_hits if f not in FX_EFFECTS)
     for uf in unknown_fx:
         gov_warnings.append(f"[WARN]  ambient-fx: 未登錄的 data-fx=\"{uf}\"（可用：{', '.join(sorted(FX_EFFECTS))}）。")
     if valid_fx:
@@ -1026,7 +1110,7 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
         used_mods.append("ambient-fx(" + "+".join(valid_fx) + ")")
         css_parts.append(_read_asset("modules/fx/base.css"))
         js_parts.append(_read_asset("modules/fx/core.js"))
-        for fx_name in FX_EFFECTS:
+        for fx_name in sorted(FX_EFFECTS):
             rel = f"modules/fx/{fx_name}.js"
             if fx_name in valid_fx:
                 js_parts.append(_read_asset(rel))
@@ -1035,7 +1119,7 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
     else:
         skipped_mods.append("ambient-fx")
         saved_bytes += _size_asset("modules/fx/base.css") + _size_asset("modules/fx/core.js")
-        for fx_name in FX_EFFECTS:
+        for fx_name in sorted(FX_EFFECTS):
             saved_bytes += _size_asset(f"modules/fx/{fx_name}.js")
 
     # ---- Layer 2c: Content Modules
@@ -1059,28 +1143,30 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
     # ---- Soft Governance Guardrails (non-blocking [WARN])
     stage_mode = str(meta.get("stage_mode") or "").lower()
     fx_slide_count = 0
-    for idx, sl_html in enumerate(slides_list, 1):
+    for idx, sl_html in enumerate(clean_slides, 1):
         heroes = [hname for hname, pat in HERO_MODULE_DETECTORS if pat.search(sl_html)]
         if len(heroes) >= 2:
             gov_warnings.append(
                 f"[WARN]  s-{idx}: 單頁同時出現多個主角級互動模組（{', '.join(heroes)}），建議每頁保留 1 個主要焦點。"
             )
-        if DATA_FX_RE.search(sl_html):
+        root_m = SLIDE_OPEN_RE.search(sl_html)
+        has_root_fx = bool(root_m and DATA_FX_RE.search(root_m.group(0)))
+        if has_root_fx:
             fx_slide_count += 1
         if stage_mode == "briefing":
             b_viol = []
-            if DATA_FX_RE.search(sl_html):
+            if has_root_fx:
                 b_viol.append("ambient-fx")
-            if "data-coverflow" in sl_html:
-                b_viol.append("coverflow")
-            if "data-tilt" in sl_html:
-                b_viol.append("data-tilt")
-            for k_attr, k_name in (
-                ("data-spotlight-sweep", "spotlight-sweep"),
-                ("data-depth-deck", "depth-deck"),
-                ("data-colorize-wipe", "colorize-wipe"),
+            for k_pat, k_name in (
+                (r"\bdata-coverflow\b", "coverflow"),
+                (r"\bdata-marquee\b", "marquee"),
+                (r"\bdata-tilt\b", "data-tilt"),
+                (r"\bdata-spotlight-hover\b", "spotlight-hover"),
+                (r"\bdata-spotlight-sweep\b", "spotlight-sweep"),
+                (r"\bdata-depth-deck\b", "depth-deck"),
+                (r"\bdata-colorize-wipe\b", "colorize-wipe"),
             ):
-                if k_attr in sl_html:
+                if re.search(k_pat, sl_html):
                     b_viol.append(k_name)
             if b_viol:
                 gov_warnings.append(
@@ -1105,25 +1191,27 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
                 s_rec = next((s for s in s_idx.get("styles", []) if str(s.get("id", "")).lower() == style_id), None)
                 avoid_list = (s_rec or {}).get("motion_dna", {}).get("avoid_motions") or []
                 avoid_detectors = {
-                    "spotlight-sweep": "data-spotlight-sweep",
-                    "depth-deck": "data-depth-deck",
-                    "colorize-wipe": "data-colorize-wipe",
-                    "popup-fold": "data-popup-fold",
-                    "chat-replay": "data-chat-replay",
-                    "coverflow": "data-coverflow",
-                    "code-stage": "data-code-stage",
-                    "data-tilt": "data-tilt",
-                    "status-table": "status-table",
-                    "confetti-burst": 'data-fx="confetti-burst"',
-                    "data-stream": 'data-fx="data-stream"',
+                    "spotlight-sweep": re.compile(r"\bdata-spotlight-sweep\b"),
+                    "depth-deck": re.compile(r"\bdata-depth-deck\b"),
+                    "colorize-wipe": re.compile(r"\bdata-colorize-wipe\b"),
+                    "popup-fold": re.compile(r"\bdata-popup-fold\b"),
+                    "chat-replay": re.compile(r"\bdata-chat-replay\b"),
+                    "coverflow": re.compile(r"\bdata-(?:coverflow|marquee)\b"),
+                    "code-stage": re.compile(r"\bdata-(?:code-stage|typewriter)\b"),
+                    "data-tilt": re.compile(r"\bdata-tilt\b"),
+                    "status-table": re.compile(r'\bclass=["\'][^"\']*(?<![-\w])(?:status-table|slide\b[^"\']*(?<![-\w])status)(?![-\w])'),
+                    "confetti-burst": re.compile(r'\bdata-fx=["\']confetti-burst["\']'),
+                    "data-stream": re.compile(r'\bdata-fx=["\']data-stream["\']'),
                 }
-                for idx_s, sl_html in enumerate(slides_list, 1):
+                for idx_s, sl_html in enumerate(clean_slides, 1):
                     hits = []
+                    root_m = SLIDE_OPEN_RE.search(sl_html)
+                    root_tag = root_m.group(0) if root_m else ""
                     for av in avoid_list:
                         if av == "ambient-fx":
-                            if DATA_FX_RE.search(sl_html):
+                            if DATA_FX_RE.search(root_tag):
                                 hits.append("ambient-fx")
-                        elif av in avoid_detectors and avoid_detectors[av] in sl_html:
+                        elif av in avoid_detectors and avoid_detectors[av].search(sl_html):
                             hits.append(av)
                     if hits:
                         gov_warnings.append(
@@ -1134,11 +1222,16 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
 
     declared = meta.get("modules")
     if isinstance(declared, list):
-        allow = {str(x).strip().lower() for x in declared}
+        allow = {str(x).strip().lower() for x in declared if str(x).strip()}
         extras = sorted(m for m in used_mod_keys if m not in allow and m not in ("fit", "components"))
         if extras:
             gov_warnings.append(
                 f"[WARN]  meta.modules: 投影片使用了未宣告於白名單的模組（{', '.join(extras)}）；已自動注入，建議同步更新 storyboard.yaml。"
+            )
+        unused = sorted(m for m in allow if m not in used_mod_keys and m not in ("fit", "components"))
+        if unused:
+            gov_warnings.append(
+                f"[WARN]  meta.modules: 白名單宣告了但投影片未實際使用的模組（{', '.join(unused)}）；未注入以節省體積，建議同步清理 storyboard.yaml。"
             )
 
     return {
@@ -1298,6 +1391,25 @@ def assemble_deck(data, base_dir):
 FULL_DOC_RE = re.compile(r"<!doctype\b|<html\b", re.I)
 
 
+EXT_MEDIA_ATTR_RE = re.compile(r'(<(?:video|audio|source)\b[^>]*?\bsrc=["\'])([^"\']+)(["\'])', re.I)
+
+
+def _rebase_preview_media(markup, asset_base, preview_dir):
+    """Adjust relative <video>/<audio>/<source> src paths so samples/.preview/*.html locates external media."""
+    def repl(m):
+        pre, src, post = m.groups()
+        s = src.strip()
+        if not s or s.startswith(("http://", "https://", "//", "data:", "/")):
+            return m.group(0)
+        target = (asset_base / s).resolve()
+        if target.is_file():
+            rel = os.path.relpath(target, preview_dir).replace("\\", "/")
+            return f"{pre}{rel}{post}"
+        return m.group(0)
+
+    return EXT_MEDIA_ATTR_RE.sub(repl, markup)
+
+
 def _wrap_sample_fragment(sample_path, samples_dir, sb_data, man, deck_css, item_meta):
     """Wrap a Step 3b slide fragment into samples/.preview/<name> with shell + deck.css + modules.
     Full standalone HTML samples (legacy) are left untouched and return False.
@@ -1312,16 +1424,26 @@ def _wrap_sample_fragment(sample_path, samples_dir, sb_data, man, deck_css, item
 
     sb_meta = dict((sb_data or {}).get("meta") or {})
     man_meta = dict(man.get("meta") or {})
-    for k in ("style", "mode", "stage_mode", "nav_mode", "lang", "format"):
+    for k in ("style", "mode", "stage_mode", "nav_mode", "lang", "format", "style_css"):
         if k in man and man[k] is not None:
             man_meta[k] = man[k]
     preview_meta = {**sb_meta, **man_meta, "presenter_tools": []}
     chapters = (sb_data or {}).get("chapters") or man.get("chapters") or []
     structure = (sb_data or {}).get("structure") or {"axis": "time"}
-    preview_data = {"meta": preview_meta, "chapters": chapters, "structure": structure, "slides": []}
+    preview_data = {"meta": preview_meta, "chapters": chapters, "structure": structure, "slides": (sb_data or {}).get("slides") or []}
 
     listed = listed_chapters(preview_data)
     ch_ids = [c.get("id") for c in listed]
+    ch_sources = [
+        [
+            s for s in main_slides(preview_data)
+            if s.get("type", "content") == "content"
+            and not s.get("unlisted")
+            and s.get("chapter") == cid
+            and s.get("layout") not in ("pillars", "status-table")
+        ]
+        for cid in ch_ids
+    ]
     stem_l = sample_path.stem.lower()
     src_slide = {}
     if sb_data:
@@ -1353,15 +1475,25 @@ def _wrap_sample_fragment(sample_path, samples_dir, sb_data, man, deck_css, item
         else:
             chi = 0 if listed else -1
 
+    tab_idx = 0
+    tabs_cnt = 1
+    if 0 <= chi < len(ch_sources) and ch_sources[chi]:
+        tabs_cnt = len(ch_sources[chi])
+        if src_slide in ch_sources[chi]:
+            tab_idx = ch_sources[chi].index(src_slide)
+
     src_copy = dict(src_slide)
     for k in ("surface", "nav", "transition"):
         if item_meta.get(k):
             src_copy[k] = item_meta[k]
 
-    rec = {"kind": kind, "chi": chi, "src": src_copy, "tab": 0, "tabs": 1}
+    rec = {"kind": kind, "chi": chi, "src": src_copy, "tab": tab_idx, "tabs": tabs_cnt}
     asset_base = samples_dir.parent if ((samples_dir.parent / "assets").is_dir() or (samples_dir.parent / "storyboard.yaml").is_file()) else samples_dir
     s_html, s_css, s_js, s_raw = load_free_slide(sample_path, rec, preview_data, 1, asset_base, [], [])
+    s_html = _rebase_preview_media(s_html, asset_base, preview_dir)
     layers = _collect_layered_assets(s_html, [s_html], 0, preview_meta)
+    for w in layers["warnings"]:
+        print(f"  ({sample_path.name}) {w}")
 
     motion = motion_for(structure)
     stage_mode = str(preview_meta.get("stage_mode") or "").lower()
@@ -1375,8 +1507,11 @@ def _wrap_sample_fragment(sample_path, samples_dir, sb_data, man, deck_css, item
         "presenterTools": [],
         "modules": layers["used_mods"],
         "fx": layers["used_fx"],
-        "chapters": [c["label"] for c in listed],
-        "tabs": [[] for _ in listed],
+        "chapters": [c.get("label") or c.get("name") or c.get("id", "") for c in listed],
+        "tabs": [
+            [(s.get("tab") or s.get("title") or "") for s in ch_sources[i]]
+            for i in range(len(listed))
+        ],
         "motion": motion,
     }
     html_out = PAGE_TPL.format(
@@ -1469,7 +1604,7 @@ def build_sheet(samples_dir, out_path, title_override=None):
             raise StoryboardError(f"{samples_dir} 裡沒有找到任何樣張 HTML 檔。")
         groups = [{"heading": "樣張總覽", "note": "", "items": [{"file": p.name, "caption": p.stem} for p in htmls]}]
 
-    # Load sibling storyboard.yaml & deck.css (if present) to wrap fragment samples into .preview/
+    # Load sibling storyboard.yaml & deck.css (respecting meta.style_css) to wrap fragment samples into .preview/
     sb_data = None
     sb_path = samples_dir.parent / "storyboard.yaml"
     if sb_path.is_file():
@@ -1477,8 +1612,17 @@ def build_sheet(samples_dir, out_path, title_override=None):
             sb_data = load(sb_path)
         except Exception:
             sb_data = None
+    style_css_name = (
+        (man.get("meta") or {}).get("style_css")
+        or man.get("style_css")
+        or ((sb_data or {}).get("meta") or {}).get("style_css")
+    )
+    css_cands = []
+    if style_css_name:
+        css_cands.extend([samples_dir / style_css_name, samples_dir.parent / style_css_name])
+    css_cands.extend([samples_dir / "deck.css", samples_dir.parent / "deck.css"])
     deck_css = ""
-    for cand in (samples_dir / "deck.css", samples_dir.parent / "deck.css"):
+    for cand in css_cands:
         if cand.is_file():
             deck_css = cand.read_text(encoding="utf-8")
             break

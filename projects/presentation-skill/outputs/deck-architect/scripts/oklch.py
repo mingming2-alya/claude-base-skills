@@ -94,11 +94,54 @@ def is_purple(h):
     return C >= 0.04 and 280.0 <= H <= 335.0
 
 
-def check_palette(bg, focuses, alert=None, min_contrast=3.0):
+STYLE_BG_BANDS = {
+    "workday": {"light": (0.91, 0.98, 0.025), "dark": (0.14, 0.25, 0.03)},
+    "counsel": {"light": (0.92, 0.97, 0.02), "dark": (0.16, 0.26, 0.025)},
+    "apple": {"light": (0.90, 0.985, 0.018), "dark": (0.11, 0.20, 0.018)},
+    "illustration": {"light": (0.85, 0.97, 0.055), "dark": (0.19, 0.35, 0.065)},
+}
+
+
+def is_near_pure_bw(h):
+    L, C, _ = oklch(h)
+    return (L > 0.992 and C < 0.004) or (L < 0.12 and C < 0.004)
+
+
+def check_palette(bg, focuses, alert=None, min_contrast=3.0, bg2=None, style=None):
     issues = []
-    bg_norm = bg.strip().upper()
-    if bg_norm in ("#FFFFFF", "#FFF", "#000000", "#000"):
-        issues.append(f"底色 {bg} 為純白或純黑，請改用接近的白或黑。")
+    bg_L, bg_C, bg_H = oklch(bg)
+    if is_near_pure_bw(bg):
+        issues.append(f"底色 {bg}（L {bg_L:.3f}, C {bg_C:.3f}）過於接近純白或純黑，請改用帶微妙色溫的底色。")
+    if is_purple(bg):
+        issues.append(f"底色 {bg} 落在禁止的紫色帶（H {bg_H:.1f} ∈ 280–335，C {bg_C:.3f}）。")
+
+    if bg2:
+        b2_L, b2_C, b2_H = oklch(bg2)
+        print(f"  次底 {bg2:9s}  L {b2_L:.3f}  C {b2_C:.3f}  H {b2_H:5.1f}")
+        if is_near_pure_bw(bg2):
+            issues.append(f"次底 {bg2}（L {b2_L:.3f}, C {b2_C:.3f}）過於接近純白或純黑。")
+        if is_purple(bg2):
+            issues.append(f"次底 {bg2} 落在禁止的紫色帶（H {b2_H:.1f} ∈ 280–335，C {b2_C:.3f}）。")
+
+    if style:
+        st_key = style.strip().lower()
+        band = STYLE_BG_BANDS.get(st_key)
+        if band:
+            pol = "light" if bg_L >= 0.5 else "dark"
+            lo_L, hi_L, max_C = band[pol]
+            if not (lo_L <= bg_L <= hi_L) or bg_C > max_C:
+                issues.append(
+                    f"底色 {bg}（L {bg_L:.3f}, C {bg_C:.3f}）超出 {st_key}/{pol} 風格憲法建議帶（L {lo_L:.2f}–{hi_L:.2f}, C ≤ {max_C:.3f}）。"
+                )
+
+    if alert:
+        aL, aC, aH = oklch(alert)
+        acr = contrast(alert, bg)
+        print(f"  警示 {alert:9s}  L {aL:.3f}  C {aC:.3f}  H {aH:5.1f}  對底色 {acr:.2f}:1")
+        if is_purple(alert):
+            issues.append(f"警示色 {alert} 落在禁止的紫色帶（H {aH:.1f} ∈ 280–335，C {aC:.3f}）。")
+        if acr < min_contrast:
+            issues.append(f"警示色 {alert} 對底色 {bg} 對比僅 {acr:.2f}:1（需 >= {min_contrast:.1f}:1）。")
 
     parsed = []
     for c in focuses:
@@ -139,13 +182,15 @@ def main():
     if args[0] == "--palette":
         ap = argparse.ArgumentParser()
         ap.add_argument("--bg", required=True)
+        ap.add_argument("--bg2")
         ap.add_argument("--focus", required=True, help="comma-separated hex colours")
         ap.add_argument("--alert")
+        ap.add_argument("--style", choices=sorted(STYLE_BG_BANDS.keys()))
         ap.add_argument("--min-contrast", type=float, default=3.0)
         ns = ap.parse_args(args[1:])
         focuses = [x.strip() for x in ns.focus.split(",") if x.strip()]
         print(f"底色 {ns.bg}  OKLCH ({oklch(ns.bg)[0]:.3f}, {oklch(ns.bg)[1]:.3f}, {oklch(ns.bg)[2]:.1f})")
-        issues = check_palette(ns.bg, focuses, ns.alert, ns.min_contrast)
+        issues = check_palette(ns.bg, focuses, ns.alert, ns.min_contrast, bg2=ns.bg2, style=ns.style)
         if issues:
             print("\n未通過：")
             for msg in issues:
@@ -155,7 +200,12 @@ def main():
         return
     for c in args:
         L, C, H = oklch(c)
-        flag = " [PURPLE]" if is_purple(c) else ""
+        flags = []
+        if is_purple(c):
+            flags.append("[PURPLE]")
+        if is_near_pure_bw(c):
+            flags.append("[PURE_BW]")
+        flag = (" " + " ".join(flags)) if flags else ""
         print(f"{c}  L {L:.3f}  C {C:.3f}  H {H:5.1f}{flag}")
 
 

@@ -3,7 +3,14 @@
  */
 (function () {
   const deck = window.__deck;
-  const isStatic = () => (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false);
+  const isStill = () => (deck && typeof deck.isStill === 'function' ? deck.isStill() : (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false));
+  const isReduced = () => (deck && typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : isStill());
+  const getScale = () => (deck && typeof deck.stageScale === 'function' ? deck.stageScale() : 1) || 1;
+  const enterTimers = new Set();
+  function clearEnterTimers() {
+    enterTimers.forEach(clearTimeout);
+    enterTimers.clear();
+  }
 
   /* ---- 1. Split Mask Reveal ---- */
   function initSplitMask(el) {
@@ -14,14 +21,20 @@
         .map((p, i) => `<span class="sm-line"><span class="sm-inner" style="transition-delay:${i * 110}ms">${p}</span></span>`)
         .join('');
     }
+    let rafId = 0;
+    const setFinal = () => {
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      el.classList.remove('is-primed');
+    };
     const api = {
       play: () => {
-        if (isStatic()) { el.classList.remove('is-primed'); return; }
+        if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+        if (isReduced()) { el.classList.remove('is-primed'); return; }
         el.classList.add('is-primed');
         el.getBoundingClientRect();
-        requestAnimationFrame(() => el.classList.remove('is-primed'));
+        rafId = requestAnimationFrame(() => { rafId = 0; el.classList.remove('is-primed'); });
       },
-      setFinal: () => el.classList.remove('is-primed')
+      setFinal,
     };
     el._smInit = api;
     return api;
@@ -32,9 +45,20 @@
     if (root._spInit) return root._spInit;
     root.classList.add('live-ctrl');
     if (!root.querySelector('.sp-lit')) {
-      const raw = root.innerHTML;
-      root.innerHTML = `<div class="sp-cone"></div><div class="sp-base">${raw}</div><div class="sp-lit" aria-hidden="true">${raw}</div>`;
-      root.querySelectorAll('.sp-lit [id]').forEach(n => n.removeAttribute('id'));
+      const cone = document.createElement('div');
+      cone.className = 'sp-cone';
+      const base = document.createElement('div');
+      base.className = 'sp-base';
+      // Move original nodes (preserving existing listeners/state) instead of innerHTML rebuild
+      while (root.firstChild) base.appendChild(root.firstChild);
+      const lit = base.cloneNode(true);
+      lit.className = 'sp-lit';
+      lit.setAttribute('aria-hidden', 'true');
+      lit.removeAttribute('id');
+      lit.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      root.appendChild(cone);
+      root.appendChild(base);
+      root.appendChild(lit);
     }
     let rafId = 0;
 
@@ -45,16 +69,17 @@
 
     function stop() {
       if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      setPos(50, 50);
     }
 
     // Single-pass cinematic sweep (left -> center) then completely STILL for reading
     function start() {
-      stop();
-      if (isStatic()) { setPos(50, 50); return; }
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      if (isReduced()) { setPos(50, 50); return; }
       const dur = 1050;
       const t0 = performance.now();
       function step(now) {
-        if (isStatic()) { stop(); setPos(50, 50); return; }
+        if (isReduced()) { stop(); return; }
         const p = Math.min(1, (now - t0) / dur);
         const e = 1 - Math.pow(1 - p, 3);
         const x = 14 + (50 - 14) * e;
@@ -71,13 +96,13 @@
     }
 
     root.addEventListener('pointermove', e => {
-      if (isStatic()) return;
-      stop(); // Immediate user takeover
+      if (isReduced()) return;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
       const r = root.getBoundingClientRect();
       if (!r.width || !r.height) return;
       setPos(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
     });
-    root.addEventListener('pointerleave', () => { stop(); setPos(50, 50); });
+    root.addEventListener('pointerleave', () => { stop(); });
 
     setPos(50, 50);
     const api = { start, stop, setPos };
@@ -92,6 +117,8 @@
     const cards = [...root.querySelectorAll('[data-deck-card]')];
     if (!cards.length) return null;
     let order = cards.map((_, i) => i);
+    let tossing = false;
+    let tossTimer = 0;
 
     function layout() {
       const n = order.length;
@@ -112,13 +139,16 @@
     }
 
     function next(dir) {
-      if (order.length < 2) return;
+      if (order.length < 2 || tossing) return;
       const front = cards[order[0]];
-      if (!isStatic()) {
+      if (!isReduced()) {
+        tossing = true;
         front.classList.add('is-tossing');
         front.style.transform = `translate3d(${dir * 160}px, -12px, 30px) rotate(${dir * 9}deg) scale(0.95)`;
         front.style.opacity = '0.25';
-        setTimeout(() => {
+        tossTimer = setTimeout(() => {
+          tossTimer = 0;
+          tossing = false;
           front.classList.remove('is-tossing');
           order.push(order.shift());
           layout();
@@ -129,10 +159,19 @@
       }
     }
 
+    function reset() {
+      clearTimeout(tossTimer);
+      tossTimer = 0;
+      tossing = false;
+      cards.forEach(c => c.classList.remove('is-tossing', 'is-dragging'));
+      order = cards.map((_, i) => i);
+      layout();
+    }
+
     cards.forEach(card => {
       let startX = 0, dx = 0, dragging = false;
       card.addEventListener('pointerdown', e => {
-        if (card.dataset.depth !== '0' || isStatic()) return;
+        if (card.dataset.depth !== '0' || isStill() || tossing) return;
         e.stopPropagation();
         dragging = true;
         startX = e.clientX;
@@ -143,8 +182,8 @@
       card.addEventListener('pointermove', e => {
         if (!dragging) return;
         e.stopPropagation();
-        dx = e.clientX - startX;
-        card.style.transform = `translate3d(${dx}px, ${Math.abs(dx) * -0.06}px, 18px) rotate(${dx * 0.045}deg)`;
+        dx = (e.clientX - startX) / getScale();
+        card.style.transform = `translate3d(${dx.toFixed(1)}px, ${(Math.abs(dx) * -0.06).toFixed(1)}px, 18px) rotate(${(dx * 0.045).toFixed(2)}deg)`;
       });
       const finish = e => {
         if (!dragging) return;
@@ -165,10 +204,7 @@
     });
 
     layout();
-    const api = {
-      next: () => next(1),
-      reset: () => { order = cards.map((_, i) => i); layout(); }
-    };
+    const api = { next: () => next(1), reset };
     root._ddInit = api;
     return api;
   }
@@ -178,17 +214,37 @@
     if (root._cwInit) return root._cwInit;
     root.classList.add('live-ctrl');
     if (!root.querySelector('.cw-color')) {
-      const inner = root.innerHTML;
-      root.innerHTML = `<div class="cw-mono">${inner}</div><div class="cw-color" aria-hidden="true">${inner}</div><div class="cw-beam"></div>`;
-      root.querySelectorAll('.cw-color [id]').forEach(n => n.removeAttribute('id'));
+      const mono = document.createElement('div');
+      mono.className = 'cw-mono';
+      while (root.firstChild) mono.appendChild(root.firstChild);
+      const color = mono.cloneNode(true);
+      color.className = 'cw-color';
+      color.setAttribute('aria-hidden', 'true');
+      color.removeAttribute('id');
+      color.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      const beam = document.createElement('div');
+      beam.className = 'cw-beam';
+      root.appendChild(mono);
+      root.appendChild(color);
+      root.appendChild(beam);
     }
     let timer = 0;
+    let rafId = 0;
     function setPct(p) {
       root.style.setProperty('--cw-pct', p + '%');
     }
+    function setFinal() {
+      clearTimeout(timer);
+      timer = 0;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      setPct(100);
+      root.classList.remove('is-sweeping');
+    }
     function play() {
       clearTimeout(timer);
-      if (isStatic()) { setPct(100); root.classList.remove('is-sweeping'); return; }
+      timer = 0;
+      if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+      if (isReduced()) { setFinal(); return; }
       const color = root.querySelector('.cw-color');
       const beam = root.querySelector('.cw-beam');
       if (color) color.style.transition = 'none';
@@ -198,11 +254,11 @@
       if (color) color.style.transition = '';
       if (beam) beam.style.transition = '';
       root.classList.add('is-sweeping');
-      requestAnimationFrame(() => setPct(100));
-      timer = setTimeout(() => root.classList.remove('is-sweeping'), 1250);
+      rafId = requestAnimationFrame(() => { rafId = 0; setPct(100); });
+      timer = setTimeout(() => { timer = 0; root.classList.remove('is-sweeping'); }, 1250);
     }
     setPct(100);
-    const api = { play, setFinal: () => { clearTimeout(timer); setPct(100); root.classList.remove('is-sweeping'); } };
+    const api = { play, setFinal };
     root._cwInit = api;
     return api;
   }
@@ -212,11 +268,12 @@
   const decks = [...document.querySelectorAll('[data-depth-deck]')].map(initDepthDeck).filter(Boolean);
   const colors = [...document.querySelectorAll('[data-colorize-wipe]')].map(initColorize);
 
-  function settleAll() {
+  function settleAll(resetDecks) {
+    clearEnterTimers();
     splits.forEach(s => s.setFinal());
     spots.forEach(s => s.stop());
     colors.forEach(c => c.setFinal());
-    decks.forEach(d => d.reset());
+    if (resetDecks) decks.forEach(d => d.reset());
   }
 
   function stepOf(el, sl) {
@@ -226,28 +283,55 @@
 
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       const curStep = detail.step || 0;
-      sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) <= curStep) el._smInit.play(); });
-      sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) <= curStep) el._spInit.start(); });
-      sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) <= curStep) el._cwInit.play(); });
+      if (detail.restAtFinal || detail.reducedMotion || detail.staticMode || isReduced()) {
+        sl.querySelectorAll('[data-split-mask]').forEach(el => el._smInit && el._smInit.setFinal());
+        sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => el._spInit && el._spInit.stop());
+        sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
+        return;
+      }
+      const run = () => {
+        if (deck.slides[deck.index] !== sl || isReduced()) return;
+        sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) <= curStep) el._smInit.play(); });
+        sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) <= curStep) el._spInit.start(); });
+        sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) <= curStep) el._cwInit.play(); });
+      };
+      const delay = detail.enterDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); run(); }, delay);
+        enterTimers.add(id);
+      } else {
+        run();
+      }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
+      if (detail.dir < 0 || isReduced()) {
+        sl.querySelectorAll('[data-split-mask]').forEach(el => el._smInit && el._smInit.setFinal());
+        sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => el._spInit && el._spInit.stop());
+        sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
+        return;
+      }
       sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) === detail.step) el._smInit.play(); });
       sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) === detail.step) el._spInit.start(); });
       sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) === detail.step) el._cwInit.play(); });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
+      sl.querySelectorAll('[data-split-mask]').forEach(el => el._smInit && el._smInit.setFinal());
       sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => el._spInit && el._spInit.stop());
       sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
+      sl.querySelectorAll('[data-depth-deck]').forEach(el => el._ddInit && el._ddInit.reset());
     });
-    deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
-    deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });
+    deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(true); });
+    deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(false); });
+    deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => { if (detail.reduced) settleAll(false); });
   }
   window.__motionKits = window.__motionKits || {};
   window.__motionKits.apple = { initSplitMask, initSpotlight, initDepthDeck, initColorize, splits, spots, decks, colors };

@@ -25,6 +25,9 @@
   z-index: 92;
   display: none;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: calc(100vw - 16px);
   gap: 8px;
   padding: 8px 14px;
   border-radius: 999px;
@@ -38,6 +41,16 @@
 }
 #deck-annotator-bar.show {
   display: inline-flex;
+}
+@media (max-width: 720px) {
+  #deck-annotator-bar {
+    top: 10px;
+    right: 8px;
+    left: 8px;
+    border-radius: 16px;
+    padding: 6px 10px;
+    gap: 5px;
+  }
 }
 #deck-annotator-bar .dab-btn {
   appearance: none;

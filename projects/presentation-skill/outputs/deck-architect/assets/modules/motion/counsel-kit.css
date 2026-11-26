@@ -34,10 +34,13 @@
 .rr-bar-wrap { height: 12px; border-radius: var(--radius, 0px); background: color-mix(in srgb, currentColor 14%, transparent); overflow: hidden; }
 .rr-bar {
   height: 100%;
+  width: 100%;
   border-radius: var(--radius, 0px);
   background: color-mix(in srgb, currentColor 38%, transparent);
-  width: var(--rr-w, 50%);
-  transition: width .72s cubic-bezier(0.16, 1, 0.3, 1), background-color .35s ease;
+  transform-origin: left center;
+  transform: scaleX(var(--rr-scale, 0.5));
+  transition: transform .72s cubic-bezier(0.16, 1, 0.3, 1), background-color .35s ease;
+  will-change: transform;
 }
 [data-rank-item].is-leader .rr-bar { background: var(--accent, #0D6B4F); }
 .rr-score {

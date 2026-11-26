@@ -15,7 +15,8 @@
   outline: none;
   cursor: pointer;
 }
-[data-surface="light"] .live-ctrl input[type="range"] {
+[data-surface="light"] .live-ctrl input[type="range"],
+:where(html[data-mode="light"]) .slide:not([data-surface="dark"]):not([data-surface="photo"]) .live-ctrl input[type="range"] {
   background: var(--slider-track, rgba(20, 24, 32, 0.14));
 }
 .live-ctrl input[type="range"]::-webkit-slider-thumb {
@@ -44,7 +45,7 @@
   align-items: center;
   gap: 4px;
   padding: 4px;
-  border-radius: 999px;
+  border-radius: var(--ctrl-radius, 999px);
   background: var(--bg-2, rgba(255, 255, 255, 0.06));
   border: 1px solid var(--line);
 }
@@ -55,7 +56,7 @@
   color: var(--fg-2);
   font: 600 18px/1 var(--font-label);
   padding: 10px 18px;
-  border-radius: 999px;
+  border-radius: var(--ctrl-radius, 999px);
   cursor: pointer;
   transition: background .2s ease, color .2s ease, transform .15s ease;
 }
@@ -75,7 +76,7 @@
   align-items: center;
   gap: 12px;
   padding: 6px 14px 6px 8px;
-  border-radius: 999px;
+  border-radius: var(--ctrl-radius, 999px);
   border: 1px solid var(--line);
   background: var(--bg-2, rgba(255, 255, 255, 0.05));
   color: var(--fg);
@@ -132,7 +133,7 @@
   color: var(--fg-2);
   font: 600 18px/1 var(--font-label);
   padding: 10px 18px;
-  border-radius: 12px;
+  border-radius: var(--ctrl-radius, 12px);
   cursor: pointer;
   transition: border-color .2s ease, color .2s ease, background .2s ease, transform .15s ease;
 }

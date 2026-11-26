@@ -72,8 +72,10 @@
     }
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+
   function setDrawing(flag) {
-    if (deck.isStatic()) flag = false;
+    if (isStill()) flag = false;
     drawingMode = Boolean(flag);
     layer.classList.toggle('is-drawing', drawingMode);
     bar.classList.toggle('show', drawingMode);
@@ -85,7 +87,7 @@
   }
 
   function setLaser(flag) {
-    if (deck.isStatic()) flag = false;
+    if (isStill()) flag = false;
     laserMode = Boolean(flag);
     laser.classList.toggle('is-on', laserMode);
     if (laserMode) {
@@ -200,20 +202,22 @@
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const lockedOther = !drawingMode && typeof deck.hasNavLock === 'function' && deck.hasNavLock();
     if (e.key === 'a' || e.key === 'A') {
-      if (deck.isStatic()) return;
+      if (isStill() || lockedOther) return;
       e.preventDefault();
       setDrawing(!drawingMode);
     } else if (e.key === 'l' || e.key === 'L') {
-      if (deck.isStatic()) return;
+      if (isStill() || lockedOther) return;
       e.preventDefault();
       setLaser(!laserMode);
-    } else if ((e.key === 'c' || e.key === 'C') && (drawingMode || (strokesBySlide.get(deck.index) || []).length)) {
+    } else if ((e.key === 'c' || e.key === 'C') && !lockedOther && (drawingMode || (strokesBySlide.get(deck.index) || []).length)) {
       e.preventDefault();
       clearCurrent();
     }
   });
 
+  deck.stage.addEventListener('deck:slideleave', finishStroke);
   deck.stage.addEventListener('deck:slideenter', renderSlideStrokes);
   deck.stage.addEventListener('deck:still', ({ detail }) => {
     if (detail.still) { setDrawing(false); setLaser(false); }

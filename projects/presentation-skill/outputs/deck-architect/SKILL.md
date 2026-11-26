@@ -1,9 +1,9 @@
 ---
 name: deck-architect
-description: 兩大主柱驅動的簡報製作技能（v4.8）：【主柱 1｜架構與內容】以資深顧問站在主題標竿與全面視角分兩階段腦力激盪——Step 1a 先收使用者的故事種子，再拍板架構與不循規蹈矩的敘事脈絡（關卡 1a），Step 1b 深挖內容細節、反方質疑、說服載體與減法（關卡 1b）；【主柱 2｜排版與呈現】以視覺吸引與引導為核心，選完風格才決定呈現：Step 3a 依內容主題與說服載體選定靜態×動態風格並一起定明暗、導航與分鏡，3b 用真實內容精雕樣張活範本，並以像素 WCAG、動態實測與生動度稽核把關。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
+description: 兩大主柱驅動的簡報製作技能（v4.9）：【主柱 1｜架構與內容】以資深顧問站在主題標竿與全面視角分兩階段腦力激盪——Step 1a 先收使用者的故事種子，再拍板架構與不循規蹈矩的敘事脈絡（關卡 1a），Step 1b 深挖內容細節、反方質疑、說服載體與減法（關卡 1b）；【主柱 2｜排版與呈現】以視覺吸引與引導為核心，選完風格才決定呈現：Step 3a 依內容主題與說服載體選定靜態×動態風格並一起定明暗、導航與分鏡，3b 用真實內容精雕樣張活範本，並以像素 WCAG、動態實測與生動度稽核把關。只要使用者想做、規劃、改寫任何簡報、PPT、投影片、deck、提案、報告、分享、演講、發表會、年度成果、會議簡報、客戶洽談、活動開場、教學課程，或說「幫我想簡報架構」「這份報告要怎麼講」，都應使用此技能。Use for any presentation / slides / pitch deck / talk request.
 ---
 
-# Deck Architect v4.8：兩大主柱 × 顧問腦力激盪 × 靜態動態極致舞台
+# Deck Architect v4.9：兩大主柱 × 顧問腦力激盪 × 靜態動態極致舞台
 
 兩大核心主柱：
 1. **主柱一｜架構與內容**：先定義架構（Step 1a），再補充內容細節（Step 1b）——作為顧問站在這類主題的標竿與全面視角，持續追問深挖、從使用者的故事種子出發，協助梳理**不一定要循規蹈矩、更有張力的敘事脈絡**，並視情況主動提供方案建議。
@@ -38,7 +38,7 @@ decks/<name>/
 ├── media/                   # 可選：外連影片／實測音檔（保持相對路徑，不轉 Base64）
 ├── IMAGE_UPGRADE.md         # 可選：AI 升級生圖清單（零等待程式版同步附上）
 ├── deck.html                # Step 4：assemble.py 掛載三層輕底盤與按需模組產出的成品
-└── check/                   # Step 5：check.mjs 逐頁截圖、像素 WCAG＋16 項動態與行動實測＋生動度體檢報告
+└── check/                   # Step 5：check.mjs 逐頁截圖、像素 WCAG＋17 項動態與行動實測＋生動度體檢報告
 ```
 
 ## 架構模式：三層按需架構（亂中有序治理，未用到 0 KB）
@@ -113,7 +113,7 @@ node <skill>/scripts/check.mjs --sheet decks/<name>/samples
 1. 確認 `storyboard.yaml` 的 `style`、`mode`、`nav_mode` 與逐頁 `director`／`surface` 都已在 Step 3a 後補齊，把 Step 3b 選定的 OKLCH 雙極變數寫入 `deck.css`（由 `templates/deck.css` 起始），把 Step 3b 已確認的 2–3 張樣張移入 `slides/`。
 2. 依總頁數採最穩定的精雕節奏（防止長對話上下文疲勞導致後面幾頁退化為純文字方塊）：
    - **≤ 6 頁**：主代理依 `director:`、`references/visual-guidance.md`、`references/recipes/` 與按需模組子手冊逐頁撰寫其餘 `slides/*.html`。
-   - **> 6 頁（強烈建議，快速模式可省略）**：將剩餘頁面拆成 **每 3–4 頁一小批**，並行派給乾淨上下文子代理精雕。每個子代理必吃 6 樣精準輸入：① `brief.md` 的**主／次受眾起點、Grounding 前置概念、人際顧慮與 `constraints`（第 1、8 節）**，加上**母題、故事種子與該批章節細節（第 3、5 節）**、② `deck.css` 與 `storyboard.yaml` 的 `meta`（3a 定案的風格與呈現規格）、③ Step 3b 已通過的 2–3 張真實樣張（**活範本**）、④ **主柱二核心 `references/visual-guidance.md`**（七種假指引反模式、靜態動線、空間分群、底部基線與靜止閱讀窗）、⑤ 僅該批 3–4 頁的 `storyboard.yaml`（含 `director:`）、⑥ 該批用到的 1–2 支 `references/recipes/*.md` 與對應 `references/modules/*.md`。主代理最後統一確認跨頁 `data-morph` 與節奏連貫。
+   - **> 6 頁（強烈建議，快速模式可省略）**：將剩餘頁面拆成 **每 3–4 頁一小批**，並行派給乾淨上下文子代理精雕。每個子代理必吃 6 樣精準輸入：① `brief.md` 的**主／次受眾起點、Grounding 前置概念、人際顧慮與 `constraints`（第 1、8 節）**，加上**母題、故事種子與該批章節細節（第 3、5 節）**、② **選定風格憲法 `styles/<selected>.md`**（固定本質、字體字級、OKLCH 範圍、動效參數與禁忌清單）＋ `deck.css` ＋ `storyboard.yaml` 的 `meta`、③ Step 3b 已通過的 2–3 張真實樣張（**活範本**）、④ **主柱二核心 `references/visual-guidance.md`**（七種假指引反模式、靜態動線、空間分群、底部基線與靜止閱讀窗）、⑤ 僅該批 3–4 頁的 `storyboard.yaml`（含 `director:`）、⑥ 該批用到的 1–2 支 `references/recipes/*.md` 與對應 `references/modules/*.md`。主代理最後統一確認跨頁 `data-morph` 與節奏連貫。
 3. 組裝單檔簡報（三層細粒度注入＋軟性 `[WARN]` 場合與風格跨界防呆＋本機靜態圖與影片海報內嵌）：
 
 ```bash
@@ -128,8 +128,8 @@ python3 <skill>/scripts/assemble.py decks/<name>/storyboard.yaml --write-upgrade
 node <skill>/scripts/check.mjs decks/<name>/deck.html --jpg --motion
 ```
 
-- **下限品管與視覺指引（必過）**：`?still=1` 真實背景像素 WCAG 對比（含漸層字）、主標題≥總結、溢出與邊界、最小字級、SVG 重複 ID、圖片／腳本錯誤，加上 `--motion` 最多 **16 項**動態與行動實測（含聚光壓暗歸零、SVG 真描線、Layer 1 `G`/`A`/`L`/`S`、Layer 2 說服模組、**4 套風格動態套件實測**、**閱讀期靜止檢核反永動**、**390px 手機橫向溢出實測**）。離線載不到 Google Fonts 只列為提示（設計內建系統字體退路）。
-- **上限生動度稽核（Liveliness Audit，依 `stage_mode` 自動調檔）**：自動量測視覺頁佔比、動態原語多樣性（風格套件的原語分開計算）、連續純文字單調頁，以及**風格契合**（有沒有用到選定風格的招牌動態），點名全場最平淡的 1–3 頁。
+- **下限品管與視覺指引（必過）**：`?still=1` 真實背景像素 WCAG 對比（含漸層字與 OKLCH 底色／禁紫檢核）、主標題≥總結、溢出與邊界、最小字級、SVG 重複 ID、圖片／腳本錯誤，加上 `--motion` 最多 **17 項**動態與行動實測（含 WAAPI 過渡 `fill:forwards` 清零、聚光壓暗歸零與單拍時序檢核、SVG 真描線與線點順序、Layer 1 `G` 縮圖保真／`A`/`L`/`S`、Layer 2 說服模組、**4 套風格動態套件實測**、**閱讀期靜止檢核反永動**、**390px 手機 `#ctrl-bar` 與橫向溢出實測**、**活頁 `beforeprint`/`afterprint` 列印展開與復原**）。離線載不到 Google Fonts 只列為提示（設計內建系統字體退路）。
+- **上限生動度稽核（Liveliness Audit，依 `stage_mode` 自動調檔）**：自動量測視覺頁佔比（公平採計去框編輯頁與全套互動元件）、動態原語多樣性（風格套件的原語分開計算）、連續純文字單調頁，以及**風格契合**（有沒有用到選定風格的招牌動態），點名全場最平淡的 1–3 頁。
 - **視覺精修輪（Polish Pass）**：親自看過 `check/slide-*.jpg` 並對照 `visual-guidance.md` 第六節 6 條人工檢核（三秒靜態動線、空間分群、底部基線、去小字不回潮、視覺張力對標 `style-library.html`），若下限有錯、或 `pitch`/`keynote` 生動度與質感未達標，針對點名頁面升級圖解／互動並重建，**最多修 2 輪**；升級時優先用選定風格的招牌動態，不為了湊種類疊加不屬於這款風格的效果；未解項如實回報。
 
 ### Step 6｜交付　⛔ 關卡 3

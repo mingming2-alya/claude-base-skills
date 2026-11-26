@@ -46,7 +46,7 @@
 
 - **聚光＋非焦點壓暗排程（`data-focus-plan` ＋ `data-focus="1|2|3"`）**：當拍主角 `.focus-active`（粗亮框＋≥20px 外光暈，群組／浮空字加 `data-focus-style="clean"`）、已演完 `.focus-visited`（`0.78–0.84`）、未出場 `.focus-dim`（`0.26–0.32`）；演畢／打斷／搶先互動瞬間歸零復原。
 - **因果現場演變（`data-transform-at="780"`）**：HTML 原 DOM 為最終態；進頁瞬間先套 `.pre-transform` 展現舊態，到點移除翻轉新態。
-- **語意節拍（`data-beat="1|2|3|4"` ＋ `data-from`）**：`BEAT_MS = {1:120, 2:760, 3:1480, 4:2200}`，可配 `data-delay` 精細微調。
+- **語意節拍（`data-beat="1|2|3|4"` ＋ `data-from`）**：`BEAT_MS = {1:120, 2:1480, 3:2840, 4:4200}`（預設拍距 1360ms＝600ms 進場＋760ms 靜止閱讀窗；容器可設 `data-beat-gap="1500"` 調整全頁拍距，單一元素可配 `data-delay` 精細微調）。
 - **真描線與方向揭露**：實線用 SVG `<path data-draw>`（`pathLength="1"`）；圓環用 `data-draw="ring"`；虛線引導針／時間軌／斜刪線用 HTML `data-wipe="down|right|left|up"`；長條生長用 `data-grow="x|x-left|y|y-down"`。
 - **端點綻放與目標波紋**：`data-pop` 與線條抵達時刻精準對齊；`data-ripple` 釘住插畫物件或折線端點；`data-nudge="x"` 進場微動暗示滑桿可拖曳；`data-travel` 限單段短距過場、禁跨多站滑行。
 - **高反差單次聚光框（`data-spotlight`）**、**跨頁 Magic Move（`data-morph="id"`，MIT `open-slide`）**、**節流滾動數字（`data-count`，MIT `scrolline`）**、**延遲 Canvas 2D 氛圍層（`data-fx="ambient-dust"|"soft-aurora"`，MIT `lewislulu`）**。

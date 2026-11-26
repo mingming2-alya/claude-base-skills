@@ -62,12 +62,18 @@
     };
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+  const seenCmdIds = new Set();
+
   function broadcast() {
     const payload = buildPayload();
+    let bcSent = false;
     if (bc) {
-      try { bc.postMessage(payload); } catch (_) {}
+      try { bc.postMessage(payload); bcSent = true; } catch (_) {}
     }
-    try { localStorage.setItem(channelName, JSON.stringify(payload)); } catch (_) {}
+    if (!bcSent) {
+      try { localStorage.setItem(channelName, JSON.stringify(payload)); } catch (_) {}
+    }
     if (popup && !popup.closed && typeof popup.__onDeckState === 'function') {
       try { popup.__onDeckState(payload); } catch (_) {}
     }
@@ -76,6 +82,11 @@
 
   function handleIncoming(msg) {
     if (!msg || typeof msg !== 'object') return;
+    if (msg.id) {
+      if (seenCmdIds.has(msg.id)) return;
+      seenCmdIds.add(msg.id);
+      if (seenCmdIds.size > 160) seenCmdIds.clear();
+    }
     if (msg.type === 'hello') broadcast();
     else if (msg.type === 'cmd') {
       if (msg.action === 'next') deck.step(1);
@@ -129,7 +140,8 @@
       '(function(){' +
       'var chName=' + JSON.stringify(chName) + ';' +
       'var bc=null;try{bc=new BroadcastChannel(chName)}catch(_){}' +
-      'function send(msg){if(bc)try{bc.postMessage(msg)}catch(_){}try{localStorage.setItem(chName+":cmd",JSON.stringify(Object.assign({ts:Date.now()},msg)))}catch(_){}}' +
+      'var seq=0;' +
+      'function send(msg){var pkt=Object.assign({id:Date.now()+":"+(++seq),ts:Date.now()},msg);var sent=false;if(bc){try{bc.postMessage(pkt);sent=true;}catch(_){}}if(!sent){try{localStorage.setItem(chName+":cmd",JSON.stringify(pkt));}catch(_){}}}' +
       'function render(s){if(!s||s.type!=="state")return;' +
       'var pad=function(n){return(n<10?"0":"")+n};' +
       'document.getElementById("sv-pos").textContent=(s.current&&s.current.appendix)?"附件":(pad(s.mainPos>0?s.mainPos:(s.index+1))+" / "+pad(s.total));' +
@@ -155,7 +167,7 @@
   }
 
   function open() {
-    if (deck.isStatic()) return false;
+    if (isStill()) return false;
     if (popup && !popup.closed) {
       popup.focus();
       broadcast();
@@ -192,7 +204,7 @@
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (typeof deck.hasNavLock === 'function' && deck.hasNavLock()) return;
     if (e.key === 's' || e.key === 'S') {
-      if (deck.isStatic()) return;
+      if (isStill()) return;
       e.preventDefault();
       open();
     }

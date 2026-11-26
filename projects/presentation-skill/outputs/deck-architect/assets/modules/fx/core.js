@@ -62,16 +62,18 @@
     }
   }
 
+  const isReduced = () => (typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : deck.isStatic());
+
   function startFx(sl, deferMs) {
     stopFx();
-    if (!sl || deck.isStatic()) return;
+    if (!sl || isReduced()) return;
     const fx = (sl.dataset.fx || '').trim();
     if (!fx || !registry.has(fx)) return;
     const tok = fxToken;
 
     const boot = () => {
       fxTimer = 0;
-      if (tok !== fxToken || deck.isStatic() || deck.slides[deck.index] !== sl) return;
+      if (tok !== fxToken || isReduced() || deck.slides[deck.index] !== sl) return;
       const factory = registry.get(fx);
       if (!factory) return;
       let canvas = sl.querySelector(':scope > canvas.fx-canvas');
@@ -95,7 +97,7 @@
       if (typeof stepFn !== 'function') return;
 
       const loop = now => {
-        if (tok !== fxToken || deck.isStatic()) { fxRaf = 0; return; }
+        if (tok !== fxToken || isReduced()) { fxRaf = 0; return; }
         const keepGoing = stepFn(now);
         if (keepGoing === false) { fxRaf = 0; return; }
         fxRaf = requestAnimationFrame(loop);
@@ -115,22 +117,26 @@
   };
 
   deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
-    if (detail.staticMode) { stopFx(); return; }
+    if (detail.reducedMotion || detail.staticMode) { stopFx(); return; }
     startFx(detail.slide, detail.instant ? 180 : 620);
   });
   deck.stage.addEventListener('deck:slideleave', stopFx);
   deck.stage.addEventListener('deck:still', ({ detail }) => {
     if (detail.still) stopFx();
-    else startFx(deck.slides[deck.index], 120);
+    else if (!isReduced()) startFx(deck.slides[deck.index], 120);
   });
   deck.stage.addEventListener('deck:lowpower', ({ detail }) => {
     if (detail.lowPower) stopFx();
+    else if (!isReduced()) startFx(deck.slides[deck.index], 120);
+  });
+  deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => {
+    if (detail.reduced) stopFx();
     else startFx(deck.slides[deck.index], 120);
   });
 
   // Fallback boot if deck already entered a slide before this plugin registered
   Promise.resolve().then(() => {
-    if (!fxTimer && !fxRaf && !deck.isStatic() && deck.slides[deck.index]) {
+    if (!fxTimer && !fxRaf && !isReduced() && deck.slides[deck.index]) {
       startFx(deck.slides[deck.index], 180);
     }
   });

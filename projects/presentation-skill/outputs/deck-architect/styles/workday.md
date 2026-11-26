@@ -20,7 +20,7 @@
 
 | 角色 | 字體堆疊（含離線退路） | 字級 |
 |---|---|---|
-| 主標題（最大） | `"Noto Sans TC", var(--font-sans-fallback)` 900 | 56–68 px，字距 −0.015em |
+| 主標題（最大） | `"Noto Sans TC", var(--font-sans-fallback)` 900 | 56–68 px，中文維持字距 0 |
 | 結論副標 | `"Noto Sans TC", var(--font-sans-fallback)` 600（卡點詞 900 風險色） | 25–28 px |
 | 整體總數大字 | `"Archivo", "Noto Sans TC", var(--font-sans-fallback)` 900 | 88–104 px（`tabular-nums`） |
 | 圓環數字 | `"Archivo", "Noto Sans TC", var(--font-sans-fallback)` 900 | 44–48 px（`tabular-nums`） |

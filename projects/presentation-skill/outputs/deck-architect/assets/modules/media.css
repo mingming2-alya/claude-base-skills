@@ -93,14 +93,15 @@ audio[data-sound-demo] {
   align-items: center;
   gap: 18px;
   padding: 18px 24px;
-  border-radius: 16px;
+  border-radius: var(--card-radius, 16px);
   background: var(--sound-bg, rgba(20, 24, 32, 0.05));
   border: 1px solid var(--sound-border, var(--line));
   color: var(--fg);
   transition: border-color .22s ease, background .22s ease, box-shadow .22s ease;
 }
 [data-surface="dark"] .sound-demo-bar,
-[data-surface="photo"] .sound-demo-bar {
+[data-surface="photo"] .sound-demo-bar,
+:where(html[data-mode="dark"]) .slide:not([data-surface="light"]):not([data-surface="split"]) .sound-demo-bar {
   background: var(--sound-bg, rgba(255, 255, 255, 0.06));
 }
 .sound-demo-bar.is-playing {
@@ -185,7 +186,7 @@ audio[data-sound-demo] {
   align-items: center;
   gap: 4px;
   padding: 3px;
-  border-radius: 999px;
+  border-radius: var(--ctrl-radius, 999px);
   border: 1px solid var(--line);
   background: var(--bg);
 }
@@ -196,7 +197,7 @@ audio[data-sound-demo] {
   color: var(--fg-2);
   font: 700 18px/1 var(--font-label);
   padding: 8px 14px;
-  border-radius: 999px;
+  border-radius: var(--ctrl-radius, 999px);
   white-space: nowrap;
   cursor: pointer;
   transition: background .18s ease, color .18s ease;
@@ -206,9 +207,8 @@ audio[data-sound-demo] {
   color: var(--accent-ink);
 }
 
-/* Static / print: keep poster & clean static waveform, hide interactive overlays */
-html.still .media-video-ctrl,
-body.low-power .media-video-ctrl {
+/* Static / print: keep poster & clean static waveform, hide overlays in ?still=1 & print (keep usable in low-power) */
+html.still .media-video-ctrl {
   display: none !important;
 }
 html.still .sound-demo-bar.is-playing .sound-wave i,

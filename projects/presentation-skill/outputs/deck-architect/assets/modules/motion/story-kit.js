@@ -3,27 +3,51 @@
  */
 (function () {
   const deck = window.__deck;
-  const isStatic = () => (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false);
+  const isReduced = () => (deck && typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : (deck && typeof deck.isStatic === 'function' ? deck.isStatic() : false));
+  const enterTimers = new Set();
+  function clearEnterTimers() {
+    enterTimers.forEach(clearTimeout);
+    enterTimers.clear();
+  }
 
   /* ---- 1. Pop-up Book 3D Fold ---- */
   function initPopupFold(root) {
     if (root._pfInit) return root._pfInit;
+    root.classList.add('live-ctrl');
     const layers = [...root.querySelectorAll('[data-pop-layer]')];
     layers.forEach((layer, i) => {
       if (!layer.style.transitionDelay) layer.style.transitionDelay = (i * 120) + 'ms';
     });
+    let foldTimer = 0;
 
+    function unfold() {
+      clearTimeout(foldTimer);
+      foldTimer = 0;
+      root.classList.remove('is-folded');
+    }
+    function fold() {
+      clearTimeout(foldTimer);
+      foldTimer = 0;
+      root.classList.add('is-folded');
+    }
     function play() {
-      if (isStatic()) { root.classList.remove('is-folded'); return; }
+      clearTimeout(foldTimer);
+      foldTimer = 0;
+      if (isReduced()) { root.classList.remove('is-folded'); return; }
       root.classList.add('is-folded');
       root.getBoundingClientRect();
-      setTimeout(() => root.classList.remove('is-folded'), 90);
+      foldTimer = setTimeout(() => {
+        foldTimer = 0;
+        root.classList.remove('is-folded');
+      }, 90);
     }
     function toggle() {
+      clearTimeout(foldTimer);
+      foldTimer = 0;
       root.classList.toggle('is-folded');
     }
 
-    const api = { play, toggle, unfold: () => root.classList.remove('is-folded'), fold: () => root.classList.add('is-folded') };
+    const api = { play, toggle, unfold, fold };
     root._pfInit = api;
     return api;
   }
@@ -52,7 +76,7 @@
     }
     function play() {
       clearTimers();
-      if (isStatic()) { showAll(); return; }
+      if (isReduced()) { showAll(); return; }
       msgs.forEach(m => m.classList.add('is-hidden'));
       let t = 180;
       msgs.forEach(m => {
@@ -78,6 +102,7 @@
   const chats = [...document.querySelectorAll('[data-chat-replay]')].map(initChatReplay);
 
   function settleAll() {
+    clearEnterTimers();
     folds.forEach(f => f.unfold());
     chats.forEach(c => c.showAll());
   }
@@ -89,19 +114,41 @@
 
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       const curStep = detail.step || 0;
-      sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) <= curStep) el._pfInit.play(); });
-      sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) <= curStep) el._crInit.play(); });
+      if (detail.restAtFinal || detail.reducedMotion || detail.staticMode || isReduced()) {
+        sl.querySelectorAll('[data-popup-fold]').forEach(el => el._pfInit && el._pfInit.unfold());
+        sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
+        return;
+      }
+      const run = () => {
+        if (deck.slides[deck.index] !== sl || isReduced()) return;
+        sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) <= curStep) el._pfInit.play(); });
+        sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) <= curStep) el._crInit.play(); });
+      };
+      const delay = detail.enterDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); run(); }, delay);
+        enterTimers.add(id);
+      } else {
+        run();
+      }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
+      if (detail.dir < 0 || isReduced()) {
+        sl.querySelectorAll('[data-popup-fold]').forEach(el => el._pfInit && el._pfInit.unfold());
+        sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
+        return;
+      }
       sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) === detail.step) el._pfInit.play(); });
       sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) === detail.step) el._crInit.play(); });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl) return;
       sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
@@ -109,6 +156,7 @@
     });
     deck.stage.addEventListener('deck:still', ({ detail }) => { if (detail.still) settleAll(); });
     deck.stage.addEventListener('deck:lowpower', ({ detail }) => { if (detail.lowPower) settleAll(); });
+    deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => { if (detail.reduced) settleAll(); });
   }
   window.__motionKits = window.__motionKits || {};
   window.__motionKits.story = { initPopupFold, initChatReplay, folds, chats };

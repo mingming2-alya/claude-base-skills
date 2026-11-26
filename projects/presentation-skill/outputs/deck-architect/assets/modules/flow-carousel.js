@@ -124,7 +124,7 @@
 
     function schedule() {
       stop();
-      if (!autoplay || deck.isStatic() || pausedByHover) return;
+      if (!autoplay || isReduced() || pausedByHover) return;
       const sl = root.closest('.slide');
       if (!sl || deck.slides[deck.index] !== sl) return;
       if (mode === 'chat' && idx >= cards.length - 1) return;
@@ -153,11 +153,21 @@
     instances.push(api);
   });
 
-  function syncForSlide(sl, staticMode) {
+  function isStill() {
+    return typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic();
+  }
+  function isReduced() {
+    return typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : deck.isStatic();
+  }
+
+  function syncForSlide(sl, reduced) {
     for (const inst of instances) {
-      if (staticMode) {
+      if (isStill()) {
         inst.stop();
         inst.apply(inst.stillIdx);
+      } else if (reduced || isReduced()) {
+        inst.stop();
+        if (inst.mode === 'chat') inst.apply(inst.stillIdx);
       } else if (inst.slide === sl) {
         if (inst.mode === 'chat') inst.apply(0);
         inst.schedule();
@@ -167,12 +177,13 @@
     }
   }
 
-  deck.stage.addEventListener('deck:slideenter', ({ detail }) => syncForSlide(detail.slide, detail.staticMode));
+  deck.stage.addEventListener('deck:slideenter', ({ detail }) => syncForSlide(detail.slide, detail.reducedMotion || detail.staticMode));
   deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
     for (const inst of instances) if (inst.slide === detail.slide) inst.stop();
   });
-  deck.stage.addEventListener('deck:still', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.still));
-  deck.stage.addEventListener('deck:lowpower', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.lowPower));
+  deck.stage.addEventListener('deck:still', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.still || isReduced()));
+  deck.stage.addEventListener('deck:lowpower', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.lowPower || isReduced()));
+  deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.reduced));
 
-  if (deck.slides[deck.index]) syncForSlide(deck.slides[deck.index], deck.isStatic());
+  if (deck.slides[deck.index]) syncForSlide(deck.slides[deck.index], isReduced());
 })();

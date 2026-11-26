@@ -37,14 +37,22 @@
     return lbEl;
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+  const isReduced = () => (typeof deck.isReducedMotion === 'function' ? deck.isReducedMotion() : deck.isStatic());
+
   function openLightbox(item) {
-    if (deck.isStatic()) return;
+    if (isStill()) return;
     const lb = ensureLightbox();
     const mediaSlot = lb.querySelector('.cfl-media');
     const capSlot = lb.querySelector('.cfl-cap');
     mediaSlot.innerHTML = '';
     const media = item.querySelector('img, svg');
-    if (media) mediaSlot.appendChild(media.cloneNode(true));
+    if (media) {
+      const clone = media.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+      mediaSlot.appendChild(clone);
+    }
     const cap = item.querySelector('figcaption');
     capSlot.textContent = cap ? cap.textContent.trim() : '';
     capSlot.style.display = capSlot.textContent ? '' : 'none';
@@ -118,7 +126,7 @@
 
     function schedule() {
       stop();
-      if (!autoplay || deck.isStatic() || pausedByHover) return;
+      if (!autoplay || isReduced() || pausedByHover) return;
       const sl = root.closest('.slide');
       if (!sl || deck.slides[deck.index] !== sl) return;
       timer = setTimeout(() => {
@@ -173,11 +181,13 @@
     track.dataset.mqCloned = '1';
   });
 
-  function syncForSlide(sl, staticMode) {
+  function syncForSlide(sl, reduced) {
     for (const inst of instances) {
-      if (staticMode) {
+      if (isStill()) {
         inst.stop();
         inst.layout(inst.stillIdx);
+      } else if (reduced || isReduced()) {
+        inst.stop();
       } else if (inst.slide === sl) {
         inst.schedule();
       } else {
@@ -186,13 +196,17 @@
     }
   }
 
-  deck.stage.addEventListener('deck:slideenter', ({ detail }) => syncForSlide(detail.slide, detail.staticMode));
+  deck.stage.addEventListener('deck:slideenter', ({ detail }) => syncForSlide(detail.slide, detail.reducedMotion || detail.staticMode));
   deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
     for (const inst of instances) if (inst.slide === detail.slide) inst.stop();
     if (lbEl) lbEl.classList.remove('open');
   });
-  deck.stage.addEventListener('deck:still', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.still));
-  deck.stage.addEventListener('deck:lowpower', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.lowPower));
+  deck.stage.addEventListener('deck:still', ({ detail }) => {
+    if (detail.still && lbEl) lbEl.classList.remove('open');
+    syncForSlide(deck.slides[deck.index], detail.still || isReduced());
+  });
+  deck.stage.addEventListener('deck:lowpower', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.lowPower || isReduced()));
+  deck.stage.addEventListener('deck:reducedmotion', ({ detail }) => syncForSlide(deck.slides[deck.index], detail.reduced));
 
-  if (deck.slides[deck.index]) syncForSlide(deck.slides[deck.index], deck.isStatic());
+  if (deck.slides[deck.index]) syncForSlide(deck.slides[deck.index], isReduced());
 })();

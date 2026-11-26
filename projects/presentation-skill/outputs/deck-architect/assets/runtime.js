@@ -44,13 +44,32 @@
   let lowPower = false;
   const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
   let reduce = reduceMQ.matches;
-  if (reduceMQ.addEventListener) reduceMQ.addEventListener('change', e => { reduce = e.matches; if (reduce) freezeNow(); });
 
   if (stillMode) document.documentElement.classList.add('still');
   if (hideCtrlMode) document.documentElement.classList.add('hide-ctrl');
   if (noScaleMode) document.documentElement.classList.add('noscale');
 
-  const isStatic = () => Boolean(stillMode || lowPower || reduce);
+  // Orthogonal modes:
+  //  - isStill(): true ONLY in ?still=1 capture mode (freezes chrome & disables interactive chrome)
+  //  - isReducedMotion(): true in ?still=1, B low-power, or prefers-reduced-motion (suppresses motion/autoplay while keeping presenter & interactive controls usable)
+  const isStill = () => Boolean(stillMode);
+  const isReducedMotion = () => Boolean(stillMode || lowPower || reduce);
+  const isStatic = isReducedMotion; // backwards-compatible alias
+
+  const stageScale = () => {
+    const r = stage.getBoundingClientRect();
+    return r.width ? r.width / 1920 : 1;
+  };
+
+  if (reduceMQ.addEventListener) {
+    reduceMQ.addEventListener('change', e => {
+      reduce = e.matches;
+      if (reduce) freezeNow();
+      stage.dispatchEvent(new CustomEvent('deck:reducedmotion', {
+        detail: { reduced: isReducedMotion(), reduce },
+      }));
+    });
+  }
   const DECK = window.DECK || {};
   const M = DECK.motion || 'horizontal';
   const deckStageMode = DECK.stageMode || document.documentElement.dataset.stageMode || '';
@@ -86,6 +105,7 @@
   let toastTimer = null;
   const returnTo = [];
   const activeAnims = new Set();
+  const persistedAnims = new Set();
   const activeTimers = new Set();
   const activeRafs = new Set();
   const hiddenMorphEls = new Set();
@@ -94,9 +114,17 @@
   const isApp = i => slides[i] && slides[i].dataset.appendix === '1';
   const mainIndices = slides.map((_, i) => i).filter(i => !isApp(i));
 
-  function trackAnim(anim) {
+  function cancelAnim(anim) {
+    if (!anim) return;
+    activeAnims.delete(anim);
+    persistedAnims.delete(anim);
+    try { anim.cancel(); } catch (_) {}
+  }
+
+  function trackAnim(anim, persist) {
     if (!anim) return anim;
     activeAnims.add(anim);
+    if (persist) persistedAnims.add(anim);
     const done = () => activeAnims.delete(anim);
     anim.finished.then(done, done);
     return anim;
@@ -373,7 +401,8 @@
     const mode = (sl.dataset.motionMode || cs.getPropertyValue('--motion-mode') || 'spring').trim();
     const staggerBase = parseFloat(cs.getPropertyValue('--stagger-base')) || 46;
     const morphMs = parseFloat(cs.getPropertyValue('--morph-ms')) || 680;
-    const ease = mode === 'crisp' ? EASE_CRISP : EASE_SPRING;
+    const rawEase = cs.getPropertyValue('--enter-easing').trim();
+    const ease = rawEase || (mode === 'crisp' ? EASE_CRISP : EASE_SPRING);
     return { mode, staggerBase, morphMs, ease };
   }
 
@@ -409,7 +438,7 @@
 
   function cancelElStepAnim(el) {
     const prev = stepAnims.get(el);
-    if (prev) { try { prev.cancel(); } catch (_) {} stepAnims.delete(el); }
+    if (prev) { cancelAnim(prev); stepAnims.delete(el); }
   }
 
   function stepFromTransform(el) {
@@ -422,7 +451,7 @@
     return 'translate3d(0,22px,0)';
   }
 
-  function applySlideStep(sl, targetStep, dir, instant, token) {
+  function applySlideStep(sl, targetStep, dir, silent, token) {
     if (!sl) return;
     const maxS = getMaxStep(sl);
     const k = Math.max(0, Math.min(maxS, targetStep));
@@ -437,7 +466,7 @@
 
       cancelElStepAnim(el);
 
-      if (instant || isStatic() || el.dataset.stepHidden === undefined) {
+      if (silent || isReducedMotion() || el.dataset.stepHidden === undefined) {
         el.dataset.stepHidden = nowVis ? '0' : '1';
         if (nowVis) snapSubtreeFinal(el);
         return;
@@ -456,19 +485,19 @@
         const anim = trackAnim(el.animate(
           [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translate3d(0,-10px,0)' }],
           { duration: 220, easing: 'ease-out', fill: 'forwards' }
-        ));
+        ), true);
         stepAnims.set(el, anim);
         anim.finished.then(() => {
           if (token === navToken && Number(sl.dataset.currentStep) === k) {
             el.dataset.stepHidden = '1';
-            try { anim.cancel(); } catch (_) {}
           }
+          cancelAnim(anim);
         }, () => {});
       }
     });
 
     updateCtrlBar();
-    if (!instant) {
+    if (!silent) {
       stage.dispatchEvent(new CustomEvent('deck:stepchange', {
         detail: { index: cur, slide: sl, step: curStep, totalSteps: maxS, dir },
       }));
@@ -482,7 +511,8 @@
     if (!maxS) return 0;
     const nextK = Math.max(0, Math.min(maxS, k));
     if (nextK === curStep) return curStep;
-    applySlideStep(sl, nextK, dir, isStatic(), navToken);
+    clearFocus(sl);
+    applySlideStep(sl, nextK, dir, false, navToken);
     return curStep;
   }
 
@@ -580,11 +610,11 @@
     });
   }
 
-  function snapSlideFinal(sl) {
+  function snapSlideFinal(sl, expandSteps = true) {
     if (!sl) return;
     clearGuidanceState(sl);
     const maxS = getMaxStep(sl);
-    if (maxS > 0) {
+    if (expandSteps && maxS > 0) {
       sl.dataset.currentStep = String(maxS);
       if (slides[cur] === sl) curStep = maxS;
       sl.querySelectorAll(STEP_SEL).forEach(el => {
@@ -607,11 +637,19 @@
     return out.sort((a, b) => a.start - b.start);
   }
 
-  const BEAT_MS = { '1': 120, '2': 760, '3': 1480, '4': 2200 };
-  function beatDelay(el, fallback) {
+  // Calibrated to Visual Guidance spec: 1.3-1.8s per beat (600ms reveal + 760ms still reading window)
+  const BEAT_MS = { '1': 120, '2': 1480, '3': 2840, '4': 4200 };
+  function beatDelay(el, fallback, sl) {
     if (el.dataset.delay !== undefined) return parseFloat(el.dataset.delay) || 0;
     const b = el.dataset.beat;
-    if (b && BEAT_MS[b] !== undefined) return BEAT_MS[b];
+    if (b) {
+      const n = parseInt(b, 10);
+      if (sl && sl.dataset.beatGap && n >= 1) {
+        const gap = parseFloat(sl.dataset.beatGap) || 1360;
+        return 120 + (n - 1) * gap;
+      }
+      if (BEAT_MS[b] !== undefined) return BEAT_MS[b];
+    }
     return fallback;
   }
 
@@ -625,11 +663,24 @@
       return skipDeferred ? list.filter(el => deferredStepOf(el, sl) === 0) : list;
     };
 
+    // 0. Live Causal State Transformation ([data-transform-at="ms"]) — works at slide entry & inside data-step
+    q('[data-transform-at]').forEach(el => {
+      const ms = parseFloat(el.dataset.transformAt) || 1200;
+      el.classList.remove('transforming');
+      el.classList.add('pre-transform');
+      later(() => {
+        if (token !== navToken || isReducedMotion()) { el.classList.remove('pre-transform', 'transforming'); return; }
+        el.classList.remove('pre-transform');
+        el.classList.add('transforming');
+        later(() => { el.classList.remove('transforming'); }, 840);
+      }, baseDelay + ms);
+    });
+
     // 1. Non-uniform staggered groups ([data-stagger])
     const staggeredSet = new Set();
     q('[data-stagger]').forEach(group => {
       const stepMs = parseFloat(group.getAttribute('data-stagger')) || cfg.staggerBase;
-      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40);
+      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40, sl);
       const items = [...group.children].filter(el => el.nodeType === 1);
       items.forEach((el, i) => {
         staggeredSet.add(el);
@@ -654,7 +705,7 @@
       if (el.parentElement && el.parentElement.closest('.rv, [data-stagger]')) return;
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
       if (!skipDeferred && el === root) return; // root already animated by applySlideStep
-      const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)));
+      const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)), sl);
       const dir = el.dataset.from || 'up';
       const fromT = dir === 'left' ? 'translate3d(-24px,0,0)'
         : dir === 'right' ? 'translate3d(24px,0,0)'
@@ -670,9 +721,9 @@
     // 3. Mobile-visible high-contrast spotlight cues ([data-spotlight])
     q('[data-spotlight]').forEach(el => {
       el.classList.remove('spot-pulse');
-      const d = baseDelay + beatDelay(el, skipDeferred ? 540 : 120);
+      const d = baseDelay + beatDelay(el, skipDeferred ? 540 : 120, sl);
       later(() => {
-        if (token !== navToken || isStatic()) return;
+        if (token !== navToken || isReducedMotion()) return;
         el.classList.add('spot-pulse');
         later(() => el.classList.remove('spot-pulse'), 1320);
       }, d);
@@ -691,7 +742,7 @@
       const dec = numRaw.includes('.') ? numRaw.split('.')[1].length : 0;
       const target = parseFloat(numRaw.replace(/,/g, ''));
       const dur = parseFloat(el.dataset.dur) || 820;
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60, sl);
       const fmt = v => {
         let s = dec > 0 ? v.toFixed(dec) : String(Math.round(v));
         if (hasComma) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -702,7 +753,7 @@
       let lastPaint = 0;
       const tick = now => {
         activeRafs.delete(id);
-        if (token !== navToken || isStatic()) { tn.nodeValue = finalStr; return; }
+        if (token !== navToken || isReducedMotion()) { tn.nodeValue = finalStr; return; }
         if (now < startAt) { id = requestAnimationFrame(tick); activeRafs.add(id); return; }
         const p = Math.min(1, (now - startAt) / dur);
         if (p >= 1) { tn.nodeValue = finalStr; return; }
@@ -720,7 +771,7 @@
 
     // 5. True SVG stroke draw & progress rings ([data-draw])
     q('[data-draw]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80, sl);
       const dur = parseFloat(el.dataset.dur) || 880;
       if (el.getAttribute('data-draw') === 'ring') {
         const circ = parseFloat(el.dataset.circ || '0');
@@ -750,7 +801,7 @@
     // 6. Directional bar growth ([data-grow="x|x-left|y|y-down"])
     q('[data-grow]').forEach((el, idx) => {
       const dir = (el.getAttribute('data-grow') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65);
+      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65, sl);
       const dur = parseFloat(el.dataset.dur) || 720;
       if (el instanceof SVGElement) el.style.transformBox = 'fill-box';
       if (dir === 'x-left') {
@@ -771,7 +822,7 @@
     // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"])
     q('[data-wipe]').forEach(el => {
       const dir = (el.getAttribute('data-wipe') || 'right').toLowerCase();
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60, sl);
       const dur = parseFloat(el.dataset.dur) || 540;
       const fromClip = dir === 'left' ? 'inset(0 0 0 100%)'
         : dir === 'down' ? 'inset(0 0 100% 0)'
@@ -785,7 +836,7 @@
 
     // 8. Endpoint dot / arrowhead / badge crisp pop ([data-pop])
     q('[data-pop]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120, sl);
       const dur = parseFloat(el.dataset.dur) || 340;
       if (el instanceof SVGElement) {
         el.style.transformBox = 'fill-box';
@@ -799,23 +850,24 @@
 
     // 9. Target-lock concentric ripple ([data-ripple])
     q('[data-ripple]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 560 : 160);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 560 : 160, sl);
       const dur = parseFloat(el.dataset.dur) || 1050;
-      trackAnim(el.animate(
+      const anim = trackAnim(el.animate(
         [
           { opacity: 0, transform: 'scale(0.35)' },
           { opacity: 0.92, transform: 'scale(0.88)', offset: 0.16 },
           { opacity: 0, transform: 'scale(2.85)' },
         ],
         { duration: dur, delay, easing: EASE_SPRING, fill: 'both' }
-      ));
+      ), true);
+      anim.finished.then(() => cancelAnim(anim), () => {});
     });
 
     // 10. Chronological rail travel bead ([data-travel="x|y"])
     q('[data-travel]').forEach(el => {
       const axis = (el.getAttribute('data-travel') || 'x').toLowerCase();
       const dist = parseFloat(el.dataset.travelDist || '800');
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 100);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 100, sl);
       const dur = parseFloat(el.dataset.dur) || 2400;
       const p0 = 'translate3d(0,0,0)';
       const p1 = axis === 'y'
@@ -824,7 +876,7 @@
       const p2 = axis === 'y'
         ? 'translate3d(0,' + dist + 'px,0)'
         : 'translate3d(' + dist + 'px,0,0)';
-      trackAnim(el.animate(
+      const anim = trackAnim(el.animate(
         [
           { opacity: 0, transform: p0 + ' scale(0.5)' },
           { opacity: 1, transform: p1 + ' scale(1)', offset: 0.05 },
@@ -832,13 +884,14 @@
           { opacity: 0, transform: p2 + ' scale(0.55)' },
         ],
         { duration: dur, delay, easing: 'cubic-bezier(0.25, 0.06, 0.25, 1)', fill: 'both' }
-      ));
+      ), true);
+      anim.finished.then(() => cancelAnim(anim), () => {});
     });
 
     // 11. Interactive control affordance nudge ([data-nudge="x|y"])
     q('[data-nudge]').forEach(el => {
       const axis = (el.getAttribute('data-nudge') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 1100);
+      const delay = baseDelay + beatDelay(el, 1100, sl);
       const dur = parseFloat(el.dataset.dur) || 920;
       const frames = axis === 'y'
         ? [
@@ -858,21 +911,21 @@
   }
 
   function triggerSubtreePrimitives(el, sl, delay, token) {
-    if (!el || isStatic()) { snapSubtreeFinal(el); return; }
+    if (!el || isReducedMotion()) { snapSubtreeFinal(el); return; }
     runPrimitives(el, sl, delay, token, null, false);
   }
 
   function animateSlideContent(sl, baseDelay, token, morphedIds) {
-    if (!sl || isStatic()) { snapSlideFinal(sl); return; }
+    if (!sl || isReducedMotion()) { snapSlideFinal(sl, isStill()); return; }
 
-    // 0a. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
+    // 0. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
     const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
     const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
     if (focusPlan.length && focusEls.length) {
       const myFocusToken = bumpFocus(sl);
       const visited = new Set();
       const applyStage = activeId => {
-        if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
+        if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isReducedMotion()) return;
         sl.classList.add('is-focusing');
         for (const el of focusEls) {
           const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
@@ -891,7 +944,7 @@
           applyStage(stepItem.id);
         } else {
           later(() => {
-            if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
+            if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isReducedMotion()) return;
             for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
             applyStage(stepItem.id);
           }, startAt);
@@ -902,20 +955,6 @@
         clearFocusClasses(sl);
       }, baseDelay + maxEnd);
     }
-
-    // 0b. Live Causal State Transformation ([data-transform-at="ms"])
-    sl.querySelectorAll('[data-transform-at]').forEach(el => {
-      if (deferredStepOf(el, sl) > 0) return;
-      const ms = parseFloat(el.dataset.transformAt) || 1200;
-      el.classList.remove('transforming');
-      el.classList.add('pre-transform');
-      later(() => {
-        if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
-        el.classList.remove('pre-transform');
-        el.classList.add('transforming');
-        later(() => { el.classList.remove('transforming'); }, 840);
-      }, baseDelay + ms);
-    });
 
     runPrimitives(sl, sl, baseDelay, token, morphedIds, true);
   }
@@ -936,7 +975,11 @@
     ];
     for (const p of props) dst.style[p] = cs[p];
     dst.style.margin = '0';
-    dst.style.whiteSpace = 'nowrap';
+    const lh = parseFloat(cs.lineHeight) || (parseFloat(cs.fontSize) || 16) * 1.25;
+    const srcRect = src.getBoundingClientRect();
+    if (srcRect.height <= lh * 1.45 * stageScale()) {
+      dst.style.whiteSpace = 'nowrap';
+    }
     const srcKids = src.children, dstKids = dst.children;
     for (let i = 0; i < Math.min(srcKids.length, dstKids.length); i++) {
       const kcs = getComputedStyle(srcKids[i]);
@@ -951,10 +994,10 @@
   function collectMorphPairs(prev, next) {
     if (!prev || !next || prev === next) return [];
     const sr = stage.getBoundingClientRect();
-    const s = sr.width ? sr.width / 1920 : 1;
+    const s = stageScale();
     const fromMap = new Map();
     prev.querySelectorAll('[data-morph]').forEach(el => {
-      if (el.dataset.stepHidden === '1') return;
+      if (el.closest('[data-step-hidden="1"]')) return;
       const id = el.dataset.morph;
       if (id && !fromMap.has(id)) {
         const box = stageBox(el, sr, s);
@@ -967,7 +1010,7 @@
     if (!wasActive) { next.classList.add('active'); next.style.opacity = '0'; }
     const pairs = [];
     next.querySelectorAll('[data-morph]').forEach(toEl => {
-      if (toEl.dataset.stepHidden === '1') return;
+      if (toEl.closest('[data-step-hidden="1"]')) return;
       const id = toEl.dataset.morph;
       const from = fromMap.get(id);
       if (!from) return;
@@ -996,10 +1039,19 @@
 
       const fromClip = fromCS.webkitBackgroundClip || fromCS.backgroundClip || '';
       const fromGrad = fromClip.includes('text') && (fromCS.backgroundImage || '').includes('gradient');
+      const toClip = toCS.webkitBackgroundClip || toCS.backgroundClip || '';
+      const toGrad = toClip.includes('text') && (toCS.backgroundImage || '').includes('gradient');
       if (fromGrad) {
-        clone.style.color = toCS.color;
-        clone.style.webkitTextFillColor = toCS.color;
-        clone.style.background = 'none';
+        if (!toGrad) {
+          clone.style.color = toCS.color;
+          clone.style.webkitTextFillColor = toCS.color;
+          clone.style.background = 'none';
+        } else {
+          clone.style.backgroundImage = fromCS.backgroundImage;
+          clone.style.backgroundClip = 'text';
+          clone.style.webkitBackgroundClip = 'text';
+          clone.style.webkitTextFillColor = 'transparent';
+        }
       }
 
       clone.style.position = 'absolute';
@@ -1027,30 +1079,39 @@
           { transform: 'translate3d(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px,0) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')' },
         ],
         { duration: morphDur, easing: EASE_CINEMA, fill: 'forwards' }
-      ));
+      ), true);
       anims.push(aMove.finished);
 
-      if (!fromGrad && fromCS.color !== toCS.color) {
-        trackAnim(clone.animate([{ color: fromCS.color }, { color: toCS.color }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+      if (!fromGrad && !toGrad && fromCS.color !== toCS.color) {
+        trackAnim(clone.animate([{ color: fromCS.color }, { color: toCS.color }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
       }
       if (!isTextOnly && fromCS.backgroundColor !== toCS.backgroundColor) {
-        trackAnim(clone.animate([{ backgroundColor: fromCS.backgroundColor }, { backgroundColor: toCS.backgroundColor }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+        trackAnim(clone.animate([{ backgroundColor: fromCS.backgroundColor }, { backgroundColor: toCS.backgroundColor }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
       }
       for (let i = 0; i < clone.children.length; i++) {
         const fc = getComputedStyle(fromEl.children[i]).color;
         const tc = toEl.children[i] ? getComputedStyle(toEl.children[i]).color : toCS.color;
         if (fc !== tc) {
-          trackAnim(clone.children[i].animate([{ color: fc }, { color: tc }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+          trackAnim(clone.children[i].animate([{ color: fc }, { color: tc }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
         }
       }
     }
     return anims;
   }
 
-  // ---------------------------------------------------------------- flight cleanup (zero lockout!)
+  // ---------------------------------------------------------------- flight cleanup (zero lockout, zero WAAPI fill:forwards leak!)
+  function cancelElementAnims(el) {
+    if (!el || typeof el.getAnimations !== 'function') return;
+    for (const a of el.getAnimations()) {
+      try { a.cancel(); } catch (_) {}
+    }
+  }
+
   function cleanupFlight(keepPrev, keepNext) {
     for (const a of activeAnims) { try { a.cancel(); } catch (_) {} }
     activeAnims.clear();
+    for (const a of persistedAnims) { try { a.cancel(); } catch (_) {} }
+    persistedAnims.clear();
     for (const id of activeTimers) clearTimeout(id);
     activeTimers.clear();
     for (const id of activeRafs) cancelAnimationFrame(id);
@@ -1058,8 +1119,12 @@
     morphLayer.innerHTML = '';
     for (const el of hiddenMorphEls) el.style.visibility = '';
     hiddenMorphEls.clear();
-    if (curtain) curtain.style.opacity = '0';
+    if (curtain) {
+      cancelElementAnims(curtain);
+      curtain.style.opacity = '0';
+    }
     for (const sl of slides) {
+      cancelElementAnims(sl);
       sl.classList.remove('in-flight');
       sl.style.zIndex = '';
       if (sl !== keepPrev) clearGuidanceState(sl);
@@ -1072,7 +1137,7 @@
     }
   }
 
-  function freezeNow() {
+  function freezeNow(expandSteps = false) {
     navToken++;
     cleanupFlight(null, slides[cur]);
     if (slides[cur]) {
@@ -1080,7 +1145,7 @@
       slides[cur].style.opacity = '';
       slides[cur].style.transform = '';
       slides[cur].style.clipPath = '';
-      snapSlideFinal(slides[cur]);
+      snapSlideFinal(slides[cur], expandSteps);
     }
     updateCtrlBar();
   }
@@ -1096,7 +1161,12 @@
       next.dataset.kind === 'toc' || prev.dataset.kind === 'toc' ||
       (next.dataset.chi !== prev.dataset.chi && Number(next.dataset.chi) >= 0 && Number(prev.dataset.chi) >= 0)
     );
-    return chChange ? 'push' : 'cross';
+    if (chChange) {
+      if (M === 'vertical') return 'push-y';
+      if (M === 'zoom-in' || M === 'zoom-out') return 'zoom-rise';
+      return 'push';
+    }
+    return 'cross';
   }
 
   function go(n, instant, opts) {
@@ -1110,16 +1180,22 @@
     const token = ++navToken;
     cur = n;
 
-    const skipTransition = Boolean(instant || isStatic() || !prev || prev === next);
-    const animateInitial = Boolean(!prev && !instant && !isStatic());
+    const skipTransition = Boolean(instant || isReducedMotion() || !prev || prev === next);
+    const animateInitial = Boolean(!prev && !instant && !isReducedMotion());
 
     // Initialize target step on incoming slide BEFORE morph collection or paint
+    // Only ?still=1 (or explicit opts.step='final') forces step expansion; B/reduced-motion preserves stepping
     const maxS = getMaxStep(next);
     let targetStep = 0;
-    if (isStatic() || (opts && opts.step === 'final')) targetStep = maxS;
+    if (isStill() || (opts && opts.step === 'final')) targetStep = maxS;
     else if (opts && typeof opts.step === 'number') targetStep = Math.max(0, Math.min(maxS, opts.step));
     else if (dir < 0 && prev && prev !== next && !instant) targetStep = maxS;
     applySlideStep(next, targetStep, 0, true, token);
+
+    // Clear lingering transition WAAPI locks on incoming slide BEFORE measuring morph target boxes
+    cancelElementAnims(next);
+    next.style.transform = '';
+    next.style.clipPath = '';
 
     const morphPairs = (!skipTransition && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
 
@@ -1135,6 +1211,11 @@
     updateCtrlBar();
     try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
 
+    // Fit incoming slide BEFORE animateSlideContent zeroes [data-count] text nodes
+    if (typeof window.__deckFit === 'function') window.__deckFit(next);
+
+    let enterDelay = 0;
+
     if (skipTransition) {
       stage.classList.add('no-trans');
       if (prev && prev !== next) prev.classList.remove('active', 'leaving');
@@ -1142,8 +1223,9 @@
       next.style.opacity = '';
       next.style.transform = '';
       next.style.clipPath = '';
-      if (isStatic()) snapSlideFinal(next);
-      else if (animateInitial && targetStep === 0) animateSlideContent(next, 60, token, null);
+      if (isStill()) snapSlideFinal(next, true);
+      else if (isReducedMotion()) snapSlideFinal(next, false);
+      else if (animateInitial && targetStep === 0) { enterDelay = 60; animateSlideContent(next, 60, token, null); }
       else snapSubtreeFinal(next);
       stage.offsetWidth;
       requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
@@ -1160,20 +1242,26 @@
       next.style.clipPath = '';
 
       if (kind === 'shock' && curtain) {
+        enterDelay = 420;
         stage.classList.add('hide-nav');
         stage.classList.remove('show-side-nav');
         prev.classList.remove('active');
         prev.classList.add('leaving');
-        const cIn = trackAnim(curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' }));
+        const cIn = trackAnim(curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' }), true);
         cIn.finished.then(() => {
-          if (token !== navToken) return;
+          if (token !== navToken) { cancelAnim(cIn); return; }
+          curtain.style.opacity = '1';
+          cancelAnim(cIn);
           prev.classList.remove('leaving', 'active');
           clearGuidanceState(prev);
           next.classList.add('active');
           later(() => {
             if (token !== navToken) return;
-            const cOut = trackAnim(curtain.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 280, fill: 'forwards' }));
-            cOut.finished.then(() => { if (token === navToken) { curtain.style.opacity = '0'; cOut.cancel(); } }, () => {});
+            const cOut = trackAnim(curtain.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 280, fill: 'forwards' }), true);
+            cOut.finished.then(() => {
+              if (token === navToken) curtain.style.opacity = '0';
+              cancelAnim(cOut);
+            }, () => {});
             const st = next.querySelector('.shock-text, [data-role="shock"], h1');
             if (st) {
               trackAnim(st.animate(
@@ -1190,6 +1278,7 @@
         next.classList.add('active', 'in-flight');
 
         const waits = [];
+        const forwardsAnims = [];
         let contentDelay = 160;
 
         if (kind === 'iris') {
@@ -1208,7 +1297,8 @@
             const aOut = trackAnim(prev.animate(
               [{ clipPath: 'circle(145% at ' + origin + ')' }, { clipPath: 'circle(0% at ' + origin + ')' }],
               { duration: 640, easing: EASE_CINEMA, fill: 'forwards' }
-            ));
+            ), true);
+            forwardsAnims.push(aOut);
             waits.push(aOut.finished);
             if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 680));
             contentDelay = 200;
@@ -1222,6 +1312,20 @@
           ));
           const aIn = trackAnim(next.animate(
             [{ transform: 'translate3d(' + sx + ',0,0)' }, { transform: 'translate3d(0,0,0)' }],
+            { duration: 640, easing: EASE_CINEMA }
+          ));
+          waits.push(aOut.finished, aIn.finished);
+          if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 740));
+          contentDelay = 260;
+        } else if (kind === 'push-y') {
+          const sy = dir > 0 ? '100%' : '-100%';
+          const oy = dir > 0 ? '-14%' : '14%';
+          const aOut = trackAnim(prev.animate(
+            [{ transform: 'translate3d(0,0,0)' }, { transform: 'translate3d(0,' + oy + ',0)' }],
+            { duration: 640, easing: EASE_CINEMA }
+          ));
+          const aIn = trackAnim(next.animate(
+            [{ transform: 'translate3d(0,' + sy + ',0)' }, { transform: 'translate3d(0,0,0)' }],
             { duration: 640, easing: EASE_CINEMA }
           ));
           waits.push(aOut.finished, aIn.finished);
@@ -1244,7 +1348,8 @@
             const aOut = trackAnim(prev.animate(
               [{ transform: 'translate3d(0,0,0)' }, { transform: 'translate3d(0,100%,0)' }],
               { duration: 560, easing: EASE_CINEMA, fill: 'forwards' }
-            ));
+            ), true);
+            forwardsAnims.push(aOut);
             const aIn = trackAnim(next.animate(
               [{ transform: 'scale(0.95)', opacity: 0.75 }, { transform: 'scale(1)', opacity: 1 }],
               { duration: 560, easing: EASE_CINEMA }
@@ -1288,6 +1393,8 @@
           contentDelay = 120;
         }
 
+        enterDelay = contentDelay;
+
         // Only run slide-entry choreography when landing at step 0 (not when backing into final step)
         if (targetStep === 0) {
           animateSlideContent(next, contentDelay, token, morphedIds);
@@ -1302,9 +1409,13 @@
             hiddenMorphEls.delete(fromEl);
             hiddenMorphEls.delete(toEl);
           }
+          // Hide prev BEFORE canceling forwards animations so there is zero 1-frame flash
           prev.classList.remove('leaving', 'active', 'in-flight');
           prev.style.zIndex = '';
+          prev.style.transform = '';
           prev.style.clipPath = '';
+          forwardsAnims.forEach(cancelAnim);
+          cancelElementAnims(prev);
           clearGuidanceState(prev);
           next.classList.remove('in-flight');
           next.style.zIndex = '';
@@ -1313,13 +1424,18 @@
       }
     }
 
-    if (typeof window.__deckFit === 'function') window.__deckFit();
+    const restAtFinal = Boolean(maxS > 0 && targetStep === maxS && (dir < 0 || (opts && opts.step === 'final')));
     const detail = {
       index: cur,
       slide: next,
       prev,
+      dir,
       instant: skipTransition,
       initial: animateInitial,
+      enterDelay,
+      restAtFinal,
+      still: isStill(),
+      reducedMotion: isReducedMotion(),
       staticMode: isStatic(),
       surface: stage.dataset.activeSurface,
       step: curStep,
@@ -1333,7 +1449,7 @@
     if (isApp(cur)) { back(); return; }
     const sl = slides[cur];
     const maxS = getMaxStep(sl);
-    if (!isStatic() && maxS > 0) {
+    if (!isStill() && maxS > 0) {
       if (d > 0 && curStep < maxS) { setStep(curStep + 1, 1); return; }
       if (d < 0 && curStep > 0) { setStep(curStep - 1, -1); return; }
     }
@@ -1360,26 +1476,48 @@
     lowPower = typeof force === 'boolean' ? force : !lowPower;
     document.body.classList.toggle('low-power', lowPower);
     if (lowPower) {
-      freezeNow();
+      freezeNow(false);
       toast('已切換靜態省電模式（按 B 恢復動態）');
     } else {
       updateCtrlBar();
       toast('已恢復動態播放');
     }
     stage.dispatchEvent(new CustomEvent('deck:lowpower', { detail: { lowPower } }));
+    stage.dispatchEvent(new CustomEvent('deck:reducedmotion', { detail: { reduced: isReducedMotion(), lowPower } }));
     return lowPower;
   }
 
   function setStill(flag) {
     stillMode = Boolean(flag);
     document.documentElement.classList.toggle('still', stillMode);
-    if (stillMode) freezeNow();
+    if (stillMode) freezeNow(true);
     else updateCtrlBar();
     stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: stillMode } }));
+    stage.dispatchEvent(new CustomEvent('deck:reducedmotion', { detail: { reduced: isReducedMotion(), still: stillMode } }));
   }
 
+  // ---------------------------------------------------------------- live beforeprint / afterprint (P / Ctrl+P without ?still=1)
+  let printSnapshot = null;
+  addEventListener('beforeprint', () => {
+    if (printSnapshot) return;
+    printSnapshot = { cur, curStep };
+    navToken++;
+    cleanupFlight(null, null);
+    slides.forEach(sl => snapSlideFinal(sl, true));
+    stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true, printing: true } }));
+  });
+  addEventListener('afterprint', () => {
+    if (!printSnapshot) return;
+    const snap = printSnapshot;
+    printSnapshot = null;
+    if (snap.cur >= 0 && snap.cur < slides.length) {
+      go(snap.cur, true, { step: snap.curStep });
+    }
+    stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: stillMode, printing: false } }));
+  });
+
   // ---------------------------------------------------------------- input handling (keyboard + click + mobile swipe)
-  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], #ctrl-bar, #nav-side, #deck-grid, #deck-annotator, #deck-lightbox, [data-compare-slider], [data-zoomable], [data-ref], input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
+  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], [data-bento-item], [data-rf-item], [data-popup-fold], [data-deck-card], #ctrl-bar, #nav-side, #deck-grid, #deck-annotator, #deck-lightbox, [data-compare-slider], [data-zoomable], [data-ref], input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
 
   addEventListener('keydown', e => {
     const k = e.key;
@@ -1388,6 +1526,7 @@
       if (k === 'Escape') document.activeElement.blur();
       return;
     }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (k === 'Escape') {
       if (closeTopOverlay()) { e.preventDefault(); return; }
       if (isApp(cur)) { e.preventDefault(); back(); return; }
@@ -1441,13 +1580,13 @@
     if (booted) return;
     booted = true;
     const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
-    // Play slide-1 entrance choreography in live mode; snap instantly when static (?still=1 / reduced-motion)
-    go(start - 1, isStatic());
+    // Play slide-1 entrance choreography in live mode; snap instantly when reduced-motion / ?still=1
+    go(start - 1, isReducedMotion());
     if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
   }
 
-  // Auto-takeover: early interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
-  const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], input, select, textarea, button:not(.back):not([data-link])';
+  // Auto-takeover: early pointer or keyboard interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
+  const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], [data-bento-item], [data-rf-item], [data-popup-fold], [data-deck-card], input, select, textarea, button:not(.back):not([data-link])';
   const handleEarlyTakeover = e => {
     const sl = slides[cur];
     if (!sl || !sl.classList.contains('is-focusing')) return;
@@ -1457,6 +1596,11 @@
   };
   stage.addEventListener('pointerdown', handleEarlyTakeover, true);
   stage.addEventListener('input', handleEarlyTakeover, true);
+  stage.addEventListener('keydown', e => {
+    if (['Enter', ' ', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      handleEarlyTakeover(e);
+    }
+  }, true);
 
   window.__deck = {
     go: (n, instant = true, opts) => go(n, instant, opts),
@@ -1474,7 +1618,10 @@
     closeTopOverlay,
     addCtrlButton,
     toast,
+    isStill,
+    isReducedMotion,
     isStatic,
+    stageScale,
     isApp,
     stage,
     count: slides.length,

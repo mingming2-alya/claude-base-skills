@@ -58,8 +58,8 @@
   --quote-weight: 600;
   --number-weight: 900;
   --numeral-weight: 700;
-  --display-tracking: -0.02em;
-  --title-tracking: -0.01em;
+  --display-tracking: 0;
+  --title-tracking: 0;
   --label-tracking: 0.02em;
 
   /* Flexible navigation placement tokens (styles may override) */
@@ -74,10 +74,9 @@
   --nav-accent: var(--accent);
   --nav-border: var(--line-2);
 
-  /* 60fps motion personality tokens (spring | crisp | tactile) */
+  /* 60fps motion personality tokens (spring | crisp | tactile); styles may override --enter-easing */
   --motion-mode: spring;
   --spring-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
   --stagger-base: 64;
   --morph-ms: 780;
 }
@@ -117,6 +116,13 @@
   --nav-active: var(--dark-fg, #F0EFEA);
   --nav-accent: var(--dark-accent, #3ED49C);
   --nav-border: var(--dark-line-2, rgba(240, 239, 234, .14));
+}
+
+/* Enforce counsel architectural zero-radius / zero-shadow law across Layer 2 modules & recipes */
+:where(html[data-style="counsel"]) {
+  --card-radius: 0px;
+  --ctrl-radius: 0px;
+  --card-shadow: none;
 }
 
 html, body {
@@ -424,6 +430,7 @@ mark.em {
   opacity: 0;
   z-index: 4;
 }
+:where([data-ripple], [data-travel]) { opacity: 0; }
 
 /* ---------------------------------------------------------------- navigation modes (top-bar / minimal-side / divider-only) */
 #nav {
@@ -684,6 +691,9 @@ mark.em {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  max-width: calc(100vw - 16px);
+  overflow-x: auto;
+  scrollbar-width: none;
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(15, 18, 24, 0.88);
@@ -695,6 +705,7 @@ mark.em {
   pointer-events: none;
   transition: opacity .24s ease, transform .24s cubic-bezier(0.22, 1, 0.36, 1);
 }
+#ctrl-bar::-webkit-scrollbar { display: none; }
 #ctrl-bar.visible {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
@@ -710,12 +721,20 @@ mark.em {
   padding: 0 10px;
   border-radius: 999px;
   font: 600 13px/1 var(--font-sans-fallback);
+  white-space: nowrap;
+  flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
   cursor: pointer;
   transition: background .16s ease, color .16s ease;
+}
+@media (max-width: 720px) {
+  #ctrl-bar { gap: 4px; padding: 5px 8px; bottom: 10px; }
+  #ctrl-bar .cb-btn { padding: 0 7px; font-size: 12px; height: 28px; min-width: 28px; }
+  #ctrl-bar .cb-pos { padding: 0 5px; font-size: 12px; }
+  #ctrl-bar .cb-sep { display: none; }
 }
 #ctrl-bar .cb-btn:hover { background: rgba(255, 255, 255, 0.12); color: #FFFFFF; }
 #ctrl-bar .cb-btn.is-on { background: rgba(62, 212, 156, 0.22); color: #7BF0C3; }
@@ -838,9 +857,11 @@ body.hide-ctrl #deck-progress {
     transform: none !important;
     clip-path: none !important;
   }
-  .slide * { animation: none !important; }
+  .slide * { animation: none !important; transition: none !important; }
+  .slide [data-focus] { opacity: 1 !important; transform: none !important; box-shadow: none !important; }
   .slide [data-step-hidden="1"] { display: none !important; }
-  .slide [data-step]:not([data-step-hidden="1"]) { opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .slide [data-step]:not([data-step-hidden="1"]),
+  .slide [data-step-only]:not([data-step-hidden="1"]) { opacity: 1 !important; visibility: visible !important; transform: none !important; }
   .toc li.off { opacity: .28 !important; }
   .snav {
     display: flex;
@@ -964,16 +985,21 @@ body.hide-ctrl #deck-progress {
   pointer-events: none;
 }
 #deck-grid .dg-thumb-stage .slide {
-  display: flex !important;
   opacity: 1 !important;
   visibility: visible !important;
   position: absolute !important;
   inset: 0 !important;
   transform: none !important;
+  clip-path: none !important;
 }
 #deck-grid .dg-thumb-stage [data-step-hidden="1"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+#deck-grid .dg-thumb-stage [data-focus] {
   opacity: 1 !important;
-  visibility: visible !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 #deck-grid .dg-meta {
   display: flex;
@@ -1039,6 +1065,9 @@ html.still #deck-grid { display: none !important; }
   z-index: 92;
   display: none;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: calc(100vw - 16px);
   gap: 8px;
   padding: 8px 14px;
   border-radius: 999px;
@@ -1052,6 +1081,16 @@ html.still #deck-grid { display: none !important; }
 }
 #deck-annotator-bar.show {
   display: inline-flex;
+}
+@media (max-width: 720px) {
+  #deck-annotator-bar {
+    top: 10px;
+    right: 8px;
+    left: 8px;
+    border-radius: 16px;
+    padding: 6px 10px;
+    gap: 5px;
+  }
 }
 #deck-annotator-bar .dab-btn {
   appearance: none;
@@ -1286,125 +1325,125 @@ html.still #deck-laser {
 }
 
 /* 01-cover.html */
-#s-1{ background: var(--bg); color: var(--fg); }
-#s-1 .band{ position: absolute; right: 0; top: 0; bottom: 0; width: 420px; background: var(--accent); color: var(--accent-ink); padding: 72px 52px; display: flex; flex-direction: column; justify-content: space-between; }
-#s-1 .band-kicker{ font-weight: 700; font-size: 20px; letter-spacing: .06em; color: var(--accent-sub); }
-#s-1 .band-stat .big{ font: 900 124px/.9 var(--font-number); letter-spacing: -.04em; }
-#s-1 .band-stat .big small{ font-size: 44px; font-weight: 700; }
-#s-1 .band-stat p{ margin-top: 14px; font-weight: 500; font-size: 24px; line-height: 1.45; color: var(--accent-sub); }
-#s-1 .main{ position: absolute; left: 96px; top: 96px; right: 492px; bottom: 92px; display: flex; flex-direction: column; justify-content: space-between; }
-#s-1 .kicker{ font-weight: 700; font-size: 22px; color: var(--accent-text); letter-spacing: .04em; }
-#s-1 h1{ font-weight: 900; font-size: 112px; line-height: 1.08; letter-spacing: -.025em; margin-top: 28px; }
-#s-1 .sub{ margin-top: 28px; font-weight: 500; font-size: 36px; line-height: 1.48; color: var(--fg-2); max-width: 1080px; }
-#s-1 .route{ display: grid; grid-template-columns: 1.2fr repeat(3, 1fr); gap: 32px; padding-top: 24px; border-top: 2px solid var(--fg); }
-#s-1 .route i{ display: block; font-style: normal; font-weight: 700; font-size: 20px; color: var(--fg-3); margin-bottom: 6px; font-family: var(--font-number); }
-#s-1 .route span{ font-weight: 700; font-size: 24px; color: var(--fg); }
+.slide[data-slide-scope="s-1"]{ background: var(--bg); color: var(--fg); }
+[data-slide-scope="s-1"] .band{ position: absolute; right: 0; top: 0; bottom: 0; width: 420px; background: var(--accent); color: var(--accent-ink); padding: 72px 52px; display: flex; flex-direction: column; justify-content: space-between; }
+[data-slide-scope="s-1"] .band-kicker{ font-weight: 700; font-size: 20px; letter-spacing: .06em; color: var(--accent-sub); }
+[data-slide-scope="s-1"] .band-stat .big{ font: 900 124px/.9 var(--font-number); letter-spacing: -.04em; }
+[data-slide-scope="s-1"] .band-stat .big small{ font-size: 44px; font-weight: 700; }
+[data-slide-scope="s-1"] .band-stat p{ margin-top: 14px; font-weight: 500; font-size: 24px; line-height: 1.45; color: var(--accent-sub); }
+[data-slide-scope="s-1"] .main{ position: absolute; left: 96px; top: 96px; right: 492px; bottom: 92px; display: flex; flex-direction: column; justify-content: space-between; }
+[data-slide-scope="s-1"] .kicker{ font-weight: 700; font-size: 22px; color: var(--accent-text); letter-spacing: .04em; }
+[data-slide-scope="s-1"] h1{ font-weight: 900; font-size: 112px; line-height: 1.08; letter-spacing: -.025em; margin-top: 28px; }
+[data-slide-scope="s-1"] .sub{ margin-top: 28px; font-weight: 500; font-size: 36px; line-height: 1.48; color: var(--fg-2); max-width: 1080px; }
+[data-slide-scope="s-1"] .route{ display: grid; grid-template-columns: 1.2fr repeat(3, 1fr); gap: 32px; padding-top: 24px; border-top: 2px solid var(--fg); }
+[data-slide-scope="s-1"] .route i{ display: block; font-style: normal; font-weight: 700; font-size: 20px; color: var(--fg-3); margin-bottom: 6px; font-family: var(--font-number); }
+[data-slide-scope="s-1"] .route span{ font-weight: 700; font-size: 24px; color: var(--fg); }
 /* 02-pain.html */
-#s-2 .slide-nav{ position: absolute; left: 88px; top: 44px; }
-#s-2 .head{ position: absolute; left: 88px; right: 88px; top: 118px; }
-#s-2 h2.title{ font-weight: 900; font-size: 86px; line-height: 1.1; letter-spacing: -.02em; }
-#s-2 p.lead{ margin-top: 20px; font-weight: 500; font-size: 32px; line-height: 1.48; color: var(--fg); max-width: 1360px; }
-#s-2 p.lead em{ font-style: normal; font-weight: 900; color: var(--late); }
-#s-2 .grid{ position: absolute; left: 88px; right: 88px; top: 368px; bottom: 110px; display: grid; grid-template-columns: 760px 1fr; gap: 72px; align-items: end; }
-#s-2 .hero-box{ border-top: 4px solid var(--late); padding-top: 30px; }
-#s-2 .hero-num{ font: 900 228px/.86 var(--font-number); letter-spacing: -.045em; color: var(--late); font-variant-numeric: tabular-nums; }
-#s-2 .hero-num small{ font-size: 84px; font-weight: 700; margin-left: 6px; }
-#s-2 .hero-lbl{ margin-top: 24px; font-weight: 700; font-size: 32px; color: var(--fg); }
-#s-2 .hero-sub{ margin-top: 10px; font-weight: 400; font-size: 24px; line-height: 1.5; color: var(--fg-2); }
-#s-2 .causes{ border-top: 2px solid var(--fg); }
-#s-2 .cause{ display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding: 30px 0; border-bottom: 1px solid var(--line-2); align-items: baseline; }
-#s-2 .cause .cn{ font: 900 54px/1 var(--font-number); color: var(--fg); font-variant-numeric: tabular-nums; }
-#s-2 .cause strong{ display: block; font-weight: 700; font-size: 28px; color: var(--fg); }
-#s-2 .cause span{ display: block; margin-top: 8px; font-weight: 400; font-size: 22px; line-height: 1.48; color: var(--fg-2); }
-#s-2 .src{ position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+[data-slide-scope="s-2"] .slide-nav{ position: absolute; left: 88px; top: 44px; }
+[data-slide-scope="s-2"] .head{ position: absolute; left: 88px; right: 88px; top: 118px; }
+[data-slide-scope="s-2"] h2.title{ font-weight: 900; font-size: 86px; line-height: 1.1; letter-spacing: -.02em; }
+[data-slide-scope="s-2"] p.lead{ margin-top: 20px; font-weight: 500; font-size: 32px; line-height: 1.48; color: var(--fg); max-width: 1360px; }
+[data-slide-scope="s-2"] p.lead em{ font-style: normal; font-weight: 900; color: var(--late); }
+[data-slide-scope="s-2"] .grid{ position: absolute; left: 88px; right: 88px; top: 368px; bottom: 110px; display: grid; grid-template-columns: 760px 1fr; gap: 72px; align-items: end; }
+[data-slide-scope="s-2"] .hero-box{ border-top: 4px solid var(--late); padding-top: 30px; }
+[data-slide-scope="s-2"] .hero-num{ font: 900 228px/.86 var(--font-number); letter-spacing: -.045em; color: var(--late); font-variant-numeric: tabular-nums; }
+[data-slide-scope="s-2"] .hero-num small{ font-size: 84px; font-weight: 700; margin-left: 6px; }
+[data-slide-scope="s-2"] .hero-lbl{ margin-top: 24px; font-weight: 700; font-size: 32px; color: var(--fg); }
+[data-slide-scope="s-2"] .hero-sub{ margin-top: 10px; font-weight: 400; font-size: 24px; line-height: 1.5; color: var(--fg-2); }
+[data-slide-scope="s-2"] .causes{ border-top: 2px solid var(--fg); }
+[data-slide-scope="s-2"] .cause{ display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding: 30px 0; border-bottom: 1px solid var(--line-2); align-items: baseline; }
+[data-slide-scope="s-2"] .cause .cn{ font: 900 54px/1 var(--font-number); color: var(--fg); font-variant-numeric: tabular-nums; }
+[data-slide-scope="s-2"] .cause strong{ display: block; font-weight: 700; font-size: 28px; color: var(--fg); }
+[data-slide-scope="s-2"] .cause span{ display: block; margin-top: 8px; font-weight: 400; font-size: 22px; line-height: 1.48; color: var(--fg-2); }
+[data-slide-scope="s-2"] .src{ position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
 /* 03-chart.html */
-#s-3 .slide-nav{ position: absolute; left: 88px; top: 44px; }
-#s-3 .left{ position: absolute; left: 88px; top: 122px; width: 680px; bottom: 84px; display: flex; flex-direction: column; }
-#s-3 h2.title{ font-weight: 900; font-size: 84px; line-height: 1.1; letter-spacing: -.02em; }
-#s-3 p.lead{ margin-top: 24px; font-weight: 500; font-size: 32px; line-height: 1.5; color: var(--fg); }
-#s-3 p.lead em{ font-style: normal; font-weight: 900; color: var(--accent-text); white-space: nowrap; }
-#s-3 .ev{ margin-top: 46px; border-top: 2px solid var(--fg); }
-#s-3 .ev-row{ display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--line-2); }
-#s-3 .ev-num{ font: 900 64px/1 var(--font-number); font-variant-numeric: tabular-nums; color: var(--fg); letter-spacing: -.03em; }
-#s-3 .ev-num .u{ font-weight: 700; font-size: 24px; margin-left: 4px; color: var(--fg-2); font-family: var(--font-body); }
-#s-3 .ev-num.hi{ color: var(--accent-text); }
-#s-3 .ev-txt strong{ display: block; font-weight: 700; font-size: 25px; color: var(--fg); }
-#s-3 .ev-txt span{ display: block; margin-top: 6px; font-weight: 400; font-size: 21px; line-height: 1.45; color: var(--fg-2); }
-#s-3 .src{ position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
-#s-3 .detail-btn{ position: absolute; left: 88px; bottom: 94px; padding: 11px 22px; border: 1.5px solid var(--fg); background: var(--bg); color: var(--fg); font-weight: 700; font-size: 20px; cursor: pointer; }
-#s-3 .detail-btn:hover{ background: var(--fg); color: var(--bg); }
+[data-slide-scope="s-3"] .slide-nav{ position: absolute; left: 88px; top: 44px; }
+[data-slide-scope="s-3"] .left{ position: absolute; left: 88px; top: 122px; width: 680px; bottom: 84px; display: flex; flex-direction: column; }
+[data-slide-scope="s-3"] h2.title{ font-weight: 900; font-size: 84px; line-height: 1.1; letter-spacing: -.02em; }
+[data-slide-scope="s-3"] p.lead{ margin-top: 24px; font-weight: 500; font-size: 32px; line-height: 1.5; color: var(--fg); }
+[data-slide-scope="s-3"] p.lead em{ font-style: normal; font-weight: 900; color: var(--accent-text); white-space: nowrap; }
+[data-slide-scope="s-3"] .ev{ margin-top: 46px; border-top: 2px solid var(--fg); }
+[data-slide-scope="s-3"] .ev-row{ display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--line-2); }
+[data-slide-scope="s-3"] .ev-num{ font: 900 64px/1 var(--font-number); font-variant-numeric: tabular-nums; color: var(--fg); letter-spacing: -.03em; }
+[data-slide-scope="s-3"] .ev-num .u{ font-weight: 700; font-size: 24px; margin-left: 4px; color: var(--fg-2); font-family: var(--font-body); }
+[data-slide-scope="s-3"] .ev-num.hi{ color: var(--accent-text); }
+[data-slide-scope="s-3"] .ev-txt strong{ display: block; font-weight: 700; font-size: 25px; color: var(--fg); }
+[data-slide-scope="s-3"] .ev-txt span{ display: block; margin-top: 6px; font-weight: 400; font-size: 21px; line-height: 1.45; color: var(--fg-2); }
+[data-slide-scope="s-3"] .src{ position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+[data-slide-scope="s-3"] .detail-btn{ position: absolute; left: 88px; bottom: 94px; padding: 11px 22px; border: 1.5px solid var(--fg); background: var(--bg); color: var(--fg); font-weight: 700; font-size: 20px; cursor: pointer; }
+[data-slide-scope="s-3"] .detail-btn:hover{ background: var(--fg); color: var(--bg); }
 
-#s-3 .chart{ position: absolute; left: 836px; right: 84px; top: 116px; bottom: 0; }
-#s-3 .target-line{ position: absolute; left: 0; right: 0; bottom: 480px; border-top: 2.5px dashed var(--fg); z-index: 6; }
-#s-3 .target-tag{ position: absolute; left: 0; top: -38px; font-weight: 700; font-size: 21px; color: var(--fg); background: var(--bg); padding: 4px 10px 4px 0; }
-#s-3 .bars{ position: absolute; left: 0; right: 0; bottom: 0; top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: end; }
-#s-3 .bar-col{ position: relative; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
-#s-3 .block{ position: relative; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 26px 32px; }
-#s-3 .block.best{ height: 336px; background: var(--accent); color: var(--accent-ink); }
-#s-3 .block.mid{ height: 784px; background: var(--gray); color: var(--fg); }
-#s-3 .block.high{ height: 880px; background: var(--gray2); color: var(--fg); }
-#s-3 .over{ position: absolute; left: 0; right: 0; top: 0;
+[data-slide-scope="s-3"] .chart{ position: absolute; left: 836px; right: 84px; top: 116px; bottom: 0; }
+[data-slide-scope="s-3"] .target-line{ position: absolute; left: 0; right: 0; bottom: 480px; border-top: 2.5px dashed var(--fg); z-index: 6; }
+[data-slide-scope="s-3"] .target-tag{ position: absolute; left: 0; top: -38px; font-weight: 700; font-size: 21px; color: var(--fg); background: var(--bg); padding: 4px 10px 4px 0; }
+[data-slide-scope="s-3"] .bars{ position: absolute; left: 0; right: 0; bottom: 0; top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; align-items: end; }
+[data-slide-scope="s-3"] .bar-col{ position: relative; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+[data-slide-scope="s-3"] .block{ position: relative; width: 100%; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 26px 32px; }
+[data-slide-scope="s-3"] .block.best{ height: 336px; background: var(--accent); color: var(--accent-ink); }
+[data-slide-scope="s-3"] .block.mid{ height: 784px; background: var(--gray); color: var(--fg); }
+[data-slide-scope="s-3"] .block.high{ height: 880px; background: var(--gray2); color: var(--fg); }
+[data-slide-scope="s-3"] .over{ position: absolute; left: 0; right: 0; top: 0;
   background: repeating-linear-gradient(-45deg, rgba(181,56,31,.24) 0 10px, rgba(232,194,182,.55) 10px 20px);
   border-bottom: 2px solid var(--late); }
-#s-3 .block.mid .over{ height: 304px; }
-#s-3 .block.high .over{ height: 400px; }
-#s-3 .gap-pill{ position: absolute; left: 24px; top: 24px; background: var(--late); color: #FAF6F2; padding: 10px 16px; z-index: 7; }
-#s-3 .gap-pill strong{ display: block; font: 900 38px/1 var(--font-number); font-variant-numeric: tabular-nums; }
-#s-3 .gap-pill span{ display: block; margin-top: 4px; font-weight: 500; font-size: 18px; }
-#s-3 .val{ font: 900 128px/.9 var(--font-number); font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
-#s-3 .val small{ font: 700 44px/1 var(--font-number); margin-left: 4px; }
-#s-3 .meta{ margin-top: 14px; font-weight: 700; font-size: 26px; }
-#s-3 .sub{ margin-top: 4px; font-weight: 500; font-size: 20px; opacity: .88; }
-#s-3 .block.best .sub{ color: var(--accent-sub); opacity: 1; }
+[data-slide-scope="s-3"] .block.mid .over{ height: 304px; }
+[data-slide-scope="s-3"] .block.high .over{ height: 400px; }
+[data-slide-scope="s-3"] .gap-pill{ position: absolute; left: 24px; top: 24px; background: var(--late); color: #FAF6F2; padding: 10px 16px; z-index: 7; }
+[data-slide-scope="s-3"] .gap-pill strong{ display: block; font: 900 38px/1 var(--font-number); font-variant-numeric: tabular-nums; }
+[data-slide-scope="s-3"] .gap-pill span{ display: block; margin-top: 4px; font-weight: 500; font-size: 18px; }
+[data-slide-scope="s-3"] .val{ font: 900 128px/.9 var(--font-number); font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+[data-slide-scope="s-3"] .val small{ font: 700 44px/1 var(--font-number); margin-left: 4px; }
+[data-slide-scope="s-3"] .meta{ margin-top: 14px; font-weight: 700; font-size: 26px; }
+[data-slide-scope="s-3"] .sub{ margin-top: 4px; font-weight: 500; font-size: 20px; opacity: .88; }
+[data-slide-scope="s-3"] .block.best .sub{ color: var(--accent-sub); opacity: 1; }
 /* 04-scene.html */
-#s-4 .slide-nav{ position: absolute; left: 88px; top: 44px; }
-#s-4 .head{ position: absolute; left: 88px; top: 118px; max-width: 1200px; }
-#s-4 h2.title{ font-weight: 900; font-size: 82px; line-height: 1.1; letter-spacing: -.02em; }
-#s-4 p.lead{ margin-top: 18px; font-weight: 500; font-size: 32px; line-height: 1.48; color: var(--fg); }
-#s-4 p.lead em{ font-style: normal; font-weight: 900; color: var(--accent-text); }
-#s-4 .cards{ position: absolute; left: 88px; right: 88px; top: 368px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
-#s-4 .step{ background: rgba(241, 239, 234, .92); border-top: 3px solid var(--fg); padding: 26px 28px; }
-#s-4 .step.active{ border-top-color: var(--accent); }
-#s-4 .step .t0{ font: 900 22px/1 var(--font-number); color: var(--accent-text); letter-spacing: .02em; }
-#s-4 .step h3{ margin-top: 12px; font-weight: 800; font-size: 32px; color: var(--fg); }
-#s-4 .step p{ margin-top: 10px; font-weight: 400; font-size: 23px; line-height: 1.5; color: var(--fg-2); }
-#s-4 .foot-note{ position: absolute; left: 88px; bottom: 42px; font-weight: 500; font-size: 20px; color: var(--fg-3); }
+[data-slide-scope="s-4"] .slide-nav{ position: absolute; left: 88px; top: 44px; }
+[data-slide-scope="s-4"] .head{ position: absolute; left: 88px; top: 118px; max-width: 1200px; }
+[data-slide-scope="s-4"] h2.title{ font-weight: 900; font-size: 82px; line-height: 1.1; letter-spacing: -.02em; }
+[data-slide-scope="s-4"] p.lead{ margin-top: 18px; font-weight: 500; font-size: 32px; line-height: 1.48; color: var(--fg); }
+[data-slide-scope="s-4"] p.lead em{ font-style: normal; font-weight: 900; color: var(--accent-text); }
+[data-slide-scope="s-4"] .cards{ position: absolute; left: 88px; right: 88px; top: 368px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; }
+[data-slide-scope="s-4"] .step{ background: rgba(241, 239, 234, .92); border-top: 3px solid var(--fg); padding: 26px 28px; }
+[data-slide-scope="s-4"] .step.active{ border-top-color: var(--accent); }
+[data-slide-scope="s-4"] .step .t0{ font: 900 22px/1 var(--font-number); color: var(--accent-text); letter-spacing: .02em; }
+[data-slide-scope="s-4"] .step h3{ margin-top: 12px; font-weight: 800; font-size: 32px; color: var(--fg); }
+[data-slide-scope="s-4"] .step p{ margin-top: 10px; font-weight: 400; font-size: 23px; line-height: 1.5; color: var(--fg-2); }
+[data-slide-scope="s-4"] .foot-note{ position: absolute; left: 88px; bottom: 42px; font-weight: 500; font-size: 20px; color: var(--fg-3); }
 /* 05-shock.html */
-#s-5{ background: var(--shock-bg); color: var(--shock-fg); }
-#s-5 .wrap{ position: absolute; left: 120px; right: 120px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
-#s-5 .shock-text{ font-weight: 900; font-size: 108px; line-height: 1.15; letter-spacing: -.02em; max-width: 1640px; }
-#s-5 .shock-text em{ font-style: normal; color: var(--shock-em); }
-#s-5 .shock-sub{ margin-top: 38px; font-weight: 500; font-size: 38px; line-height: 1.45; color: #B8BDC6; }
-#s-5 .src{ position: absolute; left: 120px; bottom: 44px; font-size: 19px; color: #8E949E; }
+.slide[data-slide-scope="s-5"]{ background: var(--shock-bg); color: var(--shock-fg); }
+[data-slide-scope="s-5"] .wrap{ position: absolute; left: 120px; right: 120px; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+[data-slide-scope="s-5"] .shock-text{ font-weight: 900; font-size: 108px; line-height: 1.15; letter-spacing: -.02em; max-width: 1640px; }
+[data-slide-scope="s-5"] .shock-text em{ font-style: normal; color: var(--shock-em); }
+[data-slide-scope="s-5"] .shock-sub{ margin-top: 38px; font-weight: 500; font-size: 38px; line-height: 1.45; color: #B8BDC6; }
+[data-slide-scope="s-5"] .src{ position: absolute; left: 120px; bottom: 44px; font-size: 19px; color: #8E949E; }
 /* 07-closing.html */
-#s-7{ background: var(--accent); color: var(--accent-ink); }
-#s-7 .wrap{ position: absolute; left: 120px; right: 120px; top: 140px; bottom: 120px; display: flex; flex-direction: column; justify-content: space-between; }
-#s-7 .kicker{ font-weight: 700; font-size: 22px; color: var(--accent-sub); letter-spacing: .06em; }
-#s-7 h2{ font-weight: 900; font-size: 98px; line-height: 1.14; letter-spacing: -.02em; max-width: 1520px; }
-#s-7 .sub{ margin-top: 28px; font-weight: 500; font-size: 34px; line-height: 1.5; color: var(--accent-sub); max-width: 1460px; }
-#s-7 .actions{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; border-top: 1.5px solid rgba(244,242,236,.35); padding-top: 28px; }
-#s-7 .actions strong{ display: block; font-weight: 700; font-size: 24px; color: var(--accent-ink); }
-#s-7 .actions span{ display: block; margin-top: 8px; font-weight: 400; font-size: 21px; line-height: 1.45; color: var(--accent-sub); }
+.slide[data-slide-scope="s-7"]{ background: var(--accent); color: var(--accent-ink); }
+[data-slide-scope="s-7"] .wrap{ position: absolute; left: 120px; right: 120px; top: 140px; bottom: 120px; display: flex; flex-direction: column; justify-content: space-between; }
+[data-slide-scope="s-7"] .kicker{ font-weight: 700; font-size: 22px; color: var(--accent-sub); letter-spacing: .06em; }
+[data-slide-scope="s-7"] h2{ font-weight: 900; font-size: 98px; line-height: 1.14; letter-spacing: -.02em; max-width: 1520px; }
+[data-slide-scope="s-7"] .sub{ margin-top: 28px; font-weight: 500; font-size: 34px; line-height: 1.5; color: var(--accent-sub); max-width: 1460px; }
+[data-slide-scope="s-7"] .actions{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; border-top: 1.5px solid rgba(244,242,236,.35); padding-top: 28px; }
+[data-slide-scope="s-7"] .actions strong{ display: block; font-weight: 700; font-size: 24px; color: var(--accent-ink); }
+[data-slide-scope="s-7"] .actions span{ display: block; margin-top: 8px; font-weight: 400; font-size: 21px; line-height: 1.45; color: var(--accent-sub); }
 /* app-model.html */
-#s-8 .head{ position: absolute; left: 88px; right: 240px; top: 72px; }
-#s-8 .kicker{ font-weight: 700; font-size: 20px; color: var(--accent-text); letter-spacing: .04em; margin-bottom: 10px; }
-#s-8 h2.title{ font-weight: 900; font-size: 72px; line-height: 1.12; }
-#s-8 .cols{ position: absolute; left: 88px; right: 88px; top: 258px; bottom: 96px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
-#s-8 .box{ border-top: 2.5px solid var(--fg); padding-top: 26px; }
-#s-8 .box.warn{ border-top-color: var(--late); }
-#s-8 .box h3{ font-weight: 800; font-size: 32px; margin-bottom: 24px; }
-#s-8 .box.warn h3{ color: var(--late); }
-#s-8 ul{ list-style: none; display: flex; flex-direction: column; gap: 20px; }
-#s-8 li{ font-weight: 500; font-size: 25px; line-height: 1.5; padding-left: 26px; position: relative; color: var(--fg); }
-#s-8 li::before{ content: ""; position: absolute; left: 0; top: .68em; width: 12px; height: 3px; background: var(--accent); }
-#s-8 .box.warn li::before{ background: var(--late); }
-#s-8 .src{ position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
+[data-slide-scope="s-8"] .head{ position: absolute; left: 88px; right: 240px; top: 72px; }
+[data-slide-scope="s-8"] .kicker{ font-weight: 700; font-size: 20px; color: var(--accent-text); letter-spacing: .04em; margin-bottom: 10px; }
+[data-slide-scope="s-8"] h2.title{ font-weight: 900; font-size: 72px; line-height: 1.12; }
+[data-slide-scope="s-8"] .cols{ position: absolute; left: 88px; right: 88px; top: 258px; bottom: 96px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+[data-slide-scope="s-8"] .box{ border-top: 2.5px solid var(--fg); padding-top: 26px; }
+[data-slide-scope="s-8"] .box.warn{ border-top-color: var(--late); }
+[data-slide-scope="s-8"] .box h3{ font-weight: 800; font-size: 32px; margin-bottom: 24px; }
+[data-slide-scope="s-8"] .box.warn h3{ color: var(--late); }
+[data-slide-scope="s-8"] ul{ list-style: none; display: flex; flex-direction: column; gap: 20px; }
+[data-slide-scope="s-8"] li{ font-weight: 500; font-size: 25px; line-height: 1.5; padding-left: 26px; position: relative; color: var(--fg); }
+[data-slide-scope="s-8"] li::before{ content: ""; position: absolute; left: 0; top: .68em; width: 12px; height: 3px; background: var(--accent); }
+[data-slide-scope="s-8"] .box.warn li::before{ background: var(--late); }
+[data-slide-scope="s-8"] .src{ position: absolute; left: 88px; bottom: 38px; font-size: 19px; color: var(--fg-3); }
 </style>
 </head>
 <body>
 <div id="viewport"><div id="stage">
 <div id="nav"></div><div id="tabs"></div>
-<section class="slide canvas" id="s-1" data-kind="cover" data-chi="-1" data-tab="0" data-tabs="1" data-notes="">
+<section class="slide canvas" id="s-1" data-slide-scope="s-1" data-kind="cover" data-chi="-1" data-tab="0" data-tabs="1" data-notes="">
   <div class="band">
     <div class="band-kicker">PILOT RESULT</div>
     <div class="band-stat">
@@ -1427,7 +1466,7 @@ html.still #deck-laser {
     </div>
   </div>
 </section>
-<section class="slide canvas" data-nav="inline" id="s-2" data-kind="content" data-chi="0" data-tab="0" data-tabs="1" data-notes="先用單店真實損耗把問題具象化，說明人工估量在雨天與假日誤差最大。">
+<section class="slide canvas" data-nav="inline" id="s-2" data-slide-scope="s-2" data-kind="content" data-chi="0" data-tab="0" data-tabs="1" data-notes="先用單店真實損耗把問題具象化，說明人工估量在雨天與假日誤差最大。">
   <nav class="slide-nav" data-auto-nav><b class="on">現況痛點</b><span>試點成果</span><span>導入節奏</span></nav>
   <header class="head">
     <h2 class="title" data-role="title">報廢的代價</h2>
@@ -1456,7 +1495,7 @@ html.still #deck-laser {
   </div>
   <p class="src">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（板橋、東區兩店常態營運日）</p>
 </section>
-<section class="slide canvas" data-nav="inline" id="s-3" data-kind="content" data-chi="1" data-tab="0" data-tabs="2" data-notes="試點數據僅涵蓋常態 8 週，尚未計入中秋禮盒檔期；若被問及演算法細節可點右下角進入附件。">
+<section class="slide canvas" data-nav="inline" id="s-3" data-slide-scope="s-3" data-kind="content" data-chi="1" data-tab="0" data-tabs="2" data-notes="試點數據僅涵蓋常態 8 週，尚未計入中秋禮盒檔期；若被問及演算法細節可點右下角進入附件。">
   <nav class="slide-nav" data-auto-nav><span>現況痛點</span><b class="on">試點成果</b><span>導入節奏</span></nav>
   <div class="left">
     <h2 class="title" data-role="title">三門市報廢率</h2>
@@ -1507,7 +1546,7 @@ html.still #deck-laser {
   </div>
   <p class="src">資料來源：星塵烘焙 2026 Q3 門市日結紀錄（試點 8 週，不含中秋禮盒檔期）</p>
 </section>
-<section class="slide canvas" data-nav="inline" id="s-4" data-kind="content" data-chi="1" data-tab="1" data-tabs="2" data-notes="這頁同時示範零等待程式插畫與可替換 AI 升級插槽（bakery-flow）；提醒門市須維持收銀機網路連線。">
+<section class="slide canvas" data-nav="inline" id="s-4" data-slide-scope="s-4" data-kind="content" data-chi="1" data-tab="1" data-tabs="2" data-notes="這頁同時示範零等待程式插畫與可替換 AI 升級插槽（bakery-flow）；提醒門市須維持收銀機網路連線。">
   <div class="asset-slot" data-slot="bakery-flow" data-mode="light">
     <svg viewBox="0 0 1920 1080" aria-hidden="true">
       <defs>
@@ -1568,7 +1607,7 @@ html.still #deck-laser {
   </div>
   <p class="foot-note">前提條件：門市須維持既有收銀機網路連線以利凌晨自動回傳日結資料。</p>
 </section>
-<section class="slide canvas" data-nav="none" id="s-5" data-kind="shock" data-chi="-1" data-tab="0" data-tabs="1" data-notes="停頓兩秒再切到進度與風險總覽。">
+<section class="slide canvas" data-nav="none" id="s-5" data-slide-scope="s-5" data-kind="shock" data-chi="-1" data-tab="0" data-tabs="1" data-notes="停頓兩秒再切到進度與風險總覽。">
   <div class="wrap">
     <p class="shock-text" data-role="shock" data-fit="phrase">少丟 1 盤麵包，<br>門市淨利多 <em>1.8%</em></p>
     <p class="shock-sub">五家主力門市同步導入，預估年省 170 萬原料成本。</p>
@@ -1576,7 +1615,7 @@ html.still #deck-laser {
   <p class="src">資料來源：財務部 2026 單店損益模型試算（常態營運週期推估）</p>
 </section>
 <section class="slide status" id="s-6" data-kind="status" data-chi="-1" data-notes="此頁由底盤商務元件 status-table 直接生成，展示自由畫布與高紀律工作頁無縫混搭。"><header class="st-head"><h2 class="title" data-role="title">五店導入進度與風險</h2><div class="legend"><span><i class="st-done"></i>已完成</span><span><i class="st-doing"></i>進行中</span><span><i class="st-target"></i>目標</span><span class="dot dot-red"></span>需介入<span class="dot dot-yellow"></span>注意<span class="dot dot-green"></span>正常</div></header><div class="st-body"><ul class='st-summary'><li>北區三店：信義店已上線且報廢降至 <mark class="em">4.2%</mark>；板橋店卡在收銀回傳排程，需資訊組協助</li><li>中南二店：台中店本週啟動網路健檢；高雄店排定 12/15 接棒，目前無風險</li></ul><table class='status-table'><thead><tr><th class='c-name'>項目</th><th class='c-owner'>負責</th><th>網路健檢</th><th>日結串接</th><th>店長培訓</th><th>正式上線</th><th class='c-prog'>進度</th><th class='c-risk'>風險</th><th class='c-sup'>需要的支援</th></tr></thead><tbody><tr class='grp'><td colspan='9'>北區主力門市</td></tr><tr class='rk-red'><td class='c-name'>板橋車站店</td><td class='c-owner'>林組長</td><td class='st st-done'><i></i><b>11/02</b> 已完成</td><td class='st st-doing'><i></i><b>11/24</b> 進行中</td><td class='st st-target'><i></i><b>11/28</b> 目標</td><td class='st st-target'><i></i><b>12/01</b> 目標</td><td class='c-prog'><span class='bar'><span style='width:45%'></span></span>45%</td><td class='c-risk'><span class='dot dot-red'></span>需介入</td><td class='c-sup'>資訊組本週五前修正收銀機夜間自動回傳</td></tr><tr class='rk-yellow'><td class='c-name'>東區概念店</td><td class='c-owner'>陳店長</td><td class='st st-done'><i></i><b>11/05</b> 已完成</td><td class='st st-done'><i></i><b>11/14</b> 已完成</td><td class='st st-doing'><i></i><b>11/22</b> 進行中</td><td class='st st-target'><i></i><b>11/26</b> 目標</td><td class='c-prog'><span class='bar'><span style='width:75%'></span></span>75%</td><td class='c-risk'><span class='dot dot-yellow'></span>注意</td><td class='c-sup'>需區經理確認假日限定款是否納入預報</td></tr><tr class='rk-green'><td class='c-name'>信義旗艦店</td><td class='c-owner'>王店長</td><td class='st st-done'><i></i><b>09/01</b> 已完成</td><td class='st st-done'><i></i><b>09/08</b> 已完成</td><td class='st st-done'><i></i><b>09/15</b> 已完成</td><td class='st st-done'><i></i><b>09/20</b> 已完成</td><td class='c-prog'><span class='bar'><span style='width:100%'></span></span>100%</td><td class='c-risk'><span class='dot dot-green'></span>正常</td><td class='c-sup'>試點標竿，協助培訓新店</td></tr><tr class='grp'><td colspan='9'>中南主力門市</td></tr><tr class='rk-green'><td class='c-name'>台中公益店</td><td class='c-owner'>吳店長</td><td class='st st-doing'><i></i><b>11/25</b> 進行中</td><td class='st st-target'><i></i><b>12/02</b> 目標</td><td class='st st-target'><i></i><b>12/08</b> 目標</td><td class='st st-target'><i></i><b>12/12</b> 目標</td><td class='c-prog'><span class='bar'><span style='width:25%'></span></span>25%</td><td class='c-risk'><span class='dot dot-green'></span>正常</td><td class='c-sup'>進度正常</td></tr><tr class='rk-green'><td class='c-name'>高雄巨蛋店</td><td class='c-owner'>鄭店長</td><td class='st st-target'><i></i><b>12/01</b> 目標</td><td class='st st-target'><i></i><b>12/08</b> 目標</td><td class='st st-target'><i></i><b>12/12</b> 目標</td><td class='st st-target'><i></i><b>12/15</b> 目標</td><td class='c-prog'><span class='bar'><span style='width:10%'></span></span>10%</td><td class='c-risk'><span class='dot dot-green'></span>正常</td><td class='c-sup'>進度正常</td></tr></tbody></table></div><p class="source">資料來源：營運企劃組 2026/11/19 週進度彙整</p><div class="pageno">06</div></section>
-<section class="slide canvas" data-nav="none" id="s-7" data-kind="closing" data-chi="-1" data-tab="0" data-tabs="1" data-notes="">
+<section class="slide canvas" data-nav="none" id="s-7" data-slide-scope="s-7" data-kind="closing" data-chi="-1" data-tab="0" data-tabs="1" data-notes="">
   <div class="wrap">
     <div class="kicker">DECISION NEEDED · 2026 Q4</div>
     <div>
@@ -1590,7 +1629,7 @@ html.still #deck-laser {
     </div>
   </div>
 </section>
-<section class="slide canvas" data-nav="none" id="s-8" data-kind="content" data-chi="1" data-tab="0" data-tabs="1" data-notes="現場被追問演算法與節慶限制時點入，按 Esc 或右上返回鍵回到第 3 頁。" data-appendix="1" data-id="model-detail"><button class="back" type="button">← 返回</button>
+<section class="slide canvas" data-nav="none" id="s-8" data-slide-scope="s-8" data-kind="content" data-chi="1" data-tab="0" data-tabs="1" data-notes="現場被追問演算法與節慶限制時點入，按 Esc 或右上返回鍵回到第 3 頁。" data-appendix="1" data-id="model-detail"><button class="back" type="button">← 返回</button>
   <header class="head">
     <div class="kicker">附件｜點擊右上返回或按 Esc 回到「三門市報廢率」</div>
     <h2 class="title" data-role="title">預報模型輸入與限制</h2>
@@ -1669,13 +1708,32 @@ html.still #deck-laser {
   let lowPower = false;
   const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
   let reduce = reduceMQ.matches;
-  if (reduceMQ.addEventListener) reduceMQ.addEventListener('change', e => { reduce = e.matches; if (reduce) freezeNow(); });
 
   if (stillMode) document.documentElement.classList.add('still');
   if (hideCtrlMode) document.documentElement.classList.add('hide-ctrl');
   if (noScaleMode) document.documentElement.classList.add('noscale');
 
-  const isStatic = () => Boolean(stillMode || lowPower || reduce);
+  // Orthogonal modes:
+  //  - isStill(): true ONLY in ?still=1 capture mode (freezes chrome & disables interactive chrome)
+  //  - isReducedMotion(): true in ?still=1, B low-power, or prefers-reduced-motion (suppresses motion/autoplay while keeping presenter & interactive controls usable)
+  const isStill = () => Boolean(stillMode);
+  const isReducedMotion = () => Boolean(stillMode || lowPower || reduce);
+  const isStatic = isReducedMotion; // backwards-compatible alias
+
+  const stageScale = () => {
+    const r = stage.getBoundingClientRect();
+    return r.width ? r.width / 1920 : 1;
+  };
+
+  if (reduceMQ.addEventListener) {
+    reduceMQ.addEventListener('change', e => {
+      reduce = e.matches;
+      if (reduce) freezeNow();
+      stage.dispatchEvent(new CustomEvent('deck:reducedmotion', {
+        detail: { reduced: isReducedMotion(), reduce },
+      }));
+    });
+  }
   const DECK = window.DECK || {};
   const M = DECK.motion || 'horizontal';
   const deckStageMode = DECK.stageMode || document.documentElement.dataset.stageMode || '';
@@ -1711,6 +1769,7 @@ html.still #deck-laser {
   let toastTimer = null;
   const returnTo = [];
   const activeAnims = new Set();
+  const persistedAnims = new Set();
   const activeTimers = new Set();
   const activeRafs = new Set();
   const hiddenMorphEls = new Set();
@@ -1719,9 +1778,17 @@ html.still #deck-laser {
   const isApp = i => slides[i] && slides[i].dataset.appendix === '1';
   const mainIndices = slides.map((_, i) => i).filter(i => !isApp(i));
 
-  function trackAnim(anim) {
+  function cancelAnim(anim) {
+    if (!anim) return;
+    activeAnims.delete(anim);
+    persistedAnims.delete(anim);
+    try { anim.cancel(); } catch (_) {}
+  }
+
+  function trackAnim(anim, persist) {
     if (!anim) return anim;
     activeAnims.add(anim);
+    if (persist) persistedAnims.add(anim);
     const done = () => activeAnims.delete(anim);
     anim.finished.then(done, done);
     return anim;
@@ -1998,7 +2065,8 @@ html.still #deck-laser {
     const mode = (sl.dataset.motionMode || cs.getPropertyValue('--motion-mode') || 'spring').trim();
     const staggerBase = parseFloat(cs.getPropertyValue('--stagger-base')) || 46;
     const morphMs = parseFloat(cs.getPropertyValue('--morph-ms')) || 680;
-    const ease = mode === 'crisp' ? EASE_CRISP : EASE_SPRING;
+    const rawEase = cs.getPropertyValue('--enter-easing').trim();
+    const ease = rawEase || (mode === 'crisp' ? EASE_CRISP : EASE_SPRING);
     return { mode, staggerBase, morphMs, ease };
   }
 
@@ -2034,7 +2102,7 @@ html.still #deck-laser {
 
   function cancelElStepAnim(el) {
     const prev = stepAnims.get(el);
-    if (prev) { try { prev.cancel(); } catch (_) {} stepAnims.delete(el); }
+    if (prev) { cancelAnim(prev); stepAnims.delete(el); }
   }
 
   function stepFromTransform(el) {
@@ -2047,7 +2115,7 @@ html.still #deck-laser {
     return 'translate3d(0,22px,0)';
   }
 
-  function applySlideStep(sl, targetStep, dir, instant, token) {
+  function applySlideStep(sl, targetStep, dir, silent, token) {
     if (!sl) return;
     const maxS = getMaxStep(sl);
     const k = Math.max(0, Math.min(maxS, targetStep));
@@ -2062,7 +2130,7 @@ html.still #deck-laser {
 
       cancelElStepAnim(el);
 
-      if (instant || isStatic() || el.dataset.stepHidden === undefined) {
+      if (silent || isReducedMotion() || el.dataset.stepHidden === undefined) {
         el.dataset.stepHidden = nowVis ? '0' : '1';
         if (nowVis) snapSubtreeFinal(el);
         return;
@@ -2081,19 +2149,19 @@ html.still #deck-laser {
         const anim = trackAnim(el.animate(
           [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translate3d(0,-10px,0)' }],
           { duration: 220, easing: 'ease-out', fill: 'forwards' }
-        ));
+        ), true);
         stepAnims.set(el, anim);
         anim.finished.then(() => {
           if (token === navToken && Number(sl.dataset.currentStep) === k) {
             el.dataset.stepHidden = '1';
-            try { anim.cancel(); } catch (_) {}
           }
+          cancelAnim(anim);
         }, () => {});
       }
     });
 
     updateCtrlBar();
-    if (!instant) {
+    if (!silent) {
       stage.dispatchEvent(new CustomEvent('deck:stepchange', {
         detail: { index: cur, slide: sl, step: curStep, totalSteps: maxS, dir },
       }));
@@ -2107,7 +2175,8 @@ html.still #deck-laser {
     if (!maxS) return 0;
     const nextK = Math.max(0, Math.min(maxS, k));
     if (nextK === curStep) return curStep;
-    applySlideStep(sl, nextK, dir, isStatic(), navToken);
+    clearFocus(sl);
+    applySlideStep(sl, nextK, dir, false, navToken);
     return curStep;
   }
 
@@ -2205,11 +2274,11 @@ html.still #deck-laser {
     });
   }
 
-  function snapSlideFinal(sl) {
+  function snapSlideFinal(sl, expandSteps = true) {
     if (!sl) return;
     clearGuidanceState(sl);
     const maxS = getMaxStep(sl);
-    if (maxS > 0) {
+    if (expandSteps && maxS > 0) {
       sl.dataset.currentStep = String(maxS);
       if (slides[cur] === sl) curStep = maxS;
       sl.querySelectorAll(STEP_SEL).forEach(el => {
@@ -2232,11 +2301,19 @@ html.still #deck-laser {
     return out.sort((a, b) => a.start - b.start);
   }
 
-  const BEAT_MS = { '1': 120, '2': 760, '3': 1480, '4': 2200 };
-  function beatDelay(el, fallback) {
+  // Calibrated to Visual Guidance spec: 1.3-1.8s per beat (600ms reveal + 760ms still reading window)
+  const BEAT_MS = { '1': 120, '2': 1480, '3': 2840, '4': 4200 };
+  function beatDelay(el, fallback, sl) {
     if (el.dataset.delay !== undefined) return parseFloat(el.dataset.delay) || 0;
     const b = el.dataset.beat;
-    if (b && BEAT_MS[b] !== undefined) return BEAT_MS[b];
+    if (b) {
+      const n = parseInt(b, 10);
+      if (sl && sl.dataset.beatGap && n >= 1) {
+        const gap = parseFloat(sl.dataset.beatGap) || 1360;
+        return 120 + (n - 1) * gap;
+      }
+      if (BEAT_MS[b] !== undefined) return BEAT_MS[b];
+    }
     return fallback;
   }
 
@@ -2250,11 +2327,24 @@ html.still #deck-laser {
       return skipDeferred ? list.filter(el => deferredStepOf(el, sl) === 0) : list;
     };
 
+    // 0. Live Causal State Transformation ([data-transform-at="ms"]) — works at slide entry & inside data-step
+    q('[data-transform-at]').forEach(el => {
+      const ms = parseFloat(el.dataset.transformAt) || 1200;
+      el.classList.remove('transforming');
+      el.classList.add('pre-transform');
+      later(() => {
+        if (token !== navToken || isReducedMotion()) { el.classList.remove('pre-transform', 'transforming'); return; }
+        el.classList.remove('pre-transform');
+        el.classList.add('transforming');
+        later(() => { el.classList.remove('transforming'); }, 840);
+      }, baseDelay + ms);
+    });
+
     // 1. Non-uniform staggered groups ([data-stagger])
     const staggeredSet = new Set();
     q('[data-stagger]').forEach(group => {
       const stepMs = parseFloat(group.getAttribute('data-stagger')) || cfg.staggerBase;
-      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40);
+      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40, sl);
       const items = [...group.children].filter(el => el.nodeType === 1);
       items.forEach((el, i) => {
         staggeredSet.add(el);
@@ -2279,7 +2369,7 @@ html.still #deck-laser {
       if (el.parentElement && el.parentElement.closest('.rv, [data-stagger]')) return;
       if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
       if (!skipDeferred && el === root) return; // root already animated by applySlideStep
-      const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)));
+      const d = baseDelay + beatDelay(el, Math.round(cfg.staggerBase * Math.pow(rvIdx++, 0.85)), sl);
       const dir = el.dataset.from || 'up';
       const fromT = dir === 'left' ? 'translate3d(-24px,0,0)'
         : dir === 'right' ? 'translate3d(24px,0,0)'
@@ -2295,9 +2385,9 @@ html.still #deck-laser {
     // 3. Mobile-visible high-contrast spotlight cues ([data-spotlight])
     q('[data-spotlight]').forEach(el => {
       el.classList.remove('spot-pulse');
-      const d = baseDelay + beatDelay(el, skipDeferred ? 540 : 120);
+      const d = baseDelay + beatDelay(el, skipDeferred ? 540 : 120, sl);
       later(() => {
-        if (token !== navToken || isStatic()) return;
+        if (token !== navToken || isReducedMotion()) return;
         el.classList.add('spot-pulse');
         later(() => el.classList.remove('spot-pulse'), 1320);
       }, d);
@@ -2316,7 +2406,7 @@ html.still #deck-laser {
       const dec = numRaw.includes('.') ? numRaw.split('.')[1].length : 0;
       const target = parseFloat(numRaw.replace(/,/g, ''));
       const dur = parseFloat(el.dataset.dur) || 820;
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60, sl);
       const fmt = v => {
         let s = dec > 0 ? v.toFixed(dec) : String(Math.round(v));
         if (hasComma) s = s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -2327,7 +2417,7 @@ html.still #deck-laser {
       let lastPaint = 0;
       const tick = now => {
         activeRafs.delete(id);
-        if (token !== navToken || isStatic()) { tn.nodeValue = finalStr; return; }
+        if (token !== navToken || isReducedMotion()) { tn.nodeValue = finalStr; return; }
         if (now < startAt) { id = requestAnimationFrame(tick); activeRafs.add(id); return; }
         const p = Math.min(1, (now - startAt) / dur);
         if (p >= 1) { tn.nodeValue = finalStr; return; }
@@ -2345,7 +2435,7 @@ html.still #deck-laser {
 
     // 5. True SVG stroke draw & progress rings ([data-draw])
     q('[data-draw]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80, sl);
       const dur = parseFloat(el.dataset.dur) || 880;
       if (el.getAttribute('data-draw') === 'ring') {
         const circ = parseFloat(el.dataset.circ || '0');
@@ -2375,7 +2465,7 @@ html.still #deck-laser {
     // 6. Directional bar growth ([data-grow="x|x-left|y|y-down"])
     q('[data-grow]').forEach((el, idx) => {
       const dir = (el.getAttribute('data-grow') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65);
+      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65, sl);
       const dur = parseFloat(el.dataset.dur) || 720;
       if (el instanceof SVGElement) el.style.transformBox = 'fill-box';
       if (dir === 'x-left') {
@@ -2396,7 +2486,7 @@ html.still #deck-laser {
     // 7. Directional GPU clip-path wipe ([data-wipe="right|left|down|up"])
     q('[data-wipe]').forEach(el => {
       const dir = (el.getAttribute('data-wipe') || 'right').toLowerCase();
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60, sl);
       const dur = parseFloat(el.dataset.dur) || 540;
       const fromClip = dir === 'left' ? 'inset(0 0 0 100%)'
         : dir === 'down' ? 'inset(0 0 100% 0)'
@@ -2410,7 +2500,7 @@ html.still #deck-laser {
 
     // 8. Endpoint dot / arrowhead / badge crisp pop ([data-pop])
     q('[data-pop]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120, sl);
       const dur = parseFloat(el.dataset.dur) || 340;
       if (el instanceof SVGElement) {
         el.style.transformBox = 'fill-box';
@@ -2424,23 +2514,24 @@ html.still #deck-laser {
 
     // 9. Target-lock concentric ripple ([data-ripple])
     q('[data-ripple]').forEach(el => {
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 560 : 160);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 560 : 160, sl);
       const dur = parseFloat(el.dataset.dur) || 1050;
-      trackAnim(el.animate(
+      const anim = trackAnim(el.animate(
         [
           { opacity: 0, transform: 'scale(0.35)' },
           { opacity: 0.92, transform: 'scale(0.88)', offset: 0.16 },
           { opacity: 0, transform: 'scale(2.85)' },
         ],
         { duration: dur, delay, easing: EASE_SPRING, fill: 'both' }
-      ));
+      ), true);
+      anim.finished.then(() => cancelAnim(anim), () => {});
     });
 
     // 10. Chronological rail travel bead ([data-travel="x|y"])
     q('[data-travel]').forEach(el => {
       const axis = (el.getAttribute('data-travel') || 'x').toLowerCase();
       const dist = parseFloat(el.dataset.travelDist || '800');
-      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 100);
+      const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 100, sl);
       const dur = parseFloat(el.dataset.dur) || 2400;
       const p0 = 'translate3d(0,0,0)';
       const p1 = axis === 'y'
@@ -2449,7 +2540,7 @@ html.still #deck-laser {
       const p2 = axis === 'y'
         ? 'translate3d(0,' + dist + 'px,0)'
         : 'translate3d(' + dist + 'px,0,0)';
-      trackAnim(el.animate(
+      const anim = trackAnim(el.animate(
         [
           { opacity: 0, transform: p0 + ' scale(0.5)' },
           { opacity: 1, transform: p1 + ' scale(1)', offset: 0.05 },
@@ -2457,13 +2548,14 @@ html.still #deck-laser {
           { opacity: 0, transform: p2 + ' scale(0.55)' },
         ],
         { duration: dur, delay, easing: 'cubic-bezier(0.25, 0.06, 0.25, 1)', fill: 'both' }
-      ));
+      ), true);
+      anim.finished.then(() => cancelAnim(anim), () => {});
     });
 
     // 11. Interactive control affordance nudge ([data-nudge="x|y"])
     q('[data-nudge]').forEach(el => {
       const axis = (el.getAttribute('data-nudge') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, 1100);
+      const delay = baseDelay + beatDelay(el, 1100, sl);
       const dur = parseFloat(el.dataset.dur) || 920;
       const frames = axis === 'y'
         ? [
@@ -2483,21 +2575,21 @@ html.still #deck-laser {
   }
 
   function triggerSubtreePrimitives(el, sl, delay, token) {
-    if (!el || isStatic()) { snapSubtreeFinal(el); return; }
+    if (!el || isReducedMotion()) { snapSubtreeFinal(el); return; }
     runPrimitives(el, sl, delay, token, null, false);
   }
 
   function animateSlideContent(sl, baseDelay, token, morphedIds) {
-    if (!sl || isStatic()) { snapSlideFinal(sl); return; }
+    if (!sl || isReducedMotion()) { snapSlideFinal(sl, isStill()); return; }
 
-    // 0a. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
+    // 0. 3-tier Spotlight + Context Dimming Choreographer ([data-focus-plan] + [data-focus])
     const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
     const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
     if (focusPlan.length && focusEls.length) {
       const myFocusToken = bumpFocus(sl);
       const visited = new Set();
       const applyStage = activeId => {
-        if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
+        if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isReducedMotion()) return;
         sl.classList.add('is-focusing');
         for (const el of focusEls) {
           const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
@@ -2516,7 +2608,7 @@ html.still #deck-laser {
           applyStage(stepItem.id);
         } else {
           later(() => {
-            if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
+            if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isReducedMotion()) return;
             for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
             applyStage(stepItem.id);
           }, startAt);
@@ -2527,20 +2619,6 @@ html.still #deck-laser {
         clearFocusClasses(sl);
       }, baseDelay + maxEnd);
     }
-
-    // 0b. Live Causal State Transformation ([data-transform-at="ms"])
-    sl.querySelectorAll('[data-transform-at]').forEach(el => {
-      if (deferredStepOf(el, sl) > 0) return;
-      const ms = parseFloat(el.dataset.transformAt) || 1200;
-      el.classList.remove('transforming');
-      el.classList.add('pre-transform');
-      later(() => {
-        if (token !== navToken || isStatic()) { el.classList.remove('pre-transform', 'transforming'); return; }
-        el.classList.remove('pre-transform');
-        el.classList.add('transforming');
-        later(() => { el.classList.remove('transforming'); }, 840);
-      }, baseDelay + ms);
-    });
 
     runPrimitives(sl, sl, baseDelay, token, morphedIds, true);
   }
@@ -2561,7 +2639,11 @@ html.still #deck-laser {
     ];
     for (const p of props) dst.style[p] = cs[p];
     dst.style.margin = '0';
-    dst.style.whiteSpace = 'nowrap';
+    const lh = parseFloat(cs.lineHeight) || (parseFloat(cs.fontSize) || 16) * 1.25;
+    const srcRect = src.getBoundingClientRect();
+    if (srcRect.height <= lh * 1.45 * stageScale()) {
+      dst.style.whiteSpace = 'nowrap';
+    }
     const srcKids = src.children, dstKids = dst.children;
     for (let i = 0; i < Math.min(srcKids.length, dstKids.length); i++) {
       const kcs = getComputedStyle(srcKids[i]);
@@ -2576,10 +2658,10 @@ html.still #deck-laser {
   function collectMorphPairs(prev, next) {
     if (!prev || !next || prev === next) return [];
     const sr = stage.getBoundingClientRect();
-    const s = sr.width ? sr.width / 1920 : 1;
+    const s = stageScale();
     const fromMap = new Map();
     prev.querySelectorAll('[data-morph]').forEach(el => {
-      if (el.dataset.stepHidden === '1') return;
+      if (el.closest('[data-step-hidden="1"]')) return;
       const id = el.dataset.morph;
       if (id && !fromMap.has(id)) {
         const box = stageBox(el, sr, s);
@@ -2592,7 +2674,7 @@ html.still #deck-laser {
     if (!wasActive) { next.classList.add('active'); next.style.opacity = '0'; }
     const pairs = [];
     next.querySelectorAll('[data-morph]').forEach(toEl => {
-      if (toEl.dataset.stepHidden === '1') return;
+      if (toEl.closest('[data-step-hidden="1"]')) return;
       const id = toEl.dataset.morph;
       const from = fromMap.get(id);
       if (!from) return;
@@ -2621,10 +2703,19 @@ html.still #deck-laser {
 
       const fromClip = fromCS.webkitBackgroundClip || fromCS.backgroundClip || '';
       const fromGrad = fromClip.includes('text') && (fromCS.backgroundImage || '').includes('gradient');
+      const toClip = toCS.webkitBackgroundClip || toCS.backgroundClip || '';
+      const toGrad = toClip.includes('text') && (toCS.backgroundImage || '').includes('gradient');
       if (fromGrad) {
-        clone.style.color = toCS.color;
-        clone.style.webkitTextFillColor = toCS.color;
-        clone.style.background = 'none';
+        if (!toGrad) {
+          clone.style.color = toCS.color;
+          clone.style.webkitTextFillColor = toCS.color;
+          clone.style.background = 'none';
+        } else {
+          clone.style.backgroundImage = fromCS.backgroundImage;
+          clone.style.backgroundClip = 'text';
+          clone.style.webkitBackgroundClip = 'text';
+          clone.style.webkitTextFillColor = 'transparent';
+        }
       }
 
       clone.style.position = 'absolute';
@@ -2652,30 +2743,39 @@ html.still #deck-laser {
           { transform: 'translate3d(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px,0) scale(' + sx.toFixed(4) + ',' + sy.toFixed(4) + ')' },
         ],
         { duration: morphDur, easing: EASE_CINEMA, fill: 'forwards' }
-      ));
+      ), true);
       anims.push(aMove.finished);
 
-      if (!fromGrad && fromCS.color !== toCS.color) {
-        trackAnim(clone.animate([{ color: fromCS.color }, { color: toCS.color }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+      if (!fromGrad && !toGrad && fromCS.color !== toCS.color) {
+        trackAnim(clone.animate([{ color: fromCS.color }, { color: toCS.color }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
       }
       if (!isTextOnly && fromCS.backgroundColor !== toCS.backgroundColor) {
-        trackAnim(clone.animate([{ backgroundColor: fromCS.backgroundColor }, { backgroundColor: toCS.backgroundColor }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+        trackAnim(clone.animate([{ backgroundColor: fromCS.backgroundColor }, { backgroundColor: toCS.backgroundColor }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
       }
       for (let i = 0; i < clone.children.length; i++) {
         const fc = getComputedStyle(fromEl.children[i]).color;
         const tc = toEl.children[i] ? getComputedStyle(toEl.children[i]).color : toCS.color;
         if (fc !== tc) {
-          trackAnim(clone.children[i].animate([{ color: fc }, { color: tc }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }));
+          trackAnim(clone.children[i].animate([{ color: fc }, { color: tc }], { duration: morphDur * 0.7, easing: 'ease-out', fill: 'forwards' }), true);
         }
       }
     }
     return anims;
   }
 
-  // ---------------------------------------------------------------- flight cleanup (zero lockout!)
+  // ---------------------------------------------------------------- flight cleanup (zero lockout, zero WAAPI fill:forwards leak!)
+  function cancelElementAnims(el) {
+    if (!el || typeof el.getAnimations !== 'function') return;
+    for (const a of el.getAnimations()) {
+      try { a.cancel(); } catch (_) {}
+    }
+  }
+
   function cleanupFlight(keepPrev, keepNext) {
     for (const a of activeAnims) { try { a.cancel(); } catch (_) {} }
     activeAnims.clear();
+    for (const a of persistedAnims) { try { a.cancel(); } catch (_) {} }
+    persistedAnims.clear();
     for (const id of activeTimers) clearTimeout(id);
     activeTimers.clear();
     for (const id of activeRafs) cancelAnimationFrame(id);
@@ -2683,8 +2783,12 @@ html.still #deck-laser {
     morphLayer.innerHTML = '';
     for (const el of hiddenMorphEls) el.style.visibility = '';
     hiddenMorphEls.clear();
-    if (curtain) curtain.style.opacity = '0';
+    if (curtain) {
+      cancelElementAnims(curtain);
+      curtain.style.opacity = '0';
+    }
     for (const sl of slides) {
+      cancelElementAnims(sl);
       sl.classList.remove('in-flight');
       sl.style.zIndex = '';
       if (sl !== keepPrev) clearGuidanceState(sl);
@@ -2697,7 +2801,7 @@ html.still #deck-laser {
     }
   }
 
-  function freezeNow() {
+  function freezeNow(expandSteps = false) {
     navToken++;
     cleanupFlight(null, slides[cur]);
     if (slides[cur]) {
@@ -2705,7 +2809,7 @@ html.still #deck-laser {
       slides[cur].style.opacity = '';
       slides[cur].style.transform = '';
       slides[cur].style.clipPath = '';
-      snapSlideFinal(slides[cur]);
+      snapSlideFinal(slides[cur], expandSteps);
     }
     updateCtrlBar();
   }
@@ -2721,7 +2825,12 @@ html.still #deck-laser {
       next.dataset.kind === 'toc' || prev.dataset.kind === 'toc' ||
       (next.dataset.chi !== prev.dataset.chi && Number(next.dataset.chi) >= 0 && Number(prev.dataset.chi) >= 0)
     );
-    return chChange ? 'push' : 'cross';
+    if (chChange) {
+      if (M === 'vertical') return 'push-y';
+      if (M === 'zoom-in' || M === 'zoom-out') return 'zoom-rise';
+      return 'push';
+    }
+    return 'cross';
   }
 
   function go(n, instant, opts) {
@@ -2735,16 +2844,22 @@ html.still #deck-laser {
     const token = ++navToken;
     cur = n;
 
-    const skipTransition = Boolean(instant || isStatic() || !prev || prev === next);
-    const animateInitial = Boolean(!prev && !instant && !isStatic());
+    const skipTransition = Boolean(instant || isReducedMotion() || !prev || prev === next);
+    const animateInitial = Boolean(!prev && !instant && !isReducedMotion());
 
     // Initialize target step on incoming slide BEFORE morph collection or paint
+    // Only ?still=1 (or explicit opts.step='final') forces step expansion; B/reduced-motion preserves stepping
     const maxS = getMaxStep(next);
     let targetStep = 0;
-    if (isStatic() || (opts && opts.step === 'final')) targetStep = maxS;
+    if (isStill() || (opts && opts.step === 'final')) targetStep = maxS;
     else if (opts && typeof opts.step === 'number') targetStep = Math.max(0, Math.min(maxS, opts.step));
     else if (dir < 0 && prev && prev !== next && !instant) targetStep = maxS;
     applySlideStep(next, targetStep, 0, true, token);
+
+    // Clear lingering transition WAAPI locks on incoming slide BEFORE measuring morph target boxes
+    cancelElementAnims(next);
+    next.style.transform = '';
+    next.style.clipPath = '';
 
     const morphPairs = (!skipTransition && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
 
@@ -2760,6 +2875,11 @@ html.still #deck-laser {
     updateCtrlBar();
     try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
 
+    // Fit incoming slide BEFORE animateSlideContent zeroes [data-count] text nodes
+    if (typeof window.__deckFit === 'function') window.__deckFit(next);
+
+    let enterDelay = 0;
+
     if (skipTransition) {
       stage.classList.add('no-trans');
       if (prev && prev !== next) prev.classList.remove('active', 'leaving');
@@ -2767,8 +2887,9 @@ html.still #deck-laser {
       next.style.opacity = '';
       next.style.transform = '';
       next.style.clipPath = '';
-      if (isStatic()) snapSlideFinal(next);
-      else if (animateInitial && targetStep === 0) animateSlideContent(next, 60, token, null);
+      if (isStill()) snapSlideFinal(next, true);
+      else if (isReducedMotion()) snapSlideFinal(next, false);
+      else if (animateInitial && targetStep === 0) { enterDelay = 60; animateSlideContent(next, 60, token, null); }
       else snapSubtreeFinal(next);
       stage.offsetWidth;
       requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
@@ -2785,20 +2906,26 @@ html.still #deck-laser {
       next.style.clipPath = '';
 
       if (kind === 'shock' && curtain) {
+        enterDelay = 420;
         stage.classList.add('hide-nav');
         stage.classList.remove('show-side-nav');
         prev.classList.remove('active');
         prev.classList.add('leaving');
-        const cIn = trackAnim(curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' }));
+        const cIn = trackAnim(curtain.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, fill: 'forwards' }), true);
         cIn.finished.then(() => {
-          if (token !== navToken) return;
+          if (token !== navToken) { cancelAnim(cIn); return; }
+          curtain.style.opacity = '1';
+          cancelAnim(cIn);
           prev.classList.remove('leaving', 'active');
           clearGuidanceState(prev);
           next.classList.add('active');
           later(() => {
             if (token !== navToken) return;
-            const cOut = trackAnim(curtain.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 280, fill: 'forwards' }));
-            cOut.finished.then(() => { if (token === navToken) { curtain.style.opacity = '0'; cOut.cancel(); } }, () => {});
+            const cOut = trackAnim(curtain.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 280, fill: 'forwards' }), true);
+            cOut.finished.then(() => {
+              if (token === navToken) curtain.style.opacity = '0';
+              cancelAnim(cOut);
+            }, () => {});
             const st = next.querySelector('.shock-text, [data-role="shock"], h1');
             if (st) {
               trackAnim(st.animate(
@@ -2815,6 +2942,7 @@ html.still #deck-laser {
         next.classList.add('active', 'in-flight');
 
         const waits = [];
+        const forwardsAnims = [];
         let contentDelay = 160;
 
         if (kind === 'iris') {
@@ -2833,7 +2961,8 @@ html.still #deck-laser {
             const aOut = trackAnim(prev.animate(
               [{ clipPath: 'circle(145% at ' + origin + ')' }, { clipPath: 'circle(0% at ' + origin + ')' }],
               { duration: 640, easing: EASE_CINEMA, fill: 'forwards' }
-            ));
+            ), true);
+            forwardsAnims.push(aOut);
             waits.push(aOut.finished);
             if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 680));
             contentDelay = 200;
@@ -2847,6 +2976,20 @@ html.still #deck-laser {
           ));
           const aIn = trackAnim(next.animate(
             [{ transform: 'translate3d(' + sx + ',0,0)' }, { transform: 'translate3d(0,0,0)' }],
+            { duration: 640, easing: EASE_CINEMA }
+          ));
+          waits.push(aOut.finished, aIn.finished);
+          if (morphPairs.length) waits.push(...launchMorphClones(morphPairs, 740));
+          contentDelay = 260;
+        } else if (kind === 'push-y') {
+          const sy = dir > 0 ? '100%' : '-100%';
+          const oy = dir > 0 ? '-14%' : '14%';
+          const aOut = trackAnim(prev.animate(
+            [{ transform: 'translate3d(0,0,0)' }, { transform: 'translate3d(0,' + oy + ',0)' }],
+            { duration: 640, easing: EASE_CINEMA }
+          ));
+          const aIn = trackAnim(next.animate(
+            [{ transform: 'translate3d(0,' + sy + ',0)' }, { transform: 'translate3d(0,0,0)' }],
             { duration: 640, easing: EASE_CINEMA }
           ));
           waits.push(aOut.finished, aIn.finished);
@@ -2869,7 +3012,8 @@ html.still #deck-laser {
             const aOut = trackAnim(prev.animate(
               [{ transform: 'translate3d(0,0,0)' }, { transform: 'translate3d(0,100%,0)' }],
               { duration: 560, easing: EASE_CINEMA, fill: 'forwards' }
-            ));
+            ), true);
+            forwardsAnims.push(aOut);
             const aIn = trackAnim(next.animate(
               [{ transform: 'scale(0.95)', opacity: 0.75 }, { transform: 'scale(1)', opacity: 1 }],
               { duration: 560, easing: EASE_CINEMA }
@@ -2913,6 +3057,8 @@ html.still #deck-laser {
           contentDelay = 120;
         }
 
+        enterDelay = contentDelay;
+
         // Only run slide-entry choreography when landing at step 0 (not when backing into final step)
         if (targetStep === 0) {
           animateSlideContent(next, contentDelay, token, morphedIds);
@@ -2927,9 +3073,13 @@ html.still #deck-laser {
             hiddenMorphEls.delete(fromEl);
             hiddenMorphEls.delete(toEl);
           }
+          // Hide prev BEFORE canceling forwards animations so there is zero 1-frame flash
           prev.classList.remove('leaving', 'active', 'in-flight');
           prev.style.zIndex = '';
+          prev.style.transform = '';
           prev.style.clipPath = '';
+          forwardsAnims.forEach(cancelAnim);
+          cancelElementAnims(prev);
           clearGuidanceState(prev);
           next.classList.remove('in-flight');
           next.style.zIndex = '';
@@ -2938,13 +3088,18 @@ html.still #deck-laser {
       }
     }
 
-    if (typeof window.__deckFit === 'function') window.__deckFit();
+    const restAtFinal = Boolean(maxS > 0 && targetStep === maxS && (dir < 0 || (opts && opts.step === 'final')));
     const detail = {
       index: cur,
       slide: next,
       prev,
+      dir,
       instant: skipTransition,
       initial: animateInitial,
+      enterDelay,
+      restAtFinal,
+      still: isStill(),
+      reducedMotion: isReducedMotion(),
       staticMode: isStatic(),
       surface: stage.dataset.activeSurface,
       step: curStep,
@@ -2958,7 +3113,7 @@ html.still #deck-laser {
     if (isApp(cur)) { back(); return; }
     const sl = slides[cur];
     const maxS = getMaxStep(sl);
-    if (!isStatic() && maxS > 0) {
+    if (!isStill() && maxS > 0) {
       if (d > 0 && curStep < maxS) { setStep(curStep + 1, 1); return; }
       if (d < 0 && curStep > 0) { setStep(curStep - 1, -1); return; }
     }
@@ -2985,26 +3140,48 @@ html.still #deck-laser {
     lowPower = typeof force === 'boolean' ? force : !lowPower;
     document.body.classList.toggle('low-power', lowPower);
     if (lowPower) {
-      freezeNow();
+      freezeNow(false);
       toast('已切換靜態省電模式（按 B 恢復動態）');
     } else {
       updateCtrlBar();
       toast('已恢復動態播放');
     }
     stage.dispatchEvent(new CustomEvent('deck:lowpower', { detail: { lowPower } }));
+    stage.dispatchEvent(new CustomEvent('deck:reducedmotion', { detail: { reduced: isReducedMotion(), lowPower } }));
     return lowPower;
   }
 
   function setStill(flag) {
     stillMode = Boolean(flag);
     document.documentElement.classList.toggle('still', stillMode);
-    if (stillMode) freezeNow();
+    if (stillMode) freezeNow(true);
     else updateCtrlBar();
     stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: stillMode } }));
+    stage.dispatchEvent(new CustomEvent('deck:reducedmotion', { detail: { reduced: isReducedMotion(), still: stillMode } }));
   }
 
+  // ---------------------------------------------------------------- live beforeprint / afterprint (P / Ctrl+P without ?still=1)
+  let printSnapshot = null;
+  addEventListener('beforeprint', () => {
+    if (printSnapshot) return;
+    printSnapshot = { cur, curStep };
+    navToken++;
+    cleanupFlight(null, null);
+    slides.forEach(sl => snapSlideFinal(sl, true));
+    stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true, printing: true } }));
+  });
+  addEventListener('afterprint', () => {
+    if (!printSnapshot) return;
+    const snap = printSnapshot;
+    printSnapshot = null;
+    if (snap.cur >= 0 && snap.cur < slides.length) {
+      go(snap.cur, true, { step: snap.curStep });
+    }
+    stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: stillMode, printing: false } }));
+  });
+
   // ---------------------------------------------------------------- input handling (keyboard + click + mobile swipe)
-  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], #ctrl-bar, #nav-side, #deck-grid, #deck-annotator, #deck-lightbox, [data-compare-slider], [data-zoomable], [data-ref], input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
+  const INTERACTIVE_SEL = '.live-ctrl, [data-interactive], [data-bento-item], [data-rf-item], [data-popup-fold], [data-deck-card], #ctrl-bar, #nav-side, #deck-grid, #deck-annotator, #deck-lightbox, [data-compare-slider], [data-zoomable], [data-ref], input, select, textarea, label, #notes, a, video, audio, button:not(.back):not([data-link])';
 
   addEventListener('keydown', e => {
     const k = e.key;
@@ -3013,6 +3190,7 @@ html.still #deck-laser {
       if (k === 'Escape') document.activeElement.blur();
       return;
     }
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (k === 'Escape') {
       if (closeTopOverlay()) { e.preventDefault(); return; }
       if (isApp(cur)) { e.preventDefault(); back(); return; }
@@ -3066,13 +3244,13 @@ html.still #deck-laser {
     if (booted) return;
     booted = true;
     const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
-    // Play slide-1 entrance choreography in live mode; snap instantly when static (?still=1 / reduced-motion)
-    go(start - 1, isStatic());
+    // Play slide-1 entrance choreography in live mode; snap instantly when reduced-motion / ?still=1
+    go(start - 1, isReducedMotion());
     if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
   }
 
-  // Auto-takeover: early interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
-  const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], input, select, textarea, button:not(.back):not([data-link])';
+  // Auto-takeover: early pointer or keyboard interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
+  const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], [data-bento-item], [data-rf-item], [data-popup-fold], [data-deck-card], input, select, textarea, button:not(.back):not([data-link])';
   const handleEarlyTakeover = e => {
     const sl = slides[cur];
     if (!sl || !sl.classList.contains('is-focusing')) return;
@@ -3082,6 +3260,11 @@ html.still #deck-laser {
   };
   stage.addEventListener('pointerdown', handleEarlyTakeover, true);
   stage.addEventListener('input', handleEarlyTakeover, true);
+  stage.addEventListener('keydown', e => {
+    if (['Enter', ' ', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+      handleEarlyTakeover(e);
+    }
+  }, true);
 
   window.__deck = {
     go: (n, instant = true, opts) => go(n, instant, opts),
@@ -3099,7 +3282,10 @@ html.still #deck-laser {
     closeTopOverlay,
     addCtrlButton,
     toast,
+    isStill,
+    isReducedMotion,
     isStatic,
+    stageScale,
     isApp,
     stage,
     count: slides.length,
@@ -3146,6 +3332,53 @@ html.still #deck-laser {
     });
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+
+  function sanitizeCloneToFinal(clone) {
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    clone.querySelectorAll('canvas.fx-canvas, video, audio').forEach(n => n.remove());
+    clone.classList.add('active');
+    clone.classList.remove('leaving', 'in-flight', 'is-focusing');
+    clone.style.opacity = '';
+    clone.style.transform = '';
+    clone.style.clipPath = '';
+    clone.style.visibility = '';
+    clone.style.zIndex = '';
+    clone.querySelectorAll('.focus-dim, .focus-active, .focus-visited, .pre-transform, .transforming, .spot-pulse, .is-primed, .is-folded, .has-open, .is-open, .is-rf-dim, .is-rf-focus, .is-step-dim').forEach(n => {
+      n.classList.remove('focus-dim', 'focus-active', 'focus-visited', 'pre-transform', 'transforming', 'spot-pulse', 'is-primed', 'is-folded', 'has-open', 'is-open', 'is-rf-dim', 'is-rf-focus', 'is-step-dim');
+    });
+    clone.querySelectorAll('[data-count]').forEach(el => {
+      if (el.dataset.countFinal !== undefined) {
+        for (const n of el.childNodes) {
+          if (n.nodeType === 3 && /\d/.test(n.nodeValue)) { n.nodeValue = el.dataset.countFinal; break; }
+        }
+      }
+    });
+    clone.querySelectorAll('[data-odometer]').forEach(el => {
+      if (el.dataset.odoRaw) el.textContent = el.dataset.odoRaw;
+    });
+    // Snap data-step / data-step-hide / data-step-only cleanly to final step
+    let maxS = 0;
+    const stepEls = clone.querySelectorAll('[data-step], [data-step-hide], [data-step-only]');
+    stepEls.forEach(el => {
+      if (el.dataset.step !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.step, 10) || 0);
+      if (el.dataset.stepHide !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.stepHide, 10) || 0);
+      if (el.dataset.stepOnly !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.stepOnly, 10) || 0);
+    });
+    stepEls.forEach(el => {
+      let show = 0, hide = Infinity;
+      if (el.dataset.stepOnly !== undefined) {
+        const k = parseInt(el.dataset.stepOnly, 10) || 0;
+        show = k; hide = k + 1;
+      } else {
+        if (el.dataset.step !== undefined) show = parseInt(el.dataset.step, 10) || 0;
+        if (el.dataset.stepHide !== undefined) hide = parseInt(el.dataset.stepHide, 10) || Infinity;
+      }
+      el.dataset.stepHidden = (maxS >= show && maxS < hide) ? '0' : '1';
+    });
+  }
+
   function buildGrid() {
     if (gridEl) return gridEl;
     gridEl = document.createElement('div');
@@ -3178,11 +3411,7 @@ html.still #deck-laser {
       const miniStage = document.createElement('div');
       miniStage.className = 'dg-thumb-stage';
       const clone = sl.cloneNode(true);
-      clone.removeAttribute('id');
-      clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
-      clone.querySelectorAll('canvas.fx-canvas, video, audio').forEach(n => n.remove());
-      clone.classList.add('active');
-      clone.classList.remove('leaving', 'in-flight', 'is-focusing');
+      sanitizeCloneToFinal(clone);
       miniStage.appendChild(clone);
       thumb.appendChild(miniStage);
 
@@ -3212,7 +3441,7 @@ html.still #deck-laser {
   }
 
   function open() {
-    if (deck.isStatic()) return;
+    if (isStill()) return;
     buildGrid();
     cards.forEach((c, i) => c.classList.toggle('is-current', i === deck.index));
     gridEl.classList.add('open');
@@ -3248,7 +3477,8 @@ html.still #deck-laser {
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'g' || e.key === 'G') {
-      if (deck.isStatic()) return;
+      if (isStill()) return;
+      if (!isOpen() && typeof deck.hasNavLock === 'function' && deck.hasNavLock()) return;
       e.preventDefault();
       toggle();
     }
@@ -3332,8 +3562,10 @@ html.still #deck-laser {
     }
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+
   function setDrawing(flag) {
-    if (deck.isStatic()) flag = false;
+    if (isStill()) flag = false;
     drawingMode = Boolean(flag);
     layer.classList.toggle('is-drawing', drawingMode);
     bar.classList.toggle('show', drawingMode);
@@ -3345,7 +3577,7 @@ html.still #deck-laser {
   }
 
   function setLaser(flag) {
-    if (deck.isStatic()) flag = false;
+    if (isStill()) flag = false;
     laserMode = Boolean(flag);
     laser.classList.toggle('is-on', laserMode);
     if (laserMode) {
@@ -3460,20 +3692,22 @@ html.still #deck-laser {
     const tag = document.activeElement && document.activeElement.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const lockedOther = !drawingMode && typeof deck.hasNavLock === 'function' && deck.hasNavLock();
     if (e.key === 'a' || e.key === 'A') {
-      if (deck.isStatic()) return;
+      if (isStill() || lockedOther) return;
       e.preventDefault();
       setDrawing(!drawingMode);
     } else if (e.key === 'l' || e.key === 'L') {
-      if (deck.isStatic()) return;
+      if (isStill() || lockedOther) return;
       e.preventDefault();
       setLaser(!laserMode);
-    } else if ((e.key === 'c' || e.key === 'C') && (drawingMode || (strokesBySlide.get(deck.index) || []).length)) {
+    } else if ((e.key === 'c' || e.key === 'C') && !lockedOther && (drawingMode || (strokesBySlide.get(deck.index) || []).length)) {
       e.preventDefault();
       clearCurrent();
     }
   });
 
+  deck.stage.addEventListener('deck:slideleave', finishStroke);
   deck.stage.addEventListener('deck:slideenter', renderSlideStrokes);
   deck.stage.addEventListener('deck:still', ({ detail }) => {
     if (detail.still) { setDrawing(false); setLaser(false); }
@@ -3554,12 +3788,18 @@ html.still #deck-laser {
     };
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+  const seenCmdIds = new Set();
+
   function broadcast() {
     const payload = buildPayload();
+    let bcSent = false;
     if (bc) {
-      try { bc.postMessage(payload); } catch (_) {}
+      try { bc.postMessage(payload); bcSent = true; } catch (_) {}
     }
-    try { localStorage.setItem(channelName, JSON.stringify(payload)); } catch (_) {}
+    if (!bcSent) {
+      try { localStorage.setItem(channelName, JSON.stringify(payload)); } catch (_) {}
+    }
     if (popup && !popup.closed && typeof popup.__onDeckState === 'function') {
       try { popup.__onDeckState(payload); } catch (_) {}
     }
@@ -3568,6 +3808,11 @@ html.still #deck-laser {
 
   function handleIncoming(msg) {
     if (!msg || typeof msg !== 'object') return;
+    if (msg.id) {
+      if (seenCmdIds.has(msg.id)) return;
+      seenCmdIds.add(msg.id);
+      if (seenCmdIds.size > 160) seenCmdIds.clear();
+    }
     if (msg.type === 'hello') broadcast();
     else if (msg.type === 'cmd') {
       if (msg.action === 'next') deck.step(1);
@@ -3621,7 +3866,8 @@ html.still #deck-laser {
       '(function(){' +
       'var chName=' + JSON.stringify(chName) + ';' +
       'var bc=null;try{bc=new BroadcastChannel(chName)}catch(_){}' +
-      'function send(msg){if(bc)try{bc.postMessage(msg)}catch(_){}try{localStorage.setItem(chName+":cmd",JSON.stringify(Object.assign({ts:Date.now()},msg)))}catch(_){}}' +
+      'var seq=0;' +
+      'function send(msg){var pkt=Object.assign({id:Date.now()+":"+(++seq),ts:Date.now()},msg);var sent=false;if(bc){try{bc.postMessage(pkt);sent=true;}catch(_){}}if(!sent){try{localStorage.setItem(chName+":cmd",JSON.stringify(pkt));}catch(_){}}}' +
       'function render(s){if(!s||s.type!=="state")return;' +
       'var pad=function(n){return(n<10?"0":"")+n};' +
       'document.getElementById("sv-pos").textContent=(s.current&&s.current.appendix)?"附件":(pad(s.mainPos>0?s.mainPos:(s.index+1))+" / "+pad(s.total));' +
@@ -3647,7 +3893,7 @@ html.still #deck-laser {
   }
 
   function open() {
-    if (deck.isStatic()) return false;
+    if (isStill()) return false;
     if (popup && !popup.closed) {
       popup.focus();
       broadcast();
@@ -3684,7 +3930,7 @@ html.still #deck-laser {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (typeof deck.hasNavLock === 'function' && deck.hasNavLock()) return;
     if (e.key === 's' || e.key === 'S') {
-      if (deck.isStatic()) return;
+      if (isStill()) return;
       e.preventDefault();
       open();
     }
@@ -3701,20 +3947,72 @@ html.still #deck-laser {
   };
 })();
 
-/* deck-architect v4.5 typography auto-fit
+/* deck-architect v4.9 typography auto-fit
  *
  * Supports:
- *  - [data-fit="phrase"]  : shrink display phrases so punctuation groups stay unbroken
+ *  - [data-fit="phrase"]  : auto-wraps CJK punctuation clauses into .ph if absent, then shrinks cleanly
  *  - [data-fit="figure"]  : uniform shrink for big KPI numbers inside [data-fit-group="figure"]
  *  - [data-fit="box"]     : auto-shrink container font-size if content overflows its fixed height/width
+ *
+ * Preserves author inline font-size via cached data-fit-base-px, and supports scoped per-slide fitting
+ * via window.__deckFit(slideEl) to avoid full-document layout thrash during slide transitions.
  */
 (function () {
-  function fitPhrases() {
-    document.querySelectorAll('[data-fit="phrase"], .key, .shock-text, .closing-text, .cover-title').forEach(function (el) {
-      var phs = [].slice.call(el.querySelectorAll('.ph'));
+  var CLAUSE_SPLIT = /(?<=[，、；：。！？,;!?])\s*/;
+
+  function cacheBase(el) {
+    if (!el.dataset.fitBasePx) {
+      var cur = parseFloat(getComputedStyle(el).fontSize);
+      if (cur > 0) el.dataset.fitBasePx = String(cur);
+    }
+    var base = parseFloat(el.dataset.fitBasePx || '0');
+    if (base > 0) el.style.fontSize = base + 'px';
+    return base;
+  }
+
+  function ensurePhrases(el) {
+    var existing = [].slice.call(el.querySelectorAll('.ph'));
+    if (existing.length) return existing;
+    if (!el.hasAttribute('data-fit')) return [];
+    // Only auto-split simple display text (text nodes, <mark>, <br>) so complex markup stays untouched
+    for (var i = 0; i < el.childNodes.length; i++) {
+      var n = el.childNodes[i];
+      if (n.nodeType === 1 && n.tagName !== 'MARK' && n.tagName !== 'BR' && n.tagName !== 'SPAN') return [];
+    }
+    var parts = [];
+    var cur = '';
+    el.childNodes.forEach(function (n) {
+      if (n.nodeType === 1 && n.tagName === 'BR') {
+        if (cur) { parts.push(cur); cur = ''; }
+        parts.push('<br>');
+      } else if (n.nodeType === 1) {
+        cur += n.outerHTML;
+      } else if (n.nodeType === 3) {
+        var segs = n.nodeValue.split(CLAUSE_SPLIT);
+        for (var j = 0; j < segs.length; j++) {
+          cur += segs[j].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          if (j < segs.length - 1 && cur.trim()) {
+            parts.push(cur);
+            cur = '';
+          }
+        }
+      }
+    });
+    if (cur) parts.push(cur);
+    var nonBr = parts.filter(function (x) { return x && x !== '<br>'; });
+    if (nonBr.length < 2) return [];
+    el.innerHTML = parts.map(function (x) {
+      return x === '<br>' ? '<br>' : '<span class="ph">' + x + '</span>';
+    }).join('');
+    return [].slice.call(el.querySelectorAll('.ph'));
+  }
+
+  function fitPhrases(scope) {
+    var root = scope || document;
+    root.querySelectorAll('[data-fit="phrase"], .key, .shock-text, .closing-text, .cover-title').forEach(function (el) {
+      var phs = ensurePhrases(el);
       if (!phs.length) return;
-      el.style.fontSize = '';
-      var base = parseFloat(getComputedStyle(el).fontSize);
+      var base = cacheBase(el);
       if (!base) return;
       var size = base;
       function wraps() {
@@ -3723,21 +4021,23 @@ html.still #deck-laser {
       }
       while (wraps() && size > base * 0.72) {
         size -= base * 0.04;
-        el.style.fontSize = size + 'px';
+        el.style.fontSize = size.toFixed(1) + 'px';
       }
-      if (wraps()) el.style.fontSize = '';
+      if (wraps()) el.style.fontSize = base + 'px';
     });
   }
 
-  function fitFigures() {
-    document.querySelectorAll('.slide').forEach(function (sl) {
+  function fitFigures(scope) {
+    var slideList = scope && scope.classList && scope.classList.contains('slide')
+      ? [scope]
+      : [].slice.call((scope || document).querySelectorAll('.slide'));
+    slideList.forEach(function (sl) {
       var groups = sl.querySelectorAll('[data-fit-group="figure"], .body');
       var list = groups.length ? [].slice.call(groups) : [sl];
       list.forEach(function (box) {
         var els = [].slice.call(box.querySelectorAll('[data-fit="figure"], .number .value, .stats-row .sv'));
         if (!els.length) return;
-        els.forEach(function (e) { e.style.fontSize = ''; });
-        var base = els.map(function (e) { return parseFloat(getComputedStyle(e).fontSize) || 64; });
+        var base = els.map(function (e) { return cacheBase(e) || 64; });
         var k = 1;
         function over() {
           return box.scrollWidth > box.clientWidth + 2 ||
@@ -3745,17 +4045,17 @@ html.still #deck-laser {
         }
         while (over() && k > 0.5) {
           k -= 0.05;
-          els.forEach(function (e, i) { e.style.fontSize = (base[i] * k) + 'px'; });
+          els.forEach(function (e, i) { e.style.fontSize = (base[i] * k).toFixed(1) + 'px'; });
         }
       });
     });
   }
 
-  function fitBoxes() {
-    document.querySelectorAll('[data-fit="box"]').forEach(function (box) {
+  function fitBoxes(scope) {
+    var root = scope || document;
+    root.querySelectorAll('[data-fit="box"]').forEach(function (box) {
       if (!box.clientHeight || !box.clientWidth) return;
-      box.style.fontSize = '';
-      var base = parseFloat(getComputedStyle(box).fontSize) || 24;
+      var base = cacheBase(box) || 24;
       var minPx = Math.max(18, parseFloat(box.dataset.fitMin || '18') || 18);
       var size = base;
       var guard = 0;
@@ -3766,16 +4066,16 @@ html.still #deck-laser {
     });
   }
 
-  function run() {
-    fitPhrases();
-    fitFigures();
-    fitBoxes();
+  function run(scope) {
+    fitPhrases(scope);
+    fitFigures(scope);
+    fitBoxes(scope);
   }
 
   window.__deckFit = run;
   run();
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(run);
+    document.fonts.ready.then(function () { run(); });
   }
 })();
 </script>

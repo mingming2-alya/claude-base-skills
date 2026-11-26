@@ -26,6 +26,53 @@
     });
   }
 
+  const isStill = () => (typeof deck.isStill === 'function' ? deck.isStill() : deck.isStatic());
+
+  function sanitizeCloneToFinal(clone) {
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+    clone.querySelectorAll('canvas.fx-canvas, video, audio').forEach(n => n.remove());
+    clone.classList.add('active');
+    clone.classList.remove('leaving', 'in-flight', 'is-focusing');
+    clone.style.opacity = '';
+    clone.style.transform = '';
+    clone.style.clipPath = '';
+    clone.style.visibility = '';
+    clone.style.zIndex = '';
+    clone.querySelectorAll('.focus-dim, .focus-active, .focus-visited, .pre-transform, .transforming, .spot-pulse, .is-primed, .is-folded, .has-open, .is-open, .is-rf-dim, .is-rf-focus, .is-step-dim').forEach(n => {
+      n.classList.remove('focus-dim', 'focus-active', 'focus-visited', 'pre-transform', 'transforming', 'spot-pulse', 'is-primed', 'is-folded', 'has-open', 'is-open', 'is-rf-dim', 'is-rf-focus', 'is-step-dim');
+    });
+    clone.querySelectorAll('[data-count]').forEach(el => {
+      if (el.dataset.countFinal !== undefined) {
+        for (const n of el.childNodes) {
+          if (n.nodeType === 3 && /\d/.test(n.nodeValue)) { n.nodeValue = el.dataset.countFinal; break; }
+        }
+      }
+    });
+    clone.querySelectorAll('[data-odometer]').forEach(el => {
+      if (el.dataset.odoRaw) el.textContent = el.dataset.odoRaw;
+    });
+    // Snap data-step / data-step-hide / data-step-only cleanly to final step
+    let maxS = 0;
+    const stepEls = clone.querySelectorAll('[data-step], [data-step-hide], [data-step-only]');
+    stepEls.forEach(el => {
+      if (el.dataset.step !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.step, 10) || 0);
+      if (el.dataset.stepHide !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.stepHide, 10) || 0);
+      if (el.dataset.stepOnly !== undefined) maxS = Math.max(maxS, parseInt(el.dataset.stepOnly, 10) || 0);
+    });
+    stepEls.forEach(el => {
+      let show = 0, hide = Infinity;
+      if (el.dataset.stepOnly !== undefined) {
+        const k = parseInt(el.dataset.stepOnly, 10) || 0;
+        show = k; hide = k + 1;
+      } else {
+        if (el.dataset.step !== undefined) show = parseInt(el.dataset.step, 10) || 0;
+        if (el.dataset.stepHide !== undefined) hide = parseInt(el.dataset.stepHide, 10) || Infinity;
+      }
+      el.dataset.stepHidden = (maxS >= show && maxS < hide) ? '0' : '1';
+    });
+  }
+
   function buildGrid() {
     if (gridEl) return gridEl;
     gridEl = document.createElement('div');
@@ -58,11 +105,7 @@
       const miniStage = document.createElement('div');
       miniStage.className = 'dg-thumb-stage';
       const clone = sl.cloneNode(true);
-      clone.removeAttribute('id');
-      clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
-      clone.querySelectorAll('canvas.fx-canvas, video, audio').forEach(n => n.remove());
-      clone.classList.add('active');
-      clone.classList.remove('leaving', 'in-flight', 'is-focusing');
+      sanitizeCloneToFinal(clone);
       miniStage.appendChild(clone);
       thumb.appendChild(miniStage);
 
@@ -92,7 +135,7 @@
   }
 
   function open() {
-    if (deck.isStatic()) return;
+    if (isStill()) return;
     buildGrid();
     cards.forEach((c, i) => c.classList.toggle('is-current', i === deck.index));
     gridEl.classList.add('open');
@@ -128,7 +171,8 @@
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'g' || e.key === 'G') {
-      if (deck.isStatic()) return;
+      if (isStill()) return;
+      if (!isOpen() && typeof deck.hasNavLock === 'function' && deck.hasNavLock()) return;
       e.preventDefault();
       toggle();
     }

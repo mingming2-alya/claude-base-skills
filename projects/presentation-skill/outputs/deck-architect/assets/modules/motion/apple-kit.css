@@ -56,7 +56,7 @@
 [data-depth-deck] [data-deck-card] {
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: var(--card-radius, 18px);
   cursor: grab;
   transform-origin: center bottom;
   transition:
@@ -78,7 +78,7 @@
 [data-colorize-wipe] {
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: var(--card-radius, 16px);
 }
 [data-colorize-wipe] .cw-mono {
   position: relative;
@@ -143,6 +143,8 @@ body.low-power [data-colorize-wipe] .cw-beam {
   [data-split-mask] .sm-inner,
   [data-depth-deck] [data-deck-card],
   [data-colorize-wipe] .cw-color { transition: none !important; }
+  [data-split-mask].is-primed .sm-inner { transform: none !important; opacity: 1 !important; }
+  [data-depth-deck] [data-deck-card] { filter: none !important; }
   [data-spotlight-sweep] .sp-base { opacity: 1 !important; }
   [data-spotlight-sweep] .sp-lit, [data-spotlight-sweep] .sp-cone { display: none !important; }
   [data-colorize-wipe] .cw-mono { filter: none !important; opacity: 1 !important; }

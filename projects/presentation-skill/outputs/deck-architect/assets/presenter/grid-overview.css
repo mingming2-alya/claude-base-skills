@@ -92,16 +92,21 @@
   pointer-events: none;
 }
 #deck-grid .dg-thumb-stage .slide {
-  display: flex !important;
   opacity: 1 !important;
   visibility: visible !important;
   position: absolute !important;
   inset: 0 !important;
   transform: none !important;
+  clip-path: none !important;
 }
 #deck-grid .dg-thumb-stage [data-step-hidden="1"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+#deck-grid .dg-thumb-stage [data-focus] {
   opacity: 1 !important;
-  visibility: visible !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 #deck-grid .dg-meta {
   display: flex;

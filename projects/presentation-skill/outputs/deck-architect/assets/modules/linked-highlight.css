@@ -21,8 +21,7 @@
 .slide.is-ref-linking [data-ref].is-ref-locked {
   box-shadow: 0 0 0 3px var(--accent), 0 14px 32px rgba(0, 0, 0, 0.24);
 }
-html.still .slide.is-ref-linking [data-ref],
-body.low-power .slide.is-ref-linking [data-ref] {
+html.still .slide.is-ref-linking [data-ref] {
   opacity: 1 !important;
   box-shadow: none !important;
   filter: none !important;

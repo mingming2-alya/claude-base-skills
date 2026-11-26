@@ -2,7 +2,7 @@
 (function () {
   if (!window.__deckFx) return;
   window.__deckFx.register('confetti-burst', ({ ctx, w, h, palette }) => {
-    const cols = [palette.primary, palette.secondary, palette.warm, '244,114,182'];
+    const cols = [palette.primary, palette.secondary, palette.warm];
     const parts = Array.from({ length: 42 }, (_, i) => {
       const ang = -Math.PI * (0.18 + (i / 42) * 0.64) + (Math.sin(i * 3.1) * 0.14);
       const spd = 1.9 + (i % 6) * 0.42;
