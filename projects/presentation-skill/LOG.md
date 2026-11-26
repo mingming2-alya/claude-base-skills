@@ -1618,3 +1618,17 @@
   - 重新打包 `outputs/deck-architect.skill`（skill-creator `package_skill` 驗證通過，83 檔，369.4 KB，零 `__pycache__`，與原始碼逐位元一致）。
 - **同步的檔案**：`inputs/presentation-principles.md`、`outputs/deck-architect/{SKILL.md,assets/{runtime.js,style-library.html},references/{grill.md,structure.md,contexts.md,samples.md,modules-catalog.md,content-shapes.md,visual-guidance.md,presentation-rules.md,recipes/editorial-drama.md,recipes/product-story.md},scripts/{lint.py,check.mjs},styles/index.json,templates/{brief.md,storyboard.yaml,deck.css}}`、`outputs/deck-architect.skill`、`outputs/examples/v48-regression/`、`outputs/examples/v4-alive-demo/brief.md`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：使用者提供一份真實簡報需求，從 Step 1a 跑到成品，重點觀察主柱一的顧問品質與成品生動度；跑完再決定是否進 Phase D。
+
+
+## 2026-11-26｜外部稽核報告逐條評估（對象 `c2bfaf8`）
+
+- **背景**：使用者上傳另一個 Agent 對 v4.8（`c2bfaf8`）做的唯讀稽核報告，問「你同不同意？」。報告分三部分：4 個結構矛盾、5 個引擎 Bug、5 處口徑不一致，並建議先修 P0/P1 再進真實簡報 PK。
+- **做法**：每條對照原始碼，能實測的在 `outputs/examples/v48-regression/` 用 Playwright＋系統 Chrome 實跑（`mode: dark` 時內建頁底色、`slides/*.html` 寫入地雷詞與簡體字後的 lint／assemble 結果、直接開在各頁時 11 原語與 `data-beat` 的可見度、刪 `id` 的 SVG 複本是否仍顯示漸層）。
+- **結論**：14 條同意 11、部分同意 3，沒有整條不同意。4 條由 v4.8 新增的 `templates/deck.css` 造成或觸發（`oklch()` 色值、只設前綴變數、頂列留白選擇器太寬）；最終檢查漏掉，是因為回歸範例的自由畫布頁都寫了 `surface:`、內建頁退回預設色時對比仍合格，`check.mjs` 也沒有「底色來自 `deck.css`」這項檢查。
+- **不同意的部分與理由**：
+  - 依 `stage_mode` 放寬 brief 檢查：briefing 種子寫「無」本來只警告；三候選含破框是使用者在 C.1 拍板，破框是「不循規蹈矩」的落點；要輕量有快速模式。
+  - 縮圖刪 `id` 會破 SVG 漸層：投影片用 `visibility: hidden` 隱藏，`url(#…)` 仍指向原頁定義，實測正常。
+  - 「首頁動態全面啞火」：內容完整可見，只是第一頁不播進場（P2）；但頁內腳本呼叫 `window.__deck.stage` 報錯屬實（P1）。修法要讓 runtime 延後觸發第一頁，不能只換腳本順序。
+- **產出**：`inputs/external-audit-c2bfaf8.md`（原文照錄）、`inputs/external-audit-c2bfaf8-review.md`（逐條判定、證據與修法意見）。
+- **下一步**：用表單請使用者決定修補範圍、發散題是否標（推薦）、briefing 是否放寬 brief 檢查、第一頁是否自動播進場。
+- **同步的檔案**：`inputs/external-audit-c2bfaf8.md`、`inputs/external-audit-c2bfaf8-review.md`、`STATUS.md`、`LOG.md`。
