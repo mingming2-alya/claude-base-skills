@@ -103,20 +103,26 @@
 | `data-spotlight` | 高反差雙層光暈單次聚光框（手機亦清晰） | `data-delay`、`--spot-border`、`--spot-glow` | 維持正常邊框 |
 | `data-transform-at="780"` | 因果現場演變（進頁套 `.pre-transform`，到點切換最終態） | 毫秒數 | 直接呈現最終態 |
 | `data-draw` / `data-draw="ring"` | SVG 實線路徑／圓環真描繪（`pathLength="1"`） | `data-delay`、`data-dur` | 完整繪出 |
+| `data-grow="x\|x-left\|y\|y-down"` | 條狀圖／甘特條純 GPU 方向生長 | `data-delay`、`data-dur` | 完整展開 |
 | `data-wipe="right\|left\|down\|up"` | 純 GPU `clip-path` 方向揭露（虛線／刪除線／細軌零拉扯） | `data-delay`、`data-dur` | 完全展開 |
 | `data-pop` | 端點圓點／箭頭／徽章精準綻放 | `data-delay`、`data-dur` | 正常顯示 |
-| `data-ripple` | 目標點雙圈擴散波紋（純 HTML） | `data-delay`、`--ripple-color` | 自動隱藏 |
+| `data-ripple` | 目標點雙圈擴散波紋（純 HTML，單次綻放即靜止） | `data-delay`、`--ripple-color` | 自動隱藏 |
 | `data-travel="x\|y"` | 單段短距橋接光珠（僅限兩節點短距，禁跨多站連續滑行） | `data-travel-dist`、`data-delay`、`data-dur` | 自動隱藏 |
 | `data-nudge="x"` | 互動控制進場單次微動暗示 | `data-delay` | 停用 |
 | `data-beat="1\|2\|3\|4"` ＋ `data-from` | 語意分拍方向進場 | `left\|right\|up\|down\|none` | 正常顯示 |
 
+### 與 v4.7 風格動態套件協同規則（三條必守）
+1. **禁雙重壓暗衝突**：若某頁使用互動聚光套件（如 `[data-rack-focus]`、`[data-bento-expand]`、`[data-ref]`），**同一組卡片不可重複掛載自動 `data-focus-plan` 爭搶 `opacity`**；擇一主導或由底盤自動接管。
+2. **底盤自動搶先接管（Zero Lockout）**：只要使用者點擊或拖曳頁面內任一互動控件（`.live-ctrl`、`input`、`button`、`[data-interactive]`），`runtime.js` 自動呼叫 `window.__deck.clearFocus()` 立刻取消剩餘 `data-focus-plan` 壓暗排程並交還 100% 清晰控制權。
+3. **與 `data-step` 雙軌無縫聯動**：4 套風格動態套件（`motion-workday`/`counsel`/`apple`/`story`）皆支援置於 `<div data-step="N">` 內，進頁時自動等待講者點擊揭曉該步後才觸發進場。
+
 ---
 
-## 六、Step 5 視覺指引品管清單（人工＋`check.mjs --motion`）
+## 六、Step 5 視覺指引品管清單（人工＋`check.mjs --motion` 15 項）
 
 1. **場合節奏與去框化**：明暗極性與去框比例是否符合 `brief.md` 的 `stage_mode`？`keynote` 是否避開連續 5 頁以上同質暗色圓角卡片？
-2. **三秒靜態動線**：關掉動畫（`?still=1`）看截圖，視線是否仍自然從主角流向結論／拍板點？
-3. **零同時混戰與手機可辨識**：動態進場時同一時刻僅 1 個主焦點、無左右乒乓；390px 手機下聚光壓暗與因果箭頭依然一眼清晰。
+2. **三秒靜態動線與底部基線**：關掉動畫（`?still=1`）看截圖，視線是否仍自然從主角流向結論／拍板點？雙欄底部基線是否齊平？
+3. **零同時混戰、零永動與 390px 手機清晰**：動態進場時同一時刻僅 1 個主焦點、無左右乒乓、無正文區 `infinite` 永動干擾（`check.mjs` 第 14 項）；390px 手機無橫向溢出且聚光清晰（`check.mjs` 第 15 項）。
 4. **線點時序零破綻**：端點圓點只在線條抵達瞬間綻放，虛線銳利無拉扯。
-5. **零殘留復原**：整頁演完與快按方向鍵打斷後，`.focus-*` 與 `.pre-transform` 100% 歸零復原（`check.mjs --motion` 自動實測）。
+5. **零殘留復原與提早接管**：整頁演完、快按方向鍵打斷或使用者提早互動後，`.focus-*` 與 `.pre-transform` 100% 歸零復原（`check.mjs --motion` 自動實測）。
 6. **去小字不回潮**：視覺指引靠光影、反差、線條、波紋與微動傳達，不為引導加回冗餘第 3 層小字（合法豁免之原話暗房與產品情感主標除外）。

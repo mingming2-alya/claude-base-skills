@@ -1,16 +1,17 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.7.3 六維度全盤體檢收官：9 處真實遺漏全數補齊＋15 項動態與行動實測＋風格跨界防呆完成 ✅）**：
+> **最新接手點（2026-11-26｜`deck-architect` v4.7.4 視覺指引第二核心專項體檢與底盤加固完成 ✅）**：
 >
-> 1. **六大維度（靜態上限／動態上限／風格動態融合與 Library／核心元件與模組化注入／流程架構／整合秩序）全數閉環，9 處實查遺漏全數清零**：
->    - **靜態×動態融合鐵律貫穿全檔**：同步寫入 `references/visual-guidance.md`、`motion-system.md`、`style-motion-kits.md`、`samples.md` 與全數 5 支 `references/recipes/*.md` 黃金工藝配方（5/5 皆已對接 v4.7 風格動態原語與 3 拍語意順序）。
->    - **4 套風格動態套件補齊硬契約 #2**：`workday-kit`／`counsel-kit`／`apple-kit`／`story-kit` 全部補齊 `deck:lowpower`（`B` 鍵瞬凍）與 `deck:slideleave`（清理 rAF/計時器），且 `spotlight-sweep` 改單次掃完即靜止（零永動干擾）。
->    - **自動化防呆與品管升至 15 項**：`scripts/assemble.py` 新增讀取 `styles/index.json` `avoid_motions` 對 `meta.style` 做風格×動態跨界軟性 `[WARN]` 防呆；`scripts/check.mjs --motion` 新增第 14 項「閱讀期靜止檢核（反永動）」與第 15 項「390px 手機橫向溢出實測」；`SKILL.md`、`modules-catalog.md`、`grill.md` 與 `samples.md` 全數同步無斷層。
+> 1. **將「視覺指引（`references/visual-guidance.md`）」正式落實為全流程與底盤引擎的第二核心，修補 4 處關鍵斷層**：
+>    - **底盤自動搶先接管（`assets/runtime.js`）**：新增 `focusToken`、`window.__deck.clearFocus(sl)` 與捕獲層監聽——使用者提早點擊／操作頁內任一 `.live-ctrl`、`input`、`button`、`[data-interactive]`，底盤**自動清除 `data-focus-plan` 壓暗並取消所有剩餘排程計時器**（零鎖死、零樣板 JS）。
+>    - **雙軌 `data-step` 聯動（4 套 `assets/modules/motion/*.js`）**：`workday-kit`/`counsel-kit`/`apple-kit`/`story-kit` 全數支援 `deck:stepchange`，置於 `<div data-step="N">` 內的風格動態原語會靜候講者點擊揭曉該步後才觸發進場。
+>    - **拉升為 `SKILL.md` 全流程第二核心**：將 `references/visual-guidance.md` 明確寫入 Step 2 分鏡、Step 3 融合關卡、Step 4 分批子代理 6 樣必吃輸入清單與 Step 5 人工品管。
+>    - **規格與協同補齊（`references/visual-guidance.md`）**：速查表補齊 `data-grow`，並增訂「與 v4.7 風格動態套件協同三條規則（禁雙重壓暗衝突、底盤自動接管、`data-step` 雙軌聯動）」。
 > 2. **驗證與重打包**：
->    - 9 項補洞斷言、風格跨界防呆煙霧測試（`counsel` 誤用 `popup-fold` 精準觸發 `[WARN]`）、`v45-modular-demo` 與 `v4-alive-demo` 全套 15 項 `--motion`＋Liveliness Audit 全部通過 ✅。
->    - 重新打包 `outputs/deck-architect.skill`（**82 檔，零 `__pycache__`**）。
+>    - 真實無頭 Chromium CDP 實測驗證：`focusingBefore: true` → 提早點擊後 `focusingAfterClick: false` → 過 Beat 2 後仍 `focusingAfterBeat2: false`（剩餘計時器徹底取消），且 `<div data-step="1">` 內 `[data-odometer]` 步進觸發 `stepOdoHasDigits: true` ✅。
+>    - 重新打包 `outputs/deck-architect.skill`（**82 檔，340.6 KB**，零 `__pycache__`）。
 >
-> **下一步（Phase C.2 收官驗收 → Phase D）**：`deck-architect` v4.7.3 已達無斷層就緒狀態，隨時可以真實簡報進行端到端實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「靜態上限 × 動態上限一體」Style DNA**。
+> **下一步（Phase C.2 收官驗收 → Phase D）**：`deck-architect` v4.7.4 已達無斷層就緒狀態，隨時可以真實簡報進行端到端實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「靜態上限 × 動態上限一體」Style DNA**。
 >
 > 主軸文件是 `ROADMAP.md`，執行紀錄在 `LOG.md`，專案規則在根目錄 `CLAUDE.md`。
 

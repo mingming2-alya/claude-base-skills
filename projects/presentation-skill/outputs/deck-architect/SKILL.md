@@ -57,9 +57,9 @@ decks/<name>/
 
 ### Step 2｜架構展開 ＋ 逐頁 4 行視覺分鏡 → `storyboard.yaml`
 
-讀 `references/presentation-rules.md` 與 `references/content-shapes.md`，把 `brief.md`（含減法清單與招牌亮點頁）展開成 `storyboard.yaml`（`templates/storyboard.yaml`）：
+讀 `references/presentation-rules.md`、`references/content-shapes.md` 與 **第二核心 `references/visual-guidance.md`**（四大靜態動線、空間分群與單向語意順序），把 `brief.md`（含減法清單與招牌亮點頁）展開成 `storyboard.yaml`（`templates/storyboard.yaml`）：
 - 將長段背景與口白歸入 `notes`，畫布只留視覺錨點。
-- 為頁面補上輕量 4 行 **`director:` 分鏡**（`hero` 視覺主角、`archetype` 對應 `references/recipes/`、`module` 觸發模組、`choreo` 切頁與動線）：`briefing` 僅標關鍵 2–3 頁即可；`pitch`/`keynote` 建議逐頁填寫，防止 Step 4 退回純文字卡片。
+- 為頁面補上輕量 4 行 **`director:` 分鏡**（`hero` 視覺主角、`archetype` 對應 `references/recipes/`、`module` 觸發模組、`choreo` 視覺指引動線與單向語意節拍）：`briefing` 僅標關鍵 2–3 頁即可；`pitch`/`keynote` 建議逐頁填寫，防止 Step 4 退回純文字卡片。
 - 執行並修完所有 ERROR：
 
 ```bash
@@ -68,14 +68,14 @@ python3 <skill>/scripts/lint.py decks/<name>/storyboard.yaml
 
 呈交一頁**架構與分鏡摘要**（章節、每頁題目、視覺主角、極性與頁數算術）。
 
-### Step 3｜兩階段視覺關卡（風格圖鑑快選 → 單風格高工藝樣張）　⛔ 關卡二
+### Step 3｜兩階段視覺關卡（融合圖鑑快選 → 單風格高工藝樣張）　⛔ 關卡二
 
-讀 `references/samples.md`、`styles/index.json` 與 `styles/color-system.md`：
+讀 `references/samples.md`、`references/visual-guidance.md`（**第二核心：靜態動線、空間分群、底部基線、3 拍語意順序與靜止閱讀窗**）、`styles/index.json` 與 `styles/color-system.md`：
 
-1. **Step 3a｜風格與動效圖鑑快選（Style & Motion Library）**：
-   - 展示 `assets/style-library.html`（收錄 4 款已完整就緒風格：`workday`、`counsel`、`apple`、`illustration`，支援淺／深切換、試播動效與 `?stage=` 場合高亮），並以互動表單推薦最適合本場 `stage_mode` 的款式，請使用者**先挑中 1 款風格**（以及偏好明暗策略）。
+1. **Step 3a｜風格 × 動態 DNA 融合圖鑑快選**：
+   - 展示 `assets/style-library.html`（收錄 4 款 1920×1080 靜態×動態融合就緒風格：`workday`、`counsel`、`apple`、`illustration`，支援淺／深切換、3 拍語意重播、直接互動、全螢幕放大與 `?stage=` 場合高亮），並以互動表單推薦最適合本場 `stage_mode` 的款式，請使用者**先挑中 1 款風格**（以及偏好明暗策略）。
 2. **Step 3b｜用選定風格集中精雕 2–3 張真實樣張 ＋ 3 組 OKLCH 配色**：
-   - 讀入 `styles/<selected>.md` 與對應 `references/recipes/*.md` 黃金工藝配方，只針對使用者挑中的這 1 款風格，用真實內容畫出 **2–3 張高工藝樣張**（封面＋核心招牌亮點頁＋異構圖／異極性頁）並跑 `scripts/oklch.py --palette` 驗證 3 組 OKLCH 配色。
+   - 讀入 `styles/<selected>.md`、`styles/index.json` 該風格的 `motion_dna` 與對應 `references/recipes/*.md` 黃金工藝配方，只針對使用者挑中的這 1 款風格，用真實內容畫出 **2–3 張高工藝樣張**（封面＋核心招牌亮點頁＋異構圖／異極性頁，同步立住**靜態美感上限＋視覺指引動線＋專屬動態原語**）並跑 `scripts/oklch.py --palette` 驗證 3 組 OKLCH 配色。
    - 執行像素品管並**親自看過 `samples/sheet.jpg`**：
 
 ```bash
@@ -89,9 +89,9 @@ node <skill>/scripts/check.mjs --sheet decks/<name>/samples
 
 1. 將選定的 `style`、`mode` 與 OKLCH 雙極變數寫入 `storyboard.yaml` 與 `deck.css`，把 Step 3b 已確認的 2–3 張樣張移入 `slides/`。
 2. 依總頁數採最穩定的精雕節奏（防止長對話上下文疲勞導致後面幾頁退化為純文字方塊）：
-   - **≤ 6 頁**：主代理依 `director:`、`references/recipes/`、`references/visual-guidance.md` 與按需模組子手冊逐頁撰寫其餘 `slides/*.html`。
-   - **> 6 頁（強烈建議，快速模式可省略）**：將剩餘頁面拆成 **每 3–4 頁一小批**，並行派給乾淨上下文子代理精雕。每個子代理只吃 5 樣精準輸入：① `brief.md` Stage Spec 與母題摘要、② `deck.css`、③ Step 3b 已通過的 2–3 張真實樣張（**活範本**）、④ 僅該批 3–4 頁的 `storyboard.yaml`（含 `director:`）、⑤ 該批用到的 1–2 支 `references/recipes/*.md` 與 1 本 `references/modules/*.md`。主代理最後統一確認跨頁 `data-morph` 與節奏連貫。
-3. 組裝單檔簡報（三層細粒度注入＋軟性 `[WARN]` 防呆＋本機靜態圖與影片海報內嵌）：
+   - **≤ 6 頁**：主代理依 `director:`、`references/visual-guidance.md`、`references/recipes/` 與按需模組子手冊逐頁撰寫其餘 `slides/*.html`。
+   - **> 6 頁（強烈建議，快速模式可省略）**：將剩餘頁面拆成 **每 3–4 頁一小批**，並行派給乾淨上下文子代理精雕。每個子代理必吃 6 樣精準輸入：① `brief.md` Stage Spec 與母題摘要、② `deck.css`、③ Step 3b 已通過的 2–3 張真實樣張（**活範本**）、④ **第二核心 `references/visual-guidance.md`**（七種假指引反模式、靜態動線、空間分群、底部基線與靜止閱讀窗）、⑤ 僅該批 3–4 頁的 `storyboard.yaml`（含 `director:`）、⑥ 該批用到的 1–2 支 `references/recipes/*.md` 與對應 `references/modules/*.md`。主代理最後統一確認跨頁 `data-morph` 與節奏連貫。
+3. 組裝單檔簡報（三層細粒度注入＋軟性 `[WARN]` 場合與風格跨界防呆＋本機靜態圖與影片海報內嵌）：
 
 ```bash
 python3 <skill>/scripts/assemble.py decks/<name>/storyboard.yaml --write-upgrade-list
@@ -99,15 +99,15 @@ python3 <skill>/scripts/assemble.py decks/<name>/storyboard.yaml --write-upgrade
 
 若有待升級 `.asset-slot`，補齊 `IMAGE_UPGRADE.md`（`templates/image-upgrade.md`）。
 
-### Step 5｜雙門檻品管（下限安全 ＋ 上限生動度）＋ 視覺精修輪 → `check/`
+### Step 5｜雙門檻品管（下限安全 ＋ 視覺指引 ＋ 上限生動度）＋ 視覺精修輪 → `check/`
 
 ```bash
 node <skill>/scripts/check.mjs decks/<name>/deck.html --jpg --motion
 ```
 
-- **下限品管（必過）**：`?still=1` 真實背景像素 WCAG 對比（含漸層字）、主標題≥總結、溢出與邊界、最小字級、SVG 重複 ID、圖片／腳本錯誤，加上 `--motion` 最多 **15 項**動態與行動實測（含 Layer 1 `G`/`A`/`L`/`S`、Layer 2 說服模組、閱讀期靜止檢核反永動、390px 手機橫向溢出實測）。
+- **下限品管與視覺指引（必過）**：`?still=1` 真實背景像素 WCAG 對比（含漸層字）、主標題≥總結、溢出與邊界、最小字級、SVG 重複 ID、圖片／腳本錯誤，加上 `--motion` 最多 **15 項**動態與行動實測（含聚光壓暗歸零、SVG 真描線、Layer 1 `G`/`A`/`L`/`S`、Layer 2 說服模組、**閱讀期靜止檢核反永動**、**390px 手機橫向溢出實測**）。
 - **上限生動度稽核（Liveliness Audit，依 `stage_mode` 自動調檔）**：自動量測視覺頁佔比、去框化比例、動態原語多樣性與連續純文字單調頁，點名全場最平淡的 1–3 頁。
-- **視覺精修輪（Polish Pass）**：親自看過 `check/slide-*.jpg`，若下限有錯、或 `pitch`/`keynote` 生動度未達標，針對點名頁面升級圖解／互動並重建，**最多修 2 輪**；未解項如實回報。
+- **視覺精修輪（Polish Pass）**：親自看過 `check/slide-*.jpg` 並對照 `visual-guidance.md` 第六節 6 條人工檢核（三秒靜態動線、空間分群、底部基線、去小字不回潮），若下限有錯、或 `pitch`/`keynote` 生動度未達標，針對點名頁面升級圖解／互動並重建，**最多修 2 輪**；未解項如實回報。
 
 ### Step 6｜交付　⛔ 關卡三
 

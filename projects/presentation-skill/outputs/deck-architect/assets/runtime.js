@@ -527,6 +527,8 @@
   }
   initPrimitives();
 
+  let focusToken = 0;
+
   function clearFocusClasses(sl) {
     if (!sl) return;
     sl.classList.remove('is-focusing');
@@ -535,8 +537,14 @@
     });
   }
 
+  function clearFocus(sl) {
+    focusToken++;
+    clearFocusClasses(sl || slides[cur]);
+  }
+
   function clearGuidanceState(sl) {
     if (!sl) return;
+    focusToken++;
     clearFocusClasses(sl);
     sl.querySelectorAll('[data-transform-at]').forEach(el => {
       el.classList.remove('pre-transform', 'transforming');
@@ -851,9 +859,10 @@
     const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
     const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
     if (focusPlan.length && focusEls.length) {
+      const myFocusToken = ++focusToken;
       const visited = new Set();
       const applyStage = activeId => {
-        if (token !== navToken || isStatic()) return;
+        if (token !== navToken || myFocusToken !== focusToken || isStatic()) return;
         sl.classList.add('is-focusing');
         for (const el of focusEls) {
           const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
@@ -872,14 +881,14 @@
           applyStage(stepItem.id);
         } else {
           later(() => {
-            if (token !== navToken || isStatic()) return;
+            if (token !== navToken || myFocusToken !== focusToken || isStatic()) return;
             for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
             applyStage(stepItem.id);
           }, startAt);
         }
       });
       later(() => {
-        if (token !== navToken) return;
+        if (token !== navToken || myFocusToken !== focusToken) return;
         clearFocusClasses(sl);
       }, baseDelay + maxEnd);
     }
@@ -1418,6 +1427,18 @@
   go(start - 1, true);
   if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
 
+  // Auto-takeover: early interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
+  const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], input, select, textarea, button:not(.back):not([data-link])';
+  const handleEarlyTakeover = e => {
+    const sl = slides[cur];
+    if (!sl || !sl.classList.contains('is-focusing')) return;
+    if (e.target && e.target.closest && e.target.closest(TAKEOVER_SEL)) {
+      clearFocus(sl);
+    }
+  };
+  stage.addEventListener('pointerdown', handleEarlyTakeover, true);
+  stage.addEventListener('input', handleEarlyTakeover, true);
+
   window.__deck = {
     go: (n, instant = true, opts) => go(n, instant, opts),
     step,
@@ -1426,6 +1447,7 @@
     back,
     setStill,
     toggleLowPower,
+    clearFocus,
     setCtrlBarVisible,
     registerOverlay,
     hasNavLock,

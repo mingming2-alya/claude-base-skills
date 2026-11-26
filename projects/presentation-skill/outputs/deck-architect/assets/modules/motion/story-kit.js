@@ -82,12 +82,24 @@
     chats.forEach(c => c.showAll());
   }
 
+  function stepOf(el, sl) {
+    const h = el.closest('[data-step], [data-step-only]');
+    return h && sl && sl.contains(h) ? (parseInt(h.dataset.step || h.dataset.stepOnly || '0', 10) || 0) : 0;
+  }
+
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
       const sl = detail.slide;
       if (!sl) return;
-      sl.querySelectorAll('[data-popup-fold]').forEach(el => el._pfInit && el._pfInit.play());
-      sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.play());
+      const curStep = detail.step || 0;
+      sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) <= curStep) el._pfInit.play(); });
+      sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) <= curStep) el._crInit.play(); });
+    });
+    deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      const sl = detail.slide;
+      if (!sl || detail.step <= 0) return;
+      sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) === detail.step) el._pfInit.play(); });
+      sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) === detail.step) el._crInit.play(); });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       const sl = detail.slide;

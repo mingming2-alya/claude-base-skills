@@ -1543,3 +1543,13 @@
   9. `references/grill.md`：Step 1 幕後模組映射補納 4 套風格動態套件，打通 Step 1→2→3→4 全鏈路。
 - **驗證與重打包**：9 項補洞斷言、風格跨界防呆煙霧測試、`v45-modular-demo` 與 `v4-alive-demo` 全套 15 項 `--motion`＋Liveliness Audit 全部通過 ✅；重打包 `outputs/deck-architect.skill`（82 檔，零 `__pycache__`）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/modules/motion/*.js,references/{visual-guidance.md,samples.md,modules-catalog.md,grill.md,recipes/*.md},scripts/{assemble.py,check.mjs}}`、`outputs/deck-architect.skill`、`outputs/examples/{v45-modular-demo,v4-alive-demo}/check/report.md`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+
+## 2026-11-26｜`deck-architect` v4.7.4：視覺指引（第二核心）專項深查與 4 處關鍵修補
+
+- **專項深查抓出的 4 處斷層與修補**：
+  1. **`assets/runtime.js` 自動搶先接管（Zero Lockout）**：新增 `focusToken` 與 `window.__deck.clearFocus(sl)`，並在 `#stage` 捕獲層監聽 `.live-ctrl`/`input`/`button`/`[data-interactive]` 的 `pointerdown`/`input`——使用者提早互動立刻解除 `data-focus-plan` 壓暗並取消所有剩餘排程計時器，不再需要逐頁手寫樣板 JS。
+  2. **4 套風格動態套件補齊 `data-step` 雙軌聯動**：`workday-kit.js`/`counsel-kit.js`/`apple-kit.js`/`story-kit.js` 全面加入 `stepOf()` 與 `deck:stepchange` 監聽，置於 `<div data-step="N">` 內的新原語會延遲至講者點擊揭曉該步時才觸發。
+  3. **`SKILL.md` 正式確立視覺指引為第二核心**：將 `references/visual-guidance.md` 補入 Step 2 分鏡、Step 3 融合關卡、Step 4 分批子代理 6 樣必吃輸入清單與 Step 5 人工品管。
+  4. **`references/visual-guidance.md` 補齊速查與協同規則**：補列 `data-grow`，增訂與 v4.7 風格動態套件協同三條規則（禁雙重壓暗衝突、底盤自動接管、`data-step` 雙軌聯動）。
+- **實測與重打包**：無頭 Chromium CDP 實測驗證提早互動即刻清除壓暗且過 Beat 2 不復發（`focusingBefore:true → focusingAfterClick:false → focusingAfterBeat2:false`）、`data-step="1"` 內 `[data-odometer]` 準時觸發（`stepOdoHasDigits:true`）；重打包 `outputs/deck-architect.skill`（**82 檔，340.6 KB**）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/runtime.js,assets/modules/motion/*.js,references/visual-guidance.md}`、`outputs/deck-architect.skill`、`STATUS.md`、`LOG.md`。

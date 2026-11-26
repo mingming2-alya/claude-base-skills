@@ -217,13 +217,26 @@
     decks.forEach(d => d.reset());
   }
 
+  function stepOf(el, sl) {
+    const h = el.closest('[data-step], [data-step-only]');
+    return h && sl && sl.contains(h) ? (parseInt(h.dataset.step || h.dataset.stepOnly || '0', 10) || 0) : 0;
+  }
+
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
       const sl = detail.slide;
       if (!sl) return;
-      sl.querySelectorAll('[data-split-mask]').forEach(el => el._smInit && el._smInit.play());
-      sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => el._spInit && el._spInit.start());
-      sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.play());
+      const curStep = detail.step || 0;
+      sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) <= curStep) el._smInit.play(); });
+      sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) <= curStep) el._spInit.start(); });
+      sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) <= curStep) el._cwInit.play(); });
+    });
+    deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      const sl = detail.slide;
+      if (!sl || detail.step <= 0) return;
+      sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) === detail.step) el._smInit.play(); });
+      sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) === detail.step) el._spInit.start(); });
+      sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) === detail.step) el._cwInit.play(); });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       const sl = detail.slide;

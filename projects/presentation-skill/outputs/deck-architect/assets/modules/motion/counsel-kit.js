@@ -173,12 +173,24 @@
     racks.forEach(r => r.clear());
   }
 
+  function stepOf(el, sl) {
+    const h = el.closest('[data-step], [data-step-only]');
+    return h && sl && sl.contains(h) ? (parseInt(h.dataset.step || h.dataset.stepOnly || '0', 10) || 0) : 0;
+  }
+
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
       const sl = detail.slide;
       if (!sl) return;
-      sl.querySelectorAll('[data-odometer]').forEach(el => el._odoInit && el._odoInit.play());
-      sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.play());
+      const curStep = detail.step || 0;
+      sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) <= curStep) el._odoInit.play(); });
+      sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) <= curStep) el._rrInit.play(); });
+    });
+    deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      const sl = detail.slide;
+      if (!sl || detail.step <= 0) return;
+      sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) === detail.step) el._odoInit.play(); });
+      sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) === detail.step) el._rrInit.play(); });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       const sl = detail.slide;

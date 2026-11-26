@@ -117,11 +117,26 @@
   const rulers = [...document.querySelectorAll('[data-ruler-progress]')].map(initRuler);
   const bentos = [...document.querySelectorAll('[data-bento-expand]')].map(initBento);
 
+  function stepOf(el, sl) {
+    const h = el.closest('[data-step], [data-step-only]');
+    return h && sl && sl.contains(h) ? (parseInt(h.dataset.step || h.dataset.stepOnly || '0', 10) || 0) : 0;
+  }
+
   if (deck && deck.stage) {
     deck.stage.addEventListener('deck:slideenter', ({ detail }) => {
       const sl = detail.slide;
       if (!sl) return;
-      sl.querySelectorAll('[data-ruler-progress]').forEach(el => el._rpInit && el._rpInit.play());
+      const curStep = detail.step || 0;
+      sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
+        if (el._rpInit && stepOf(el, sl) <= curStep) el._rpInit.play();
+      });
+    });
+    deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      const sl = detail.slide;
+      if (!sl || detail.step <= 0) return;
+      sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
+        if (el._rpInit && stepOf(el, sl) === detail.step) el._rpInit.play();
+      });
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       const sl = detail.slide;
