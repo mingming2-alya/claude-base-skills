@@ -9,11 +9,10 @@
 >      - `motion-counsel`（Editorial Weight）：`[data-rank-race]` FLIP 排名超車、`[data-odometer]` 機械滾輪數字、`[data-rack-focus]` 推鏡景深聚焦。
 >      - `motion-apple`（Cinema Spring）：`[data-split-mask]` 遮罩斬切文字、`[data-spotlight-sweep]` 擺動／追隨聚光燈掃字、`[data-depth-deck]` 3D 景深疊卡甩牌、`[data-colorize-wipe]` 黑白柔焦→彩色光掃。
 >      - `motion-story`（Tactile Bounce）：`[data-popup-fold]` 立體書 3D 翻折＋主從標籤延遲、`[data-chat-replay]` 對話氣泡實況劇院。
->    - **原地升級 `assets/style-library.html`**：徹底告別千篇一律 14px 淡入；4 款風格卡片全部變成可親手點擊、拖曳、掃光、切換招式與淺深底的活體舞台，並清楚標示每款風格綁定注入的模組清單。
->    - **引擎與手冊閉環**：`assemble.py` 新增 4 套風格動態細粒度按需注入＋`briefing` 高舞台原語防呆；`check.mjs` Liveliness Audit 納管 11 支新原語；新增 `references/modules/style-motion-kits.md` 並在 `references/motion-system.md` 納入迪士尼 4 條簡報物理守則。
+>    - **靜態上限 × 動態上限真正融合（`assets/style-library.html`、`references/motion-system.md`、`references/modules/style-motion-kits.md`）**：徹底淘汰簡陋 UI 小卡與 Emoji 佔位，將圖鑑升級為 **4 款 1920×1080 Phase A+ 靜態美感上限完整活體舞台**（`workday` 6 格現代 Bento 儀表板＋點擊 A/B 方案全看板連動推演、`counsel` 麥肯錫建築色塊即圖表＋點擊選址柱推鏡景深與滾輪聯動、`apple` 雙層微光玻璃平板＋天氣情境即時重繪曲線與標註、`illustration` 真實無字 3D 手工黏土烘焙底圖融真文字＋暖彩光掃與三站點聚光換數），皆支援淺／深切換、重播與 `⛶ 放大` 全螢幕試玩；並將「先立靜態上限、動態寄生原生結構、禁為動效降級畫面」寫入技能第一鐵律。
 > 2. **驗證與重打包**：
->    - 4 套風格動態套件注入煙霧測試通過（按需注入 4 套、未用模組全略過省 123.0 KB）；既有 `v45-modular-demo` 零回歸（4 套新套件全略過 0 KB、`check.mjs --jpg --motion` 0 錯、最低 `4.84:1`、Liveliness Audit 100% ✅）；無頭 Chrome 截圖目視檢核新版 `style-library.html` 通過。
->    - 重新打包 `outputs/deck-architect.skill`（**82 檔，265.9 KB**，零 `__pycache__`）。
+>    - 4 套風格動態套件注入煙霧測試通過（按需注入 4 套、未用模組全略過省 123.0 KB）；既有 `v45-modular-demo` 零回歸（4 套新套件全略過 0 KB、`check.mjs --jpg --motion` 0 錯、最低 `4.84:1`、Liveliness Audit 100% ✅）；無頭 Chrome 截圖目視檢核融合版 `style-library.html` 通過（零遮擋、16:9 完整呈現）。
+>    - 重新打包 `outputs/deck-architect.skill`（**82 檔，332.4 KB**，含內嵌 30.7 KB 真實黏土場景圖，零 `__pycache__`）。
 >
 > **下一步（Phase C.2 收官驗收 → Phase D）**：由使用者親手試玩新版 `style-library.html`，滿意後可擇期以真實簡報跑一次 v4.7 實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「風格 × 動態一體」Style DNA 並逐款上架圖鑑**。
 >

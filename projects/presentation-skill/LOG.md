@@ -1504,3 +1504,16 @@
   - 重新打包 `outputs/deck-architect.skill`（**82 檔，265.9 KB**，零 `__pycache__`）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,styles/{index.json,workday.md,counsel.md,apple.md,illustration.md},assets/style-library.html,assets/modules/motion/*,references/{motion-system.md,modules-catalog.md,modules/style-motion-kits.md},scripts/{assemble.py,check.mjs}}`、`outputs/deck-architect.skill`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：交由使用者親手試玩新版風格 × 動態圖鑑，確認體感後推進實戰 PK 或 Phase D。
+
+## 2026-11-26｜`deck-architect` v4.7.1：靜態風格上限 × 動態上限真正融合（圖鑑與鐵律升級）
+
+- **使用者關鍵指正**：指出前版圖鑑為了展示動效做成一般 UI 小元件與 Emoji 卡片，沒有體現 Phase A+ 辛苦定案的「靜態風格上限」，也尚未把靜態上限與動態上限真正融為一體。
+- **本輪融合實作**：
+  1. **確立「靜態上限 × 動態上限融合第一鐵律」**：寫入 `references/motion-system.md`（§5.3 第 0 條）與 `references/modules/style-motion-kits.md`——每一頁凍結於 `?still=1` 也必須保有 Phase A+ 級靜態視覺工藝，動態必須直接「寄生」於風格原生結構（甘特條、進度圓環、巨型建築色塊柱、微光玻璃裝置曲線、真實無字 AI 黏土場景），嚴禁為套動效而降級畫面。
+  2. **重製 `assets/style-library.html` 為 1920×1080 等比縮放 4 大活體大師舞台**（含 `⛶ 放大` 全螢幕把玩與零遮擋下方互動提示條）：
+     - `workday`：完整 6 格現代 Bento 儀表板（雙語意甘特斜紋條＋75%/100% 圓環＋51% 五店柱群＋方案 A/B 拍板卡）× 點擊方案 A/B 全看板即時聚光與甘特推演。
+     - `counsel`：完整麥肯錫「色塊即圖表」建築構圖（左三指標＋右三全高色塊柱＋虛線目標線＋紅斜線差距塊）× 機械滾輪數字與點擊選址柱推鏡景深聯動。
+     - `apple`：完整雙層微光玻璃平板舞台＋四向極細引線標註 × 主標斬字、8 週曲線真描線與點擊天氣膠囊即時重繪排程。
+     - `illustration`：內嵌真實無字 3D 手工黏土烘焙底圖（30.7 KB 壓縮版 `clay-bakery-scene.jpg`）融可編輯真文字與黏土小平板活數字 × 素模→暖彩光掃喚醒、端點波紋與點擊三站點聚光換數。
+- **驗證與重打包**：無頭 Chrome 截圖目視驗收通過（4 張 16:9 畫面零遮擋、靜態與互動細節完整）；重打包 `outputs/deck-architect.skill`（**82 檔，332.4 KB**，零 `__pycache__`）。
+- **同步的檔案**：`outputs/deck-architect/assets/style-library.html`、`outputs/deck-architect/references/motion-system.md`、`outputs/deck-architect/references/modules/style-motion-kits.md`、`outputs/deck-architect.skill`、`STATUS.md`、`LOG.md`。
