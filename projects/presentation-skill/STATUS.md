@@ -1,20 +1,18 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-25｜`deck-architect` v4.7「風格 × 動態 × 主題一體」資料庫＋4 套風格綁定高質感動態原語＋互動圖鑑重製完成 ✅）**：
+> **最新接手點（2026-11-26｜`deck-architect` v4.7.2 六大血淚 Takeaway 全項回補＋靜態上限 × 動態上限深度融合＋14 項動態品管完成 ✅）**：
 >
-> 1. **吸收 `motion.dev/examples`、`motionface.cc` 與迪士尼 12 原則心法，不另起爐灶、回歸「主題 → 風格 DNA → 專屬動態」一體設計**：
->    - **單一風格動態資料庫（`styles/index.json` v4.7＋4 份 `styles/*.md`）**：全部 12 款風格統一掛載 `motion_dna`（物理個性、迪士尼節奏重點、綁定原語、禁忌動態）並預留 `external_adapters` 外接圖書館掛接槽。
->    - **4 套風格綁定高質感按需原語（`assets/modules/motion/*`，未用到 0 KB）**：
->      - `motion-workday`（Crisp Snap）：`[data-ruler-progress]` 阻尼刻度尺推進＋達標亮燈、`[data-bento-expand]` 看板聚焦展開。
->      - `motion-counsel`（Editorial Weight）：`[data-rank-race]` FLIP 排名超車、`[data-odometer]` 機械滾輪數字、`[data-rack-focus]` 推鏡景深聚焦。
->      - `motion-apple`（Cinema Spring）：`[data-split-mask]` 遮罩斬切文字、`[data-spotlight-sweep]` 擺動／追隨聚光燈掃字、`[data-depth-deck]` 3D 景深疊卡甩牌、`[data-colorize-wipe]` 黑白柔焦→彩色光掃。
->      - `motion-story`（Tactile Bounce）：`[data-popup-fold]` 立體書 3D 翻折＋主從標籤延遲、`[data-chat-replay]` 對話氣泡實況劇院。
->    - **靜態上限 × 動態上限真正融合（`assets/style-library.html`、`references/motion-system.md`、`references/modules/style-motion-kits.md`）**：徹底淘汰簡陋 UI 小卡與 Emoji 佔位，將圖鑑升級為 **4 款 1920×1080 Phase A+ 靜態美感上限完整活體舞台**（`workday` 6 格現代 Bento 儀表板＋點擊 A/B 方案全看板連動推演、`counsel` 麥肯錫建築色塊即圖表＋點擊選址柱推鏡景深與滾輪聯動、`apple` 雙層微光玻璃平板＋天氣情境即時重繪曲線與標註、`illustration` 真實無字 3D 手工黏土烘焙底圖融真文字＋暖彩光掃與三站點聚光換數），皆支援淺／深切換、重播與 `⛶ 放大` 全螢幕試玩；並將「先立靜態上限、動態寄生原生結構、禁為動效降級畫面」寫入技能第一鐵律。
+> 1. **逐條對照 Phase B.3 六大 Takeaway 完成根治修補（零退步、零永動干擾）**：
+>    - **Takeaway #1 語意順序優先**：4 款圖鑑重播全面改為嚴格單向 3 拍語意順序（`workday` 風險→拍板→健康；`counsel` 目標基準線→達標柱→超標紅差距；`apple` 主張→條件走勢→產出成效；`illustration` 左→中→右三站時間接力）。
+>    - **Takeaway #2 閱讀期完全靜止（反永動劫持）**：`assets/modules/motion/apple-kit.js` `[data-spotlight-sweep]` 移除無限鐘擺循環，改為單次光掃後**完全靜止**；`assets/style-library.html` 移除 3 個無限循環波紋，改為抵達端點單次綻放；**`scripts/check.mjs --motion` 新增第 14 項「閱讀期靜止檢核」**，自動攔截正文區干擾型 `infinite` 永動動畫。
+>    - **Takeaway #3 從容節奏＋零鎖死隨時接管**：4 款皆為每拍 ~1.4s（含閱讀靜止窗），中途點擊任何互動元件立即取消剩餘排程並解除壓暗。
+>    - **Takeaway #4 空間先分群** & **#5 雙欄底部基線齊平**：`workday` 升級回 Phase B.3 進化版「左欄行動主軸（風險 ↓ 因果紅箭頭 ↓ 拍板）＋右欄健康總覽由高到低」；`counsel` 與 `workday` 雙欄底部基線精準對齊。
+>    - **Takeaway #6 中場影格實拍＋390px 手機實測**：實際以 Chromium CDP 抓完稿、Beat 1 中場實拍與 390px 手機畫面，發現手機上控制鈕壓到圖面右上角並立即將控制列移出 16:9 畫布外（桌面與 390px 手機均 0% 遮擋、0px 橫向溢出）。
 > 2. **驗證與重打包**：
->    - 4 套風格動態套件注入煙霧測試通過（按需注入 4 套、未用模組全略過省 123.0 KB）；既有 `v45-modular-demo` 零回歸（4 套新套件全略過 0 KB、`check.mjs --jpg --motion` 0 錯、最低 `4.84:1`、Liveliness Audit 100% ✅）；無頭 Chrome 截圖目視檢核融合版 `style-library.html` 通過（零遮擋、16:9 完整呈現）。
->    - 重新打包 `outputs/deck-architect.skill`（**82 檔，332.4 KB**，含內嵌 30.7 KB 真實黏土場景圖，零 `__pycache__`）。
+>    - `check.mjs --jpg --motion` 於 `v45-modular-demo`（4.84:1、100% 視覺）與 `v4-alive-demo`（4.70:1、80% 視覺、8 種原語）全數通過含新第 14 項「閱讀期靜止檢核」✅；`style-library.html` 實測 0 個永動 CSS 動畫、Beat 1 中場聚光與中途點擊接管全通過。
+>    - 重新打包 `outputs/deck-architect.skill`（**82 檔，335.4 KB**，零 `__pycache__`）。
 >
-> **下一步（Phase C.2 收官驗收 → Phase D）**：由使用者親手試玩新版 `style-library.html`，滿意後可擇期以真實簡報跑一次 v4.7 實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「風格 × 動態一體」Style DNA 並逐款上架圖鑑**。
+> **下一步（Phase C.2 收官驗收 → Phase D）**：由使用者親手試玩新版 `style-library.html`（點 `↻ 3拍重播` 與畫布互動），滿意後可擇期以真實簡報跑一次端到端實戰 PK 複驗，或推進 **Phase D｜補齊其餘 8 款「靜態上限 × 動態上限一體」Style DNA**。
 >
 > 主軸文件是 `ROADMAP.md`，執行紀錄在 `LOG.md`，專案規則在根目錄 `CLAUDE.md`。
 

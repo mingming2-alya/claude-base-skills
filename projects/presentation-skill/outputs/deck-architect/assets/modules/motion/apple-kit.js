@@ -27,7 +27,7 @@
     return api;
   }
 
-  /* ---- 2. Swinging / Pointer Spotlight Sweep ---- */
+  /* ---- 2. Single-Pass Spotlight Sweep (Settles Still for Reading; Pointer Hover Optional) ---- */
   function initSpotlight(root) {
     if (root._spInit) return root._spInit;
     root.classList.add('live-ctrl');
@@ -36,43 +36,49 @@
       root.innerHTML = `<div class="sp-cone"></div><div class="sp-base">${raw}</div><div class="sp-lit" aria-hidden="true">${raw}</div>`;
     }
     let rafId = 0;
-    let pointerActive = false;
-    let phase = 0;
 
     function setPos(px, py) {
       root.style.setProperty('--sp-x', px.toFixed(1) + '%');
       root.style.setProperty('--sp-y', py.toFixed(1) + '%');
     }
 
-    function tick() {
-      if (isStatic()) { stop(); setPos(50, 50); return; }
-      if (!pointerActive) {
-        phase += 0.024;
-        const x = 50 + Math.sin(phase) * 38;
-        const y = 46 + Math.cos(phase * 1.4) * 14;
-        setPos(x, y);
-      }
-      rafId = requestAnimationFrame(tick);
-    }
-    function start() {
-      if (isStatic()) { setPos(50, 50); return; }
-      if (!rafId) rafId = requestAnimationFrame(tick);
-    }
     function stop() {
       if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
     }
 
+    // Single-pass cinematic sweep (left -> center) then completely STILL for reading
+    function start() {
+      stop();
+      if (isStatic()) { setPos(50, 50); return; }
+      const dur = 1050;
+      const t0 = performance.now();
+      function step(now) {
+        if (isStatic()) { stop(); setPos(50, 50); return; }
+        const p = Math.min(1, (now - t0) / dur);
+        const e = 1 - Math.pow(1 - p, 3);
+        const x = 14 + (50 - 14) * e;
+        const y = 42 + (50 - 42) * e;
+        setPos(x, y);
+        if (p < 1) {
+          rafId = requestAnimationFrame(step);
+        } else {
+          rafId = 0;
+          setPos(50, 50); // Reading window: 100% still
+        }
+      }
+      rafId = requestAnimationFrame(step);
+    }
+
     root.addEventListener('pointermove', e => {
       if (isStatic()) return;
-      pointerActive = true;
+      stop(); // Immediate user takeover
       const r = root.getBoundingClientRect();
       if (!r.width || !r.height) return;
       setPos(((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
     });
-    root.addEventListener('pointerleave', () => { pointerActive = false; });
+    root.addEventListener('pointerleave', () => { stop(); setPos(50, 50); });
 
-    setPos(50, 48);
-    if (!deck) start();
+    setPos(50, 50);
     const api = { start, stop, setPos };
     root._spInit = api;
     return api;

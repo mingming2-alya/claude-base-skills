@@ -1517,3 +1517,14 @@
      - `illustration`：內嵌真實無字 3D 手工黏土烘焙底圖（30.7 KB 壓縮版 `clay-bakery-scene.jpg`）融可編輯真文字與黏土小平板活數字 × 素模→暖彩光掃喚醒、端點波紋與點擊三站點聚光換數。
 - **驗證與重打包**：無頭 Chrome 截圖目視驗收通過（4 張 16:9 畫面零遮擋、靜態與互動細節完整）；重打包 `outputs/deck-architect.skill`（**82 檔，332.4 KB**，零 `__pycache__`）。
 - **同步的檔案**：`outputs/deck-architect/assets/style-library.html`、`outputs/deck-architect/references/motion-system.md`、`outputs/deck-architect/references/modules/style-motion-kits.md`、`outputs/deck-architect.skill`、`STATUS.md`、`LOG.md`。
+
+## 2026-11-26｜`deck-architect` v4.7.2：逐條回補 Phase B.3 六大 Takeaway（反永動、空間分群、3 拍語意節奏、中場＋390px 實測）
+
+- **自我體檢抓出的退步與逐條修補**：
+  1. **語意順序（Takeaway #1）**：修掉 `apple`／`workday`／`counsel` 進場一鍋端同時演完的問題，全面改為單向 3 拍語意揭曉（`workday` 風險→拍板→健康；`counsel` 目標線→達標柱→超標紅差距；`apple` 主張→條件走勢→產出成效；`illustration` 左→中→右三站時間接力）。
+  2. **閱讀期完全靜止（Takeaway #2）**：修掉 `apple-kit.js` `[data-spotlight-sweep]` 無限鐘擺 rAF 搖晃（改單次掃完即靜止），修掉 `style-library.html` 3 個 `infinite` 永動波紋（改單次抵達綻放）；並於 `scripts/check.mjs --motion` 新增第 14 項「閱讀期靜止檢核（反永動干擾）」。
+  3. **從容節奏＋零鎖死隨時接管（Takeaway #3）**：4 款 3 拍節拍器拉開至每拍 ~1.4s（含閱讀靜止窗），且中途點擊任何互動元件立刻清除排程並解除壓暗。
+  4. **空間先分群＋雙欄底部基線齊平（Takeaway #4 & #5）**：`workday` 從舊版四散格位升級回 Phase B.3 進化版「左欄行動主軸（風險↓因果箭頭↓拍板）＋右欄健康總覽由高到低」；`counsel` 左三指標與出處線精準對齊右側建築柱底線。
+  5. **中場影格＋390px 手機實測（Takeaway #6）**：實拍完稿、Beat 1 中場與 390px 手機畫面，當場抓到手機控制鈕壓住 16:9 畫布右上角並移出為獨立頁頂工具列（0% 遮擋、0px 溢出）。
+- **驗證與重打包**：`check.mjs --jpg --motion` 於 `v45-modular-demo` 與 `v4-alive-demo` 全數通過含新第 14 項檢核 ✅；重打包 `outputs/deck-architect.skill`（**82 檔，335.4 KB**）。
+- **同步的檔案**：`outputs/deck-architect/assets/{style-library.html,modules/motion/apple-kit.js}`、`outputs/deck-architect/references/modules/style-motion-kits.md`、`outputs/deck-architect/scripts/check.mjs`、`outputs/deck-architect.skill`、`outputs/examples/{v45-modular-demo,v4-alive-demo}/check/report.md`、`STATUS.md`、`LOG.md`。

@@ -1196,6 +1196,29 @@ async function runMotionAudit(driver, filePath) {
     results.push(`v4.5 說服力互動模組（${v45Parts.join('、')}）：通過`);
   }
 
+  // 14. Reading-window stillness check (Takeaway #2: no infinite pulsing/bouncing distractions on content slides)
+  const infHits = await driver.evaluate(() => {
+    const bad = [];
+    window.__deck.slides.forEach((sl, idx) => {
+      if (sl.dataset.appendix === '1') return;
+      const els = sl.querySelectorAll('*');
+      for (const el of els) {
+        if (el.closest('[data-marquee], .cr-typing, .tw-cursor, .fx-canvas, .ap-live-dot')) continue;
+        const st = getComputedStyle(el);
+        if (st.animationName && st.animationName !== 'none' && st.animationIterationCount === 'infinite') {
+          bad.push(`第 ${idx + 1} 頁 <${el.tagName.toLowerCase()}> (${st.animationName})`);
+          break;
+        }
+      }
+    });
+    return bad;
+  });
+  if (infHits.length) {
+    failures.push(`閱讀期靜止檢核未過（偵測到永動干擾動畫，違背「畫完就安靜」原則）：${infHits.join('、')}`);
+  } else {
+    results.push('閱讀期靜止檢核（反永動干擾／畫完就安靜）：通過');
+  }
+
   const jsErrs = driver.getErrors();
   for (const e of jsErrs) failures.push(`動態測試期間腳本錯誤：${e}`);
   return { results, failures };

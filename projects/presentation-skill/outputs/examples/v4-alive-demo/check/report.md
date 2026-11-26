@@ -6,6 +6,11 @@
 
 接著請逐張看截圖，確認美感、去小字程度、斷行與主標題階層符合預期。
 
+## 生動度與反單調體檢（Liveliness Audit · `stage_mode=pitch`）
+- 視覺／圖表／互動頁佔比：**4/5（80%）**（標準 ≥ 55%）
+- 動態與互動原語多樣性：**8 種**（data-wipe、data-focus-plan、data-count、data-transform-at、data-draw、data-grow、data-morph、interactive-module；標準 ≥ 2 種）
+- ✅ 達標：視覺豐富度與節奏變化符合此場合標準。
+
 ## 動態互動檢核（`--motion`）
 - ✅ 連按打斷測試（4 次／180ms）：通過（精準落於第 5 頁，無殘留 clone、壓暗與鎖死）
 - ✅ 跨頁 Magic Move（第 3 ↔ 4 頁 `hero-rate`）：通過（飛行中 clone=1，落地清理完整）
@@ -16,6 +21,7 @@
 - ✅ 引導線與描繪原語檢核（9 條 SVG 描線／10 處方向揭露）：通過（零退化 SVG 縮放）
 - ✅ 導航模式（top-bar｜實測 inline）與自動隱藏底控膠囊：通過（頁碼 07 / 07、浮現與自動收合正常）
 - ✅ Layer 1 講者臨場工具（總覽矩陣 G、畫筆標註 A 與雷射筆 L、雙螢幕講者同步 S）：通過（快捷鍵鎖定與 Esc 層級退出正常）
+- ✅ 閱讀期靜止檢核（反永動干擾／畫完就安靜）：通過
 
 ## 可升級圖像插槽
 - 第 1 頁：cover-photo
