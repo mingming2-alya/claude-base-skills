@@ -758,6 +758,8 @@ def lint_brief(text):
     if strict and b is not None and _says_none(b):
         E("4. 候選 B", "標準模式要給三個本質不同的候選，不能略過。")
     need("選定與理由", "4. 選定與理由", True, "選了哪個或怎麼混搭，以及為什麼它能把聽眾帶到終點。")
+    need("30 秒口述邏輯鏈", "4. 30 秒口述邏輯鏈", strict, "用「起點共識 → 但是 → 所以 → 證據 → 因此」3–5 句串起整份架構，驗證章間有沒有斷層。")
+    need("架構級排除清單", "4. 排除清單（Out of Scope）", False, "列出這場明確不進主線的主題（整塊刪除或僅放附件）；沒有就寫「無」。")
     in4, stops = False, []
     for no, line in enumerate(lines, 1):
         if line.startswith("## "):
@@ -770,7 +772,7 @@ def lint_brief(text):
         for t, n in stops:
             if _unfilled(t):
                 reported.add(n)
-        E("4. 章節", "第 4 節的章節停靠點至少要 2 個（每個寫章名、分鐘數與這章唯一要記住的一件事）。")
+        E("4. 章節", "第 4 節的章節停靠點至少要 2 個（每個寫章名、分鐘數、預估頁數與這章唯一要記住的一件事）。")
 
     # ---- section 5: per-chapter depth
     if len(chapters) < 2:

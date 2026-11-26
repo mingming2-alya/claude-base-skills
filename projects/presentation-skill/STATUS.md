@@ -1,6 +1,16 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.8.1 外部稽核修補定案 ✅）**：
+> **最新接手點（2026-11-26｜`deck-architect` v4.8.2 主柱一六項結構缺口修補 ✅）**：
+>
+> - 依專案全歷史與第一性原理稽核主柱一（Step 1a／1b／Step 4 交接）並一次補齊 6 項結構缺口：
+>   1. **Round 0 先問既有素材＋起手狀態三分流**：`references/grill.md` Step 1a 頂部新增 Round 0（先問有無既有草稿／前版／模板＋確認標準／快速模式），依「一張白紙／一團雜亂素材／既有舊稿或模板改造」走不同起手路線，並確立「重提案、輕審問（Proposal-First）」防疲勞紀律。
+>   2. **主受眾 vs 次受眾分層**：`grill.md` 與 `templates/brief.md` 將「對象起點」拆為拍板者（主受眾）與同場利害關係人（次受眾）。
+>   3. **30 秒口述邏輯鏈（Story Spine）＋逐章頁數配額**：`grill.md`、`structure.md`、`templates/brief.md` 要求每個候選與核准架構皆附「起點共識 → 但是 → 所以 → 證據 → 因此」3–5 句口述鏈與 `X 分｜Y 頁` 預估頁數配額；`scripts/lint.py` 納入自動把關（標準 `[ERROR]`、快速 `[WARN]`）。
+>   4. **架構級排除清單（Out of Scope）**：在 Step 1a 與關卡 1a 明確列出不進主線的整塊主題（刪或移附件），`lint.py` 納入 `[WARN]` 檢查。
+>   5. **Step 1b → 1a 合法回退機制**：`grill.md` 1b 頂部明訂 3 種必須局部回退重調骨架的觸發條件（證據懸空／反方質疑必須前置／單章比重嚴重失衡）。
+>   6. **Step 4 分身補回 `brief.md` 第 1／8 節上下文**：`SKILL.md` Step 4 子代理輸入 ① 明確帶入主／次受眾起點、Grounding 前置概念、人際顧慮與 `constraints` 地雷，不再只傳母題與章節明細。
+> - **驗證與重打包**：`v4-alive-demo/brief.md` 同步新欄位並過 `lint.py`（0 錯 0 警）；標準／快速模式 4 組變體斷言與 `v48-regression/storyboard.yaml` 0 錯全過；重打包 `outputs/deck-architect.skill`（83 檔，373.0 KB，零 `__pycache__`，SHA-256 逐位元一致）。
+> - **前一段（v4.8.1 外部稽核修補定案 ✅）**：
 >
 > - 依外部稽核評估（`inputs/external-audit-c2bfaf8-review.md`）與使用者拍板（「好的請修改！」），**完成 13 項有效修補**（保留 `grid-overview.js` 刪 `id` 實測無礙，維持標準模式三候選含破框）：
 >   1. **P0 底色極性與模板修復**：`shell.css` 改 `:where(:root)` 並補 `:where(html[data-mode="light"|"dark"])` 零權重串接 `--light-*`/`--dark-*`（不破壞舊版 `deck.css` 直接覆寫 `:root`）；`templates/deck.css` 換為 `oklch.py` 驗證過的高對比 `#hex`（≥ 5.90:1），且 `top-bar` 頂列留白（124/156px）嚴格限定正文無內嵌導航頁，不再誤推封面／震撼／結尾；`check.mjs` 新增 `meta.mode` 根變數極性防呆＋可見 `#nav`/`#tabs` 像素對比與邊界檢查。
@@ -9,8 +19,8 @@
 >   4. **P1 Step 3b 片段樣張與三組配色閉環**：`assemble.py --sheet` 自動把片段樣張套殼成 `.preview/<file>`（沿用 `shell.css` + `deck.css` + 按需模組 + `storyboard.yaml` 導航）並渲染 `manifest.json` 的 `palettes` 三欄 OKLCH 色票卡；`check.mjs --sheet` 自動載入 `.preview/<file>?still=1` 實測（完整相容舊版獨立 HTML 樣張）；`assemble.py` 加入 `_scope_slide_css()` 防止樣張昇格進 `slides/` 時外洩 `html/body/*` 全域重設。
 >   5. **P1/P2 引擎與細節補強**：`fx/core.js` 透過 1×1 `<canvas>` 像素讀取支援 `oklch()`/`color-mix()`/`hsl()`；`runtime.js` 修正 `Home`/`End` 留在主線頁不跳入附件；`speaker-view.js` 改以主線頁數為分母、附件顯示「附件」；`counsel-kit.css` `rack-focus` 改零陰影 crisp 外框符合 `styles/counsel.md`；移除廢棄永動 `.flow-token`；`assemble.py` 補上 `keynote` `ambient-fx > 2` 警告。
 >   6. **P2 規格與圖鑑口徑收斂**：`style-library.html` 4 張卡全補「適配主題」列並與 `styles/index.json` `signature_motions` 100% 對齊；`lint.py` 5 章以上降為 `[WARN]`、`pillars` 排除 `unlisted` 章節、`lint_brief()` 用英文字邊界防誤判且 `briefing` 種子寫「無」不再重複警告；`grill.md`/`SKILL.md`/`CLAUDE.md` 區分收斂型（標推薦附理由）與發散型腦力激盪（不標推薦防錨定）；`apple.md`/`index.json`/`apple-kit.css` 移除舊「擺動」口徑；`modules-catalog.md` 釐清 `flow-carousel="chat"` 與 `data-chat-replay` 分工；`outputs/style-specs/README.md`、`presentation-principles.md`、`ROADMAP.md` 標明歷史封存並指向 `outputs/deck-architect/styles/`。
-> - **驗證結果**：5 份 v4 範例全部重組並通過 `lint.py`（0 錯）與 `check.mjs --jpg --motion`（零 ❌）：`v48-regression` 9 頁全過（最低對比 `5.12:1`，16 種原語，風格契合 3/3）、`v45-modular-demo`（`4.84:1`）、`v44-keynote-demo`（`4.53:1`）、`v4-alive-demo`（`4.70:1`）、`v4-demo`（`4.81:1`）＋ `v4-demo/samples --sheet` 3 張全過；另跑 26 項 v4.8.1 專項測試（含暗底無 `surface` 封面、首頁 `slideenter`、OKLCH FX、`Home`/`End`、講者模式主線計數、片段樣張 `--sheet` + 三組色票）26/26 全過；`v4-alive-demo/brief.md` 0 錯 0 警。重打包 `outputs/deck-architect.skill`（83 檔，370.1 KB，零 `__pycache__`，SHA-256 逐位元一致）。
-> - **下一步**：拿一份**真實簡報**從 Step 1a 跑到成品（PK 驗證主柱一顧問品質與成品生動度），跑完再決定是否進 Phase D。需要使用者提供一份真實需求。
+> - **驗證結果**：5 份 v4 範例全部重組並通過 `lint.py`（0 錯）與 `check.mjs --jpg --motion`（零 ❌）：`v48-regression` 9 頁全過（最低對比 `5.12:1`，16 種原語，風格契合 3/3）、`v45-modular-demo`（`4.84:1`）、`v44-keynote-demo`（`4.53:1`）、`v4-alive-demo`（`4.70:1`）、`v4-demo`（`4.81:1`）＋ `v4-demo/samples --sheet` 3 張全過；另跑 26 項 v4.8.1 專項測試 26/26 全過；`v4-alive-demo/brief.md` 0 錯 0 警。
+> - **下一步**：完成主柱二（視覺引導／靜態／動態／模組化注入）全歷史深度體檢，接著拿一份**真實簡報**從 Step 1a 跑到成品（PK 驗證主柱一顧問品質與成品生動度），跑完再決定是否進 Phase D。
 >
 > **前一段（2026-11-26｜`deck-architect` v4.8 最終檢查定案 ✅）**：
 >
@@ -79,8 +89,8 @@ _最後更新：2026-11-26_
 
 | 路徑 | 內容 |
 |---|---|
-| `outputs/deck-architect/` | **v4.8.1 完整版 Skill 原始碼（83 檔）**：兩大主柱流程＋三層按需引擎（`boot()` 啟動與 `meta.mode` 零權重串接）＋4 套風格動態套件＋`templates/deck.css`＋Step 3b 片段樣張與三組色票對照＋brief／storyboard／HTML 自由畫布 lint＋16 項動態行動實測＋導航對比／極性防呆與風格契合稽核 |
-| `outputs/deck-architect.skill` | v4.8.1 打包檔（370.1 KB，83 檔，零 `__pycache__`，SHA-256 逐位元一致） |
+| `outputs/deck-architect/` | **v4.8.2 完整版 Skill 原始碼（83 檔）**：兩大主柱流程（含 Round 0 起手三分流、主／次受眾、30 秒邏輯鏈、Out of Scope、1b→1a 回退）＋三層按需引擎（`boot()` 啟動與 `meta.mode` 零權重串接）＋4 套風格動態套件＋`templates/deck.css`＋Step 3b 片段樣張與三組色票對照＋brief／storyboard／HTML 自由畫布 lint＋16 項動態行動實測＋導航對比／極性防呆與風格契合稽核 |
+| `outputs/deck-architect.skill` | v4.8.2 打包檔（373.0 KB，83 檔，零 `__pycache__`，SHA-256 逐位元一致） |
 | `outputs/examples/v48-regression/` | v4.8/v4.8.1 引擎回歸測試簡報（4 套套件 11 原語、`unlisted`、聚光復原、`templates/deck.css`；9 頁全過，最低 `5.12:1`）。改底盤或腳本後先跑這份 |
 | `outputs/examples/v4-alive-demo/brief.md` | 示範用 brief（依既有虛構範例事後補寫，示範格式與 brief lint，不是主柱一實測紀錄） |
 | `outputs/examples/v45-modular-demo/` | v4.5/v4.6 三層引擎與全部新／升級模組虛構技術示範（6 頁，最低對比 `4.84:1`） |

@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.8.1 外部稽核修補與全範例回歸定案 ✅）**：完成外部稽核 13 項有效修補——`shell.css` 零權重 `html[data-mode]` 串接 `--light-*`/`--dark-*`、`templates/deck.css` 改驗過 `#hex` 並限縮頂列讓位僅正文頁、`lint.py` 納入自由畫布 `slides/*.html` 約束與語言檢查、`assemble.py` 重排腳本載入順序加 `window.__deck.boot()` 並支援 Step 3b 片段樣張 `.preview/` 自動套殼與三組 OKLCH 色票卡、`fx/core.js` 支援 `oklch()`/`color-mix()`、`runtime.js` 首頁進場與 `Home`/`End` 主線邊界、`speaker-view.js` 主線頁碼、`check.mjs` 加可見導航對比與 `meta.mode` 極性防呆、`style-library.html` 補適配主題列與原語對齊，以及多份規格口徑統一。全部 5 份 v4 範例與 26 項專測全數通過，重打包 `outputs/deck-architect.skill`（83 檔，370.1 KB）。**下一步：拿真實簡報跑完整流程（使用者已拍板，先於 Phase D）。**
+> **最新接手點（2026-11-26｜`deck-architect` v4.8.2 主柱一六項結構缺口修補 ✅）**：在 v4.8.1 外部稽核 13 項全量修補與全範例回歸的基礎上，補齊主柱一（Step 1a／1b／Step 4 交接）六項第一性原理缺口——Round 0 先問既有素材＋起手狀態三分流＋重提案輕審問（Proposal-First）、主受眾 vs 次受眾分層、30 秒口述邏輯鏈（Story Spine）＋逐章頁數配額（`lint.py` 標準 `[ERROR]`／快速 `[WARN]`）、架構級排除清單（Out of Scope）、Step 1b → 1a 合法回退三觸發、Step 4 分身補回 `brief.md` 第 1／8 節上下文。同步更新 `v4-alive-demo/brief.md` 並通過全套 lint 驗證，重打包 `outputs/deck-architect.skill`（83 檔，373.0 KB，SHA-256 逐位元一致）。**下一步：完成主柱二（視覺引導／靜態／動態／模組化注入）深度體檢，並拿真實簡報跑完整流程 PK（先於 Phase D）。**
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。

@@ -1660,3 +1660,21 @@
   - 重新打包 `outputs/deck-architect.skill`（83 檔，370.1 KB，零 `__pycache__`，SHA-256 逐位元一致）。
 - **同步的檔案**：`CLAUDE.md`、`projects/presentation-skill/{STATUS.md,ROADMAP.md,LOG.md,inputs/presentation-principles.md,outputs/style-specs/README.md,outputs/deck-architect.skill}`、`outputs/deck-architect/{SKILL.md,assets/{shell.css,runtime.js,style-library.html,modules/fx/core.js,modules/motion/{apple-kit.css,counsel-kit.css},presenter/speaker-view.js},references/{grill.md,samples.md,modules-catalog.md},scripts/{lint.py,assemble.py,check.mjs},styles/{index.json,apple.md},templates/{deck.css,storyboard.yaml}}`、`outputs/examples/{v48-regression,v45-modular-demo,v44-keynote-demo,v4-alive-demo,v4-demo}/`（重建 `deck.html` 與 `check/report.md`、`v48-regression` 同步 `deck.css` 與截圖、`v4-demo/samples` 驗證輸出）。
 - **下一步**：使用者提供一份真實簡報需求，跑完整 Step 1a→Step 6 PK 驗證，再決定 Phase D。
+
+
+## 2026-11-26｜v4.8.2 主柱一（Step 1a／1b／Step 4 交接）六項結構缺口修補
+
+- **背景**：使用者擔心「第一步的架構做錯了後面都要從頭來過」，要求回讀從專案建立至今的歷史紀錄（`presentation-principles.md`、v1 四次真實迭代、Phase C 標竿拆解、`LOG.md`、`grill.md`、`structure.md`、`brief.md`）並依第一性原理檢查主柱一遺漏，確認 6 項結構缺口後指示一次修補。
+- **本輪修改（v4.8.2）**：
+  1. **Round 0 先問既有素材＋起手狀態三分流＋Proposal-First 防疲勞（`references/grill.md`、`templates/brief.md`、`SKILL.md`）**：Step 1a 頂部新增 Round 0（未上傳任何既有稿件時先問有無舊版／前人簡報／計畫書／模板，並同步確認標準／快速模式），將起手明確分為「一張白紙／一團雜亂素材／既有舊稿或模板改造」三條支線；原則 4 加入「重提案、輕審問（Proposal-First）」，能先提出初步假設讓使用者改、絕不連問 25 題。
+  2. **主受眾 vs 次受眾分層（`references/grill.md`、`templates/brief.md`）**：將「對象起點」明確拆為**主受眾**（拍板者／主角）與**次受眾**（同場列席的利害關係人，其顧慮會改寫敘事安全閥與備查附錄）。
+  3. **30 秒口述邏輯鏈（Story Spine）＋逐章預估頁數配額（`references/grill.md`、`references/structure.md`、`templates/brief.md`、`scripts/lint.py`、`SKILL.md`）**：3 個架構候選與關卡 1a 拍板骨架皆必須附「起點共識 → 但是 → 所以 → 證據顯示 → 因此請你」3–5 句口述邏輯鏈，以及每章 `X 分｜約 Y 頁` 的預估頁數配額；`lint.py` `lint_brief()` 新增「30 秒口述邏輯鏈」檢查（標準模式 `[ERROR]`、快速模式 `[WARN]`）。
+  4. **架構級排除清單（Out of Scope）（`references/grill.md`、`references/structure.md`、`templates/brief.md`、`scripts/lint.py`、`SKILL.md`）**：Step 1a 節點群 B 與關卡 1a 明確盤點「這場刻意不進主線的整塊主題（整塊刪除或僅放附件）」；`lint.py` 新增 `[WARN]` 檢查。
+  5. **Step 1b → 1a 合法回退機制（`references/grill.md`、`SKILL.md`）**：在 Step 1b 頂部明訂 3 種必須回頭局部重調骨架並更新關卡 1a 的觸發條件（核心證據懸空、反方致命質疑必須前置拆彈、單章篇幅膨脹打破頁數配額），避免硬在壞骨架上硬塞細節。
+  6. **Step 4 分身補回 `brief.md` 第 1／8 節上下文（`SKILL.md`）**：Step 4 分批子代理輸入 ① 明確納入 `brief.md` 第 1 節（主／次受眾起點、Grounding 前置概念、人際顧慮）與第 8 節（`constraints` 地雷與邊界），讓寫每頁 HTML 的分身知道寫給誰看、不能踩什麼雷。
+- **驗證與重打包**：
+  - `outputs/examples/v4-alive-demo/brief.md` 同步補齊新欄位，通過 `lint.py`（0 錯 0 警）。
+  - 4 組標準／快速模式 `lint_brief()` 變體斷言全過（標準缺邏輯鏈報 `[ERROR]`、快速缺邏輯鏈與排除清單降 `[WARN]` 仍通過、標準缺排除清單報 `[WARN]`）；`templates/brief.md` 如預期指出 2 項新未填欄位；`v48-regression/storyboard.yaml` 0 錯通過。
+  - 重新打包 `outputs/deck-architect.skill`（83 檔，373.0 KB，零 `__pycache__`，SHA-256 逐位元一致）。
+- **同步的檔案**：`projects/presentation-skill/{STATUS.md,ROADMAP.md,LOG.md,outputs/deck-architect.skill}`、`outputs/deck-architect/{SKILL.md,references/{grill.md,structure.md},templates/brief.md,scripts/lint.py}`、`outputs/examples/v4-alive-demo/brief.md`。
+- **下一步**：完成主柱二（視覺引導／靜態／動態／模組化注入）全歷史與第一性原理體檢，視需要修補後進真實簡報 PK。
