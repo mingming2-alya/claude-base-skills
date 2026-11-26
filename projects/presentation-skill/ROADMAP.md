@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.8 最終檢查定案）**：依兩大主柱逐檔檢查後定案——主柱邊界改為「每個決定等它需要的資訊到齊才做」（呈現層決定一律延到 Step 3a 選完風格後；Step 2 只寫視覺主角）、Step 1a 先收故事種子再提敘事候選、每個建議都要附理由、主題類型統一成 `contexts.md` 一張表、`brief.md` 由 lint 檢查顧問流程有沒有留下產出；同時修掉換頁後聚光卡在第 1 拍、OKLCH 顏色對比誤判、離線字體誤報與配方缺畫布樣式等問題，新增 `templates/deck.css` 與 `examples/v48-regression/` 回歸測試。重打包 `outputs/deck-architect.skill`（83 檔，369.4 KB）。**下一步：拿真實簡報跑完整流程（使用者已拍板，先於 Phase D）。**
+> **最新接手點（2026-11-26｜`deck-architect` v4.8.1 外部稽核修補與全範例回歸定案 ✅）**：完成外部稽核 13 項有效修補——`shell.css` 零權重 `html[data-mode]` 串接 `--light-*`/`--dark-*`、`templates/deck.css` 改驗過 `#hex` 並限縮頂列讓位僅正文頁、`lint.py` 納入自由畫布 `slides/*.html` 約束與語言檢查、`assemble.py` 重排腳本載入順序加 `window.__deck.boot()` 並支援 Step 3b 片段樣張 `.preview/` 自動套殼與三組 OKLCH 色票卡、`fx/core.js` 支援 `oklch()`/`color-mix()`、`runtime.js` 首頁進場與 `Home`/`End` 主線邊界、`speaker-view.js` 主線頁碼、`check.mjs` 加可見導航對比與 `meta.mode` 極性防呆、`style-library.html` 補適配主題列與原語對齊，以及多份規格口徑統一。全部 5 份 v4 範例與 26 項專測全數通過，重打包 `outputs/deck-architect.skill`（83 檔，370.1 KB）。**下一步：拿真實簡報跑完整流程（使用者已拍板，先於 Phase D）。**
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。
@@ -26,7 +26,7 @@
 ### ② 設計美感與「活」（皮肉）：生成式風格憲法 ＋ HTML 主場優勢
 研究見 `inputs/research-html-slide-skills.md`、`inputs/design-research.md`、`inputs/style-research.md`、`inputs/reference-styles.md`、`inputs/motion-research.md`、`inputs/phase-c-teardown-learnings.md`、`inputs/modular-capabilities-audit.md`。**借用前先確認授權**：MIT 等寬鬆授權可以借程式碼並標註來源；限制商用或未標授權的（如 guizang AGPL-3.0）只學做法與數值、自己實作。
 
-- [x] **風格方向與首批定調（原 2a–2b）**：12 款風格清單定案（`inputs/style-list-v5.md`）；OKLCH「鎖規則、不鎖色碼、全淺深雙底」用色系統（`outputs/style-specs/color-system.md`）；首批四款（`counsel`、`apple`、`illustration` 15 種畫風、`workday` 現代 Bento）完整 Style DNA ＋ 互動圖鑑 `assets/style-library.html` 已就緒
+- [x] **風格方向與首批定調（原 2a–2b）**：12 款風格清單定案（`inputs/style-list-v5.md`）；OKLCH「鎖規則、不鎖色碼、全淺深雙底」用色系統（`outputs/deck-architect/styles/color-system.md`）；首批四款（`counsel`、`apple`、`illustration` 15 種畫風、`workday` 現代 Bento）完整 Style DNA ＋ 互動圖鑑 `assets/style-library.html` 已就緒
 - [x] **內容結構與容量基礎（原 v3.0 資產沿用）**：14 種結構＋5 種圖表結構、容量規則、`series`、`lint.py`；已轉為 `references/content-shapes.md` 內容形狀指南
 - [x] **三層細粒度按需架構＋亂中有序治理（Phase A / C.2 / v4.5–v4.7.6）**：Layer 0 輕底盤（含 `unlisted: true`）＋Layer 1 3 項講者工具（`G`/`A`/`L`/`S`）＋Layer 2 11 項細粒度內容模組與 4 套風格動態套件（未用到 0 KB）＋軟性 `[WARN]` 場合與風格跨界防呆
 - [~] **多元風格憲法庫 Style DNA**：已就緒 4 款並上架 `style-library.html`；其餘 8 款＋主題智能配對與外觀帳本於 Phase D 補齊

@@ -19,7 +19,7 @@
   transition: none !important;
 }
 
-/* 2. Swinging / Pointer-Tracking Spotlight Sweep */
+/* 2. Single-Pass Spotlight Sweep (Settles Still; Optional Pointer Hover) */
 [data-spotlight-sweep] {
   position: relative;
   overflow: hidden;

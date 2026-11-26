@@ -21,7 +21,7 @@
  */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
+:where(:root) {
   /* Curated offline CJK + Latin fallback voices */
   --font-sans-fallback: "PingFang TC", "Microsoft JhengHei", "Heiti TC", "Noto Sans CJK TC", system-ui, -apple-system, sans-serif;
   --font-serif-fallback: "Songti TC", "PMingLiU", "Noto Serif CJK TC", Georgia, serif;
@@ -29,7 +29,7 @@
   --font-kai-fallback: "BiauKai", "DFKai-SB", "Kaiti TC", serif;
   --font-mono-fallback: "SFMono-Regular", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
-  /* Default surface & type tokens (overridden by deck style CSS) */
+  /* Default surface & type tokens (overridden by deck style CSS or html[data-mode]) */
   --bg: #F1EFEA;
   --bg-2: #E6E2DA;
   --fg: #141619;
@@ -80,6 +80,43 @@
   --enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
   --stagger-base: 64;
   --morph-ms: 780;
+}
+
+/* Connect deck-level meta.mode to deck.css --light-* and --dark-* tokens with zero specificity
+ * so slides without explicit data-surface (cover, closing, toc, status-table, free slides)
+ * inherit the deck's chosen polarity and OKLCH palette, while legacy deck.css :root overrides still win. */
+:where(html[data-mode="light"]) {
+  --bg: var(--light-bg, #F4F2ED);
+  --bg-2: var(--light-bg-2, #E8E4DC);
+  --fg: var(--light-fg, #161920);
+  --fg-2: var(--light-fg-2, #3D434F);
+  --fg-3: var(--light-fg-3, #5A606D);
+  --line: var(--light-line, rgba(22, 25, 32, .20));
+  --line-2: var(--light-line-2, rgba(22, 25, 32, .11));
+  --accent: var(--light-accent, #0D6B4F);
+  --accent-text: var(--light-accent-text, #0A5941);
+  --accent-ink: var(--light-accent-ink, #F4F2ED);
+  --nav-color: var(--light-fg-3, #5A606D);
+  --nav-active: var(--light-fg, #161920);
+  --nav-accent: var(--light-accent, #0D6B4F);
+  --nav-border: var(--light-line-2, rgba(22, 25, 32, .12));
+}
+
+:where(html[data-mode="dark"]) {
+  --bg: var(--dark-bg, #0E1117);
+  --bg-2: var(--dark-bg-2, #171C26);
+  --fg: var(--dark-fg, #F0EFEA);
+  --fg-2: var(--dark-fg-2, #BCC3D0);
+  --fg-3: var(--dark-fg-3, #929BA9);
+  --line: var(--dark-line, rgba(240, 239, 234, .22));
+  --line-2: var(--dark-line-2, rgba(240, 239, 234, .12));
+  --accent: var(--dark-accent, #3ED49C);
+  --accent-text: var(--dark-accent-text, #5CE3B0);
+  --accent-ink: var(--dark-accent-ink, #0E1117);
+  --nav-color: var(--dark-fg-3, #929BA9);
+  --nav-active: var(--dark-fg, #F0EFEA);
+  --nav-accent: var(--dark-accent, #3ED49C);
+  --nav-border: var(--dark-line-2, rgba(240, 239, 234, .14));
 }
 
 html, body {
@@ -300,18 +337,6 @@ mark.em {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
-}
-
-/* Flowing SVG offset-path token helper (visual-explainer MIT) */
-@keyframes deck-token-flow {
-  0% { offset-distance: 0%; opacity: 0; }
-  12% { opacity: 1; }
-  88% { opacity: 1; }
-  100% { offset-distance: 100%; opacity: 0; }
-}
-.flow-token {
-  pointer-events: none;
-  animation: deck-token-flow var(--token-dur, 3.2s) cubic-bezier(.4, 0, .2, 1) infinite;
 }
 
 /* Mobile-visible high-contrast focus-ring cue (4px sharp rim + 22px halo = clearly readable even at 390px) */
@@ -733,8 +758,6 @@ body.low-power *::after {
   animation-play-state: paused !important;
   transition: none !important;
 }
-html.still .flow-token,
-body.low-power .flow-token,
 html.still [data-ripple],
 body.low-power [data-ripple],
 html.still [data-travel],
@@ -804,7 +827,7 @@ body.hide-ctrl #deck-progress {
   #viewport { position: static; display: block; background: none; }
   #stage { transform: none !important; width: 1920px; height: auto; overflow: visible; }
   #nav, #tabs, #nav-side, #curtain, #morph-layer, #notes, #hint, #toast, #ctrl-bar, #deck-progress,
-  .back, .more-btn, .live-only, .flow-token, [data-ripple], [data-travel] { display: none !important; }
+  .back, .more-btn, .live-only, [data-ripple], [data-travel] { display: none !important; }
   .slide {
     position: relative;
     visibility: visible !important;
@@ -843,7 +866,7 @@ body.hide-ctrl #deck-progress {
 
 @media (prefers-reduced-motion: reduce) {
   #nav .ind, #tabs span, #nav span, #toast, #ctrl-bar, #deck-progress-fill { transition: none !important; }
-  .flow-token, [data-ripple], [data-travel] { display: none !important; }
+  [data-ripple], [data-travel] { display: none !important; }
   .slide * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
 
@@ -2612,72 +2635,72 @@ p.lead {
 }
 
 /* 01-cover.html */
-#s-1 { justify-content: space-between; }
-    #s-1 .c-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
-    #s-1 .c-hero { max-width: 1280px; position: relative; z-index: 2; }
-    #s-1 .c-hero p.sub { margin-top: 24px; font: 500 28px/1.45 var(--font-body); color: var(--fg-2); max-width: 880px; }
-    #s-1 .c-kpis { display: flex; gap: 56px; margin-top: 44px; }
-    #s-1 .c-kpi .v { font: 800 56px/1 var(--font-number); color: var(--accent-text); font-variant-numeric: tabular-nums; }
-    #s-1 .c-kpi .l { margin-top: 8px; font: 500 20px/1.3 var(--font-body); color: var(--fg-2); }
-    #s-1 .c-foot { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 14px; }
-    #s-1 .c-mlab { font: 600 18px/1 var(--font-label); color: var(--fg-3); letter-spacing: 0.08em; }
+#s-1{ justify-content: space-between; }
+    #s-1 .c-top{ display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
+    #s-1 .c-hero{ max-width: 1280px; position: relative; z-index: 2; }
+    #s-1 .c-hero p.sub{ margin-top: 24px; font: 500 28px/1.45 var(--font-body); color: var(--fg-2); max-width: 880px; }
+    #s-1 .c-kpis{ display: flex; gap: 56px; margin-top: 44px; }
+    #s-1 .c-kpi .v{ font: 800 56px/1 var(--font-number); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+    #s-1 .c-kpi .l{ margin-top: 8px; font: 500 20px/1.3 var(--font-body); color: var(--fg-2); }
+    #s-1 .c-foot{ position: relative; z-index: 2; display: flex; flex-direction: column; gap: 14px; }
+    #s-1 .c-mlab{ font: 600 18px/1 var(--font-label); color: var(--fg-3); letter-spacing: 0.08em; }
 /* 02-linked-arch.html */
-#s-2 .grid { flex: 1; display: grid; grid-template-columns: 520px minmax(0, 1fr); gap: 44px; align-items: center; }
-    #s-2 .list { display: flex; flex-direction: column; gap: 18px; }
-    #s-2 .ref-card {
+#s-2 .grid{ flex: 1; display: grid; grid-template-columns: 520px minmax(0, 1fr); gap: 44px; align-items: center; }
+    #s-2 .list{ display: flex; flex-direction: column; gap: 18px; }
+    #s-2 .ref-card{
       padding: 24px 26px; border-radius: 18px;
       border: 1px solid var(--line); background: var(--bg-2);
       display: flex; flex-direction: column; gap: 8px;
     }
-    #s-2 .ref-card strong { font: 800 24px/1.25 var(--font-body); color: var(--fg); }
-    #s-2 .ref-card p { font: 500 20px/1.45 var(--font-body); color: var(--fg-2); }
-    #s-2 .ref-card .tag { font: 700 18px/1 var(--font-number); color: var(--accent-text); }
-    #s-2 .diag-wrap {
+    #s-2 .ref-card strong{ font: 800 24px/1.25 var(--font-body); color: var(--fg); }
+    #s-2 .ref-card p{ font: 500 20px/1.45 var(--font-body); color: var(--fg-2); }
+    #s-2 .ref-card .tag{ font: 700 18px/1 var(--font-number); color: var(--accent-text); }
+    #s-2 .diag-wrap{
       border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2);
       padding: 28px; height: 100%; display: flex; align-items: center; justify-content: center;
     }
-    #s-2 .diag-wrap svg { width: 100%; height: auto; max-height: 600px; }
+    #s-2 .diag-wrap svg{ width: 100%; height: auto; max-height: 600px; }
 /* 03-compare-slider.html */
-#s-3 .cmp-box { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 18px; }
-    #s-3 .slider-host { width: 100%; height: 610px; }
+#s-3 .cmp-box{ flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 18px; }
+    #s-3 .slider-host{ width: 100%; height: 610px; }
 /* 04-code-stage.html */
-#s-4 .code-grid { flex: 1; display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 40px; align-items: start; }
-    #s-4 .step-cards { display: flex; flex-direction: column; gap: 18px; }
-    #s-4 .sc {
+#s-4 .code-grid{ flex: 1; display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 40px; align-items: start; }
+    #s-4 .step-cards{ display: flex; flex-direction: column; gap: 18px; }
+    #s-4 .sc{
       padding: 22px 26px; border-radius: 18px; border: 1px solid var(--line); background: var(--bg-2);
     }
-    #s-4 .sc strong { display: block; font: 800 22px/1.3 var(--font-body); color: var(--fg); margin-bottom: 6px; }
-    #s-4 .sc p { font: 500 20px/1.45 var(--font-body); color: var(--fg-2); }
-    #s-4 .term {
+    #s-4 .sc strong{ display: block; font: 800 22px/1.3 var(--font-body); color: var(--fg); margin-bottom: 6px; }
+    #s-4 .sc p{ font: 500 20px/1.45 var(--font-body); color: var(--fg-2); }
+    #s-4 .term{
       margin-top: 16px; padding: 16px 22px; border-radius: 14px;
       background: #141923; color: #6EE7B7; font: 600 20px/1.4 ui-monospace, SFMono-Regular, monospace;
     }
 /* 05-controls-audio.html */
-#s-5 .bench { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: stretch; }
-    #s-5 .panel {
+#s-5 .bench{ flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: stretch; }
+    #s-5 .panel{
       padding: 32px 34px; border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2);
       display: flex; flex-direction: column; justify-content: space-between; gap: 22px;
     }
-    #s-5 .panel h3 { font: 800 28px/1.25 var(--font-body); color: var(--fg); }
-    #s-5 .ctrl-row { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
-    #s-5 .readout { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    #s-5 .metric {
+    #s-5 .panel h3{ font: 800 28px/1.25 var(--font-body); color: var(--fg); }
+    #s-5 .ctrl-row{ display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+    #s-5 .readout{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    #s-5 .metric{
       padding: 20px 22px; border-radius: 16px; border: 1px solid var(--line); background: var(--bg);
     }
-    #s-5 .metric .v { font: 800 44px/1.1 var(--font-number); color: var(--accent-text); font-variant-numeric: tabular-nums; }
-    #s-5 .metric .l { margin-top: 6px; font: 500 18px/1.3 var(--font-body); color: var(--fg-2); }
+    #s-5 .metric .v{ font: 800 44px/1.1 var(--font-number); color: var(--accent-text); font-variant-numeric: tabular-nums; }
+    #s-5 .metric .l{ margin-top: 6px; font: 500 18px/1.3 var(--font-body); color: var(--fg-2); }
 /* 06-closing-chat.html */
-#s-6 .close-grid { flex: 1; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 48px; align-items: center; position: relative; z-index: 2; }
-    #s-6 .cta h2 { font: 900 64px/1.12 var(--font-display); color: var(--fg); }
-    #s-6 .cta p { margin-top: 22px; font: 500 24px/1.5 var(--font-body); color: var(--fg-2); }
-    #s-6 .cta-pill {
+#s-6 .close-grid{ flex: 1; display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 48px; align-items: center; position: relative; z-index: 2; }
+    #s-6 .cta h2{ font: 900 64px/1.12 var(--font-display); color: var(--fg); }
+    #s-6 .cta p{ margin-top: 22px; font: 500 24px/1.5 var(--font-body); color: var(--fg-2); }
+    #s-6 .cta-pill{
       margin-top: 32px; display: inline-flex; align-items: center; gap: 12px;
       padding: 16px 26px; border-radius: 16px;
       background: var(--accent); color: var(--accent-ink); font: 800 22px/1 var(--font-body);
     }
-    #s-6 .device-browser { background: var(--bg-2); }
-    #s-6 .device-browser .db-body { padding: 20px; }
-    #s-6 .chat-wrap { border: none; background: transparent; padding: 0; }
+    #s-6 .device-browser{ background: var(--bg-2); }
+    #s-6 .device-browser .db-body{ padding: 20px; }
+    #s-6 .chat-wrap{ border: none; background: transparent; padding: 0; }
 </style>
 </head>
 <body>
@@ -2959,29 +2982,6 @@ p.lead {
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="hint">← → 翻頁 · F 全螢幕 · N 備註 · B 靜態 · G 總覽 · A 畫筆 · L 雷射 · S 講者 · P 列印</div>
 <script>window.DECK={"title": "Kestrel 2.0 邊緣推論引擎", "style": "keynote-modular", "mode": "dark", "stageMode": "keynote", "navMode": "minimal-side", "presenterTools": ["grid", "annotator", "speaker"], "modules": ["components(device-frame)", "ambient-fx(constellation+confetti-burst)", "live-controls", "fit", "media", "flow-carousel", "coverflow", "linked-highlight", "compare-slider", "code-stage", "visual-flair"], "fx": ["constellation", "confetti-burst"], "chapters": ["架構解剖", "核心革新", "實測驗證"], "tabs": [["三段式邊緣架構"], ["畫面延遲對比", "核心排程實作"], ["即時降噪實測台"]], "motion": "horizontal"};</script>
-<script>(function(slide){
-const seg = slide.querySelector('#k-mode');
-    const tog = slide.querySelector('#k-cache');
-    const rng = slide.querySelector('#k-streams');
-    const sVal = slide.querySelector('#k-streams-val');
-    const latEl = slide.querySelector('#k-lat');
-    const wattEl = slide.querySelector('#k-watt');
-    function recalc() {
-      const n = parseInt(rng.value, 10) || 4;
-      const mode = seg.dataset.value || 'fp16';
-      const zeroCopy = tog.dataset.checked !== '0';
-      sVal.textContent = n + ' 路';
-      const base = mode === 'int8' ? 4.8 : 6.4;
-      const lat = base + n * (mode === 'int8' ? 0.35 : 0.5) + (zeroCopy ? 0 : 4.1);
-      const watt = (mode === 'int8' ? 8.2 : 10.6) + n * 0.9;
-      latEl.textContent = lat.toFixed(1) + ' ms';
-      wattEl.textContent = watt.toFixed(1) + ' W';
-    }
-    rng.addEventListener('input', recalc);
-    seg.addEventListener('change', recalc);
-    tog.addEventListener('change', recalc);
-    setTimeout(recalc, 0);
-})(document.getElementById('s-5'));</script>
 <script>/* deck-architect v4.4 Thin Shell Runtime (Phase C.2 — Bipolar Surface, Multi-Mode Nav, Auto-Hide Bar, Dual-Track data-step)
  *
  * Zero external dependencies, 100% offline single-file HTML playback:
@@ -3511,6 +3511,17 @@ const seg = slide.querySelector('#k-mode');
   }
   initPrimitives();
 
+  // Per-slide focus-plan tokens. A single global counter let clearGuidanceState(prev), which runs
+  // after the page transition finishes, cancel the NEXT slide's freshly started plan, leaving it
+  // stuck at beat 1 with every other card dimmed.
+  const focusTokens = new WeakMap();
+  const bumpFocus = sl => {
+    if (!sl) return 0;
+    const t = (focusTokens.get(sl) || 0) + 1;
+    focusTokens.set(sl, t);
+    return t;
+  };
+
   function clearFocusClasses(sl) {
     if (!sl) return;
     sl.classList.remove('is-focusing');
@@ -3519,8 +3530,15 @@ const seg = slide.querySelector('#k-mode');
     });
   }
 
+  function clearFocus(sl) {
+    const target = sl || slides[cur];
+    bumpFocus(target);
+    clearFocusClasses(target);
+  }
+
   function clearGuidanceState(sl) {
     if (!sl) return;
+    bumpFocus(sl);
     clearFocusClasses(sl);
     sl.querySelectorAll('[data-transform-at]').forEach(el => {
       el.classList.remove('pre-transform', 'transforming');
@@ -3835,9 +3853,10 @@ const seg = slide.querySelector('#k-mode');
     const focusPlan = parseFocusPlan(sl.dataset.focusPlan || '');
     const focusEls = focusPlan.length ? [...sl.querySelectorAll('[data-focus]')] : [];
     if (focusPlan.length && focusEls.length) {
+      const myFocusToken = bumpFocus(sl);
       const visited = new Set();
       const applyStage = activeId => {
-        if (token !== navToken || isStatic()) return;
+        if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
         sl.classList.add('is-focusing');
         for (const el of focusEls) {
           const ids = (el.dataset.focus || '').split(/[\s,]+/).filter(Boolean);
@@ -3856,14 +3875,14 @@ const seg = slide.querySelector('#k-mode');
           applyStage(stepItem.id);
         } else {
           later(() => {
-            if (token !== navToken || isStatic()) return;
+            if (token !== navToken || myFocusToken !== focusTokens.get(sl) || isStatic()) return;
             for (let k = 0; k < idx; k++) visited.add(focusPlan[k].id);
             applyStage(stepItem.id);
           }, startAt);
         }
       });
       later(() => {
-        if (token !== navToken) return;
+        if (token !== navToken || myFocusToken !== focusTokens.get(sl)) return;
         clearFocusClasses(sl);
       }, baseDelay + maxEnd);
     }
@@ -4075,7 +4094,8 @@ const seg = slide.querySelector('#k-mode');
     const token = ++navToken;
     cur = n;
 
-    const instantly = Boolean(instant || isStatic() || !prev || prev === next);
+    const skipTransition = Boolean(instant || isStatic() || !prev || prev === next);
+    const animateInitial = Boolean(!prev && !instant && !isStatic());
 
     // Initialize target step on incoming slide BEFORE morph collection or paint
     const maxS = getMaxStep(next);
@@ -4085,9 +4105,9 @@ const seg = slide.querySelector('#k-mode');
     else if (dir < 0 && prev && prev !== next && !instant) targetStep = maxS;
     applySlideStep(next, targetStep, 0, true, token);
 
-    const morphPairs = (!instantly && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
+    const morphPairs = (!skipTransition && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
 
-    cleanupFlight(instantly ? null : prev, next);
+    cleanupFlight(skipTransition ? null : prev, next);
 
     if (prev && prev !== next) {
       stage.dispatchEvent(new CustomEvent('deck:slideleave', { detail: { index: prevIdx, slide: prev, next } }));
@@ -4099,7 +4119,7 @@ const seg = slide.querySelector('#k-mode');
     updateCtrlBar();
     try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
 
-    if (instantly) {
+    if (skipTransition) {
       stage.classList.add('no-trans');
       if (prev && prev !== next) prev.classList.remove('active', 'leaving');
       next.classList.add('active');
@@ -4107,6 +4127,7 @@ const seg = slide.querySelector('#k-mode');
       next.style.transform = '';
       next.style.clipPath = '';
       if (isStatic()) snapSlideFinal(next);
+      else if (animateInitial && targetStep === 0) animateSlideContent(next, 60, token, null);
       else snapSubtreeFinal(next);
       stage.offsetWidth;
       requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
@@ -4281,7 +4302,8 @@ const seg = slide.querySelector('#k-mode');
       index: cur,
       slide: next,
       prev,
-      instant: instantly,
+      instant: skipTransition,
+      initial: animateInitial,
       staticMode: isStatic(),
       surface: stage.dataset.activeSurface,
       step: curStep,
@@ -4358,8 +4380,8 @@ const seg = slide.querySelector('#k-mode');
     if (hasNavLock()) return;
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); step(1); }
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); step(-1); }
-    else if (k === 'Home') go(0, false, { step: 0 });
-    else if (k === 'End') go(slides.length - 1, false, { step: 0 });
+    else if (k === 'Home') go(mainIndices.length ? mainIndices[0] : 0, false, { step: 0 });
+    else if (k === 'End') go(mainIndices.length ? mainIndices[mainIndices.length - 1] : slides.length - 1, false, { step: 0 });
     else if (k === 'b' || k === 'B') { e.preventDefault(); toggleLowPower(); }
     else if (k === 'f' || k === 'F') {
       document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
@@ -4398,9 +4420,27 @@ const seg = slide.querySelector('#k-mode');
     }, { passive: true });
   }
 
-  const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
-  go(start - 1, true);
-  if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
+  let booted = false;
+  function boot() {
+    if (booted) return;
+    booted = true;
+    const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
+    // Play slide-1 entrance choreography in live mode; snap instantly when static (?still=1 / reduced-motion)
+    go(start - 1, isStatic());
+    if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
+  }
+
+  // Auto-takeover: early interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
+  const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], input, select, textarea, button:not(.back):not([data-link])';
+  const handleEarlyTakeover = e => {
+    const sl = slides[cur];
+    if (!sl || !sl.classList.contains('is-focusing')) return;
+    if (e.target && e.target.closest && e.target.closest(TAKEOVER_SEL)) {
+      clearFocus(sl);
+    }
+  };
+  stage.addEventListener('pointerdown', handleEarlyTakeover, true);
+  stage.addEventListener('input', handleEarlyTakeover, true);
 
   window.__deck = {
     go: (n, instant = true, opts) => go(n, instant, opts),
@@ -4408,8 +4448,10 @@ const seg = slide.querySelector('#k-mode');
     setStep,
     openLink,
     back,
+    boot,
     setStill,
     toggleLowPower,
+    clearFocus,
     setCtrlBarVisible,
     registerOverlay,
     hasNavLock,
@@ -4430,6 +4472,9 @@ const seg = slide.querySelector('#k-mode');
     get slides() { return slides; },
     get lowPower() { return lowPower; },
   };
+
+  // Fallback auto-boot if runtime.js is loaded without an explicit trailing window.__deck.boot() call
+  Promise.resolve().then(() => { if (!booted) boot(); });
 })();
 </script>
 <script>/* deck-architect v4.5 Layer 1 Presenter Chrome: grid-overview (G key)
@@ -4823,14 +4868,23 @@ const seg = slide.querySelector('#k-mode');
   let popup = null;
   let ctrlBtn = null;
 
+  function mainSlidesIndices() {
+    const out = [];
+    for (let i = 0; i < deck.count; i++) {
+      if (deck.slides[i].dataset.appendix !== '1') out.push(i);
+    }
+    return out;
+  }
+
   function slideSummary(idx) {
     const sl = deck.slides[idx];
     if (!sl) return null;
     const h = sl.querySelector('h1, h2, .shock-text, .div-t');
     const p = sl.querySelector('p.sub, p.lead, .takeaway, p');
+    const mains = mainSlidesIndices();
     return {
       index: idx,
-      total: deck.count,
+      total: Math.max(1, mains.length),
       title: h ? h.textContent.trim().replace(/\s+/g, ' ').slice(0, 72) : (sl.dataset.id || ('Slide ' + (idx + 1))),
       preview: p ? p.textContent.trim().replace(/\s+/g, ' ').slice(0, 140) : '',
       notes: sl.dataset.notes || '（這頁沒有講者備註）',
@@ -4840,12 +4894,17 @@ const seg = slide.querySelector('#k-mode');
   }
 
   function buildPayload() {
+    const mains = mainSlidesIndices();
+    const isApp = Boolean(deck.slides[deck.index] && deck.slides[deck.index].dataset.appendix === '1');
+    const mainPos = isApp ? -1 : Math.max(1, mains.indexOf(deck.index) + 1);
     let nextIdx = deck.index + 1;
     while (nextIdx < deck.count && deck.slides[nextIdx].dataset.appendix === '1') nextIdx++;
     return {
       type: 'state',
       index: deck.index,
-      total: deck.count,
+      mainPos,
+      total: Math.max(1, mains.length),
+      totalSlides: deck.count,
       step: deck.stepIndex,
       stepTotal: deck.stepTotal,
       current: slideSummary(deck.index),
@@ -4924,7 +4983,7 @@ const seg = slide.querySelector('#k-mode');
       'function send(msg){if(bc)try{bc.postMessage(msg)}catch(_){}try{localStorage.setItem(chName+":cmd",JSON.stringify(Object.assign({ts:Date.now()},msg)))}catch(_){}}' +
       'function render(s){if(!s||s.type!=="state")return;' +
       'var pad=function(n){return(n<10?"0":"")+n};' +
-      'document.getElementById("sv-pos").textContent=pad(s.index+1)+" / "+pad(s.total);' +
+      'document.getElementById("sv-pos").textContent=(s.current&&s.current.appendix)?"附件":(pad(s.mainPos>0?s.mainPos:(s.index+1))+" / "+pad(s.total));' +
       'document.getElementById("sv-step").textContent=s.stepTotal>0?("步進 "+s.step+" / "+s.stepTotal):"";' +
       'if(s.current){document.getElementById("sv-cur-title").textContent=s.current.title;document.getElementById("sv-cur-prev").textContent=s.current.preview;document.getElementById("sv-notes").textContent=s.current.notes;}' +
       'if(s.next){document.getElementById("sv-next-title").textContent=s.next.title;document.getElementById("sv-next-prev").textContent=s.next.preview;}' +
@@ -5015,6 +5074,10 @@ const seg = slide.querySelector('#k-mode');
   let fxTimer = 0;
   let fxToken = 0;
 
+  const colorCanvas = document.createElement('canvas');
+  colorCanvas.width = colorCanvas.height = 1;
+  const colorCtx = colorCanvas.getContext('2d', { willReadFrequently: true });
+
   function parseRgb(raw, fallback) {
     const s = String(raw || '').trim();
     if (!s) return fallback;
@@ -5026,6 +5089,17 @@ const seg = slide.querySelector('#k-mode');
     }
     const rgb = s.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
     if (rgb) return rgb[1] + ',' + rgb[2] + ',' + rgb[3];
+    // Resolve oklch(), color(srgb ...), color-mix(), hsl(), etc. via 1x1 canvas pixel readout
+    if (colorCtx) {
+      try {
+        colorCtx.clearRect(0, 0, 1, 1);
+        colorCtx.fillStyle = 'rgba(0,0,0,0)';
+        colorCtx.fillStyle = s;
+        colorCtx.fillRect(0, 0, 1, 1);
+        const d = colorCtx.getImageData(0, 0, 1, 1).data;
+        if (d[3] > 0) return d[0] + ',' + d[1] + ',' + d[2];
+      } catch (_) {}
+    }
     return fallback;
   }
 
@@ -5116,59 +5190,11 @@ const seg = slide.querySelector('#k-mode');
     else startFx(deck.slides[deck.index], 120);
   });
 
-  // Boot after synchronous effect plugin scripts finish registering
+  // Fallback boot if deck already entered a slide before this plugin registered
   Promise.resolve().then(() => {
-    if (!deck.isStatic() && deck.slides[deck.index]) {
+    if (!fxTimer && !fxRaf && !deck.isStatic() && deck.slides[deck.index]) {
       startFx(deck.slides[deck.index], 180);
     }
-  });
-})();
-
-/* deck-architect v4.5 FX Plugin: confetti-burst (one-shot celebratory burst that auto-stops) */
-(function () {
-  if (!window.__deckFx) return;
-  window.__deckFx.register('confetti-burst', ({ ctx, w, h, palette }) => {
-    const cols = [palette.primary, palette.secondary, palette.warm, '244,114,182'];
-    const parts = Array.from({ length: 42 }, (_, i) => {
-      const ang = -Math.PI * (0.18 + (i / 42) * 0.64) + (Math.sin(i * 3.1) * 0.14);
-      const spd = 1.9 + (i % 6) * 0.42;
-      return {
-        x: w * 0.5 + (i % 5 - 2) * 10,
-        y: h * 0.72,
-        vx: Math.cos(ang) * spd,
-        vy: Math.sin(ang) * spd - 0.6,
-        w: 3.2 + (i % 3) * 1.2,
-        h: 1.8 + (i % 2) * 1.1,
-        rot: i * 0.4,
-        vr: (i % 2 ? 1 : -1) * 0.08,
-        col: cols[i % cols.length],
-        life: 1,
-      };
-    });
-    let start = 0;
-    return now => {
-      if (!start) start = now;
-      const elapsed = now - start;
-      ctx.clearRect(0, 0, w, h);
-      let alive = 0;
-      for (const p of parts) {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.045;
-        p.vx *= 0.992;
-        p.rot += p.vr;
-        p.life = Math.max(0, 1 - elapsed / 2400);
-        if (p.life <= 0.01 || p.y > h + 10) continue;
-        alive++;
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.rot);
-        ctx.fillStyle = 'rgba(' + p.col + ',' + (p.life * 0.85).toFixed(3) + ')';
-        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-        ctx.restore();
-      }
-      return alive > 0;
-    };
   });
 })();
 
@@ -5219,6 +5245,54 @@ const seg = slide.querySelector('#k-mode');
         ctx.fill();
       }
       return true;
+    };
+  });
+})();
+
+/* deck-architect v4.5 FX Plugin: confetti-burst (one-shot celebratory burst that auto-stops) */
+(function () {
+  if (!window.__deckFx) return;
+  window.__deckFx.register('confetti-burst', ({ ctx, w, h, palette }) => {
+    const cols = [palette.primary, palette.secondary, palette.warm, '244,114,182'];
+    const parts = Array.from({ length: 42 }, (_, i) => {
+      const ang = -Math.PI * (0.18 + (i / 42) * 0.64) + (Math.sin(i * 3.1) * 0.14);
+      const spd = 1.9 + (i % 6) * 0.42;
+      return {
+        x: w * 0.5 + (i % 5 - 2) * 10,
+        y: h * 0.72,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - 0.6,
+        w: 3.2 + (i % 3) * 1.2,
+        h: 1.8 + (i % 2) * 1.1,
+        rot: i * 0.4,
+        vr: (i % 2 ? 1 : -1) * 0.08,
+        col: cols[i % cols.length],
+        life: 1,
+      };
+    });
+    let start = 0;
+    return now => {
+      if (!start) start = now;
+      const elapsed = now - start;
+      ctx.clearRect(0, 0, w, h);
+      let alive = 0;
+      for (const p of parts) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.045;
+        p.vx *= 0.992;
+        p.rot += p.vr;
+        p.life = Math.max(0, 1 - elapsed / 2400);
+        if (p.life <= 0.01 || p.y > h + 10) continue;
+        alive++;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = 'rgba(' + p.col + ',' + (p.life * 0.85).toFixed(3) + ')';
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      }
+      return alive > 0;
     };
   });
 })();
@@ -6705,5 +6779,29 @@ const seg = slide.querySelector('#k-mode');
   });
 })();
 </script>
+<script>(function(slide){
+const seg = slide.querySelector('#k-mode');
+    const tog = slide.querySelector('#k-cache');
+    const rng = slide.querySelector('#k-streams');
+    const sVal = slide.querySelector('#k-streams-val');
+    const latEl = slide.querySelector('#k-lat');
+    const wattEl = slide.querySelector('#k-watt');
+    function recalc() {
+      const n = parseInt(rng.value, 10) || 4;
+      const mode = seg.dataset.value || 'fp16';
+      const zeroCopy = tog.dataset.checked !== '0';
+      sVal.textContent = n + ' 路';
+      const base = mode === 'int8' ? 4.8 : 6.4;
+      const lat = base + n * (mode === 'int8' ? 0.35 : 0.5) + (zeroCopy ? 0 : 4.1);
+      const watt = (mode === 'int8' ? 8.2 : 10.6) + n * 0.9;
+      latEl.textContent = lat.toFixed(1) + ' ms';
+      wattEl.textContent = watt.toFixed(1) + ' W';
+    }
+    rng.addEventListener('input', recalc);
+    seg.addEventListener('change', recalc);
+    tog.addEventListener('change', recalc);
+    setTimeout(recalc, 0);
+})(document.getElementById('s-5'));</script>
+<script>if(window.__deck&&window.__deck.boot)window.__deck.boot();</script>
 </body>
 </html>

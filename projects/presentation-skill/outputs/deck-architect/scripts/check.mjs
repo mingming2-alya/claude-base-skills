@@ -414,66 +414,95 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
       }
     }
 
-    // 6. Collect visible text runs + bounds & min font size
+    // 5b. Deck-level meta.mode polarity check (ensures html[data-mode] actually activates matching --bg)
+    const rootMode = (document.documentElement.dataset.mode || '').toLowerCase();
+    const linC = v => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+    const lumRgba = c => c ? (0.2126 * linC(c[0]) + 0.7152 * linC(c[1]) + 0.0722 * linC(c[2])) : null;
+    if ((rootMode === 'dark' || rootMode === 'light') && !sl.dataset.surface && kind !== 'shock') {
+      const rootBgRaw = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+      const rootBg = toRgba(rootBgRaw);
+      const rootL = rootBg && rootBg[3] > 0.5 ? lumRgba(rootBg) : null;
+      if (rootMode === 'dark' && rootL !== null && rootL > 0.25) {
+        issues.push(`meta.mode="dark" 但根變數 --bg 過亮（L=${rootL.toFixed(2)}）：請確認 deck.css 或 shell.css 正確套用暗色底色`);
+      } else if (rootMode === 'light' && rootL !== null && rootL < 0.45) {
+        issues.push(`meta.mode="light" 但根變數 --bg 過暗（L=${rootL.toFixed(2)}）：請確認 deck.css 或 shell.css 正確套用亮色底色`);
+      }
+    }
+
+    // 6. Collect visible text runs + bounds & min font size (active slide + visible #nav / #tabs chrome)
     const runs = [];
     const seenBounds = new Set();
     const seenSmall = new Set();
-    const walker = document.createTreeWalker(sl, NodeFilter.SHOW_TEXT);
-    while (walker.nextNode()) {
-      const t = walker.currentNode;
-      const txt = t.textContent.trim();
-      if (!txt) continue;
-      const el = t.parentElement;
-      if (!el || el.closest('style,script,title,defs,[aria-hidden="true"],[data-step-hidden="1"],.toc li.off,.snav')) continue;
-      const cs = getComputedStyle(el);
-      if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) < 0.05) continue;
+    const collectRunsIn = (root, isChrome) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      while (walker.nextNode()) {
+        const t = walker.currentNode;
+        const txt = t.textContent.trim();
+        if (!txt) continue;
+        const el = t.parentElement;
+        if (!el || el.closest('style,script,title,defs,[aria-hidden="true"],[data-step-hidden="1"],.toc li.off,.snav')) continue;
+        const cs = getComputedStyle(el);
+        if (cs.visibility === 'hidden' || cs.display === 'none' || parseFloat(cs.opacity) < 0.05) continue;
 
-      const range = document.createRange();
-      range.selectNodeContents(t);
-      const rects = [...range.getClientRects()].filter(r => r.width > 1.5 && r.height > 1.5);
-      if (!rects.length) continue;
+        const range = document.createRange();
+        range.selectNodeContents(t);
+        const rects = [...range.getClientRects()].filter(r => r.width > 1.5 && r.height > 1.5);
+        if (!rects.length) continue;
 
-      const fs = parseFloat(cs.fontSize) / scale;
-      const fw = parseInt(cs.fontWeight, 10) || 400;
-      const isFinePrint = Boolean(el.closest('.source,.pageno,.foot,[data-role="source"],figcaption,small'));
-      if (fs < (isFinePrint ? 16 : 18) && !seenSmall.has(txt.slice(0, 14))) {
-        seenSmall.add(txt.slice(0, 14));
-        issues.push(`文字太小（${fs.toFixed(0)}px）：「${txt.slice(0, 18)}」`);
-      }
-      for (const r of rects) {
-        // Trim CJK font ascent/descent box padding for fair boundary check
-        const lh = parseFloat(cs.lineHeight) || fs * 1.2 * scale;
-        const trim = Math.max(0, fs * scale * 1.4 - lh) / 2;
-        const top = r.top + trim, bot = r.bottom - trim;
-        if (
-          !el.closest('[data-bleed], svg.scene, .asset-slot') &&
-          (r.left < sr.left - 3 || r.right > sr.right + 3 || top < sr.top - 3 || bot > sr.bottom + 3)
-        ) {
-          const key = txt.slice(0, 16);
-          if (!seenBounds.has(key)) {
-            seenBounds.add(key);
-            issues.push(`文字超出畫面：「${key}」`);
+        const fs = parseFloat(cs.fontSize) / scale;
+        const fw = parseInt(cs.fontWeight, 10) || 400;
+        const isFinePrint = isChrome || Boolean(el.closest('.source,.pageno,.foot,[data-role="source"],figcaption,small'));
+        if (fs < (isFinePrint ? 16 : 18) && !seenSmall.has(txt.slice(0, 14))) {
+          seenSmall.add(txt.slice(0, 14));
+          issues.push(`文字太小（${fs.toFixed(0)}px）：「${txt.slice(0, 18)}」`);
+        }
+        for (const r of rects) {
+          // Trim CJK font ascent/descent box padding for fair boundary check
+          const lh = parseFloat(cs.lineHeight) || fs * 1.2 * scale;
+          const trim = Math.max(0, fs * scale * 1.4 - lh) / 2;
+          const top = r.top + trim, bot = r.bottom - trim;
+          if (
+            !el.closest('[data-bleed], svg.scene, .asset-slot') &&
+            (r.left < sr.left - 3 || r.right > sr.right + 3 || top < sr.top - 3 || bot > sr.bottom + 3)
+          ) {
+            const key = txt.slice(0, 16);
+            if (!seenBounds.has(key)) {
+              seenBounds.add(key);
+              issues.push(`文字超出畫面：「${key}」`);
+            }
+          }
+
+          // Color / gradient extraction
+          const isSvg = el instanceof SVGElement;
+          const clip = cs.webkitBackgroundClip || cs.backgroundClip || '';
+          const fillCol = isSvg ? cs.fill : (cs.webkitTextFillColor || cs.color);
+          const rgba = /^(none|url\()/.test(fillCol || '') ? null : toRgba(fillCol);
+          const alpha = rgba ? rgba[3] : 1;
+          const isGrad = !isSvg && clip.includes('text') && alpha < 0.2 && (cs.backgroundImage || '').includes('gradient');
+          if (isGrad) {
+            el.classList.add('__check_hide_grad');
+            runs.push({
+              text: txt.slice(0, 14), x: r.left, y: r.top, w: r.width, h: r.height,
+              size: fs, weight: fw, gradient: cs.backgroundImage, rgb: null,
+            });
+          } else if (rgba && alpha >= 0.4) {
+            runs.push({
+              text: txt.slice(0, 14), x: r.left, y: r.top, w: r.width, h: r.height,
+              size: fs, weight: fw, gradient: null, rgb: rgba.slice(0, 3),
+            });
           }
         }
-
-        // Color / gradient extraction
-        const isSvg = el instanceof SVGElement;
-        const clip = cs.webkitBackgroundClip || cs.backgroundClip || '';
-        const fillCol = isSvg ? cs.fill : (cs.webkitTextFillColor || cs.color);
-        const rgba = /^(none|url\()/.test(fillCol || '') ? null : toRgba(fillCol);
-        const alpha = rgba ? rgba[3] : 1;
-        const isGrad = !isSvg && clip.includes('text') && alpha < 0.2 && (cs.backgroundImage || '').includes('gradient');
-        if (isGrad) {
-          el.classList.add('__check_hide_grad');
-          runs.push({
-            text: txt.slice(0, 14), x: r.left, y: r.top, w: r.width, h: r.height,
-            size: fs, weight: fw, gradient: cs.backgroundImage, rgb: null,
-          });
-        } else if (rgba && alpha >= 0.4) {
-          runs.push({
-            text: txt.slice(0, 14), x: r.left, y: r.top, w: r.width, h: r.height,
-            size: fs, weight: fw, gradient: null, rgb: rgba.slice(0, 3),
-          });
+      }
+    };
+    collectRunsIn(sl, false);
+    const stageEl = document.getElementById('stage');
+    if (stageEl && !stageEl.classList.contains('hide-nav')) {
+      for (const navId of ['nav', 'tabs']) {
+        const navEl = document.getElementById(navId);
+        if (!navEl) continue;
+        const ncs = getComputedStyle(navEl);
+        if (ncs.display !== 'none' && ncs.visibility !== 'hidden' && parseFloat(ncs.opacity) > 0.1) {
+          collectRunsIn(navEl, true);
         }
       }
     }
@@ -493,7 +522,7 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
 
   // Pixel-accurate WCAG contrast: hide all text, screenshot actual painted background, sample behind every run
   const hideCss = [
-    '.slide, .slide * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }',
+    '.slide, .slide *, #nav, #nav *, #tabs, #tabs * { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; }',
     '.slide svg text, .slide svg tspan { fill: transparent !important; stroke: transparent !important; }',
     '.slide .__check_hide_grad { opacity: 0 !important; }',
   ].join('\n');
@@ -585,7 +614,13 @@ async function runSheetMode(driver, samplesDir) {
   await driver.setViewport(1920, 1080);
   for (const f of files) {
     driver.clearErrors();
-    await driver.goto(pathToFileURL(path.join(dir, f)).href);
+    const previewFile = path.join(dir, '.preview', f);
+    const usePreview = fs.existsSync(previewFile);
+    await driver.goto(pathToFileURL(usePreview ? previewFile : path.join(dir, f)).href + (usePreview ? '?still=1' : ''));
+    if (usePreview) {
+      await driver.addTempStyle('#hint, #toast, #ctrl-bar, #deck-progress { display: none !important; }', '__sheet_clean');
+      await driver.wait(100);
+    }
     const shotPath = path.join(imgDir, f.replace(/\.html$/, '.jpg'));
     const res = await auditCurrentSlide(driver, shotPath, 'jpeg');
     const jsErrs = driver.getErrors();
@@ -1163,7 +1198,8 @@ async function runMotionAudit(driver, filePath) {
     }
     if (window.__deckSpeaker) {
       const p = window.__deckSpeaker.getPayload();
-      out.speaker = Boolean(p && p.type === 'state' && p.current && p.total === window.__deck.count && window.__deckSpeaker.channelName);
+      const mainTotal = window.__deck.slides.filter(s => s.dataset.appendix !== '1').length;
+      out.speaker = Boolean(p && p.type === 'state' && p.current && (p.total === mainTotal || p.total === window.__deck.count) && window.__deckSpeaker.channelName);
     }
     return out;
   });

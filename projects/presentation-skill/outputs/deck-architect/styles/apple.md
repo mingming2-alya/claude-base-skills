@@ -75,7 +75,7 @@
 - **動態個性**：**電影舞台（Cinema Spring）**——大張力預備、微彈簧回正、光影主從跟隨。
 - **綁定原語**（用法見 `references/modules/style-motion-kits.md`）：
   - `[data-split-mask]`：文字裁切遮罩逐行拉起（適合章節宣言與震撼主標題）。
-  - `[data-spotlight-sweep]`：擺動或滑鼠追隨聚光燈掃字顯影（適合暗底揭曉核心主張）。
+  - `[data-spotlight-sweep]`：單次聚光掃字顯影，掃完即靜止、游標移入可局部探照（適合暗底揭曉核心主張）。
   - `[data-depth-deck]`：3D 景深疊卡甩牌翻面（適合逐項揭曉亮點或方案演進）。
   - `[data-colorize-wipe]`：黑白柔焦→彩色光幕掃入（適合新舊世代、前後升級對照）。
 - **搭配模組**：`media`、`flow-carousel`、`coverflow`、`ambient-fx`、`compare-slider`。

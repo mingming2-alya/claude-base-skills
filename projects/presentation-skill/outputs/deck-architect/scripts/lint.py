@@ -14,6 +14,7 @@ is judged by the user at gate 1b.
 """
 import sys
 sys.dont_write_bytecode = True
+import html as _html
 import json
 import re
 from pathlib import Path
@@ -32,6 +33,10 @@ from deck_model import (  # noqa: E402
 CJK = re.compile(r"[\u3400-\u9fff]")
 TOKEN_RE = re.compile(r"[\u4e00-\u9fff]{2,}|[A-Za-z0-9]{2,}")
 STYLE_INDEX = Path(__file__).resolve().parent.parent / "styles" / "index.json"
+HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.S)
+HTML_STRIP_BLOCKS_RE = re.compile(r"<(style|script|defs|title|noscript)\b[^>]*>.*?</\1>", re.S | re.I)
+HTML_EM_MARK_RE = re.compile(r'<mark\b[^>]*\bclass=["\'][^"\']*(?<![-\w])em(?![-\w])[^"\']*["\']', re.I)
+HTML_TAG_RE = re.compile(r"<[^>]+>")
 
 
 def _load_style_status():
@@ -44,6 +49,72 @@ def _load_style_status():
         str(s["id"]).lower(): str(s.get("status") or "")
         for s in idx.get("styles", []) if isinstance(s, dict) and s.get("id")
     }
+
+
+def _expanded_slide_indices(data):
+    """Return map of id(slide_dict) -> 1-based expanded slide index (matching assemble.expand)."""
+    all_chapters = data.get("chapters") or []
+    listed = listed_chapters(data)
+    ids = [c["id"] for c in listed]
+    unlisted_ids = {c["id"] for c in all_chapters if isinstance(c, dict) and c.get("unlisted")}
+    mode = toc_mode(data)
+    use_toc = mode == "per-chapter"
+    flow = main_slides(data)
+    idx_map = {}
+    pos = 0
+    started, agenda_done = set(), mode != "agenda"
+    for s in flow:
+        t = s.get("type", "content")
+        if not agenda_done and t != "cover":
+            pos += 1
+            agenda_done = True
+        if t == "content" and s.get("layout") not in ("pillars", "status-table"):
+            cid = s.get("chapter")
+            if not (s.get("unlisted") or cid in unlisted_ids):
+                if use_toc and cid in ids and cid not in started:
+                    pos += 1
+                started.add(cid)
+        pos += 1
+        idx_map[id(s)] = pos
+    for s in data.get("slides") or []:
+        if isinstance(s, dict) and s.get("appendix"):
+            pos += 1
+            idx_map[id(s)] = pos
+    return idx_map
+
+
+def _find_slide_fragment(s, exp_idx, base_dir):
+    """Locate the HTML fragment for a storyboard slide if one exists on disk."""
+    if base_dir is None:
+        return None
+    base = Path(base_dir)
+    if s.get("file"):
+        p = (base / s["file"]).resolve()
+        return p if p.is_file() else None
+    slides_dir = base / "slides"
+    if not slides_dir.is_dir():
+        return None
+    sid = s.get("id")
+    if sid:
+        p = slides_dir / f"{sid}.html"
+        if p.is_file():
+            return p
+    if not s.get("appendix") and exp_idx:
+        for pat in (f"{exp_idx:02d}.html", f"{exp_idx:02d}-*.html"):
+            matches = sorted(slides_dir.glob(pat))
+            if matches:
+                return matches[0]
+    return None
+
+
+def _extract_html_text(raw):
+    """Extract visible text lines and <mark class="em"> count from a free-canvas HTML slide."""
+    cleaned = HTML_COMMENT_RE.sub("", raw)
+    cleaned = HTML_STRIP_BLOCKS_RE.sub("", cleaned)
+    em_count = len(HTML_EM_MARK_RE.findall(cleaned))
+    plain = _html.unescape(HTML_TAG_RE.sub("\n", cleaned))
+    lines = [ln.strip() for ln in plain.splitlines() if ln.strip()]
+    return lines, em_count
 
 
 def _find_simplified(texts):
@@ -78,7 +149,7 @@ def _matches_any(needle, haystack):
     return hits >= max(1, int(len(grams) * 0.35))
 
 
-def lint(data):
+def lint(data, base_dir=None):
     errors, warnings, infos = [], [], []
     E = lambda where, msg: errors.append(f"[ERROR] {where}: {msg}")  # noqa: E731
     W = lambda where, msg: warnings.append(f"[WARN]  {where}: {msg}")  # noqa: E731
@@ -159,7 +230,7 @@ def lint(data):
     if len(listed) < 2:
         E("chapters", f"只有 {len(listed)} 個公開章節。架構至少要 2 個停靠點；只有一章代表還沒有架構。")
     if len(listed) > 4:
-        E("chapters", f"有 {len(listed)} 個公開章節，超過 4 章。軸切得太細，合併相鄰的章節。")
+        W("chapters", f"有 {len(listed)} 個公開章節，超過常見的 4 章上限。建議優先檢查能否合併相鄰章節；若主題確需 5 章以上，請確認視覺目錄與導航仍不擁擠。")
     elif len(listed) == 4:
         how = "每章開始前會自動插入目錄點亮頁" if toc_mode(data) == "per-chapter" else "章節短，只會在封面後插入一頁目錄"
         I("chapters", f"4 章：{how}。理想是 3 章以內，確認真的需要 4 章。")
@@ -211,6 +282,7 @@ def lint(data):
     all_visible_joined = []
     all_with_notes_joined = []
     signatures = 0
+    exp_idx_map = _expanded_slide_indices(data) if base_dir is not None else {}
 
     for n, s in enumerate(slides, 1):
         where = f"slides[{n}]"
@@ -222,8 +294,17 @@ def lint(data):
             E(where, f"type 必須是 {', '.join(sorted(SLIDE_TYPES))} 之一（目前：{t!r}）。")
             continue
         texts = slide_texts(s)
-        all_visible_joined.extend(texts)
+        frag_path = _find_slide_fragment(s, exp_idx_map.get(id(s)), base_dir)
+        html_lines, html_em_count = [], 0
+        if frag_path is not None:
+            try:
+                html_lines, html_em_count = _extract_html_text(frag_path.read_text(encoding="utf-8"))
+            except OSError:
+                pass
+        check_texts = list(texts) + html_lines
+        all_visible_joined.extend(check_texts)
         all_with_notes_joined.extend(all_slide_texts_with_notes(s))
+        all_with_notes_joined.extend(html_lines)
         is_appendix = bool(s.get("appendix"))
         is_free_file = bool(s.get("file"))
         if s.get("signature"):
@@ -234,26 +315,33 @@ def lint(data):
         if surf and surf not in SURFACES:
             E(where, f"surface 必須是 {', '.join(sorted(SURFACES))} 之一（目前：{surf!r}）。")
 
-        # ---- constraints: forbidden phrases (ERROR)
+        # ---- constraints: forbidden phrases (ERROR — checks both storyboard and free-canvas HTML)
         for bad in forbidden:
-            if any(bad.lower() in x.lower() for x in texts):
-                E(where, f"出現地雷／禁用說法「{bad}」（定義於 constraints.forbidden）。請移除或改寫。")
+            if any(bad.lower() in x.lower() for x in check_texts):
+                src_hint = f"（含 {frag_path.name}）" if frag_path and not any(bad.lower() in x.lower() for x in texts) else ""
+                E(where, f"出現地雷／禁用說法「{bad}」{src_hint}（定義於 constraints.forbidden）。請移除或改寫。")
 
         # ---- sensitivity & transition phrases
-        if st.get("sensitivity") and any("你們" in x for x in texts):
+        if st.get("sensitivity") and any("你們" in x for x in check_texts):
             W(where, "有人際顧慮（sensitivity: true）卻出現「你們」。把批評改成以「我們」開頭的反思提問，聽眾才不會覺得被指責。")
-        for txt in texts:
+        seen_trans = set()
+        for txt in check_texts:
             low = txt.lower()
             for p in TRANSITION_PHRASES:
-                if p in low:
+                if p in low and p not in seen_trans:
+                    seen_trans.add(p)
                     W(where, f"出現過場語「{p}」。位置感交給導航，不要寫過場文字；覺得需要就代表架構要調整。")
                     break
 
         # ---- Traditional Chinese check
         if check_trad:
-            sc = _find_simplified(texts)
+            sc = _find_simplified(check_texts)
             if sc:
                 W(where, f"偵測到簡體字（{''.join(sc[:10])}）。meta.lang 為 {lang}，請轉成繁體中文並確認台灣習慣用語。")
+
+        # ---- free-canvas emphasis budget check
+        if t == "content" and html_em_count > 1 and frag_path is not None:
+            W(where, f"自由編排頁（{frag_path.name}）內有 {html_em_count} 處 <mark class=\"em\">，每頁建議最多 1 處重點。")
 
         # ---- unknown fields (only warn for non-free built-in layouts)
         if t == "content" and not is_free_file and s.get("layout") in LAYOUT_FIELDS:
@@ -353,8 +441,8 @@ def lint(data):
                     E(f"{where}.pillars[{k}]", f"這一欄有 {em} 處重點，每欄最多一處。")
             if order != sorted(order):
                 E(where, "pillars 的欄位順序要跟 chapters 一致（架構的方向）。")
-            if len(order) != len(ids):
-                W(where, "pillars 沒有涵蓋所有章節。一頁總覽通常每章一欄。")
+            if len(order) != len(listed):
+                W(where, "pillars 沒有涵蓋所有公開章節。一頁總覽通常每個公開章節一欄。")
             if len(EMPH_RE.findall(str(s.get("headline", "")))) > 1:
                 E(where, "headline 最多一處重點。")
             continue
@@ -642,14 +730,14 @@ def lint_brief(text):
     sm = need("舞台光譜", "2. stage_mode", True, "briefing／pitch／keynote 三選一。")
     stage = ""
     if sm is not None:
-        hits = [k for k in ("briefing", "pitch", "keynote") if k in sm.lower()]
+        hits = [k for k in ("briefing", "pitch", "keynote") if re.search(rf"(?<![a-z-]){k}(?![a-z-])", sm.lower())]
         if len(hits) != 1:
             E("2. stage_mode", f"要三選一（目前：{sm}）。")
         else:
             stage = hits[0]
     dv = need("播放方式", "2. delivery", True, "talk／discuss／read／auto 四選一。")
     if dv is not None:
-        hits = [k for k in ("talk", "discuss", "read", "auto") if k in dv.lower()]
+        hits = [k for k in ("talk", "discuss", "read", "auto") if re.search(rf"(?<![a-z-]){k}(?![a-z-])", dv.lower())]
         if len(hits) != 1:
             E("2. delivery", f"要四選一（目前：{dv}）。")
     need("播放環境", "2. 播放環境", strict, "亮室會議室／暗場大螢幕／線上分享／列印或寄送；Step 3a 依它校準明暗。")
@@ -657,7 +745,7 @@ def lint_brief(text):
     # ---- section 3: story seeds
     seed = need("種子 1", "3. 故事種子", strict,
                 "先問使用者最想讓聽眾記住的 1–3 個時刻、案例、畫面或原話，敘事候選要圍繞它們長出來。")
-    if seed is not None and _says_none(seed) and strict:
+    if seed is not None and _says_none(seed) and strict and stage != "briefing":
         W("3. 故事種子", "寫的是「無」。標準模式建議再試一次：用 Pre-Flight 讀到的素材提幾個候選種子給使用者挑或改寫。")
     need("一句話核心訊息", "3. 一句話核心訊息", True, "若聽眾只記得一句話，是哪一句。")
 
@@ -765,7 +853,7 @@ def main():
         except StoryboardError as e:
             print(f"[ERROR] {e}")
             sys.exit(2)
-        errors, warnings, infos = lint(data)
+        errors, warnings, infos = lint(data, base_dir=Path(args[0]).resolve().parent)
     if "--json" in sys.argv:
         print(json.dumps({"errors": errors, "warnings": warnings, "infos": infos}, ensure_ascii=False, indent=2))
     else:

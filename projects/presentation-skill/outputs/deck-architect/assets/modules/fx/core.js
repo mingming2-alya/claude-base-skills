@@ -12,6 +12,10 @@
   let fxTimer = 0;
   let fxToken = 0;
 
+  const colorCanvas = document.createElement('canvas');
+  colorCanvas.width = colorCanvas.height = 1;
+  const colorCtx = colorCanvas.getContext('2d', { willReadFrequently: true });
+
   function parseRgb(raw, fallback) {
     const s = String(raw || '').trim();
     if (!s) return fallback;
@@ -23,6 +27,17 @@
     }
     const rgb = s.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
     if (rgb) return rgb[1] + ',' + rgb[2] + ',' + rgb[3];
+    // Resolve oklch(), color(srgb ...), color-mix(), hsl(), etc. via 1x1 canvas pixel readout
+    if (colorCtx) {
+      try {
+        colorCtx.clearRect(0, 0, 1, 1);
+        colorCtx.fillStyle = 'rgba(0,0,0,0)';
+        colorCtx.fillStyle = s;
+        colorCtx.fillRect(0, 0, 1, 1);
+        const d = colorCtx.getImageData(0, 0, 1, 1).data;
+        if (d[3] > 0) return d[0] + ',' + d[1] + ',' + d[2];
+      } catch (_) {}
+    }
     return fallback;
   }
 
@@ -113,9 +128,9 @@
     else startFx(deck.slides[deck.index], 120);
   });
 
-  // Boot after synchronous effect plugin scripts finish registering
+  // Fallback boot if deck already entered a slide before this plugin registered
   Promise.resolve().then(() => {
-    if (!deck.isStatic() && deck.slides[deck.index]) {
+    if (!fxTimer && !fxRaf && !deck.isStatic() && deck.slides[deck.index]) {
       startFx(deck.slides[deck.index], 180);
     }
   });

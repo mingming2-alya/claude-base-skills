@@ -1632,3 +1632,31 @@
 - **產出**：`inputs/external-audit-c2bfaf8.md`（原文照錄）、`inputs/external-audit-c2bfaf8-review.md`（逐條判定、證據與修法意見）。
 - **下一步**：用表單請使用者決定修補範圍、發散題是否標（推薦）、briefing 是否放寬 brief 檢查、第一頁是否自動播進場。
 - **同步的檔案**：`inputs/external-audit-c2bfaf8.md`、`inputs/external-audit-c2bfaf8-review.md`、`STATUS.md`、`LOG.md`。
+
+
+## 2026-11-26｜v4.8.1 外部稽核全量修補與全範例回歸驗證
+
+- **背景**：使用者同意針對 `inputs/external-audit-c2bfaf8-review.md` 認同的 13 項有效問題一次修補完成（保留 `grid-overview.js` 縮圖刪 `id` 行為，維持標準模式三候選含破框）。
+- **本輪修改（v4.8.1）**：
+  - **底色極性、模板與 `check.mjs` 防呆**：
+    - `assets/shell.css`：`:root` 降為 `:where(:root)` 零權重，新增 `:where(html[data-mode="light"|"dark"])` 串接 `deck.css` 的 `--light-*`／`--dark-*`（無 `data-surface` 的封面／結尾／內建頁自動套用正確極性與色票，同時維持舊版直接覆寫 `:root` 相容）；移除已廢棄的永動 `.flow-token` keyframes 與樣式。
+    - `templates/deck.css`：配色改為 `oklch.py` 驗證的高對比 `#hex`（≥ 5.90:1）；`top-bar` 讓位（124／156px）嚴格限定 `html[data-nav-mode="top-bar"] .slide.canvas[data-kind="content"]:not([data-nav]):not(:has([data-auto-nav]))`，不誤傷封面、震撼、結尾與內嵌導航頁。
+    - `scripts/check.mjs`：`auditCurrentSlide` 新增 `html[data-mode]` 根 `--bg` 極性驗證與可見 `#nav`/`#tabs` 像素 WCAG 對比＋邊界檢查；`runSheetMode` 自動偵測並以 `.preview/<file>?still=1` 實測片段樣張；`runMotionAudit` 講者模式檢查相容主線頁數分母。
+  - **自由畫布約束與 `lint.py` 強化**：
+    - `scripts/lint.py`：`lint(data, base_dir=None)` 同步掃描對應 `slides/*.html` 可見文字，地雷詞（`constraints.forbidden`）報 `[ERROR]` 並阻斷 `assemble.py`；`must_include`／`limitations` 納入 HTML 內文；同步檢查簡體字、過場語、`sensitivity`「你們」與多處 `<mark class="em">`；5 章以上降為 `[WARN]`（對齊原則）；`pillars` 改比對公開章節數（不誤警 `unlisted: true`）；`lint_brief()` 改用 `(?<![a-z-]){k}(?![a-z-])` 防止子字串誤判，且 `stage_mode=briefing` 種子寫「無」不再重複警告。
+  - **腳本啟動順序、首頁進場與按鍵／講者體驗**：
+    - `assets/runtime.js` + `scripts/assemble.py`：腳本順序改為 `DECK → runtime_js → module_js → slide_js → window.__deck.boot()`，確保模組與頁內腳本在首頁 `deck:slideenter` 前已就緒並可讀取 `window.__deck.stage`；live 開啟首頁即播進場編排（`?still=1`/低耗電/降動效維持瞬切終態）；修正 `Home`/`End` 留在主線頁不誤跳附件。
+    - `assets/presenter/speaker-view.js`：以主線頁數為分母（與 `#ctrl-bar` 一致），附件頁顯示「附件」。
+    - `assets/modules/fx/core.js`：`parseRgb()` 透過 1×1 `<canvas>` 像素讀取支援 `oklch()`/`color(srgb ...)`/`color-mix()`/`hsl()`，並防重複啟動。
+    - `assets/modules/motion/counsel-kit.css`：`[data-rack-focus]` 改為無陰影 2px crisp 外框對齊 `styles/counsel.md`；`apple-kit.css` 移除舊「Swinging」註解。
+  - **Step 3b 片段樣張與三組 OKLCH 配色閉環**：
+    - `scripts/assemble.py`：`build_sheet` 自動把片段樣張包成 `.preview/<file>`（套用 `shell.css` + `deck.css` + 按需模組 + `storyboard.yaml` 導航；舊版獨立 HTML 樣張保持不動），支援 `manifest.json` 的 `palettes` 陣列渲染三欄 OKLCH 色票對照卡；新增 `_scope_slide_css()` 防止獨立樣張移入 `slides/` 時外洩 `html/body/*` 全域重設；補齊 `keynote` `ambient-fx > 2` `[WARN]`。
+  - **圖鑑與文件口徑統一**：
+    - `assets/style-library.html`：4 款風格卡補上「適配主題」列（對齊 `contexts.md`〈主題類型總表〉），並與 `styles/index.json` `signature_motions` 100% 對齊；頁首副標明確說明主題優先原則。
+    - `SKILL.md`、`references/{grill.md,samples.md,modules-catalog.md}`、`templates/storyboard.yaml`、`styles/{index.json,apple.md}`、根目錄 `CLAUDE.md`、`outputs/style-specs/README.md`、`inputs/presentation-principles.md`、`ROADMAP.md`：區分收斂型決策（標推薦附理由）與發散型腦力激盪（不標推薦防錨定）；釐清 `storyboard.yaml` 與 `slides/*.html` 分工、`flow-carousel="chat"` vs `data-chat-replay` 分工、Step 3b 片段樣張與 `palettes` 流程；標明 `outputs/style-specs/` 為歷史封存並指向 `outputs/deck-architect/styles/`；清除殘留「擺動」口徑。
+- **驗證**：
+  - 全 5 份 v4 範例重跑 `lint.py`（全 0 錯）、`assemble.py` 與 `check.mjs --jpg --motion`（零 ❌）：`v48-regression`（更新 `deck.css` 後 9 頁全過，最低對比 `5.12:1`，16 種原語、風格契合 3/3）、`v45-modular-demo`（`4.84:1`）、`v44-keynote-demo`（`4.53:1`）、`v4-alive-demo`（`4.70:1`）、`v4-demo`（`4.81:1`），另驗證 `v4-demo/samples` `--sheet` 舊版獨立樣張全過、`v4-alive-demo/brief.md` 0 錯 0 警。
+  - 26 項 v4.8.1 專項測試全過（暗底無 `surface` 封面 `#13161E`、頂列留白僅正文 124px／封面 76px、`slide_js` 讀 `window.__deck` 與首頁 `slideenter`、`apple` `split-mask` 與 OKLCH `ambient-dust` 首頁啟動、`Home`/`End` 主線邊界、講者模式主線頁碼與附件標示、自由畫布 HTML 地雷詞 `[ERROR]`、CSS 作用域隔離、Step 3b 片段樣張 `.preview/`＋三組色票 `sheet.jpg`、`style-library.html` 4 卡主題列與原語對齊）。
+  - 重新打包 `outputs/deck-architect.skill`（83 檔，370.1 KB，零 `__pycache__`，SHA-256 逐位元一致）。
+- **同步的檔案**：`CLAUDE.md`、`projects/presentation-skill/{STATUS.md,ROADMAP.md,LOG.md,inputs/presentation-principles.md,outputs/style-specs/README.md,outputs/deck-architect.skill}`、`outputs/deck-architect/{SKILL.md,assets/{shell.css,runtime.js,style-library.html,modules/fx/core.js,modules/motion/{apple-kit.css,counsel-kit.css},presenter/speaker-view.js},references/{grill.md,samples.md,modules-catalog.md},scripts/{lint.py,assemble.py,check.mjs},styles/{index.json,apple.md},templates/{deck.css,storyboard.yaml}}`、`outputs/examples/{v48-regression,v45-modular-demo,v44-keynote-demo,v4-alive-demo,v4-demo}/`（重建 `deck.html` 與 `check/report.md`、`v48-regression` 同步 `deck.css` 與截圖、`v4-demo/samples` 驗證輸出）。
+- **下一步**：使用者提供一份真實簡報需求，跑完整 Step 1a→Step 6 PK 驗證，再決定 Phase D。

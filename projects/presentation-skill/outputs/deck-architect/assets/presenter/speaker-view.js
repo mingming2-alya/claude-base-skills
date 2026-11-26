@@ -17,14 +17,23 @@
   let popup = null;
   let ctrlBtn = null;
 
+  function mainSlidesIndices() {
+    const out = [];
+    for (let i = 0; i < deck.count; i++) {
+      if (deck.slides[i].dataset.appendix !== '1') out.push(i);
+    }
+    return out;
+  }
+
   function slideSummary(idx) {
     const sl = deck.slides[idx];
     if (!sl) return null;
     const h = sl.querySelector('h1, h2, .shock-text, .div-t');
     const p = sl.querySelector('p.sub, p.lead, .takeaway, p');
+    const mains = mainSlidesIndices();
     return {
       index: idx,
-      total: deck.count,
+      total: Math.max(1, mains.length),
       title: h ? h.textContent.trim().replace(/\s+/g, ' ').slice(0, 72) : (sl.dataset.id || ('Slide ' + (idx + 1))),
       preview: p ? p.textContent.trim().replace(/\s+/g, ' ').slice(0, 140) : '',
       notes: sl.dataset.notes || '（這頁沒有講者備註）',
@@ -34,12 +43,17 @@
   }
 
   function buildPayload() {
+    const mains = mainSlidesIndices();
+    const isApp = Boolean(deck.slides[deck.index] && deck.slides[deck.index].dataset.appendix === '1');
+    const mainPos = isApp ? -1 : Math.max(1, mains.indexOf(deck.index) + 1);
     let nextIdx = deck.index + 1;
     while (nextIdx < deck.count && deck.slides[nextIdx].dataset.appendix === '1') nextIdx++;
     return {
       type: 'state',
       index: deck.index,
-      total: deck.count,
+      mainPos,
+      total: Math.max(1, mains.length),
+      totalSlides: deck.count,
       step: deck.stepIndex,
       stepTotal: deck.stepTotal,
       current: slideSummary(deck.index),
@@ -118,7 +132,7 @@
       'function send(msg){if(bc)try{bc.postMessage(msg)}catch(_){}try{localStorage.setItem(chName+":cmd",JSON.stringify(Object.assign({ts:Date.now()},msg)))}catch(_){}}' +
       'function render(s){if(!s||s.type!=="state")return;' +
       'var pad=function(n){return(n<10?"0":"")+n};' +
-      'document.getElementById("sv-pos").textContent=pad(s.index+1)+" / "+pad(s.total);' +
+      'document.getElementById("sv-pos").textContent=(s.current&&s.current.appendix)?"附件":(pad(s.mainPos>0?s.mainPos:(s.index+1))+" / "+pad(s.total));' +
       'document.getElementById("sv-step").textContent=s.stepTotal>0?("步進 "+s.step+" / "+s.stepTotal):"";' +
       'if(s.current){document.getElementById("sv-cur-title").textContent=s.current.title;document.getElementById("sv-cur-prev").textContent=s.current.preview;document.getElementById("sv-notes").textContent=s.current.notes;}' +
       'if(s.next){document.getElementById("sv-next-title").textContent=s.next.title;document.getElementById("sv-next-prev").textContent=s.next.preview;}' +

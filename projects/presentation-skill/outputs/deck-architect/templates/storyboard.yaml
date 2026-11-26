@@ -1,6 +1,6 @@
-# storyboard.yaml（deck-architect v4）：整份簡報唯一的內容來源。
-# 修改文字、架構、限制與地雷一律改這裡，再跑 lint.py 與 assemble.py。
-# 自由編排頁面放在 slides/<NN>-*.html（或由 file: 指定）；未寫客製檔的頁面由輕底盤元件渲染。
+# storyboard.yaml（deck-architect v4.8）：架構、章節導航、講者備註、director 分鏡與 constraints 的唯一真相來源。
+# 修改架構、導航、備註、限制與地雷一律改這裡；自由編排頁文案放在 slides/<NN>-*.html（兩邊都會由 lint.py 統一把關，再跑 assemble.py）。
+# 未寫客製檔的頁面由輕底盤元件渲染。
 
 meta:
   title: 2026 年度回顧               # 封面主標

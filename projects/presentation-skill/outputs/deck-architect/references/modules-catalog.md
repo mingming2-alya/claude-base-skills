@@ -22,7 +22,7 @@
 | 試算器滑桿、分段膠囊、開關、情境預設、一鍵還原 | `live-controls` | `.live-ctrl`, `input[type=range]`, `[data-segmented]`, `[data-toggle]`, `[data-presets]`, `[data-reset]` | CSS + 宣告式互動 JS | `references/modules/interactive-explainers.md` |
 | 標題／大數字／區塊溢出防爆＋1:1 無縮放匯出 | `fit` | `data-fit="phrase\|figure\|box"`、URL `?noscale=1` | 純 JS | `references/modules/interactive-explainers.md` |
 | 產品實錄影片（含片段循環、倍速、全螢幕）、音檔／A-B 同步切換 | `media` | `<video data-slide-video>`, `<audio data-sound-demo>`, `[data-sound-ab]` | 外部相對路徑，離頁停播歸零 | `references/modules/media-and-gallery.md` |
-| 產品操作流、步驟回放、AI Agent 對話流 | `flow-carousel` | `[data-flow-carousel="vertical\|horizontal\|stepper\|chat"]` | 4 模式合一，含節點聯動與時間軸 | `references/modules/media-and-gallery.md` |
+| 產品操作流、步驟回放、產品／AI Agent 介面對話流（含工具呼叫） | `flow-carousel` | `[data-flow-carousel="vertical\|horizontal\|stepper\|chat"]` | 4 模式合一，含節點聯動與時間軸（`chat` 用於產品／Agent UI 演示） | `references/modules/media-and-gallery.md` |
 | 3D 照片牆、無縫客戶 Logo 跑馬燈、燈箱預覽 | `coverflow` | `[data-coverflow]`、`[data-cf-lightbox]`、`[data-marquee]` | GPU 3D + 靜態／列印自動轉網格 | `references/modules/media-and-gallery.md` |
 | 說明文字與架構圖／流程圖雙向聯動高亮 | `linked-highlight` | `[data-ref="id"]` | Hover/Click 雙向聚焦＋其餘壓暗 | `references/modules/interactive-explainers.md` |
 | 新舊 UI、降噪前後、效能優化前後拉桿對比 | `compare-slider` | `[data-compare-slider]`（內含 `[data-cs-before]` + `[data-cs-after]`） | 指標／鍵盤拖曳，靜態停 50% | `references/modules/interactive-explainers.md` |
@@ -30,8 +30,8 @@
 | 高密圖表點擊放大燈箱、輕微 3D 傾角、游標光暈 | `visual-flair` | `[data-zoomable]`、`[data-tilt]`、`[data-spotlight-hover]` | 傾角鎖定 ≤5°，燈箱吃 Overlay 棧 | `references/modules/presenter-and-fx.md` |
 | 日常看板刻度尺推進、風險卡展開聚焦 | `motion-workday` | `[data-ruler-progress]`、`[data-bento-expand]` | 綁定 `workday` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
 | 排名超車攀升、機械滾輪數字、推鏡景深聚焦 | `motion-counsel` | `[data-rank-race]`、`[data-odometer]`、`[data-rack-focus]` | 綁定 `counsel` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
-| 遮罩斬切文字、聚光燈掃字、3D 景深疊卡、黑白光掃上色 | `motion-apple` | `[data-split-mask]`、`[data-spotlight-sweep]`、`[data-depth-deck]`、`[data-colorize-wipe]` | 綁定 `apple` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
-| 立體書 3D 翻折舞台、對話氣泡劇院 | `motion-story` | `[data-popup-fold]`、`[data-chat-replay]` | 綁定 `illustration` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
+| 遮罩斬切文字、單次聚光掃字、3D 景深疊卡、黑白光掃上色 | `motion-apple` | `[data-split-mask]`、`[data-spotlight-sweep]`、`[data-depth-deck]`、`[data-colorize-wipe]` | 綁定 `apple` 風格 DNA，未用到 0 KB | `references/modules/style-motion-kits.md` |
+| 立體書 3D 翻折舞台、敘事角色對話氣泡劇院 | `motion-story` | `[data-popup-fold]`、`[data-chat-replay]` | 綁定 `illustration` 風格 DNA（敘事／教學情境對話，未用到 0 KB） | `references/modules/style-motion-kits.md` |
 
 ### 誰在什麼時候決定哪些模組（主柱邊界）
 

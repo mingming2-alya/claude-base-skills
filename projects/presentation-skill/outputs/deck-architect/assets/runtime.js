@@ -1110,7 +1110,8 @@
     const token = ++navToken;
     cur = n;
 
-    const instantly = Boolean(instant || isStatic() || !prev || prev === next);
+    const skipTransition = Boolean(instant || isStatic() || !prev || prev === next);
+    const animateInitial = Boolean(!prev && !instant && !isStatic());
 
     // Initialize target step on incoming slide BEFORE morph collection or paint
     const maxS = getMaxStep(next);
@@ -1120,9 +1121,9 @@
     else if (dir < 0 && prev && prev !== next && !instant) targetStep = maxS;
     applySlideStep(next, targetStep, 0, true, token);
 
-    const morphPairs = (!instantly && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
+    const morphPairs = (!skipTransition && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
 
-    cleanupFlight(instantly ? null : prev, next);
+    cleanupFlight(skipTransition ? null : prev, next);
 
     if (prev && prev !== next) {
       stage.dispatchEvent(new CustomEvent('deck:slideleave', { detail: { index: prevIdx, slide: prev, next } }));
@@ -1134,7 +1135,7 @@
     updateCtrlBar();
     try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
 
-    if (instantly) {
+    if (skipTransition) {
       stage.classList.add('no-trans');
       if (prev && prev !== next) prev.classList.remove('active', 'leaving');
       next.classList.add('active');
@@ -1142,6 +1143,7 @@
       next.style.transform = '';
       next.style.clipPath = '';
       if (isStatic()) snapSlideFinal(next);
+      else if (animateInitial && targetStep === 0) animateSlideContent(next, 60, token, null);
       else snapSubtreeFinal(next);
       stage.offsetWidth;
       requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
@@ -1316,7 +1318,8 @@
       index: cur,
       slide: next,
       prev,
-      instant: instantly,
+      instant: skipTransition,
+      initial: animateInitial,
       staticMode: isStatic(),
       surface: stage.dataset.activeSurface,
       step: curStep,
@@ -1393,8 +1396,8 @@
     if (hasNavLock()) return;
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); step(1); }
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); step(-1); }
-    else if (k === 'Home') go(0, false, { step: 0 });
-    else if (k === 'End') go(slides.length - 1, false, { step: 0 });
+    else if (k === 'Home') go(mainIndices.length ? mainIndices[0] : 0, false, { step: 0 });
+    else if (k === 'End') go(mainIndices.length ? mainIndices[mainIndices.length - 1] : slides.length - 1, false, { step: 0 });
     else if (k === 'b' || k === 'B') { e.preventDefault(); toggleLowPower(); }
     else if (k === 'f' || k === 'F') {
       document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
@@ -1433,9 +1436,15 @@
     }, { passive: true });
   }
 
-  const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
-  go(start - 1, true);
-  if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
+  let booted = false;
+  function boot() {
+    if (booted) return;
+    booted = true;
+    const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
+    // Play slide-1 entrance choreography in live mode; snap instantly when static (?still=1 / reduced-motion)
+    go(start - 1, isStatic());
+    if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
+  }
 
   // Auto-takeover: early interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
   const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], input, select, textarea, button:not(.back):not([data-link])';
@@ -1455,6 +1464,7 @@
     setStep,
     openLink,
     back,
+    boot,
     setStill,
     toggleLowPower,
     clearFocus,
@@ -1478,4 +1488,7 @@
     get slides() { return slides; },
     get lowPower() { return lowPower; },
   };
+
+  // Fallback auto-boot if runtime.js is loaded without an explicit trailing window.__deck.boot() call
+  Promise.resolve().then(() => { if (!booted) boot(); });
 })();

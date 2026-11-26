@@ -107,6 +107,10 @@
     .dna-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
     .phys-pill { font-size: 11.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: rgba(56,189,248,0.14); color: #7DD3FC; }
     .kit-code { font-size: 11px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.06); color: #CBD5E1; border: 1px solid var(--line); }
+    .topic-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .topic-lbl { font-size: 11.5px; font-weight: 800; color: var(--brand); letter-spacing: 0.02em; }
+    .topic-chip { font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: rgba(45,212,191,0.10); color: #CCFBF1; border: 1px solid rgba(45,212,191,0.24); }
+    .topic-chip.alt { background: rgba(255,255,255,0.04); color: var(--ink-2); border-color: var(--line); }
 
     /* Shared Beat Focus / Dim choreography (Takeaways #1, #2, #3) */
     .b-dim { opacity: 0.28 !important; transition: opacity .42s ease, transform .42s ease, box-shadow .42s ease; }
@@ -429,7 +433,7 @@
     <div>
       <div class="kicker">DECK ARCHITECT · STATIC CEILING × MOTION CEILING FUSION</div>
       <h1>風格 × 動態 DNA 融合圖鑑（4 款完整就緒）</h1>
-      <p class="sub">嚴守六大鐵律：先立 1920×1080 靜態美感上限與空間分群 → 按語意順序 3 拍從容演繹（每拍 1.4s 含靜止閱讀窗）→ 畫完完全靜止零永動干擾 → 隨時點擊互動立即接管。點 <code>↻ 3拍重播</code> 看完整節奏，點 <code>⛶ 放大</code> 全尺寸體驗。</p>
+      <p class="sub">先依簡報「主題類型」選風格（每張卡片下方標示適配主題），右上場合按鈕僅標示常用參考、不淘汰其他風格。四款皆嚴守靜態上限先行 → 語意 3 拍演繹（每拍 1.4s 靜止閱讀窗）→ 畫完完全靜止零永動 → 隨時點擊立即接管。點 <code>↻ 3拍重播</code> 看完整節奏，點 <code>⛶ 放大</code> 全尺寸體驗。</p>
     </div>
     <div class="filters" role="tablist" aria-label="依場合標示常用風格（主題優先，不排除其他風格）">
       <button class="flt-btn on" type="button" data-flt="all">全部 4 款</button>
@@ -590,11 +594,18 @@
           <span class="rec-badge">★ 此場合常用</span>
         </div>
         <p class="desc">先做空間分群（左欄風險↓拍板＋右欄健康由高到低、雙欄底部對齊）× 3 拍聚光零過衝推演。</p>
+        <div class="topic-row">
+          <span class="topic-lbl">適配主題</span>
+          <span class="topic-chip">週報／進度回報</span>
+          <span class="topic-chip">例會決策</span>
+          <span class="topic-chip">多專案總覽</span>
+          <span class="topic-chip alt">備選：例會年度成果、技術覆盤</span>
+        </div>
         <div class="dna-row">
           <span class="phys-pill">物理：Crisp Snap 零過衝</span>
-          <span class="kit-code">data-focus-plan</span>
-          <span class="kit-code">data-draw="ring"</span>
+          <span class="kit-code">data-ruler-progress</span>
           <span class="kit-code">data-bento-expand</span>
+          <span class="kit-code">data-focus-plan</span>
         </div>
       </div>
     </article>
@@ -668,11 +679,19 @@
           <span class="rec-badge">★ 此場合常用</span>
         </div>
         <p class="desc">麥肯錫級「色塊即圖表」雙欄底線齊平 × 3 拍語意揭曉（目標線 → 達標柱 → 超標紅差距）與推鏡景深。</p>
+        <div class="topic-row">
+          <span class="topic-lbl">適配主題</span>
+          <span class="topic-chip">商業／策略提案</span>
+          <span class="topic-chip">資源預算申請</span>
+          <span class="topic-chip">技術架構評審／覆盤</span>
+          <span class="topic-chip">例會年度成果</span>
+          <span class="topic-chip alt">備選：週報決策</span>
+        </div>
         <div class="dna-row">
           <span class="phys-pill">物理：Editorial Weight 精準煞停</span>
+          <span class="kit-code">data-rank-race</span>
           <span class="kit-code">data-odometer</span>
           <span class="kit-code">data-rack-focus</span>
-          <span class="kit-code">data-rank-race</span>
         </div>
       </div>
     </article>
@@ -772,12 +791,19 @@
           <span class="rec-badge">★ 此場合常用</span>
         </div>
         <p class="desc">雙層微光玻璃平板舞台 × 單向 3 拍語意揭曉（單次光掃後完全靜止）與實時情境重繪。</p>
+        <div class="topic-row">
+          <span class="topic-lbl">適配主題</span>
+          <span class="topic-chip">產品／技術發表</span>
+          <span class="topic-chip">年度峰會成果</span>
+          <span class="topic-chip">活動開場／慶典</span>
+          <span class="topic-chip alt">備選：策略提案、教學培訓</span>
+        </div>
         <div class="dna-row">
           <span class="phys-pill">物理：Cinema Spring 電影彈簧</span>
           <span class="kit-code">data-split-mask</span>
           <span class="kit-code">data-spotlight-sweep</span>
-          <span class="kit-code">data-draw</span>
           <span class="kit-code">data-depth-deck</span>
+          <span class="kit-code">data-colorize-wipe</span>
         </div>
       </div>
     </article>
@@ -846,11 +872,17 @@
           <span class="rec-badge">★ 此場合常用</span>
         </div>
         <p class="desc">真實無字 3D 手工黏土底圖融真文字 × 單次暖彩喚醒、左→中→右 3 拍時間接力與靜止閱讀窗。</p>
+        <div class="topic-row">
+          <span class="topic-lbl">適配主題</span>
+          <span class="topic-chip">知識分享／教學培訓</span>
+          <span class="topic-chip">新人引導／內部宣導</span>
+          <span class="topic-chip alt">備選：產品發表、年度峰會、活動慶典</span>
+        </div>
         <div class="dna-row">
           <span class="phys-pill">物理：Tactile Bounce 主從回彈</span>
           <span class="kit-code">data-popup-fold</span>
           <span class="kit-code">data-chat-replay</span>
-          <span class="kit-code">data-wipe="down"</span>
+          <span class="topic-chip alt">圖鑑示範 3 站接力＋暖彩喚醒；簡報招牌原語見左</span>
         </div>
       </div>
     </article>

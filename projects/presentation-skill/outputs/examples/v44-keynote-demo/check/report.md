@@ -9,7 +9,8 @@
 ## 生動度與反單調體檢（Liveliness Audit · `stage_mode=keynote`）
 - 視覺／圖表／互動頁佔比：**5/5（100%）**（標準 ≥ 75%）
 - 動態與互動原語多樣性：**5 種**（interactive-module、data-focus-plan、data-draw、data-count、data-step；標準 ≥ 4 種）
-- ✅ 達標：視覺豐富度與節奏變化符合此場合標準。
+- 風格契合（`apple` 招牌動態：split-mask、spotlight-sweep、depth-deck、colorize-wipe）：用到 **0/4**
+- ⚠️ [WARN] 選定風格 apple 的招牌動態一個都沒用到（split-mask、spotlight-sweep、depth-deck、colorize-wipe）；主柱二要的是這款風格的動態極致，Polish Pass 先從招牌動態補，不要疊不屬於這款風格的效果
 
 ## 動態互動檢核（`--motion`）
 - ✅ 連按打斷測試（4 次／180ms）：通過（精準落於第 3 頁 步進 2，無殘留 clone、壓暗與鎖死）
@@ -21,3 +22,5 @@
 - ✅ 講者點擊步進 data-step（第 3 頁共 3 步）：通過（逐層揭曉／換幕退場／回翻落終態／靜態全展開）
 - ✅ 多媒體與原生輪播原語（外連影片（第 1 頁）離頁停播歸零、實測音檔（第 4 頁）不誤翻頁且離頁歸零、活流程輪播（第 5 頁 vertical）切換不誤翻頁、3D 照片輪播（第 6 頁）切換不誤翻頁）：通過
 - ✅ Layer 1 講者臨場工具（總覽矩陣 G、畫筆標註 A 與雷射筆 L、雙螢幕講者同步 S）：通過（快捷鍵鎖定與 Esc 層級退出正常）
+- ✅ 閱讀期靜止檢核（反永動干擾／畫完就安靜）：通過
+- ✅ 390px 手機縮放實測（橫向溢出 0px、舞台實寬 390px）：通過

@@ -9,7 +9,9 @@
 ## 生動度與反單調體檢（Liveliness Audit · `stage_mode=pitch`）
 - 視覺／圖表／互動頁佔比：**4/5（80%）**（標準 ≥ 55%）
 - 動態與互動原語多樣性：**8 種**（data-wipe、data-focus-plan、data-count、data-transform-at、data-draw、data-grow、data-morph、interactive-module；標準 ≥ 2 種）
-- ✅ 達標：視覺豐富度與節奏變化符合此場合標準。
+- 風格契合（`apple` 招牌動態：split-mask、spotlight-sweep、depth-deck、colorize-wipe）：用到 **0/4**
+- ⚠️ [WARN] 選定風格 apple 的招牌動態一個都沒用到（split-mask、spotlight-sweep、depth-deck、colorize-wipe）；主柱二要的是這款風格的動態極致，Polish Pass 先從招牌動態補，不要疊不屬於這款風格的效果
+- 建議於 Polish Pass 優先升級視覺之頁面：第 2 頁
 
 ## 動態互動檢核（`--motion`）
 - ✅ 連按打斷測試（4 次／180ms）：通過（精準落於第 5 頁，無殘留 clone、壓暗與鎖死）

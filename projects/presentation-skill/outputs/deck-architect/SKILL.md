@@ -30,10 +30,10 @@ description: 兩大主柱驅動的簡報製作技能（v4.8）：【主柱 1｜�
 ```text
 decks/<name>/
 ├── brief.md                 # Step 1a+1b：內容與場合的交接契約（過 lint 才送關卡 1b）
-├── storyboard.yaml          # Step 2 起：唯一內容來源（敘事、章節、逐頁 director 分鏡、constraints）；Step 3a 寫入呈現規格
-├── deck.css                 # Step 4：這份簡報的風格與雙極 OKLCH 配色變數（--light-* / --dark-*）
-├── samples/                 # Step 3b：選定風格的 2–3 張真實高工藝樣張（確認後直接沿用為活範本）
-├── slides/                  # Step 4：逐頁自由編排 HTML 片段（>6 頁採每 3–4 頁分批精雕）
+├── storyboard.yaml          # Step 2 起：架構、導航、講者備註、director 分鏡與 constraints 的唯一真相來源；Step 3a 寫入呈現規格
+├── deck.css                 # Step 3b 起：這份簡報的風格與雙極 OKLCH 配色變數（--light-* / --dark-*）
+├── samples/                 # Step 3b：選定風格的 2–3 張真實高工藝片段樣張（含 manifest.json palettes；確認後直接沿用為活範本）
+├── slides/                  # Step 4：逐頁自由編排 HTML 片段（文案同受 lint.py 把關；>6 頁採每 3–4 頁分批精雕）
 ├── assets/                  # 可選：使用者提供或生成的靜態圖／底圖／海報（自動 Base64 內嵌）
 ├── media/                   # 可選：外連影片／實測音檔（保持相對路徑，不轉 Base64）
 ├── IMAGE_UPGRADE.md         # 可選：AI 升級生圖清單（零等待程式版同步附上）
@@ -52,7 +52,7 @@ decks/<name>/
 
 ### Step 1a｜架構與敘事脈絡腦力激盪（Architecture Brainstorm）　⛔ 關卡 1a
 
-讀 `references/grill.md`（第一、二節）、`references/contexts.md` 與 `references/structure.md`。遵循**先查事實、只問決定**與**設計樹前沿**，有表單工具時一律用互動表單（每張 2–4 題互不依賴、推薦項放第一標「（推薦）」）：
+讀 `references/grill.md`（第一、二節）、`references/contexts.md` 與 `references/structure.md`。遵循**先查事實、只問決定**與**設計樹前沿**，有表單工具時一律用互動表單（每張 2–4 題互不依賴；收斂型決策把推薦項放第一標「（推薦）」附理由，發散型腦力激盪如故事種子不標「（推薦）」避免錨定）：
 
 1. **Pre-Flight 靜默偵察**：先讀完使用者提供的所有舊檔、簡報、模板與數據，主動查核關鍵數字並盤點既有圖片／照片／影音／原話。
 2. **根節點定調＋主題類型與標竿盲點掃描（節點群 A）**：釐清理性終點 × 體感預期、對象起點與 Grounding 基線；依 `contexts.md` 〈主題類型總表〉判斷類型與氣質，**站在這類主題的標竿與全面視角主動點出缺漏維度**；拍板 **`stage_mode`（`briefing`／`pitch`／`keynote`）**，並把播放方式與播放環境當成事實記下；確認頁數算術、人際顧慮與既有框架。
@@ -96,15 +96,15 @@ python3 <skill>/scripts/lint.py decks/<name>/storyboard.yaml
    - 用一張互動表單請使用者**選定 1 款風格**，同時確認依「`stage_mode` × 風格 × 播放環境」給出的**呈現規格**（明暗策略、去框比例、導航模式；可整組接受或改單一開關）。拍板同時鎖定該風格之 `motion_dna`、專屬 `motion-*` 套件與氛圍效果，把 `style`、`mode`、`nav_mode` 寫進 `storyboard.yaml`。
 2. **Step 3a 之後｜依選定風格補齊分鏡（Agent 內部，不設關卡）**：依 `styles/<id>.md` 的版面語法與 `motion_dna`，替每頁補上 `director.archetype`、`director.choreo` 與 `surface`，再跑一次 `lint.py`（做法見 `references/samples.md`）。
 3. **Step 3b｜用選定風格集中精雕 2–3 張極致樣張 ＋ 3 組 OKLCH 配色（⛔ 關卡 2b）**：
-   - 先從 `templates/deck.css` 建立 `deck.css`（換上選定風格的字體與配色；它含配方依賴的畫布基礎排版）。讀入 `styles/<selected>.md`、`styles/index.json` 該風格的 `motion_dna` 與對應 `references/recipes/*.md` 黃金工藝配方，只針對這 1 款風格，用真實內容畫出 **2–3 張高工藝樣張**（封面＋核心招牌亮點頁＋異構圖／異極性頁，同步立住**靜態美感上限＋視覺指引動線＋專屬動態原語**，不退回平庸白框或簡陋幾何 SVG）並跑 `scripts/oklch.py --palette` 驗證 3 組 OKLCH 配色。
-   - 執行像素品管並**親自看過 `samples/sheet.jpg`**：
+   - 先從 `templates/deck.css` 建立 `deck.css`（換上選定風格的字體與配色；它含配方依賴的畫布基礎排版）。讀入 `styles/<selected>.md`、`styles/index.json` 該風格的 `motion_dna` 與對應 `references/recipes/*.md` 黃金工藝配方，只針對這 1 款風格，用真實內容直接寫成 **2–3 張 `slides/` 規格的 HTML 片段樣張**（封面＋核心招牌亮點頁＋異構圖／異極性頁，同步立住**靜態美感上限＋視覺指引動線＋專屬動態原語**，不退回平庸白框或簡陋幾何 SVG），並跑 `scripts/oklch.py --palette` 驗證 3 組 OKLCH 配色寫進 `samples/manifest.json` 的 `palettes` 欄位。
+   - 執行像素品管（`assemble.py --sheet` 會自動套用 `shell.css` + `deck.css` + 按需模組產生 `.preview/` 並渲染三組色票對照）並**親自看過 `samples/sheet.jpg`**：
 
 ```bash
 python3 <skill>/scripts/assemble.py --sheet decks/<name>/samples
 node <skill>/scripts/check.mjs --sheet decks/<name>/samples
 ```
 
-4. 以互動表單請使用者確認這組風格與配色，**停下來等回覆**。拍板後的這 2–3 張真實樣張**直接保留為正式 `slides/` 頁面**（零浪費），並成為 Step 4 的「活範本（Live Style Anchor）」。
+4. 以互動表單請使用者確認這組風格與配色，**停下來等回覆**。拍板後的這 2–3 張真實樣張**直接移入 `slides/` 作為正式頁面**（零改寫、零浪費），並成為 Step 4 的「活範本（Live Style Anchor）」。
 
 > **快速模式**跳過 3a 圖鑑與 3b 樣張：使用者在對話中說過偏好的風格就沿用；沒有就依〈主題類型總表〉選推薦風格，呈現規格採 `stage_mode` 基線，交付時告知可切換。（記住偏好的品味記憶屬 Phase E，尚未實作。）
 

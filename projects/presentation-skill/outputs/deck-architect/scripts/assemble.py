@@ -399,6 +399,103 @@ def _check_external_media(markup, base_dir, slide_id, media_refs):
             print(f"[WARN]  {slide_id}: 外連影音檔案不存在：{src}（請確認相對路徑與輸出 deck.html 對應）")
 
 
+def _scope_selector_list(sel_text, slide_id):
+    """Scope a CSS selector list to #slide_id without breaking html[data-mode]/body.static/body.low-power."""
+    parts, buf, depth_p, depth_b = [], [], 0, 0
+    for ch in sel_text:
+        if ch == "(":
+            depth_p += 1
+        elif ch == ")":
+            depth_p = max(0, depth_p - 1)
+        elif ch == "[":
+            depth_b += 1
+        elif ch == "]":
+            depth_b = max(0, depth_b - 1)
+        if ch == "," and depth_p == 0 and depth_b == 0:
+            parts.append("".join(buf))
+            buf = []
+        else:
+            buf.append(ch)
+    parts.append("".join(buf))
+
+    out, seen_norm = [], set()
+    for raw_sel in parts:
+        lead = raw_sel[:len(raw_sel) - len(raw_sel.lstrip())]
+        s = raw_sel.strip()
+        if not s:
+            continue
+        s = re.sub(r'(?<![\w-])\.slide(?![\w-])', f'#{slide_id}', s)
+        s = re.sub(r':root\b', f'#{slide_id}', s)
+        s = re.sub(r'^\*(?=(?:::(?:before|after)|:(?:before|after))?$)', f'#{slide_id} *', s)
+        s = re.sub(r'^(?:html|body)(?=$|\s)', f'#{slide_id}', s)
+        if s not in seen_norm:
+            seen_norm.add(s)
+            out.append(lead + s if not out else s)
+    return ", ".join(out) if out else sel_text
+
+
+def _scope_slide_css(css, slide_id):
+    """Rewrite .slide / :root and bare html / body / * selectors to #slide_id while preserving @keyframes and state selectors."""
+    res = []
+    buf = []
+    i, n = 0, len(css)
+    stack = []
+    in_str = None
+    while i < n:
+        ch = css[i]
+        if in_str:
+            buf.append(ch)
+            if ch == "\\" and i + 1 < n:
+                i += 1
+                buf.append(css[i])
+            elif ch == in_str:
+                in_str = None
+            i += 1
+            continue
+        if ch in ('"', "'"):
+            in_str = ch
+            buf.append(ch)
+            i += 1
+            continue
+        if ch == "/" and i + 1 < n and css[i + 1] == "*":
+            end = css.find("*/", i + 2)
+            end = n if end == -1 else end + 2
+            buf.append(css[i:end])
+            i = end
+            continue
+        if ch == "{":
+            header = "".join(buf)
+            buf = []
+            in_raw = any(k in ("rule", "at_raw") for k in stack)
+            h_strip = header.lstrip()
+            if in_raw:
+                res.append(header + "{")
+                stack.append("at_raw")
+            elif h_strip.startswith("@"):
+                res.append(header + "{")
+                if re.match(r"@(?:media|supports|layer|container)\b", h_strip, re.I):
+                    stack.append("at_nested")
+                else:
+                    stack.append("at_raw")
+            else:
+                res.append(_scope_selector_list(header, slide_id) + "{")
+                stack.append("rule")
+            i += 1
+            continue
+        if ch == "}":
+            res.append("".join(buf) + "}")
+            buf = []
+            if stack:
+                stack.pop()
+            i += 1
+            continue
+        buf.append(ch)
+        i += 1
+    if buf:
+        res.append("".join(buf))
+    return "".join(res)
+
+
 def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
     """Parse a per-slide HTML fragment (either full HTML or <section class="slide"> fragment)."""
     raw = path.read_text(encoding="utf-8")
@@ -463,14 +560,13 @@ def load_free_slide(path, rec, data, idx, base_dir, found_slots, media_refs):
         back = '<button class="back" type="button">← 返回</button>' if rec.get("appendix") else ""
         content = f'<section class="slide canvas"{extra_attrs}>{back}{content}</section>'
 
-    # Scope per-slide styles cleanly: rewrite `.slide` selector to `#s-{idx}` so slide styles stay isolated
+    # Scope per-slide styles cleanly: rewrite `.slide` / `:root` / bare global resets to `#s-{idx}`
     scoped_styles = []
     for css in styles:
         css_clean = css.strip()
         if not css_clean:
             continue
-        css_clean = re.sub(r'(?<![\w-])\.slide(?![\w-])', f'#{slide_id}', css_clean)
-        css_clean = re.sub(r':root\b', f'#{slide_id}', css_clean)
+        css_clean = _scope_slide_css(css_clean, slide_id)
         scoped_styles.append(f"/* {path.name} */\n{css_clean}")
 
     wrapped_script = ""
@@ -994,6 +1090,10 @@ def _collect_layered_assets(slides_html, slides_list, component_count, meta):
         gov_warnings.append(
             f"[WARN]  stage_mode=pitch: 全份簡報有 {fx_slide_count} 頁使用 ambient-fx（建議最多 1 頁，通常僅封面）。"
         )
+    elif stage_mode == "keynote" and fx_slide_count > 2:
+        gov_warnings.append(
+            f"[WARN]  stage_mode=keynote: 全份簡報有 {fx_slide_count} 頁使用 ambient-fx（建議最多 2 頁，通常僅封面＋結尾或轉折）。"
+        )
 
     # ---- Style-specific avoid_motions soft governance from styles/index.json (v4.7.3)
     style_id = str(meta.get("style") or "").strip().lower()
@@ -1079,9 +1179,10 @@ PAGE_TPL = """<!doctype html>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="hint">{hint_text}</div>
 <script>window.DECK={deck_json};</script>
-<script>{slide_js}</script>
 <script>{runtime_js}</script>
 <script>{module_js}</script>
+<script>{slide_js}</script>
+<script>if(window.__deck&&window.__deck.boot)window.__deck.boot();</script>
 </body>
 </html>
 """
@@ -1193,24 +1294,205 @@ def assemble_deck(data, base_dir):
     }
 
 
-# ----------------------------------------------------------------------------- Gate 2 comparison sheet builder
+# ----------------------------------------------------------------------------- Step 3b comparison sheet builder
+FULL_DOC_RE = re.compile(r"<!doctype\b|<html\b", re.I)
+
+
+def _wrap_sample_fragment(sample_path, samples_dir, sb_data, man, deck_css, item_meta):
+    """Wrap a Step 3b slide fragment into samples/.preview/<name> with shell + deck.css + modules.
+    Full standalone HTML samples (legacy) are left untouched and return False.
+    """
+    raw = sample_path.read_text(encoding="utf-8")
+    preview_dir = samples_dir / ".preview"
+    preview_path = preview_dir / sample_path.name
+    if FULL_DOC_RE.search(raw):
+        if preview_path.exists():
+            preview_path.unlink()
+        return False
+
+    sb_meta = dict((sb_data or {}).get("meta") or {})
+    man_meta = dict(man.get("meta") or {})
+    for k in ("style", "mode", "stage_mode", "nav_mode", "lang", "format"):
+        if k in man and man[k] is not None:
+            man_meta[k] = man[k]
+    preview_meta = {**sb_meta, **man_meta, "presenter_tools": []}
+    chapters = (sb_data or {}).get("chapters") or man.get("chapters") or []
+    structure = (sb_data or {}).get("structure") or {"axis": "time"}
+    preview_data = {"meta": preview_meta, "chapters": chapters, "structure": structure, "slides": []}
+
+    listed = listed_chapters(preview_data)
+    ch_ids = [c.get("id") for c in listed]
+    stem_l = sample_path.stem.lower()
+    src_slide = {}
+    if sb_data:
+        for sl in sb_data.get("slides") or []:
+            if not isinstance(sl, dict):
+                continue
+            f_val = str(sl.get("file") or "")
+            if (f_val and Path(f_val).name == sample_path.name) or (sl.get("id") and sl.get("id") == sample_path.stem):
+                src_slide = sl
+                break
+
+    kind = item_meta.get("kind") or src_slide.get("type")
+    if not kind:
+        if "cover" in stem_l:
+            kind = "cover"
+        elif "closing" in stem_l:
+            kind = "closing"
+        elif "shock" in stem_l:
+            kind = "shock"
+        else:
+            kind = "content"
+    chi = item_meta.get("chi")
+    if chi is None:
+        cid = src_slide.get("chapter")
+        if kind != "content":
+            chi = -1
+        elif cid in ch_ids:
+            chi = ch_ids.index(cid)
+        else:
+            chi = 0 if listed else -1
+
+    src_copy = dict(src_slide)
+    for k in ("surface", "nav", "transition"):
+        if item_meta.get(k):
+            src_copy[k] = item_meta[k]
+
+    rec = {"kind": kind, "chi": chi, "src": src_copy, "tab": 0, "tabs": 1}
+    asset_base = samples_dir.parent if ((samples_dir.parent / "assets").is_dir() or (samples_dir.parent / "storyboard.yaml").is_file()) else samples_dir
+    s_html, s_css, s_js, s_raw = load_free_slide(sample_path, rec, preview_data, 1, asset_base, [], [])
+    layers = _collect_layered_assets(s_html, [s_html], 0, preview_meta)
+
+    motion = motion_for(structure)
+    stage_mode = str(preview_meta.get("stage_mode") or "").lower()
+    nav_mode = str(preview_meta.get("nav_mode") or ("divider-only" if stage_mode == "keynote" else "top-bar")).lower()
+    deck_json = {
+        "title": sample_path.stem,
+        "style": str(preview_meta.get("style") or preview_meta.get("theme") or ""),
+        "mode": str(preview_meta.get("mode") or ""),
+        "stageMode": stage_mode,
+        "navMode": nav_mode,
+        "presenterTools": [],
+        "modules": layers["used_mods"],
+        "fx": layers["used_fx"],
+        "chapters": [c["label"] for c in listed],
+        "tabs": [[] for _ in listed],
+        "motion": motion,
+    }
+    html_out = PAGE_TPL.format(
+        lang=esc(preview_meta.get("lang", "zh-Hant")),
+        shape=toc_shape(motion),
+        motion=motion,
+        fmt=esc(preview_meta.get("format", "deck")),
+        style=esc(deck_json["style"]),
+        mode=esc(deck_json["mode"]),
+        stage_mode=esc(stage_mode),
+        nav_mode=esc(nav_mode),
+        title=esc(sample_path.stem),
+        fonts=collect_fonts(deck_css, s_raw),
+        shell_css=SHELL_CSS,
+        module_css=layers["module_css"],
+        deck_css=deck_css,
+        slide_css=s_css,
+        slides=s_html,
+        hint_text="",
+        deck_json=json.dumps(deck_json, ensure_ascii=False),
+        slide_js=s_js,
+        runtime_js=RUNTIME_JS,
+        module_js=layers["module_js"],
+    )
+    preview_dir.mkdir(parents=True, exist_ok=True)
+    preview_path.write_text(html_out, encoding="utf-8")
+    return True
+
+
+def _render_palettes_section(palettes):
+    if not palettes:
+        return ""
+    cards = []
+    for p in palettes:
+        if not isinstance(p, dict):
+            continue
+        name = esc(p.get("name") or "配色方案")
+        role = f'<span class="pal-role">{esc(p["role"])}</span>' if p.get("role") else ""
+        note = f'<p class="pal-note">{esc(p["note"])}</p>' if p.get("note") else ""
+        swatches = []
+        if isinstance(p.get("swatches"), list):
+            for sw in p["swatches"]:
+                if isinstance(sw, dict):
+                    col, lab = str(sw.get("color") or ""), str(sw.get("label") or sw.get("color") or "")
+                else:
+                    col, lab = str(sw), str(sw)
+                if col:
+                    swatches.append((lab, col))
+        else:
+            for key, lab in (("bg", "底色"), ("bg2", "次底"), ("surface", "次底"), ("fg", "主字"), ("focus", "焦點"), ("accent", "焦點"), ("alert", "警示"), ("accent2", "警示")):
+                val = p.get(key)
+                if val and not any(x[0] == lab for x in swatches):
+                    swatches.append((lab, str(val)))
+        chips = "".join(
+            f'<div class="sw"><span class="sw-dot" style="background:{esc(col)}"></span>'
+            f'<span class="sw-lab">{esc(lab)}</span><code>{esc(col)}</code></div>'
+            for lab, col in swatches
+        )
+        cards.append(
+            f'<div class="pal-card"><div class="pal-head"><strong>{name}</strong>{role}</div>'
+            f'<div class="pal-swatches">{chips}</div>{note}</div>'
+        )
+    if not cards:
+        return ""
+    cols = min(3, max(1, len(cards)))
+    return (
+        f'<section class="grp palettes"><h2>主題配色方案<span class="note">三組 OKLCH 調色候選（含對比與主題理由）</span></h2>'
+        f'<div class="pal-row" style="--pcols:{cols}">{"".join(cards)}</div></section>'
+    )
+
+
 def build_sheet(samples_dir, out_path, title_override=None):
     samples_dir = Path(samples_dir).resolve()
     manifest_path = samples_dir / "manifest.json"
-    title = title_override or "風格樣張對照（Gate 2）"
-    subtitle = "同一份真實簡報內容，依不同風格憲法與主題配色編排。每組 2–3 頁並排比較，點選最對味的方向（或指定調整明暗／配色）。"
+    title = title_override or "風格樣張與配色對照（Step 3b）"
+    subtitle = "選定風格的 2–3 張真實內容樣張（確認後直接沿用為正式頁面與活範本），搭配三組 OKLCH 主題配色對照。"
     groups = []
+    palettes = []
+    man = {}
 
     if manifest_path.exists():
         man = json.loads(manifest_path.read_text(encoding="utf-8"))
         title = title_override or man.get("title", title)
         subtitle = man.get("subtitle", subtitle)
         groups = man.get("groups", [])
+        palettes = man.get("palettes") or []
     else:
         htmls = sorted(p for p in samples_dir.glob("*.html") if p.name != "sheet.html")
         if not htmls:
             raise StoryboardError(f"{samples_dir} 裡沒有找到任何樣張 HTML 檔。")
         groups = [{"heading": "樣張總覽", "note": "", "items": [{"file": p.name, "caption": p.stem} for p in htmls]}]
+
+    # Load sibling storyboard.yaml & deck.css (if present) to wrap fragment samples into .preview/
+    sb_data = None
+    sb_path = samples_dir.parent / "storyboard.yaml"
+    if sb_path.is_file():
+        try:
+            sb_data = load(sb_path)
+        except Exception:
+            sb_data = None
+    deck_css = ""
+    for cand in (samples_dir / "deck.css", samples_dir.parent / "deck.css"):
+        if cand.is_file():
+            deck_css = cand.read_text(encoding="utf-8")
+            break
+
+    item_lookup = {}
+    for g in groups:
+        for it in g.get("items") or []:
+            if isinstance(it, dict) and it.get("file"):
+                item_lookup[it["file"]] = it
+
+    wrapped_count = 0
+    for html_file in sorted(p for p in samples_dir.glob("*.html") if p.name != "sheet.html"):
+        if _wrap_sample_fragment(html_file, samples_dir, sb_data, man, deck_css, item_lookup.get(html_file.name, {})):
+            wrapped_count += 1
 
     parts = [
         '<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">',
@@ -1222,6 +1504,16 @@ def build_sheet(samples_dir, out_path, title_override=None):
         "h1{font-weight:900;font-size:40px;line-height:1.2}p.sub{margin-top:10px;font-weight:400;font-size:21px;line-height:1.5;color:#52555C}"
         "section.grp{margin-top:36px}section.grp h2{font-weight:900;font-size:26px;line-height:1.25;display:flex;align-items:baseline;gap:14px}"
         "section.grp h2 span.note{font-weight:400;font-size:19px;line-height:1.3;color:#5A5D64}"
+        ".pal-row{margin-top:14px;display:grid;grid-template-columns:repeat(var(--pcols,3),minmax(0,1fr));gap:20px}"
+        ".pal-card{background:#fff;border:1px solid #CFCAC0;padding:16px 18px;border-radius:4px}"
+        ".pal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:20px}"
+        ".pal-role{font-size:14px;font-weight:700;padding:2px 9px;border-radius:999px;background:#E5EFEA;color:#0E6B4F}"
+        ".pal-swatches{margin-top:12px;display:flex;flex-wrap:wrap;gap:10px}"
+        ".sw{display:flex;align-items:center;gap:6px;background:#F6F5F0;border:1px solid #DFDCD3;border-radius:4px;padding:5px 8px}"
+        ".sw-dot{width:22px;height:22px;border-radius:3px;border:1px solid rgba(0,0,0,.18);flex:none}"
+        ".sw-lab{font-size:14px;font-weight:700;color:#2A2C30}"
+        ".sw code{font-size:13px;color:#5A5D64;font-family:ui-monospace,Consolas,monospace}"
+        ".pal-note{margin-top:10px;font-size:16px;line-height:1.45;color:#52555C}"
         ".row{margin-top:14px;display:grid;grid-template-columns:repeat(var(--cols,3),minmax(0,1fr));gap:20px}"
         "figure{background:#fff;border:1px solid #CFCAC0;padding:10px;border-radius:4px}"
         "figure img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:#1A1B1E}"
@@ -1230,6 +1522,9 @@ def build_sheet(samples_dir, out_path, title_override=None):
         "</style></head><body>",
         f"<h1>{esc(title)}</h1><p class='sub'>{esc(subtitle)}</p>",
     ]
+    pal_html = _render_palettes_section(palettes)
+    if pal_html:
+        parts.append(pal_html)
     for g in groups:
         items = g.get("items") or []
         cols = min(3, max(1, len(items)))
@@ -1245,6 +1540,8 @@ def build_sheet(samples_dir, out_path, title_override=None):
     parts.append("</body></html>")
 
     out_path.write_text("\n".join(parts), encoding="utf-8")
+    if wrapped_count:
+        print(f"已替 {wrapped_count} 張片段樣張自動套殼產生預覽：{samples_dir / '.preview'}")
     return out_path
 
 
@@ -1252,7 +1549,7 @@ def build_sheet(samples_dir, out_path, title_override=None):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("target", nargs="?", help="path/to/storyboard.yaml")
-    ap.add_argument("--sheet", help="build Gate 2 comparison sheet.html for a samples directory")
+    ap.add_argument("--sheet", help="build Step 3b comparison sheet.html for a samples directory")
     ap.add_argument("--title", help="optional title override for --sheet")
     ap.add_argument("--out", help="output HTML path")
     ap.add_argument("--force", action="store_true", help="assemble even if lint reports errors")
@@ -1278,13 +1575,13 @@ def main():
     except StoryboardError as e:
         sys.exit(f"[ERROR] {e}")
 
-    errors, warnings, infos = lint(data)
+    base = Path(a.target).resolve().parent
+    errors, warnings, infos = lint(data, base_dir=base)
     for line in errors + warnings + infos:
         print(line)
     if errors and not a.force:
         sys.exit("\nlint 有錯誤，未組裝。修正 storyboard 後重試（或加 --force 強制組裝）。")
 
-    base = Path(a.target).resolve().parent
     out = Path(a.out) if a.out else base / "deck.html"
     try:
         html_out, stats = assemble_deck(data, base)

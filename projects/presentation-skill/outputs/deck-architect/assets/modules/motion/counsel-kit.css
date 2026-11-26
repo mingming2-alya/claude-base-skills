@@ -96,7 +96,7 @@
   filter: none;
   transform: scale(1.03);
   border-color: var(--accent, #0D6B4F);
-  box-shadow: 0 18px 38px color-mix(in srgb, var(--accent, #0D6B4F) 20%, transparent);
+  box-shadow: 0 0 0 2px var(--accent, #0D6B4F);
   z-index: 3;
 }
 

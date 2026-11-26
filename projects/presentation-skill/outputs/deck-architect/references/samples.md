@@ -30,7 +30,7 @@
 Step 2 只寫了每頁的視覺主角 `hero`。風格定案後，由 Agent 一次補齊每頁的 `director`：
 
 - **`archetype`**：依該風格的版面語法（`styles/<id>.md` 第 4 節；`illustration` 依 A／B／C 三種融合版面）挑最適合這頁內容形狀與 `hero` 的做法，有對應時引用 `references/recipes/`。配方是工藝基準線，不是硬模板：風格的版面語法優先。
-- **`module`**：沿用 Step 2 從說服載體帶來的內容模組；只在該風格推薦時才加氛圍或裝飾類模組。
+- **`module`**：沿用 Step 2 從說服載體帶來的內容模組；若 Step 3a 因該風格的 `avoid_motions` 改用風格原生做法，同步清除或替換衝突的 `director.module`；只在該風格推薦時才加氛圍或裝飾類模組。
 - **`choreo`**：依該風格的 `motion_dna`（物理個性、招牌原語、禁用動態）與 `references/visual-guidance.md` 的動線原型寫轉場與 3 拍語意順序。
 - **`surface`**：依 3a 拍板的明暗策略安排逐頁極性（`keynote` 光暗雙極時避免連續 >5 頁同極性同構圖）。
 
@@ -47,7 +47,8 @@ Step 2 只寫了每頁的視覺主角 `hero`。風格定案後，由 Agent 一�
    - 讀 `styles/<selected>.md`、`styles/index.json` 中該風格的 `motion_dna`（招牌原語與 `avoid_motions` 禁忌）與 `styles/color-system.md`；
    - 依招牌頁補好的 `director.archetype`，讀入 1–2 支對應的 **`references/recipes/*.md`** 與 **`references/modules/style-motion-kits.md`** 作為工藝基準線；
    - **極致上限防退化**：對標 `assets/style-library.html` 的靜態美感與空間分群（雙欄底部基線齊平、一般卡片 ≤2 層文字、3 拍語意順序、畫完即靜止反永動）。**不要做出「三張平庸白框配三個幾何矩形 SVG」或「用橢圓色塊假裝真實產品／插畫」的降級畫面**——需實物／插畫質感時，優先用無字 AI 底圖融真文字或高完成度資料視覺化（無生圖工具時依 `styles/illustration.md` 規則 12 的程式版佔位＋`IMAGE_UPGRADE.md`）。
-2. **挑選 2–3 張最有代表性的真實頁面**：
+2. **直接寫成 `slides/` 片段格式（2–3 張最有代表性的真實頁面）**：
+   - 樣張直接寫成 `<style>...</style><section class="slide canvas">...</section>` 片段放在 `samples/`，**不另寫獨立 `<html>/<body>` 樣板**——`assemble.py --sheet` 會自動套上 `shell.css`、`deck.css`、按需模組與 `storyboard.yaml` 導航產生 `.preview/` 供 `check.mjs --sheet` 實測，拍板後無需改寫就能直接移入 `slides/`。
    - **第 1 張：封面**（展現字體聲音、承重母題與舞台第一印象）；
    - **第 2 張：核心招牌亮點頁（`signature: true`）**（直接兌現 Step 1b 拍板的最強說服畫面，自然寄生該風格專屬動態原語）；
    - **第 3 張（選填，湊滿 2–3 張）：異構圖或異極性頁**（例如 `keynote` 示範亮棚 vs 暗場反差，或 `briefing` 示範左欄風險↓拍板＋右欄健康總覽 Bento 看板）。
@@ -55,7 +56,7 @@ Step 2 只寫了每頁的視覺主角 `hero`。風格定案後，由 Agent 一�
    ```bash
    python3 <skill>/scripts/oklch.py --palette --bg '<底色>' --focus '<貼題>,<沉穩>,<外卡>' [--alert '<警示色>']
    ```
-   主樣張套用「貼題」配色，同時在 `samples/sheet.html` 附上另外兩組配色的色票／實景對照供使用者一併定調；每組配色都用一句話說明它和這份簡報主題的關聯（例：「貼題綠：呼應主題裡的永續目標」）。
+   主樣張套用「貼題」配色，同時把三組配色寫進 `samples/manifest.json` 的 `palettes` 陣列（每組含 `name`、`role`、`bg`、`bg2`、`fg`、`focus`、`alert`、`note`），`assemble.py --sheet` 會自動在 `samples/sheet.html` 上方渲染三欄色票對照卡；每組配色都用一句話說明它和這份簡報主題的關聯（例：「貼題綠：呼應主題裡的永續目標」）。
 4. **組裝樣張並跑像素品管**：
    ```bash
    python3 <skill>/scripts/assemble.py --sheet decks/<name>/samples --title "<簡報標題>｜選定風格真實樣張"
@@ -68,5 +69,5 @@ Step 2 只寫了每頁的視覺主角 `hero`。風格定案後，由 Agent 一�
 ## 交接給 Step 4（零浪費活範本機制）
 
 使用者拍板 Step 3b 後：
-- 這 2–3 張已通過像素品管的真實樣張**直接轉入 `decks/<name>/slides/` 作為正式頁面**（無需重寫）；
+- 這 2–3 張已通過像素品管的片段樣張**直接移入 `decks/<name>/slides/` 作為正式頁面**（無需重寫，也不會有殘留 `<html>/<body>` 全域樣式外洩）；
 - 同時把這 2–3 張樣張的 HTML 路徑寫入 Step 4 分批子代理的提示詞中作為 **Live Style Anchor（活範本）**，讓後面第 4–20 頁的版面呼吸、字級階層、圖解精細度與動態手感與前 3 頁一致。

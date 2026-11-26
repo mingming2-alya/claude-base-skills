@@ -31,7 +31,7 @@
         "physics": "cinema-spring (dramatic anticipation, elastic settle, optical light follow-through)",
         "primitives": [
           { "id": "split-mask", "attr": "data-split-mask", "label": "文字裁切遮罩逐行拉起" },
-          { "id": "spotlight-sweep", "attr": "data-spotlight-sweep", "label": "擺動／滑鼠追隨聚光燈掃字顯影" },
+          { "id": "spotlight-sweep", "attr": "data-spotlight-sweep", "label": "單次聚光掃字顯影（掃完即靜止，游標可探照）" },
           { "id": "depth-deck", "attr": "data-depth-deck", "label": "3D 景深疊卡甩牌翻面" },
           { "id": "colorize-wipe", "attr": "data-colorize-wipe", "label": "黑白柔焦→彩色光幕掃入揭曉" }
         ]

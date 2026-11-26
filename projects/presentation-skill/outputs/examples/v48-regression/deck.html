@@ -21,7 +21,7 @@
  */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
+:where(:root) {
   /* Curated offline CJK + Latin fallback voices */
   --font-sans-fallback: "PingFang TC", "Microsoft JhengHei", "Heiti TC", "Noto Sans CJK TC", system-ui, -apple-system, sans-serif;
   --font-serif-fallback: "Songti TC", "PMingLiU", "Noto Serif CJK TC", Georgia, serif;
@@ -29,7 +29,7 @@
   --font-kai-fallback: "BiauKai", "DFKai-SB", "Kaiti TC", serif;
   --font-mono-fallback: "SFMono-Regular", ui-monospace, "Cascadia Mono", Consolas, monospace;
 
-  /* Default surface & type tokens (overridden by deck style CSS) */
+  /* Default surface & type tokens (overridden by deck style CSS or html[data-mode]) */
   --bg: #F1EFEA;
   --bg-2: #E6E2DA;
   --fg: #141619;
@@ -80,6 +80,43 @@
   --enter-easing: cubic-bezier(0.16, 1, 0.3, 1);
   --stagger-base: 64;
   --morph-ms: 780;
+}
+
+/* Connect deck-level meta.mode to deck.css --light-* and --dark-* tokens with zero specificity
+ * so slides without explicit data-surface (cover, closing, toc, status-table, free slides)
+ * inherit the deck's chosen polarity and OKLCH palette, while legacy deck.css :root overrides still win. */
+:where(html[data-mode="light"]) {
+  --bg: var(--light-bg, #F4F2ED);
+  --bg-2: var(--light-bg-2, #E8E4DC);
+  --fg: var(--light-fg, #161920);
+  --fg-2: var(--light-fg-2, #3D434F);
+  --fg-3: var(--light-fg-3, #5A606D);
+  --line: var(--light-line, rgba(22, 25, 32, .20));
+  --line-2: var(--light-line-2, rgba(22, 25, 32, .11));
+  --accent: var(--light-accent, #0D6B4F);
+  --accent-text: var(--light-accent-text, #0A5941);
+  --accent-ink: var(--light-accent-ink, #F4F2ED);
+  --nav-color: var(--light-fg-3, #5A606D);
+  --nav-active: var(--light-fg, #161920);
+  --nav-accent: var(--light-accent, #0D6B4F);
+  --nav-border: var(--light-line-2, rgba(22, 25, 32, .12));
+}
+
+:where(html[data-mode="dark"]) {
+  --bg: var(--dark-bg, #0E1117);
+  --bg-2: var(--dark-bg-2, #171C26);
+  --fg: var(--dark-fg, #F0EFEA);
+  --fg-2: var(--dark-fg-2, #BCC3D0);
+  --fg-3: var(--dark-fg-3, #929BA9);
+  --line: var(--dark-line, rgba(240, 239, 234, .22));
+  --line-2: var(--dark-line-2, rgba(240, 239, 234, .12));
+  --accent: var(--dark-accent, #3ED49C);
+  --accent-text: var(--dark-accent-text, #5CE3B0);
+  --accent-ink: var(--dark-accent-ink, #0E1117);
+  --nav-color: var(--dark-fg-3, #929BA9);
+  --nav-active: var(--dark-fg, #F0EFEA);
+  --nav-accent: var(--dark-accent, #3ED49C);
+  --nav-border: var(--dark-line-2, rgba(240, 239, 234, .14));
 }
 
 html, body {
@@ -300,18 +337,6 @@ mark.em {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
-}
-
-/* Flowing SVG offset-path token helper (visual-explainer MIT) */
-@keyframes deck-token-flow {
-  0% { offset-distance: 0%; opacity: 0; }
-  12% { opacity: 1; }
-  88% { opacity: 1; }
-  100% { offset-distance: 100%; opacity: 0; }
-}
-.flow-token {
-  pointer-events: none;
-  animation: deck-token-flow var(--token-dur, 3.2s) cubic-bezier(.4, 0, .2, 1) infinite;
 }
 
 /* Mobile-visible high-contrast focus-ring cue (4px sharp rim + 22px halo = clearly readable even at 390px) */
@@ -733,8 +758,6 @@ body.low-power *::after {
   animation-play-state: paused !important;
   transition: none !important;
 }
-html.still .flow-token,
-body.low-power .flow-token,
 html.still [data-ripple],
 body.low-power [data-ripple],
 html.still [data-travel],
@@ -804,7 +827,7 @@ body.hide-ctrl #deck-progress {
   #viewport { position: static; display: block; background: none; }
   #stage { transform: none !important; width: 1920px; height: auto; overflow: visible; }
   #nav, #tabs, #nav-side, #curtain, #morph-layer, #notes, #hint, #toast, #ctrl-bar, #deck-progress,
-  .back, .more-btn, .live-only, .flow-token, [data-ripple], [data-travel] { display: none !important; }
+  .back, .more-btn, .live-only, [data-ripple], [data-travel] { display: none !important; }
   .slide {
     position: relative;
     visibility: visible !important;
@@ -843,7 +866,7 @@ body.hide-ctrl #deck-progress {
 
 @media (prefers-reduced-motion: reduce) {
   #nav .ind, #tabs span, #nav span, #toast, #ctrl-bar, #deck-progress-fill { transition: none !important; }
-  .flow-token, [data-ripple], [data-travel] { display: none !important; }
+  [data-ripple], [data-travel] { display: none !important; }
   .slide * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
 
@@ -1468,7 +1491,7 @@ body.low-power [data-bento-expand] [data-bento-detail] {
   filter: none;
   transform: scale(1.03);
   border-color: var(--accent, #0D6B4F);
-  box-shadow: 0 18px 38px color-mix(in srgb, var(--accent, #0D6B4F) 20%, transparent);
+  box-shadow: 0 0 0 2px var(--accent, #0D6B4F);
   z-index: 3;
 }
 
@@ -1512,7 +1535,7 @@ body.low-power [data-rack-focus].has-focus [data-rf-item]:not(.is-focused) {
   transition: none !important;
 }
 
-/* 2. Swinging / Pointer-Tracking Spotlight Sweep */
+/* 2. Single-Pass Spotlight Sweep (Settles Still; Optional Pointer Hover) */
 [data-spotlight-sweep] {
   position: relative;
   overflow: hidden;
@@ -1778,29 +1801,29 @@ body.low-power .cr-typing {
   --font-number: "Noto Sans TC", "PingFang TC", sans-serif;
 }
 
-/* 2. 淺深雙底配色（換成 Step 3b 選定的那一組；未定義時底盤退回高對比安全預設） */
+/* 2. 淺深雙底配色（使用 oklch.py --palette 驗過的 #hex，對比皆 >= 5.9:1；也可手寫 oklch()） */
 :root {
-  --light-bg: oklch(97.5% 0.006 95);
-  --light-bg-2: oklch(99.2% 0.003 95);
-  --light-fg: oklch(22% 0.02 260);
-  --light-fg-2: oklch(38% 0.02 260);
-  --light-fg-3: oklch(46% 0.02 260);
-  --light-line: oklch(22% 0.02 260 / 0.14);
-  --light-line-2: oklch(22% 0.02 260 / 0.07);
-  --light-accent: oklch(50% 0.11 175);
-  --light-accent-text: oklch(46% 0.11 175);
-  --light-accent-ink: oklch(98% 0.005 95);
+  --light-bg: #F5F4F0;
+  --light-bg-2: #FCFBF9;
+  --light-fg: #161A21;
+  --light-fg-2: #3D434F;
+  --light-fg-3: #545B68;
+  --light-line: rgba(22, 26, 33, 0.16);
+  --light-line-2: rgba(22, 26, 33, 0.08);
+  --light-accent: #0E6B4F;
+  --light-accent-text: #0B5B42;
+  --light-accent-ink: #F7F6F2;
 
-  --dark-bg: oklch(19% 0.02 255);
-  --dark-bg-2: oklch(24% 0.025 255);
-  --dark-fg: oklch(96% 0.006 95);
-  --dark-fg-2: oklch(85% 0.012 255);
-  --dark-fg-3: oklch(72% 0.015 255);
-  --dark-line: oklch(96% 0.006 95 / 0.16);
-  --dark-line-2: oklch(96% 0.006 95 / 0.08);
-  --dark-accent: oklch(76% 0.13 165);
-  --dark-accent-text: oklch(84% 0.11 165);
-  --dark-accent-ink: oklch(18% 0.03 165);
+  --dark-bg: #13161E;
+  --dark-bg-2: #1B202C;
+  --dark-fg: #F2F1EC;
+  --dark-fg-2: #C7CDD8;
+  --dark-fg-3: #959EAD;
+  --dark-line: rgba(242, 241, 236, 0.18);
+  --dark-line-2: rgba(242, 241, 236, 0.09);
+  --dark-accent: #4AD49A;
+  --dark-accent-text: #6CE4B2;
+  --dark-accent-ink: #10151C;
 }
 
 /* 3. 自由畫布基礎排版（配方依賴） */
@@ -1811,9 +1834,9 @@ body.low-power .cr-typing {
   justify-content: space-between;
   gap: 28px;
 }
-/* 頂部章節列（nav_mode: top-bar）會佔掉上方空間：有頂列從 124px 起排，章內超過 2 頁出現頁籤時從 156px 起排（與內建版面一致） */
-html[data-nav-mode="top-bar"] .slide.canvas:not([data-nav]) { padding-top: 124px; }
-html[data-nav-mode="top-bar"] .slide.canvas:not([data-nav])[data-tabs]:not([data-tabs="1"]):not([data-tabs="2"]) { padding-top: 156px; }
+/* 頂部章節列（nav_mode: top-bar）僅對有頂列的正文頁加讓位：124px（單章 >2 頁出現頁籤時 156px）；不誤傷封面／震撼／結尾與內嵌導航頁 */
+html[data-nav-mode="top-bar"] .slide.canvas[data-kind="content"]:not([data-nav]):not(:has([data-auto-nav])) { padding-top: 124px; }
+html[data-nav-mode="top-bar"] .slide.canvas[data-kind="content"]:not([data-nav]):not(:has([data-auto-nav]))[data-tabs]:not([data-tabs="1"]):not([data-tabs="2"]) { padding-top: 156px; }
 .hd {
   display: flex;
   flex-direction: column;
@@ -1838,59 +1861,59 @@ p.lead {
 }
 
 /* 02-workday.html */
-#s-2 .grid2 { flex: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
-    #s-2 .bx { display: grid; gap: 18px; }
-    #s-2 .bx .card { padding: 24px 28px; border-radius: 20px; border: 1px solid var(--line); background: var(--bg-2); }
-    #s-2 .bx h4 { font: 800 28px/1.25 var(--font-body); color: var(--fg); }
-    #s-2 .bx p { font: 600 22px/1.4 var(--font-body); color: var(--fg-2); }
+#s-2 .grid2{ flex: 1; display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+    #s-2 .bx{ display: grid; gap: 18px; }
+    #s-2 .bx .card{ padding: 24px 28px; border-radius: 20px; border: 1px solid var(--line); background: var(--bg-2); }
+    #s-2 .bx h4{ font: 800 28px/1.25 var(--font-body); color: var(--fg); }
+    #s-2 .bx p{ font: 600 22px/1.4 var(--font-body); color: var(--fg-2); }
 /* 03-counsel.html */
-#s-3 .grid2 { flex: 1; display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 56px; align-items: center; }
-    #s-3 .big-num { font: 900 120px/1 var(--font-number); color: var(--accent-text); }
-    #s-3 .rf { display: grid; gap: 14px; margin-top: 28px; }
-    #s-3 .rf .card { padding: 18px 24px; border: 1px solid var(--line); background: var(--bg-2); font: 700 24px/1.3 var(--font-body); color: var(--fg); }
+#s-3 .grid2{ flex: 1; display: grid; grid-template-columns: 1.25fr 0.75fr; gap: 56px; align-items: center; }
+    #s-3 .big-num{ font: 900 120px/1 var(--font-number); color: var(--accent-text); }
+    #s-3 .rf{ display: grid; gap: 14px; margin-top: 28px; }
+    #s-3 .rf .card{ padding: 18px 24px; border: 1px solid var(--line); background: var(--bg-2); font: 700 24px/1.3 var(--font-body); color: var(--fg); }
 /* 03b-bento-focus.html */
-#s-4 .bento { flex: 1; display: grid; grid-template-columns: 0.94fr 1.06fr; gap: 36px; align-items: stretch; }
-    #s-4 .spine { display: flex; flex-direction: column; }
-    #s-4 .card { padding: 26px 32px; border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2); }
-    #s-4 .risk { border: 1.5px solid color-mix(in srgb, var(--alert, #C03C1E) 45%, transparent); flex: 1.1; display: flex; flex-direction: column; justify-content: space-between; }
-    #s-4 .act  { border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent); flex: 0.95; display: flex; flex-direction: column; justify-content: space-between; }
-    #s-4 .arrow-gap { height: 48px; display: flex; align-items: center; justify-content: center; }
-    #s-4 .gantt { display: grid; grid-template-columns: 72px 1fr; gap: 14px 16px; align-items: center; margin-top: 14px; }
-    #s-4 .track { height: 22px; border-radius: 999px; background: var(--line-2); overflow: hidden; display: flex; }
-    #s-4 .done { background: var(--fg); height: 100%; }
-    #s-4 .delay { background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--alert,#C03C1E) 36%, transparent) 0 7px, transparent 7px 14px); border: 2px dashed var(--alert, #C03C1E); border-radius: 0 999px 999px 0; height: 100%; }
-    #s-4 .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
-    #s-4 .opt { padding: 18px 20px; border-radius: 16px; background: var(--bg); border: 1.5px solid var(--line); }
-    #s-4 .opt.rec { border-color: var(--accent); }
-    #s-4 .opt strong { display: block; font: 800 24px/1.2 var(--font-body); color: var(--fg); }
-    #s-4 .opt span { display: block; margin-top: 6px; font: 600 19px/1.3 var(--font-body); color: var(--fg-2); }
-    #s-4 .healthy { display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
-    #s-4 .bar { height: 12px; border-radius: 999px; background: var(--line-2); overflow: hidden; margin-top: 10px; }
-    #s-4 .bar > i { display: block; height: 100%; border-radius: 999px; background: var(--accent); }
-    #s-4 .chead { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    #s-4 .chead h3 { font: 800 28px/1.2 var(--font-body); color: var(--fg); }
-    #s-4 .pill { padding: 5px 14px; border-radius: 999px; font: 800 18px/1 var(--font-label); }
-    #s-4 .pill.risk { background: var(--alert, #C03C1E); color: #FFF8F5; border: none; flex: none; }
-    #s-4 .pill.ok { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-text); }
+#s-4 .bento{ flex: 1; display: grid; grid-template-columns: 0.94fr 1.06fr; gap: 36px; align-items: stretch; }
+    #s-4 .spine{ display: flex; flex-direction: column; }
+    #s-4 .card{ padding: 26px 32px; border-radius: 22px; border: 1px solid var(--line); background: var(--bg-2); }
+    #s-4 .risk{ border: 1.5px solid color-mix(in srgb, var(--alert, #C03C1E) 45%, transparent); flex: 1.1; display: flex; flex-direction: column; justify-content: space-between; }
+    #s-4 .act{ border: 1.5px solid color-mix(in srgb, var(--accent) 45%, transparent); flex: 0.95; display: flex; flex-direction: column; justify-content: space-between; }
+    #s-4 .arrow-gap{ height: 48px; display: flex; align-items: center; justify-content: center; }
+    #s-4 .gantt{ display: grid; grid-template-columns: 72px 1fr; gap: 14px 16px; align-items: center; margin-top: 14px; }
+    #s-4 .track{ height: 22px; border-radius: 999px; background: var(--line-2); overflow: hidden; display: flex; }
+    #s-4 .done{ background: var(--fg); height: 100%; }
+    #s-4 .delay{ background: repeating-linear-gradient(-45deg, color-mix(in srgb, var(--alert,#C03C1E) 36%, transparent) 0 7px, transparent 7px 14px); border: 2px dashed var(--alert, #C03C1E); border-radius: 0 999px 999px 0; height: 100%; }
+    #s-4 .opts{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    #s-4 .opt{ padding: 18px 20px; border-radius: 16px; background: var(--bg); border: 1.5px solid var(--line); }
+    #s-4 .opt.rec{ border-color: var(--accent); }
+    #s-4 .opt strong{ display: block; font: 800 24px/1.2 var(--font-body); color: var(--fg); }
+    #s-4 .opt span{ display: block; margin-top: 6px; font: 600 19px/1.3 var(--font-body); color: var(--fg-2); }
+    #s-4 .healthy{ display: flex; flex-direction: column; justify-content: space-between; gap: 18px; }
+    #s-4 .bar{ height: 12px; border-radius: 999px; background: var(--line-2); overflow: hidden; margin-top: 10px; }
+    #s-4 .bar > i{ display: block; height: 100%; border-radius: 999px; background: var(--accent); }
+    #s-4 .chead{ display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    #s-4 .chead h3{ font: 800 28px/1.2 var(--font-body); color: var(--fg); }
+    #s-4 .pill{ padding: 5px 14px; border-radius: 999px; font: 800 18px/1 var(--font-label); }
+    #s-4 .pill.risk{ background: var(--alert, #C03C1E); color: #FFF8F5; border: none; flex: none; }
+    #s-4 .pill.ok{ background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-text); }
 /* 04-editorial.html */
-#s-5 { padding: 0 !important; display: grid !important; grid-template-columns: 35% 65%; }
-    #s-5 .anchor { background: var(--dark-bg, #141821); color: var(--dark-fg, #F4F2EC); padding: 92px 64px; display: flex; flex-direction: column; justify-content: space-between; }
-    #s-5 .anchor h2 { font: 900 58px/1.15 var(--font-display); }
-    #s-5 .rows { background: var(--light-bg, #F6F5F0); color: var(--light-fg, #171A20); padding: 92px 84px; display: flex; flex-direction: column; justify-content: center; }
-    #s-5 .row { display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: baseline; padding: 34px 0; border-bottom: 1px solid rgba(23,26,32,0.14); }
-    #s-5 .row:last-child { border-bottom: none; }
-    #s-5 .num { font: 900 56px/1 var(--font-number); color: var(--light-accent-text, #0F766E); }
-    #s-5 .txt strong { display: block; font: 800 30px/1.25 var(--font-body); }
+#s-5{ padding: 0 !important; display: grid !important; grid-template-columns: 35% 65%; }
+    #s-5 .anchor{ background: var(--dark-bg, #141821); color: var(--dark-fg, #F4F2EC); padding: 92px 64px; display: flex; flex-direction: column; justify-content: space-between; }
+    #s-5 .anchor h2{ font: 900 58px/1.15 var(--font-display); }
+    #s-5 .rows{ background: var(--light-bg, #F6F5F0); color: var(--light-fg, #171A20); padding: 92px 84px; display: flex; flex-direction: column; justify-content: center; }
+    #s-5 .row{ display: grid; grid-template-columns: 180px 1fr; gap: 32px; align-items: baseline; padding: 34px 0; border-bottom: 1px solid rgba(23,26,32,0.14); }
+    #s-5 .row:last-child{ border-bottom: none; }
+    #s-5 .num{ font: 900 56px/1 var(--font-number); color: var(--light-accent-text, #0F766E); }
+    #s-5 .txt strong{ display: block; font: 800 30px/1.25 var(--font-body); }
 /* 05-apple.html */
-#s-6 .grid2 { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
-    #s-6 .claim { font: 900 64px/1.15 var(--font-display); color: var(--fg); }
-    #s-6 .sweep { margin-top: 36px; font: 800 40px/1.2 var(--font-display); color: var(--fg); }
-    #s-6 [data-deck-card] { font: 700 26px/1.3 var(--font-body); }
-    #s-6 .wipe { margin-top: 28px; height: 150px; border-radius: 18px; background: linear-gradient(120deg, var(--accent), var(--bg-2)); }
+#s-6 .grid2{ flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    #s-6 .claim{ font: 900 64px/1.15 var(--font-display); color: var(--fg); }
+    #s-6 .sweep{ margin-top: 36px; font: 800 40px/1.2 var(--font-display); color: var(--fg); }
+    #s-6 [data-deck-card]{ font: 700 26px/1.3 var(--font-body); }
+    #s-6 .wipe{ margin-top: 28px; height: 150px; border-radius: 18px; background: linear-gradient(120deg, var(--accent), var(--bg-2)); }
 /* 06-story.html */
-#s-7 .grid2 { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
-    #s-7 [data-pop-layer] h4 { font: 800 34px/1.25 var(--font-body); color: var(--fg); }
-    #s-7 [data-pop-tag] { font: 700 22px/1.3 var(--font-body); color: var(--fg-2); }
+#s-7 .grid2{ flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
+    #s-7 [data-pop-layer] h4{ font: 800 34px/1.25 var(--font-body); color: var(--fg); }
+    #s-7 [data-pop-tag]{ font: 700 22px/1.3 var(--font-body); color: var(--fg-2); }
 </style>
 </head>
 <body>
@@ -2030,7 +2053,6 @@ p.lead {
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="hint">← → 翻頁 · F 全螢幕 · N 備註 · B 靜態 · G 總覽 · A 畫筆 · L 雷射 · S 講者 · P 列印</div>
 <script>window.DECK={"title": "引擎回歸測試", "style": "counsel", "mode": "light", "stageMode": "pitch", "navMode": "top-bar", "presenterTools": ["grid", "annotator", "speaker"], "modules": ["components(cmp-fallback)", "fit", "motion-workday", "motion-counsel", "motion-apple", "motion-story"], "fx": [], "chapters": ["工作與顧問", "發表與故事"], "tabs": [["進度刻度", "方案排名", "本季進度與風險", "三個里程碑"], ["產品亮點", "使用者故事"]], "motion": "horizontal"};</script>
-<script></script>
 <script>/* deck-architect v4.4 Thin Shell Runtime (Phase C.2 — Bipolar Surface, Multi-Mode Nav, Auto-Hide Bar, Dual-Track data-step)
  *
  * Zero external dependencies, 100% offline single-file HTML playback:
@@ -3143,7 +3165,8 @@ p.lead {
     const token = ++navToken;
     cur = n;
 
-    const instantly = Boolean(instant || isStatic() || !prev || prev === next);
+    const skipTransition = Boolean(instant || isStatic() || !prev || prev === next);
+    const animateInitial = Boolean(!prev && !instant && !isStatic());
 
     // Initialize target step on incoming slide BEFORE morph collection or paint
     const maxS = getMaxStep(next);
@@ -3153,9 +3176,9 @@ p.lead {
     else if (dir < 0 && prev && prev !== next && !instant) targetStep = maxS;
     applySlideStep(next, targetStep, 0, true, token);
 
-    const morphPairs = (!instantly && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
+    const morphPairs = (!skipTransition && next.dataset.kind !== 'shock') ? collectMorphPairs(prev, next) : [];
 
-    cleanupFlight(instantly ? null : prev, next);
+    cleanupFlight(skipTransition ? null : prev, next);
 
     if (prev && prev !== next) {
       stage.dispatchEvent(new CustomEvent('deck:slideleave', { detail: { index: prevIdx, slide: prev, next } }));
@@ -3167,7 +3190,7 @@ p.lead {
     updateCtrlBar();
     try { history.replaceState(null, '', '#' + (n + 1)); } catch (_) {}
 
-    if (instantly) {
+    if (skipTransition) {
       stage.classList.add('no-trans');
       if (prev && prev !== next) prev.classList.remove('active', 'leaving');
       next.classList.add('active');
@@ -3175,6 +3198,7 @@ p.lead {
       next.style.transform = '';
       next.style.clipPath = '';
       if (isStatic()) snapSlideFinal(next);
+      else if (animateInitial && targetStep === 0) animateSlideContent(next, 60, token, null);
       else snapSubtreeFinal(next);
       stage.offsetWidth;
       requestAnimationFrame(() => requestAnimationFrame(() => stage.classList.remove('no-trans')));
@@ -3349,7 +3373,8 @@ p.lead {
       index: cur,
       slide: next,
       prev,
-      instant: instantly,
+      instant: skipTransition,
+      initial: animateInitial,
       staticMode: isStatic(),
       surface: stage.dataset.activeSurface,
       step: curStep,
@@ -3426,8 +3451,8 @@ p.lead {
     if (hasNavLock()) return;
     if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); step(1); }
     else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(k)) { e.preventDefault(); step(-1); }
-    else if (k === 'Home') go(0, false, { step: 0 });
-    else if (k === 'End') go(slides.length - 1, false, { step: 0 });
+    else if (k === 'Home') go(mainIndices.length ? mainIndices[0] : 0, false, { step: 0 });
+    else if (k === 'End') go(mainIndices.length ? mainIndices[mainIndices.length - 1] : slides.length - 1, false, { step: 0 });
     else if (k === 'b' || k === 'B') { e.preventDefault(); toggleLowPower(); }
     else if (k === 'f' || k === 'F') {
       document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {});
@@ -3466,9 +3491,15 @@ p.lead {
     }, { passive: true });
   }
 
-  const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
-  go(start - 1, true);
-  if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
+  let booted = false;
+  function boot() {
+    if (booted) return;
+    booted = true;
+    const start = parseInt((location.hash || '#1').slice(1), 10) || 1;
+    // Play slide-1 entrance choreography in live mode; snap instantly when static (?still=1 / reduced-motion)
+    go(start - 1, isStatic());
+    if (stillMode) stage.dispatchEvent(new CustomEvent('deck:still', { detail: { still: true } }));
+  }
 
   // Auto-takeover: early interaction on any slide control immediately clears focus-plan dimming (Zero Lockout)
   const TAKEOVER_SEL = '.live-ctrl, [data-interactive], [data-compare-slider], [data-ref], input, select, textarea, button:not(.back):not([data-link])';
@@ -3488,6 +3519,7 @@ p.lead {
     setStep,
     openLink,
     back,
+    boot,
     setStill,
     toggleLowPower,
     clearFocus,
@@ -3511,6 +3543,9 @@ p.lead {
     get slides() { return slides; },
     get lowPower() { return lowPower; },
   };
+
+  // Fallback auto-boot if runtime.js is loaded without an explicit trailing window.__deck.boot() call
+  Promise.resolve().then(() => { if (!booted) boot(); });
 })();
 </script>
 <script>/* deck-architect v4.5 Layer 1 Presenter Chrome: grid-overview (G key)
@@ -3904,14 +3939,23 @@ p.lead {
   let popup = null;
   let ctrlBtn = null;
 
+  function mainSlidesIndices() {
+    const out = [];
+    for (let i = 0; i < deck.count; i++) {
+      if (deck.slides[i].dataset.appendix !== '1') out.push(i);
+    }
+    return out;
+  }
+
   function slideSummary(idx) {
     const sl = deck.slides[idx];
     if (!sl) return null;
     const h = sl.querySelector('h1, h2, .shock-text, .div-t');
     const p = sl.querySelector('p.sub, p.lead, .takeaway, p');
+    const mains = mainSlidesIndices();
     return {
       index: idx,
-      total: deck.count,
+      total: Math.max(1, mains.length),
       title: h ? h.textContent.trim().replace(/\s+/g, ' ').slice(0, 72) : (sl.dataset.id || ('Slide ' + (idx + 1))),
       preview: p ? p.textContent.trim().replace(/\s+/g, ' ').slice(0, 140) : '',
       notes: sl.dataset.notes || '（這頁沒有講者備註）',
@@ -3921,12 +3965,17 @@ p.lead {
   }
 
   function buildPayload() {
+    const mains = mainSlidesIndices();
+    const isApp = Boolean(deck.slides[deck.index] && deck.slides[deck.index].dataset.appendix === '1');
+    const mainPos = isApp ? -1 : Math.max(1, mains.indexOf(deck.index) + 1);
     let nextIdx = deck.index + 1;
     while (nextIdx < deck.count && deck.slides[nextIdx].dataset.appendix === '1') nextIdx++;
     return {
       type: 'state',
       index: deck.index,
-      total: deck.count,
+      mainPos,
+      total: Math.max(1, mains.length),
+      totalSlides: deck.count,
       step: deck.stepIndex,
       stepTotal: deck.stepTotal,
       current: slideSummary(deck.index),
@@ -4005,7 +4054,7 @@ p.lead {
       'function send(msg){if(bc)try{bc.postMessage(msg)}catch(_){}try{localStorage.setItem(chName+":cmd",JSON.stringify(Object.assign({ts:Date.now()},msg)))}catch(_){}}' +
       'function render(s){if(!s||s.type!=="state")return;' +
       'var pad=function(n){return(n<10?"0":"")+n};' +
-      'document.getElementById("sv-pos").textContent=pad(s.index+1)+" / "+pad(s.total);' +
+      'document.getElementById("sv-pos").textContent=(s.current&&s.current.appendix)?"附件":(pad(s.mainPos>0?s.mainPos:(s.index+1))+" / "+pad(s.total));' +
       'document.getElementById("sv-step").textContent=s.stepTotal>0?("步進 "+s.step+" / "+s.stepTotal):"";' +
       'if(s.current){document.getElementById("sv-cur-title").textContent=s.current.title;document.getElementById("sv-cur-prev").textContent=s.current.preview;document.getElementById("sv-notes").textContent=s.current.notes;}' +
       'if(s.next){document.getElementById("sv-next-title").textContent=s.next.title;document.getElementById("sv-next-prev").textContent=s.next.preview;}' +
@@ -4904,5 +4953,7 @@ p.lead {
   window.__motionKits.story = { initPopupFold, initChatReplay, folds, chats };
 })();
 </script>
+<script></script>
+<script>if(window.__deck&&window.__deck.boot)window.__deck.boot();</script>
 </body>
 </html>

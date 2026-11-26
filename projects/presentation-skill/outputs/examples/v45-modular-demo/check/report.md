@@ -9,6 +9,7 @@
 ## 生動度與反單調體檢（Liveliness Audit · `stage_mode=keynote`）
 - 視覺／圖表／互動頁佔比：**4/4（100%）**（標準 ≥ 75%）
 - 動態與互動原語多樣性：**4 種**（data-count、interactive-module、data-draw、data-step；標準 ≥ 4 種）
+- 風格契合：略過（`meta.style`=keynote-modular，不是已就緒風格）
 - ✅ 達標：視覺豐富度與節奏變化符合此場合標準。
 
 ## 動態互動檢核（`--motion`）

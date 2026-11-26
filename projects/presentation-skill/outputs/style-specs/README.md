@@ -1,4 +1,6 @@
-# 風格規格（首批）
+# 風格規格（首批・歷史封存）
+
+> **歷史紀錄封存說明**：此資料夾保留 2026-11-19 首批風格定調初版作為歷史軌跡。現行正式版風格規格、用色系統與動態 DNA 唯一真相來源已移至 [`../deck-architect/styles/`](../deck-architect/styles/)（含 `index.json`、`color-system.md`、`workday.md`、`counsel.md`、`apple.md`、`illustration.md`）。
 
 2026-11-19 初版。使用者選定的首批三款，加上一份共用的用色系統。
 
