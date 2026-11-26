@@ -1,15 +1,18 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.8.2 主柱一六項結構缺口修補 ✅）**：
+> **最新接手點（2026-11-26｜`deck-architect` v4.8.2 主柱一六項缺口修補 ✅ ＋ 主柱二四大維度深度稽核完成）**：
 >
-> - 依專案全歷史與第一性原理稽核主柱一（Step 1a／1b／Step 4 交接）並一次補齊 6 項結構缺口：
->   1. **Round 0 先問既有素材＋起手狀態三分流**：`references/grill.md` Step 1a 頂部新增 Round 0（先問有無既有草稿／前版／模板＋確認標準／快速模式），依「一張白紙／一團雜亂素材／既有舊稿或模板改造」走不同起手路線，並確立「重提案、輕審問（Proposal-First）」防疲勞紀律。
->   2. **主受眾 vs 次受眾分層**：`grill.md` 與 `templates/brief.md` 將「對象起點」拆為拍板者（主受眾）與同場利害關係人（次受眾）。
->   3. **30 秒口述邏輯鏈（Story Spine）＋逐章頁數配額**：`grill.md`、`structure.md`、`templates/brief.md` 要求每個候選與核准架構皆附「起點共識 → 但是 → 所以 → 證據 → 因此」3–5 句口述鏈與 `X 分｜Y 頁` 預估頁數配額；`scripts/lint.py` 納入自動把關（標準 `[ERROR]`、快速 `[WARN]`）。
->   4. **架構級排除清單（Out of Scope）**：在 Step 1a 與關卡 1a 明確列出不進主線的整塊主題（刪或移附件），`lint.py` 納入 `[WARN]` 檢查。
->   5. **Step 1b → 1a 合法回退機制**：`grill.md` 1b 頂部明訂 3 種必須局部回退重調骨架的觸發條件（證據懸空／反方質疑必須前置／單章比重嚴重失衡）。
->   6. **Step 4 分身補回 `brief.md` 第 1／8 節上下文**：`SKILL.md` Step 4 子代理輸入 ① 明確帶入主／次受眾起點、Grounding 前置概念、人際顧慮與 `constraints` 地雷，不再只傳母題與章節明細。
-> - **驗證與重打包**：`v4-alive-demo/brief.md` 同步新欄位並過 `lint.py`（0 錯 0 警）；標準／快速模式 4 組變體斷言與 `v48-regression/storyboard.yaml` 0 錯全過；重打包 `outputs/deck-architect.skill`（83 檔，373.0 KB，零 `__pycache__`，SHA-256 逐位元一致）。
+> - **已完成主柱一 6 項修補（v4.8.2，`30dc93b`）**：
+>   1. **Round 0 先問既有素材＋起手狀態三分流＋Proposal-First**（`references/grill.md`、`templates/brief.md`、`SKILL.md`）。
+>   2. **主受眾 vs 次受眾分層**（`grill.md`、`templates/brief.md`）。
+>   3. **30 秒口述邏輯鏈（Story Spine）＋逐章頁數配額**（`grill.md`、`structure.md`、`templates/brief.md`、`lint.py` 標準 `[ERROR]`／快速 `[WARN]`）。
+>   4. **架構級排除清單（Out of Scope）**（`grill.md`、`structure.md`、`templates/brief.md`、`lint.py` `[WARN]`）。
+>   5. **Step 1b → 1a 合法回退機制（3 觸發條件）**（`grill.md`、`SKILL.md`）。
+>   6. **Step 4 分身補回 `brief.md` 第 1／8 節上下文**（`SKILL.md`）。
+>   - 驗證：`v4-alive-demo/brief.md` 0 錯 0 警；4 組標準／快速模式變體斷言與 `v48-regression` 全過；重打包 `outputs/deck-architect.skill`（83 檔，373.0 KB，SHA-256 逐位元一致）。
+> - **已完成主柱二全歷史與程式碼級深度稽核（`inputs/pillar2-audit-v482.md`）**：
+>   - 橫跨「視覺引導／靜態美感上限／動態系統／三層模組化注入」逐行審計＋OKLCH 數值驗算＋無頭 Chrome CDP 實測，定位 **10 項 P0 破約缺陷**（`runtime.js` WAAPI `fill:'forwards'` 打斷黑屏／回翻隱形、`isStatic()` 誤殺無障礙與講者工具、`#s-N` 作用域打爆 `G` 總覽縮圖與 Layer 2 權重、`speaker-view` HTTP 雙發跳兩頁、活頁 `P` 列印無 `beforeprint`、`style-library.html` 1.24:1／2.54:1／2.69:1 對比破功與 Apple 視線退步、`BEAT_MS` 40–120ms 違反閱讀窗＋三支配方回退 B.3 前、`assemble.py` `<!-- /slot -->` 魔術註解卡死換圖、`SKILL.md:116` 漏 `styles/<selected>.md`、`code-stage.css` 夾帶禁用紫 `#D8B4FE`/`#5B21B6`）、**11 項 P1 結構與套件缺陷**與 **3 項 P2 細節**。
+> - **下一步**：待使用者決定修補範圍（建議先修批次 A P0 急診或 A＋B 一次到位），再進真實簡報 PK。
 > - **前一段（v4.8.1 外部稽核修補定案 ✅）**：
 >
 > - 依外部稽核評估（`inputs/external-audit-c2bfaf8-review.md`）與使用者拍板（「好的請修改！」），**完成 13 項有效修補**（保留 `grid-overview.js` 刪 `id` 實測無礙，維持標準模式三候選含破框）：
@@ -100,6 +103,7 @@ _最後更新：2026-11-26_
 | `outputs/examples/v4-demo/` | Phase A 初版虛構端到端範例（8 頁，最低 `4.81:1`；`samples/` 舊版獨立樣張 `--sheet` 相容通過） |
 | `outputs/examples/{example,annual-section,layout-catalogue,progress-overview,test4}/` | v3 時代舊範例（如 `theme: editorial` 等舊欄位），只保留參考，不代表現行流程 |
 | `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–34 條（被取代的舊條目已加註） |
+| `inputs/pillar2-audit-v482.md` | v4.8.2 主柱二（視覺引導／靜態／動態／模組化注入）全歷史與程式碼＋Chrome CDP 深度稽核報告（10 項 P0、11 項 P1、3 項 P2 與三批次修補藍圖） |
 | `inputs/external-audit-c2bfaf8.md`、`inputs/external-audit-c2bfaf8-review.md` | v4.8 外部唯讀稽核報告與逐條評估（13 項有效項目已於 v4.8.1 全數修補） |
 | `inputs/modular-capabilities-audit.md` | 10 個 GitHub 簡報 Skill 二次盤點：按需模組深化與漏網 Nice-to-Have 報告 |
 | `inputs/phase-c-teardown-learnings.md` | Phase C 旗艦標竿對照與 `mattpocock/skills` 始祖回溯研究筆記（去敏版） |

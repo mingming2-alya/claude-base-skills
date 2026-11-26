@@ -1678,3 +1678,16 @@
   - 重新打包 `outputs/deck-architect.skill`（83 檔，373.0 KB，零 `__pycache__`，SHA-256 逐位元一致）。
 - **同步的檔案**：`projects/presentation-skill/{STATUS.md,ROADMAP.md,LOG.md,outputs/deck-architect.skill}`、`outputs/deck-architect/{SKILL.md,references/{grill.md,structure.md},templates/brief.md,scripts/lint.py}`、`outputs/examples/v4-alive-demo/brief.md`。
 - **下一步**：完成主柱二（視覺引導／靜態／動態／模組化注入）全歷史與第一性原理體檢，視需要修補後進真實簡報 PK。
+
+
+## 2026-11-26｜主柱二（視覺引導／靜態／動態／模組化注入）全歷史與程式碼＋CDP 深度稽核
+
+- **背景**：使用者指示在補齊主柱一六項缺口後，同步回讀專案自建立至今的歷史紀錄並依第一性原理體檢主柱二的四大核心：視覺引導、靜態美感上限、動態系統、三層模組化注入。
+- **做法**：全量審讀 `LOG.md`、`inputs/{design-research,style-research,motion-research,phase-c-teardown-learnings,modular-capabilities-audit}.md`、`outputs/deck-architect/` 全數引擎／模組／樣式／配方／品管腳本，並搭配 `oklch.py` 實算對比與無頭 Chromium CDP 實測驗證（排除已於 v4.8.1 修補之項目與已排 Phase D/E 項目），彙整為 `inputs/pillar2-audit-v482.md`。
+- **核心結論（10 項 P0 ＋ 11 項 P1 ＋ 3 項 P2）**：
+  1. **視覺引導**：`runtime.js` `BEAT_MS`（640–720ms 間隔減 600ms 動畫僅剩 40–120ms）機械性違反 0.6–0.9s 閱讀窗鐵律；`recipes/{bento-causal,linked-diagram,interactive-proof}.md` 與 `style-library.html` Apple 卡退化回 Phase B.3.1/B.3.2 之前（Stage 3 偷跑、綠卡發紅光、箭頭先綻線後到、500px 空白黑洞）；`data-transform-at` 在 `data-step > 0` 內失效、`flow-carousel` `[data-node].is-step-dim` 無靜態復原。
+  2. **靜態上限**：標竿 `style-library.html` 多處 WCAG／本質破功（Apple 淺底白裝置 `1.24:1`、Counsel 深底 `2.54:1`、Workday 深底 `2.69:1`＋`17px` 標籤）；活頁按 `P` 列印無 `beforeprint` 導致 `data-step` 消失或重疊、壓暗殘留與 `apple-kit` 透明標題；`SKILL.md:116` Step 4 分身漏帶 `styles/<selected>.md`；`code-stage.css` 夾帶禁用紫 `#D8B4FE`/`#5B21B6`；`assemble.py` 依賴未記錄 `<!-- /slot -->` 註解卡死 AI 換圖；`fit.js` `phrase` 在自由畫布無效、`Noto Serif TC` 漏載與中文負字距回潮；`check.mjs` Liveliness 懲罰去框編輯頁、Check 15 橡皮圖章 390px（`#ctrl-bar` 實測 479px 雙邊裁切）。
+  3. **動態系統**：WAAPI `fill: 'forwards'` 播完未 `cancel()`（打斷 `shock` 永久黑屏、回翻 `iris`/`sheet-up` 永久隱形或掉出 1080px 畫布）；`isStatic()` 混用 `?still=1`/`B`/減少動態，直接癱瘓講者台、總覽、畫筆雷射與所有影音／互動控件；`--enter-easing` 與 `DECK.motion` 軸線運鏡是空殼；4 套動態套件實測缺陷（`story-kit` 多層翻折靜止、`counsel-kit` 滾輪早砍＋FLIP 未除 scale、`apple-kit` 疊卡拖曳未除 scale＋連點競態、`workday-kit` 巢狀 rAF 未追蹤＋`width` 重排）；`deck:slideenter` 0ms 搶跑與回翻誤重播；Magic Move 打斷誤量與鍵盤缺修飾鍵過濾。
+  4. **模組化注入**：`#s-N` ID 作用域遭 `grid-overview.js` 刪 `id` 導致所有自由畫布縮圖崩成無樣式 HTML，同時 `1,0,0` 權重碾壓所有 Layer 2 狀態類、裸選擇器與 `@keyframes` 外洩；`speaker-view.js` HTTP/HTTPS 下雙發無去重按一次跳 2 步；`device-frame.css` 漏實作手冊教的 `.device-phone`/`.device-tablet`；4 支模組 CSS 漏接 `html[data-mode]`；`annotator` 雷射遇 `B` 鎖死、`visual-flair` 燈箱亮底白字與光暈未除 scale、`assemble.py` 掃描與 `--sheet` 預覽缺口。
+- **同步的檔案**：`projects/presentation-skill/{inputs/pillar2-audit-v482.md,STATUS.md,LOG.md}`。
+- **下一步**：交由使用者審閱稽核報告並決定修補批次（A 急診／A+B／A+B+C），完修後進真實簡報 PK。
