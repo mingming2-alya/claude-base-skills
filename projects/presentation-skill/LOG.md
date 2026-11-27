@@ -1780,3 +1780,18 @@
 - **驗證**：brief lint 模式變體斷言全過；`templates/brief.md` 如預期報未填；示範 brief 0 錯 0 警；5 份範例 storyboard lint 與改版前一致（v45 多一則風格警告是舊版腳本放在暫存區讀不到 `styles/index.json` 的比對誤差）；`--outline` 在 `v48-regression` 正確列出 9 頁與頁數算術；skill-creator `quick_validate` 通過，重打包 `outputs/deck-architect.skill`（85 檔，376.4 KB，零 `__pycache__`，逐位元一致）。
 - **同步的檔案**：`inputs/presentation-principles.md`、`outputs/deck-architect/{SKILL.md,references/{grill.md,structure.md,contexts.md},templates/{brief.md,fragments.md,questionnaire.md},scripts/lint.py,assets/style-library.html}`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/{brief.md,fragments.md}`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：回放 v1 四案（虛構情境、全新 agent 跑到關卡 1a），再真實 PK。
+
+
+## 2026-11-27｜`deck-architect` v4.10 v1 四案虛構化全新上下文盲測回放
+
+- **背景**：使用者指示接手執行 v4.10 排定之「v1 四案回放驗證」——把 `inputs/v1-iteration-{1,2,3,4}*.md` 改寫為 100% 去敏虛構情境，派 4 個全新上下文盲測分身（`v410-blind-runner`，僅讀 `outputs/deck-architect/` v4.10 與各自虛構素材，禁止讀 `STATUS.md`/`LOG.md`/`ROADMAP.md`/`inputs/`）跑完 Round 0 → ⛔ 關卡 1a，由主代理依 v1 四案真實回答扮演使用者，驗收架構命中度、歷史痛點消滅度與互動輪數／題數。
+- **四案實測結果（全文見 `inputs/v1-replay-v410.md`）**：
+  1. **Case 1｜綠能科技・新銳領導營開場演講（對應 v1-1 主管期許演講｜標準、`keynote` 15 分 ≤9 頁）**：前置 4 輪 12 題、含關卡 1a 共 **5 輪 15 題**；自動產出 `fragments.md` (18 則)＋`questionnaire-執行副總.md` (3 題)。Pre-Flight 立即抓出 F1 放開場突兀、第 2/3 段宣導重疊、結尾究責風險；使用者因最弱點反駁暗場 `One More Thing` 過於科技感並改寫混搭後，分身順接延伸出 1:1 吻合原成品的四章 9 頁骨架（3 / 1.5 / 7 / 2.5 分，86% 先肯定＋轉折故事插槽＋「我們……嗎？」反思）。
+  2. **Case 2｜雲橋物流・智慧排單助手推廣與部署（對應 v1-2 工具推廣｜標準、`pitch` 10 分 嚴格 6 頁）**：前置 4 輪 12 題、含關卡 1a 共 **5 輪 15 題**；自動產出 `fragments.md` (9 則)＋`questionnaire-研發.md` (3 題)。Pre-Flight 自行驗算 24→7 加總並抓出未覆核備註與 v1.2 ERP 未開通；Round 0 單獨先問心中講法並列入候選 A；嚴守 `封面 1 + 總目錄 1 + 正文 4 = 6 頁`；關卡 1a 主動優化 Ch 4 三欄分工把「規則檔準備」拉出成獨立欄。
+  3. **Case 3｜星辰電商・數據平台組年度成果（對應 v1-3 年度成果單章｜標準、`briefing` 3–4 分 1 頁無附件）**：前置 4 輪 12 題、含關卡 1a 共 **5 輪 15 題**；自動產出 `fragments.md` (6 則)。零劇透一眼診斷年初三欄並列與動作語言，Round 1 問清「大簡報單章 1 頁無附件」硬限，整塊移除「客製需求」並獨立推導出與原採用版 100% 一致的 Top-Down 抽象層次軸（**戰略方向 → 商業價值 → 平台基座**），同時抓出 4,200 萬 vs 38 件口徑風險與 7 組數字密度假設。
+  4. **Case 4｜海風智造・智慧工廠週進度與兩頁總覽（對應 v1-4 定期多人進度｜快速、`briefing` 3 分 純 2 頁總覽＋獨立填寫規範）**：前置 2 輪 7 題、含關卡 1a 共 **3 輪 10 題**；自動產出 `fragments.md` (7 則)。Round 0 未被告知模板存在即主動先要空白模板，讀完立刻確認模板早有 5 欄風險表故不動版面；全數抓出 12 案 3 流水帳／2 留白／8 `/`（含 A2 隱匿延誤）與兩檔大類排序落差；產出純 2 頁總覽（頂端摘要、共用 4 階段、風險燈號＋支援＋第 2 頁底部副總拍板區與跨頁 ≤10 字防重複分工），超越原 v1-4 成品。
+- **結論與實測揪出的 2 項小摩擦**：
+  - **4 / 4 案全數命中正確架構**，v1 四案全部歷史架構痛點零復發，v4.10 新機制（先問心中講法、短問卷、同一把尺比較、最弱點防被動同意）全數驗證奏效。
+  - **揪出 2 項輕量微調點**：① 快速模式實測 3 輪 10 題超出 `grill.md` §四「1–2 輪 ≤5 題」承諾（因 Round 0 先花 1 輪補檔，後面快篩與關卡 1a 又拆 2 輪，建議補檔後快篩＋拍板合 1 輪 ≤3 題）；② `fragments.md` 3/4 分身把整張表單回覆含 `1A/2A` 代碼貼成 1 則碎片（建議在 `templates/fragments.md` 與 `grill.md` 補明去題號拆原子條目）。
+- **同步的檔案**：`projects/presentation-skill/{inputs/v1-replay-v410.md,STATUS.md,ROADMAP.md,LOG.md}`。
+- **下一步**：由使用者透過互動表單決定是否先落地 2 項輕量微調（v4.10.1），或直接進真實簡報 PK。
