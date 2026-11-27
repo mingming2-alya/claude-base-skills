@@ -1722,3 +1722,22 @@
   - 重新打包 `outputs/deck-architect.skill`（83 檔，361.0 KB，零 `__pycache__`，SHA-256 逐位元一致）。
 - **同步的檔案**：`projects/presentation-skill/{STATUS.md,ROADMAP.md,LOG.md,outputs/deck-architect.skill}`、`outputs/deck-architect/` 共 48 檔（`SKILL.md`、`assets/{shell.css,fit.js,runtime.js,style-library.html}`、`assets/components/device-frame.css`、`assets/presenter/{annotator.css,annotator.js,grid-overview.css,grid-overview.js,speaker-view.js}`、`assets/modules/{code-stage,compare-slider,coverflow,flow-carousel,linked-highlight,live-controls,media,visual-flair}.{css,js}`、`assets/modules/fx/{core,confetti-burst}.js`、`assets/modules/motion/{apple,counsel,story,workday}-kit.{css,js}`、`references/{motion-system,visual-guidance}.md`、`references/recipes/{bento-causal,interactive-proof,linked-diagram}.md`、`scripts/{assemble.py,check.mjs,lint.py,oklch.py}`、`styles/{apple,workday}.md`、`templates/deck.css`）、`outputs/examples/{v48-regression,v45-modular-demo,v44-keynote-demo,v4-alive-demo,v4-demo}/`（重組 `deck.html` 與 `check/` 驗證報告＋`v4-demo/samples` `--sheet` 輸出）。
 - **下一步**：主柱一與主柱二全量檢修均已收官，待使用者提供一份真實簡報需求進行完整 Step 1a→Step 6 PK 驗證，再決定 Phase D。
+
+
+## 2026-11-27｜主柱一（Step 1 架構）第一性原理複查（對象 `38ed5df`）
+
+- **背景**：使用者擔心「第一步的架構真的很重要，做錯了後面都要從頭來過」，要求取得最新版本後，讀完專案建立至今的狀態紀錄，結合第一性原理找遺漏。
+- **取得最新版本**：遠端已由 `88bc7ed` 前進到 `38ed5df`（v4.8.1 外部稽核修補、v4.8.2 主柱一六項、主柱二全歷史稽核、v4.9.0 主柱二 22 項）。本機 11-26 未推送的 v4.9 修補與遠端重疊，收進 git stash，不推送；工作樹快轉到 `38ed5df`。
+- **讀過的紀錄**：`LOG.md` 全文、`STATUS.md`、`ROADMAP.md`、`outputs/architecture-plan.md`、`inputs/presentation-principles.md`、`inputs/v1-iteration-{1,2,3,4}*.md`、`inputs/phase-c-teardown-learnings.md`、外部稽核兩份；技能端讀 `SKILL.md`、`references/{grill,structure,contexts}.md`、`templates/brief.md`、`lint_brief()`。
+- **第一性原理**：Step 1 要產出「使用者認得、聽眾跟得上、證據撐得住、時間放得下」的架構；越晚發現錯越貴，所以需要：輸入要對、用同一把尺比過不同走法、鎖定前便宜地試過、後面發現錯時有便宜的改法。
+- **結論**：v4.8.2 已補的六項不重複；另找到 7 項缺口（全文 `inputs/pillar1-review-v490.md`）：
+  1. 【高】使用者腦中的講法沒有被問（Round 0 只問手邊檔案；v1 第二次迭代失敗正是框架在使用者心裡，v0.2 的「既有框架單獨先問」在改版中變窄）。
+  2. 【高】決定骨架的硬限制太晚問（誰上台、誰能否決結構、指定章節或模板、議程位置、會後寄出；必放與禁用在 1b）。
+  3. 【高】候選缺共同比較標準，證據就緒度到 1b 才知道。
+  4. 【高】逐頁清單沒有使用者確認點（v3.0 實測教訓：內容形狀要在 storyboard 確認）。
+  5. 【中】沒有「做到一半改架構」的變更回路，也沒標出改了最貴的決定。
+  6. 【中】現行 Step 1 在 v1 之後重寫六輪，尚未在真實內容上跑過；11-14 列的未測情境仍未測。
+  7. 【低】主題類型總表少了「成長」與「期許／動員演講」。
+  - 另有兩個小問題：口述邏輯鏈句型前後不一；關卡 1b 的表單宜呈現新決定與風險，不是整份 brief。
+- **同步的檔案**：`inputs/pillar1-review-v490.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：用表單請使用者決定修補範圍、逐頁清單確認方式、驗證方式與「成長」類的意思。
