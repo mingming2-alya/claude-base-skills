@@ -22,7 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from deck_model import (  # noqa: E402
     AXES, CELL_STATES, COMMON_FIELDS, CONTENT_MODULES, DELIVERY_MODES,
-    DENSE_LAYOUTS, EMPH_RE, LAYOUT_FIELDS, LAYOUTS, NAV_MODES,
+    DENSE_LAYOUTS, EMPH_RE, LAYOUT_FIELDS, LAYOUTS, NAV_MODES, TOC_MODES,
     PRESENTER_TOOLS, RISK_LEVELS, SIMPLIFIED_CHARS, SLIDE_TYPES, STAGE_MODES,
     SURFACES, TRANSITION_PHRASES, StoryboardError, all_slide_texts_with_notes,
     appendix_slides, capacity_problems, char_limit_for, emphasis_count,
@@ -176,6 +176,9 @@ def lint(data, base_dir=None):
     nav_mode = str(meta.get("nav_mode") or "").lower()
     if nav_mode and nav_mode not in NAV_MODES:
         E("meta.nav_mode", f"必須是 {', '.join(sorted(NAV_MODES))} 之一（目前：{nav_mode!r}）。")
+    toc_opt = str(meta.get("toc") or "").strip().lower()
+    if toc_opt and toc_opt not in TOC_MODES:
+        E("meta.toc", f"必須是 {', '.join(sorted(TOC_MODES))} 之一（目前：{toc_opt!r}）。不寫或 auto 代表依章數自動決定。")
     style = str(meta.get("style") or "").strip()
     if style:
         style_status = _load_style_status()
@@ -232,7 +235,7 @@ def lint(data, base_dir=None):
     if len(listed) > 4:
         W("chapters", f"有 {len(listed)} 個公開章節，超過常見的 4 章上限。建議優先檢查能否合併相鄰章節；若主題確需 5 章以上，請確認視覺目錄與導航仍不擁擠。")
     elif len(listed) == 4:
-        how = "每章開始前會自動插入目錄點亮頁" if toc_mode(data) == "per-chapter" else "章節短，只會在封面後插入一頁目錄"
+        how = {"per-chapter": "每章開始前會插入目錄點亮頁", "agenda": "只會在封面後插入一頁目錄", "none": "不插目錄頁"}[toc_mode(data)]
         I("chapters", f"4 章：{how}。理想是 3 章以內，確認真的需要 4 章。")
     if len(unlisted_ch) > 1:
         W("chapters", f"有 {len(unlisted_ch)} 個 unlisted 驚喜章節，建議最多 1 個（如 One More Thing）以免稀釋反轉張力。")
@@ -712,7 +715,9 @@ def lint(data, base_dir=None):
 
 # ----------------------------------------------------------------------------- brief.md (Step 1b gate)
 BRIEF_PLACEHOLDER = re.compile(r"<[^<>\n]{0,200}>")
-BRIEF_FIELD = re.compile(r"^\s*[-*]\s*\*\*(.+?)\*\*\s*[：:]\s*(.*)$")
+# "- **欄位**：值", also "- **欄位**（說明）：值" and "- **欄位：** 值"
+BRIEF_FIELD = re.compile(r"^\s*[-*]\s*\*\*(.+?)\*\*\s*(?:[（(][^）)\n]{0,120}[）)]\s*)?[：:]\s*(.*)$")
+BRIEF_FIELD_INNER = re.compile(r"^\s*[-*]\s*\*\*([^*\n]+?)[：:]\*\*\s*(.*)$")
 # Presentation decisions belong to Step 3a (after the style is chosen), never to the brief.
 BRIEF_PRESENTATION_TERMS = (
     "明暗極性策略", "去框化比例", "導航殼層", "nav_mode", "ambient-fx",
@@ -753,7 +758,7 @@ def lint_brief(text, base_dir=None):
             if section.startswith("5.") and not sub.startswith(("招牌亮點頁", "內容減法清單")):
                 chapters.append((sub, no))
             continue
-        m = BRIEF_FIELD.match(line)
+        m = BRIEF_FIELD.match(line) or BRIEF_FIELD_INNER.match(line)
         if m:
             fields.append((section, sub, m.group(1).strip(), m.group(2).strip(), no))
         elif re.match(r"^\s*[-*]\s+\S", line):
@@ -959,7 +964,7 @@ def outline(data):
     if isinstance(budget, int) and budget > 0:
         formula += f"；上限 {budget} 頁"
     head = ["", "## 逐頁清單（關卡 1c）", "", "| 頁 | 章節 | 題目 | 內容形狀 | 視覺主角 |", "|---|---|---|---|---|"]
-    tail = ["", f"頁數算術：{formula}。自動目錄頁由 assemble.py 依章節插入，未列在表內。"]
+    tail = ["", f"頁數算術：{formula}。目錄頁由 assemble.py 依章數自動插入（使用者明確要或不要目錄時，用 meta.toc 指定），未列在表內。"]
     return "\n".join(head + rows + tail)
 
 

@@ -73,6 +73,7 @@ COMMON_FIELDS = {
 
 STAGE_MODES = {"briefing", "pitch", "keynote"}
 NAV_MODES = {"top-bar", "minimal-side", "divider-only"}
+TOC_MODES = {"auto", "none", "agenda", "per-chapter"}
 SURFACES = {"dark", "light", "split", "photo"}
 PRESENTER_TOOLS = {"grid", "annotator", "speaker"}
 CONTENT_MODULES = {
@@ -235,8 +236,14 @@ def toc_mode(data):
     per-chapter: > 3 listed chapters and on average >= 2 content pages each -> a TOC highlight page before every listed chapter
     agenda:      > 3 listed chapters but short chapters -> a single agenda page after the cover
     none:        <= 3 listed chapters -> the persistent chapter bar is enough
+
+    meta.toc (none | agenda | per-chapter) overrides the automatic choice when the user
+    explicitly wants or refuses a TOC page; auto or a missing value keeps the rule above.
     """
     chapters = listed_chapters(data)
+    forced = str((data.get("meta") or {}).get("toc") or "auto").strip().lower()
+    if forced in ("none", "agenda", "per-chapter"):
+        return forced if chapters else "none"
     if len(chapters) <= 3 or (data.get("meta") or {}).get("format") == "section":
         return "none"
     listed_ids = {c.get("id") for c in chapters}

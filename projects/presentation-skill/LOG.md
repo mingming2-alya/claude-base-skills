@@ -1833,3 +1833,23 @@
 - **過程**：中途四個 agent 同時撞到 5 小時用量上限，恢復後用 SendMessage 接續，沒有重開；兩次 agent 正在結束回合沒讀到答案，重送一次。
 - **同步的檔案**：`inputs/v410-replay-run2.md`（新）、`inputs/replay-v1-cases/`（新：README、persona、四案情境與附件、每輪表單、brief、碎片簿、問卷）、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：用表單請使用者決定第 1、3、4、5 項與第 2 項的補強怎麼修，以及修完直接真實 PK 或先重跑四案回歸。
+
+## 2026-11-27｜`deck-architect` v4.10.2：第二組回放的 4 項修補
+
+- **使用者決策（互動表單，四題都選推薦）**：
+  - 推薦偏向 Agent 版本：推薦不是使用者的版本時，補「你的版本＋補弱點」選項，寫出使用者版本好在哪，前提沒驗證就先問。
+  - Round 0：兩項都改：固定一題架構硬限制複選題（兩種模式都問），Round 0 只給事實、診斷等使用者說完心中的講法再給。
+  - 工具：lint 欄位比對與目錄頁手動指定兩個都修。
+  - 下一步：修完直接拿真實簡報 PK（不先重跑四案回歸）。
+- **本輪修改（v4.10.2，原則 #39–#40）**：
+  - `references/grill.md`：原則 4 加「Round 0 只列事實、診斷延後」；起手狀態 ③ 註明診斷等使用者說完再端出；Round 0 新增架構硬限制複選事實題與「只給事實」，表單固定四題；節點群 A 第 5a 項改為追問其餘；節點群 B 第 8 項新增「推薦的不是使用者的版本時多做三件事」；快速模式與完成門檻同步。
+  - `references/structure.md`：新增推薦非使用者版本時的選項、使用者版本好在哪與條件句範例。
+  - `references/contexts.md`：快速模式註明架構硬限制在 Round 0 就問。
+  - `SKILL.md`（v4.10.2）：Step 1a 第 1、2、4 步同步上述規則；description 1020 bytes。
+  - `scripts/lint.py`：brief 欄位比對接受 `**欄位**（說明）：` 與 `**欄位：**`；驗證 `meta.toc`；4 章提示與 `--outline` 尾註依目錄模式說明。
+  - `scripts/deck_model.py`：新增 `TOC_MODES`，`toc_mode()` 接受 `meta.toc` 覆寫（`none`／`agenda`／`per-chapter`），頁數算術與 `assemble.py` 自動跟著算。
+  - `templates/storyboard.yaml`、`references/presentation-rules.md`：說明 `meta.toc`。
+  - `inputs/presentation-principles.md`：新增 #39、#40。`ROADMAP.md` 原則範圍改為 #1–#40。
+- **驗證**：5 份範例 storyboard lint 與改版前一致；示範 brief 0 錯 0 警；四份回放 brief lint 結果不變；兩種新欄位寫法舊版報 2 個假錯誤、新版通過；`v48-regression` 副本 `meta.toc` 預設／agenda／per-chapter 分別為 9／10／11 頁，與 lint 頁數算術一致，非法值報錯；重打包 `outputs/deck-architect.skill`（85 檔，379.5 KB，零 `__pycache__`，解壓後與原始碼逐檔一致）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,references/{grill.md,structure.md,contexts.md,presentation-rules.md},scripts/{lint.py,deck_model.py},templates/storyboard.yaml}`、`outputs/deck-architect.skill`、`inputs/presentation-principles.md`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+- **下一步**：使用者提供一份近期真的要講的簡報需求，從 Step 1a 跑到成品（真實 PK）；真實資料不進公開 repo。

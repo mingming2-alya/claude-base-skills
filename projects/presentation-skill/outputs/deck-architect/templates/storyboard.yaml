@@ -18,6 +18,7 @@ meta:
   palette: 貼題綠                    # Step 3b 選定的三組 OKLCH 配色之一（寫進 deck.css）
   minutes: 15                        # 總時長（分鐘），lint 會檢查時間預算與節奏
   pages: 12                          # 頁數上限（含封面與自動目錄，不含附件頁），可省略
+  # toc: auto                       # 目錄頁：auto（依章數自動，預設）/ none（不要目錄）/ agenda（封面後一頁目錄）/ per-chapter（每章前一頁）；使用者明確要或不要目錄時才寫
   # format: section                  # 作為大簡報一章（一頁總覽）：不需封面與頁碼
   lang: zh-Hant                      # zh-Hant 時 lint 會自動偵測誤殘留的簡體字
 

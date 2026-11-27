@@ -1,6 +1,21 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-27｜v4.10 第二組回放 v1 四案 ✅，待使用者決定 4 項修補與下一步）**：
+> **最新接手點（2026-11-27｜`deck-architect` v4.10.2：第二組回放的 4 項修補 ✅，下一步真實簡報 PK）**：
+>
+> - **使用者決定**（互動表單，四題都選推薦）：推薦不是使用者版本時補「你的版本＋補弱點」選項；Round 0 固定問架構硬限制、診斷延後到使用者說完講法；lint 與目錄頁兩個工具都修；修完直接拿真實簡報 PK。
+> - **v4.10.2 改了什麼**（原則 #39–#40）：
+>   1. 推薦的不是使用者的版本時，選架構那一題附「你的版本＋補掉最弱點」選項、寫出使用者版本好在哪；推薦依據的前提還沒驗證，就先問或寫成條件句（`references/grill.md` 節點群 B 第 8 項、`references/structure.md`、`SKILL.md` Step 1a 第 4 步）。
+>   2. Round 0 用一題複選事實題問架構硬限制（誰上台、誰能要求改結構、頁數上限含不含封面與目錄、指定模板或章節、會後寄不寄），標準與快速模式都問；節點群 A 第 5a 項改為追問其餘（`grill.md`、`contexts.md`、`SKILL.md`）。
+>   3. Round 0 只給事實，結構診斷與 Agent 的看法等使用者說完心中的講法再端出（`grill.md` 原則 4 與 Round 0、`SKILL.md`）。
+>   4. `lint.py` 的 brief 欄位比對接受 `**欄位**（說明）：` 與 `**欄位：**` 兩種寫法；storyboard 新增 `meta.toc`（`auto`／`none`／`agenda`／`per-chapter`）覆寫自動目錄，`lint.py` 驗證值並在頁數算術與 `--outline` 跟著算（`scripts/{deck_model.py,lint.py}`、`templates/storyboard.yaml`、`references/presentation-rules.md`）。
+> - **驗證**：
+>   - 5 份範例 storyboard lint 與改版前一致；`v4-alive-demo/brief.md` 0 錯 0 警；四份回放 brief 的 lint 結果與改版前一致。
+>   - 欄位寫法：示範 brief 改成兩種新寫法後，舊版 lint 報 2 個假錯誤，新版通過。
+>   - `meta.toc`：`v48-regression` 副本預設仍 9 頁、無目錄頁；`agenda` 10 頁、1 頁目錄；`per-chapter` 11 頁、2 頁目錄，與 lint 頁數算術一致；非法值報錯。
+>   - 重打包 `outputs/deck-architect.skill`（85 檔，379.5 KB，零 `__pycache__`，解壓後與原始碼逐檔一致）。
+> - **下一步**：使用者提供一份近期真的要講的簡報需求，從 Step 1a 跑到成品（真實 PK）。真實資料不進公開 repo，只記去敏的過程與發現。
+>
+> **前一段（2026-11-27｜v4.10 第二組回放 v1 四案 ✅）**：
 >
 > - **和前一段的關係**：同一天兩個對話各自回放了 v1 四案。前一段是第一組（`inputs/v1-replay-v410.md`，已據此發布 v4.10.1）；這一段是第二組（`inputs/v410-replay-run2.md`），案例改寫與扮演設定不同，原始表單與 brief 都留在 `inputs/replay-v1-cases/`，可以重跑。
 > - **做法**：每案派全新 agent，只拿到 v4.10 技能與使用者第一則訊息，跑 Round 0 到關卡 1a；Claude 照開跑前寫好的 `inputs/replay-v1-cases/persona.md` 扮演使用者。
@@ -14,7 +29,7 @@
 >   3. lint 欄位比對漏抓 `**欄位**（說明）：`。
 >   4. 目錄頁由章數自動決定，不能手動指定。
 > - **已由 v4.10.1 處理主因**：快速模式漏問總覽頁數，主因之一是當時的「≤5 題」上限；仍建議 Round 0 固定一題架構硬限制複選題。輪數建議維持。
-> - **下一步**：用表單請使用者決定修補範圍與下一步（修完直接真實 PK，或先重跑四案回歸）。真實 PK 要使用者提供一份真實簡報需求；真實資料不進公開 repo。
+> - **下一步**：使用者已用表單拍板，修補見最新接手點（v4.10.2）。
 >
 > **前一段（2026-11-27｜`deck-architect` v4.10.1：v1 四案盲測 4/4 命中 ＋ 修正快速模式題數上限矛盾與碎片簿 Matt 原文規則 ✅）**：
 >
@@ -125,8 +140,8 @@ _最後更新：2026-11-27_
 
 | 路徑 | 內容 |
 |---|---|
-| `outputs/deck-architect/` | **v4.10.1 完整版 Skill 原始碼（85 檔）**：主柱一深挖顧問流程（Round 0 心中講法與 `fragments.md`、1a 硬限制與 `questionnaire.md`、同一把尺比較、結構追問、關卡最弱點、獨立關卡 1c `--outline`、架構變更回路、標準／快速模式皆不設題數上限）＋主柱二三層按需引擎（WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]` 作用域、活頁 `beforeprint` 列印、`boot()` 與 `meta.mode` 零權重串接）＋4 套風格動態套件＋`templates/deck.css` 三語音＋`style-library.html` 雙底達標＋17 項動態行動實測＋雙門檻 Liveliness 稽核 |
-| `outputs/deck-architect.skill` | v4.10.1 打包檔（372.1 KB，85 檔，零 `__pycache__`，SHA-256 逐位元一致） |
+| `outputs/deck-architect/` | **v4.10.2 完整版 Skill 原始碼（85 檔）**：v4.10.2 補「你的版本＋補弱點」選項、Round 0 硬限制題與只給事實、`meta.toc`；主柱一深挖顧問流程（Round 0 心中講法與 `fragments.md`、1a 硬限制與 `questionnaire.md`、同一把尺比較、結構追問、關卡最弱點、獨立關卡 1c `--outline`、架構變更回路、標準／快速模式皆不設題數上限）＋主柱二三層按需引擎（WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]` 作用域、活頁 `beforeprint` 列印、`boot()` 與 `meta.mode` 零權重串接）＋4 套風格動態套件＋`templates/deck.css` 三語音＋`style-library.html` 雙底達標＋17 項動態行動實測＋雙門檻 Liveliness 稽核 |
+| `outputs/deck-architect.skill` | v4.10.2 打包檔（379.5 KB，85 檔，零 `__pycache__`，解壓後與原始碼逐檔一致） |
 | `outputs/examples/v48-regression/` | v4.8–v4.9 引擎回歸測試簡報（4 套套件 11 原語、`unlisted`、聚光復原、`templates/deck.css`；9 頁全過，最低 `5.12:1`）。改底盤或腳本後先跑這份 |
 | `outputs/examples/v4-alive-demo/{brief.md,fragments.md}` | 示範用 brief 與素材碎片簿（依既有虛構範例事後補寫，示範格式與 v4.10 brief lint，不是主柱一實測紀錄） |
 | `outputs/examples/v45-modular-demo/` | v4.5/v4.6 三層引擎與全部新／升級模組虛構技術示範（6 頁，最低對比 `4.84:1`） |
@@ -135,7 +150,7 @@ _最後更新：2026-11-27_
 | `outputs/examples/v4-visual-benchmark/` | 靜態美感上限重練標竿・去小字極致留白版（6 頁全通過） |
 | `outputs/examples/v4-demo/` | Phase A 初版虛構端到端範例（8 頁，最低 `4.81:1`；`samples/` 舊版獨立樣張 `--sheet` 相容通過） |
 | `outputs/examples/{example,annual-section,layout-catalogue,progress-overview,test4}/` | v3 時代舊範例（如 `theme: editorial` 等舊欄位），只保留參考，不代表現行流程 |
-| `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–38 條（被取代的舊條目已加註） |
+| `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–40 條（被取代的舊條目已加註） |
 | `inputs/v1-replay-v410.md` | v4.10 主柱一 v1 四案虛構化全新上下文盲測回放報告（4/4 命中正確架構、輪／題數統計與 v4.10.1 兩項修正紀錄） |
 | `inputs/v410-replay-run2.md`、`inputs/replay-v1-cases/` | 第二組回放報告（4/4 命中，另找到 4 項待修），以及可重跑的虛構回歸測試組：情境、扮演設定、每輪表單與 brief，重跑方法見該資料夾 `README.md` |
 | `inputs/pillar1-review-v490.md`、`inputs/mattpocock-elicitation-study.md` | v4.9.0 主柱一第一性原理複查（7 項缺口）與 `mattpocock/skills` 引導深挖十機制研究（已於 v4.10 落地） |
@@ -148,7 +163,6 @@ _最後更新：2026-11-27_
 
 ## 待使用者決定（適時用表單確認）
 
-- **第二組回放的 4 項修補與下一步**（`inputs/v410-replay-run2.md` 第六節）：推薦偏向 Agent 版本怎麼修、Round 0 要不要固定問架構硬限制並延後診斷、lint 與目錄頁兩個工具修補、修完直接真實 PK 還是先重跑四案回歸。
 - **真實簡報 PK 的題目**：由使用者提供一份真實需求（建議挑近期真的要講的簡報，例如年度成果、專案提案或分享），從 Step 1a 跑到成品驗證主柱一與主柱二。
 - **Phase D 的動態設計**：`styles/index.json` 裡其餘 8 款規劃中的風格，`kit` 欄寫沿用現有套件，但招牌動態橫跨多套（例如 `pop-youth` 寫 `motion-story`，招牌卻是 `depth-deck`、`rank-race`）。進 Phase D 時要決定：每款做自己的招牌原語，或明訂可跨套件組合。
 - 埃及壁畫、瑪雅抄本是否要生圖做升級插槽實測。
