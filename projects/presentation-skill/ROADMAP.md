@@ -1,6 +1,6 @@
 # ROADMAP：deck-architect
 
-> **最新接手點（2026-11-26｜`deck-architect` v4.9.0 主柱二 22 項全量檢修收官 ✅）**：繼 v4.8.2 主柱一六項結構修補後，完成 `inputs/pillar2-audit-v482.md` 全部 22 項（批次 A＋B＋C）主柱二檢修——修復 WAAPI `fill:'forwards'` 打斷鎖死、`isStill()`/`isReducedMotion()` 正交拆層、`[data-slide-scope]` 作用域與 `G` 縮圖保真、`speaker-view` 去重、活頁 `beforeprint`/`afterprint` 列印、平衡換圖解析、`BEAT_MS` 閱讀窗與三支配方／`style-library.html` 回寫、`code-stage.css` 去紫、4 套動態套件縮放與生命週期、4 支模組極性、`device-frame` 類名、390px `#ctrl-bar` 零裁切，並將 `check.mjs --motion` 升至 **17 項**（含去框編輯頁免罰與視覺指引時序檢核）＋強化 `lint.py`/`oklch.py`。驗證：Python 單測 27/27、Chrome CDP 瀏覽器實測 34/34（含 `style-library.html` 淺深雙底 8/8）、全 5 份 v4 範例＋`--sheet` 零 ❌、重打包 `outputs/deck-architect.skill`（83 檔，361.0 KB，SHA-256 逐位元一致）。**下一步：拿真實簡報跑完整 Step 1a→Step 6 PK（先於 Phase D）。**
+> **最新接手點（2026-11-27｜`deck-architect` v4.10 主柱一深挖與架構把關 ✅）**：使用者擔心第一步架構做錯要從頭來過；第一性原理複查（`inputs/pillar1-review-v490.md`）＋參考 `mattpocock/skills`（`inputs/mattpocock-elicitation-study.md`）後，補上先問心中的講法與素材碎片簿、架構硬限制與給主管的問卷、候選比較與結構追問、尚未確定清單、防被動同意、改起來最貴的四個決定、架構變更回路，以及 Step 2 後的獨立關卡 1c 逐頁清單（原則 #35–#38）。**下一步：回放 v1 四案（全新 agent 跑到關卡 1a），再拿真實簡報跑完整 Step 1a→Step 6 PK。**
 
 > **這是專案唯一的主軸文件。** 每個階段開始前、結束後都回來對照、更新勾選。
 > 細節紀錄在 `LOG.md`，目前進度在 `STATUS.md`，兩者都要對齊這份。
@@ -15,9 +15,9 @@
 ## 三個支柱
 
 ### ① 方法論（骨架）：來自使用者
-見 `inputs/presentation-principles.md`（原則 #1–#34）。已用 4 份真實簡報驗證（`inputs/v1-iteration-*.md`）並於 Phase C.1–C.2 依旗艦標竿實測、`mattpocock/skills` 始祖回溯與兩大主柱終審升級。
+見 `inputs/presentation-principles.md`（原則 #1–#38）。已用 4 份真實簡報驗證（`inputs/v1-iteration-*.md`）並於 Phase C.1–C.2 依旗艦標竿實測、`mattpocock/skills` 始祖回溯與兩大主柱終審升級。
 
-- [x] Grill v2（v4.8 兩階段顧問腦力激盪）：**Step 1a 架構與敘事脈絡腦力激盪（⛔ 關卡 1a：Pre-Flight、主題類型與標竿盲點掃描、雙重目標、`stage_mode` 與播放環境、故事種子、承重母題與不循規蹈矩破框 3 選 1）→ Step 1b 內容細節與說服載體腦力激盪（⛔ 關卡 1b：逐章論點細節與反方質疑拆彈、顧問主動給方案建議、白話說服載體、內容減法清單、素材缺口與數字查核；`brief.md` 過 lint 才送關卡）**；所有步驟的建議都要附理由（原則 #34）
+- [x] Grill v2（v4.8 兩階段顧問腦力激盪）：**Step 1a 架構與敘事脈絡腦力激盪（⛔ 關卡 1a：Pre-Flight、主題類型與標竿盲點掃描、雙重目標、`stage_mode` 與播放環境、故事種子、承重母題與不循規蹈矩破框 3 選 1）→ Step 1b 內容細節與說服載體腦力激盪（⛔ 關卡 1b：逐章論點細節與反方質疑拆彈、顧問主動給方案建議、白話說服載體、內容減法清單、素材缺口與數字查核；`brief.md` 過 lint 才送關卡）**；所有步驟的建議都要附理由（原則 #34）；v4.10 參考 `mattpocock/skills` 補上先問心中的講法與素材碎片簿、架構硬限制與給主管的問卷、候選比較與結構追問、尚未確定清單、防被動同意、改起來最貴的四個決定與架構變更回路（原則 #35–#38）
 - [x] 架構：一條軸、單一方向（理性不迷路底氣，但敘事脈絡可腦力激盪破框）；最上層不可並列；Design It Twice 破框提案；序幕、轉折點、可選 `unlisted: true` One More Thing 驚喜幕、3-2-1 收斂與尾聲
 - [x] 呈現：標題是路標（總結永遠不當主標題）、原則 #26 去小字（含三項合法豁免）、依 `stage_mode` 動態決定光暗雙極與去框化比例、重點放大加突出色（不畫底線）、導航三級分層、震撼頁
 - [x] 內容可信度：證據、限制、數字查核與出處（v4 已將 `constraints` 納入 `lint.py` 自動檢查）
@@ -37,7 +37,7 @@
 ### ③ 全流程（從頭到尾）
 
 - [x] Step 1a 架構與敘事脈絡腦力激盪（⛔ 關卡 1a，含 Round 0 起手三分流、主／次受眾、故事種子、30 秒邏輯鏈與 Out of Scope）→ Step 1b 內容細節與說服載體腦力激盪（⛔ 關卡 1b，含 1b→1a 合法回退）→ `brief.md`（只記內容與場合；`lint.py brief.md` 檢查有沒有做到；快速模式自動合併）
-- [x] 架構展開＋逐頁視覺主角 `director.hero` → storyboard → lint（版型配方與轉場等選完風格才補）
+- [x] 架構展開＋逐頁視覺主角 `director.hero` → storyboard → lint → ⛔ 關卡 1c 逐頁清單確認（`lint.py --outline`；版型配方與轉場等選完風格才補）
 - [x] 兩階段視覺關卡 Gate 2（v4.8）：Step 3a 依 `contexts.md`〈主題類型總表〉與說服載體選風格，同時確認明暗、去框比例、導航（場合只校準、不淘汰）→ Agent 依風格版面語法補齊分鏡 → Step 3b 單風格 2–3 張極致樣張＋3 組 OKLCH 配色（確認後直接沿用為 Step 4 活範本）
 - [x] 製作 → `deck.html`（>6 頁每 3–4 頁乾淨分身精雕＋三層細粒度按需注入＋軟性防呆）
 - [~] 品管：下限像素 WCAG＋17 項動態行動實測＋上限 Liveliness Audit 已完成；獨立評審留待 Phase E

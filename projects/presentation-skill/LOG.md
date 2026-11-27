@@ -1758,3 +1758,25 @@
   - 這些可分別補強七項缺口（對照表見研究筆記第三節）。
 - **同步的檔案**：`inputs/mattpocock-elicitation-study.md`、`STATUS.md`、`LOG.md`。
 - **下一步**：用表單請使用者決定修補範圍、深挖題的表單寫法、素材碎片簿與故事種子的關係、關卡上要不要主動邀請挑戰。
+
+
+## 2026-11-27｜`deck-architect` v4.10：主柱一深挖與架構把關（參考 `mattpocock/skills`）
+
+- **使用者決策（互動表單）**：
+  - 修補範圍：七項缺口**連同 Matt 的四個做法**（結構追問、雛形試看、給主管的問卷、「尚未確定」清單）一起修（推薦）。
+  - 深挖題在表單裡怎麼問：**維持現狀，選項當引子**（Claude 推薦「選項只給進行方式」，使用者選維持）。
+  - 素材碎片簿：**要，故事種子改成碎片簿裡使用者標的重點**（推薦）。
+  - 防被動同意：**關卡附上推薦方案最弱的一點與最沒把握的假設**（推薦）。
+  - （前一輪已定）逐頁清單在 Step 2 後獨立成關卡；先回放 v1 四案再真實 PK；「成長」＝團隊或組織成長回顧。
+- **本輪修改（v4.10）**：
+  - `references/grill.md`：七條運作原則擴為九條（新增「講不清楚就做雛形，答案在別人腦中就做問卷」「防被動同意」）；Proposal-First 前先讓使用者說，低風險預設可合成一題；Round 0 問心中的講法、開始收素材碎片簿；節點群 A 新增 5a「架構硬限制與決策人」；節點群 B 的故事種子改為重點碎片、候選附「用到的碎片」、同一把尺的候選比較與最弱的一點、選不下來做空殼清單；新增第 9 題「結構追問、尚未確定與假設、改起來最貴的四個決定」；關卡 1a 檢核項擴為 6 項；關卡 1b 表單只呈現新決定與風險；節點群 D 註明措辭層限制；快速模式與完成門檻同步；1b 題號順延。
+  - `references/structure.md`：候選從心中的講法與重點碎片長出；新增〈候選比較：用同一把尺〉與〈選定後的結構追問〉；範例改用碎片並加「最弱的一點」；新增第五節〈做到一半要改架構時（架構變更回路）〉三級成本表。
+  - `references/contexts.md`：〈主題類型總表〉新增「團隊或組織成長回顧」「期許、動員演講」兩列；標準與快速模式加入關卡 1c、心中的講法與架構硬限制。
+  - `SKILL.md`（v4.10）：主柱一關卡改為 1a＋1b＋1c；新增「關卡上主動邀請挑戰」；工作目錄加 `fragments.md`、`questionnaire-<對象>.md`；Step 1a 六步重寫；Step 2 結尾改為 ⛔ 關卡 1c（`lint.py --outline`）；Step 4 分身讀 `fragments.md`；新增〈做到一半要改架構時〉；參考檔索引同步。description 1018 bytes。
+  - `templates/brief.md`：第 1 節加心中的講法、架構硬限制與決策人、待他人回答的問卷；第 3 節改為素材碎片簿與重點碎片；第 4 節加候選比較、最弱的一點、改起來最貴的四個決定、尚未確定與假設、結構追問。新增 `templates/fragments.md`、`templates/questionnaire.md`（參考 `to-questionnaire`，MIT）。
+  - `scripts/lint.py`：`lint_brief()` 檢查新欄位（心中的講法與架構硬限制兩種模式必填；候選比較、最弱的一點、最貴的四個決定、結構追問標準模式必填、快速模式警告；尚未確定與假設警告），並在 brief 旁找不到 `fragments.md` 時警告；新增 `--outline` 印出關卡 1c 逐頁清單。
+  - `assets/style-library.html`：主題標籤同步新增兩類。`inputs/presentation-principles.md` 新增 #35–#38。`ROADMAP.md` 同步。
+  - 範例：`outputs/examples/v4-alive-demo/brief.md` 補新欄位，新增示範 `fragments.md`（虛構）。
+- **驗證**：brief lint 模式變體斷言全過；`templates/brief.md` 如預期報未填；示範 brief 0 錯 0 警；5 份範例 storyboard lint 與改版前一致（v45 多一則風格警告是舊版腳本放在暫存區讀不到 `styles/index.json` 的比對誤差）；`--outline` 在 `v48-regression` 正確列出 9 頁與頁數算術；skill-creator `quick_validate` 通過，重打包 `outputs/deck-architect.skill`（85 檔，376.4 KB，零 `__pycache__`，逐位元一致）。
+- **同步的檔案**：`inputs/presentation-principles.md`、`outputs/deck-architect/{SKILL.md,references/{grill.md,structure.md,contexts.md},templates/{brief.md,fragments.md,questionnaire.md},scripts/lint.py,assets/style-library.html}`、`outputs/deck-architect.skill`、`outputs/examples/v4-alive-demo/{brief.md,fragments.md}`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
+- **下一步**：回放 v1 四案（虛構情境、全新 agent 跑到關卡 1a），再真實 PK。

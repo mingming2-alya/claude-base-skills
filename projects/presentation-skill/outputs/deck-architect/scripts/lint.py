@@ -2,7 +2,7 @@
 """Lint a deck-architect storyboard (or brief) against narrative, structure, constraint, and pacing rules.
 
 Usage:
-  python3 lint.py path/to/storyboard.yaml [--json]
+  python3 lint.py path/to/storyboard.yaml [--json] [--outline]   # --outline: page list for gate 1c
   python3 lint.py path/to/brief.md [--json]      # Step 1b: checks the consultant work left traces
 
 Exit code 0 = no errors (warnings allowed), 1 = errors found, 2 = could not read file.
@@ -731,7 +731,7 @@ def _says_none(value):
     return bool(re.match(r"^(無|略過)(?:$|[\s。．.,，、；;：:（(／/])", v))
 
 
-def lint_brief(text):
+def lint_brief(text, base_dir=None):
     """Check that brief.md carries every trace the consultant process must leave behind."""
     errors, warnings, infos = [], [], []
     E = lambda where, msg: errors.append(f"[ERROR] {where}: {msg}")  # noqa: E731
@@ -784,7 +784,7 @@ def lint_brief(text):
     if mode_no is None or _unfilled(mode_val) or (("標準" in mode_val) == ("快速" in mode_val)):
         if mode_no:
             reported.add(mode_no)
-        E("1. 製作模式", "請寫明「標準」或「快速」。快速模式會放寬故事種子、候選數與反方質疑的檢查。")
+        E("1. 製作模式", "請寫明「標準」或「快速」。快速模式會放寬重點碎片、候選數、候選比較、結構追問與反方質疑的檢查。")
     else:
         fast = "快速" in mode_val
     strict = not fast
@@ -793,6 +793,12 @@ def lint_brief(text):
     need("理性終點", "1. 理性終點", True, "聽完之後對方要相信什麼、做出什麼決定。")
     need("體感預期", "1. 體感預期", strict, "演完燈亮那一刻，希望台下心裡冒出的那句話。")
     need("對象起點", "1. 對象起點", True, "誰會聽、在意什麼、有什麼疑慮。")
+    need("使用者心中的講法", "1. 心中的講法", True,
+         "Round 0 先問使用者心裡現在想怎麼講（先講什麼、後講什麼、一定要講的事）；還沒想法就寫「無」。"
+         "先讓使用者說，再端出 Agent 的版本，候選才不會只是 Agent 的作文。")
+    need("架構硬限制與決策人", "1. 架構硬限制", True,
+         "誰上台、誰能否決結構、指定的章節或不能動的模板、整塊不能談的主題、議程位置、會後是否寄出；沒有就寫「無」。"
+         "這些會決定骨架，要在提候選前問；使用者答不出的，做一份問卷給那個人（templates/questionnaire.md）。")
     need("主題類型與氣質", "1. 主題類型與氣質", True, "對照 contexts.md〈主題類型總表〉；Step 3a 靠它推薦風格。")
     need("標竿必答維度與處置", "1. 標竿盲點", strict, "列出這類標竿必答的維度，逐項寫「已補齊」或「刻意略過（理由）」。")
     need("時長與頁數算術", "1. 時長與頁數", True, "寫明分鐘數與頁數上限（含／不含封面與目錄）。")
@@ -811,24 +817,35 @@ def lint_brief(text):
             E("2. delivery", f"要四選一（目前：{dv}）。")
     need("播放環境", "2. 播放環境", strict, "亮室會議室／暗場大螢幕／線上分享／列印或寄送；Step 3a 依它校準明暗。")
 
-    # ---- section 3: story seeds
-    seed = need("種子 1", "3. 故事種子", strict,
-                "先問使用者最想讓聽眾記住的 1–3 個時刻、案例、畫面或原話，敘事候選要圍繞它們長出來。")
+    # ---- section 3: fragments and the highlighted ones (= story seeds)
+    need("素材碎片簿", "3. 素材碎片簿", strict, "從使用者第一句話開始，把原話逐則收進 fragments.md（templates/fragments.md），這裡寫檔名與則數。")
+    if base_dir is not None and not (Path(base_dir) / "fragments.md").is_file():
+        W("3. 素材碎片簿", f"{Path(base_dir).name}/ 裡找不到 fragments.md。使用者的原話是第一手來源，Step 4 也會讀它。")
+    seed = need("重點碎片 1", "3. 重點碎片", strict,
+                "請使用者在素材碎片簿標出最想讓聽眾記住的 1–3 則（⭐），敘事候選要圍繞它們長出來。")
     if seed is not None and _says_none(seed) and strict and stage != "briefing":
-        W("3. 故事種子", "寫的是「無」。標準模式建議再試一次：用 Pre-Flight 讀到的素材提幾個候選種子給使用者挑或改寫。")
+        W("3. 重點碎片", "寫的是「無」。標準模式建議再試一次：把碎片簿目前收到的碎片列給使用者，請他標出最想講的一則，或當場補一則。")
     need("一句話核心訊息", "3. 一句話核心訊息", True, "若聽眾只記得一句話，是哪一句。")
 
     # ---- section 4: candidates (Design It Twice) and the choice
-    need("候選 A", "4. 候選 A", strict, "穩健守正版：軸與方向、章節停靠點、用到的種子。")
+    need("候選 A", "4. 候選 A", strict, "穩健守正版：軸與方向、章節停靠點、用到的碎片；使用者心中的講法或既有框架放這裡。")
     b = need("候選 B", "4. 候選 B", strict, "聽眾痛點／反方逆推版。")
     c = need("候選 C", "4. 候選 C（破框）", strict, "破框敘事版：打破了哪個慣例。")
     if strict and c is not None and _says_none(c):
         E("4. 候選 C（破框）", "標準模式一定要給至少 1 個破框敘事候選（DESIGN-IT-TWICE），不能略過。")
     if strict and b is not None and _says_none(b):
         E("4. 候選 B", "標準模式要給三個本質不同的候選，不能略過。")
+    need("候選比較", "4. 候選比較", strict,
+         "三個候選用同一把尺比：主受眾第一個問題在第幾章被回答、每章證據就緒度、時間與頁數、前提假設、用到的碎片。")
     need("選定與理由", "4. 選定與理由", True, "選了哪個或怎麼混搭，以及為什麼它能把聽眾帶到終點。")
+    need("最弱的一點與最沒把握的假設", "4. 最弱的一點", strict,
+         "寫出推薦方案最容易被挑戰的地方與最沒把握的假設，以及使用者在關卡 1a 怎麼判斷（防被動同意）。")
+    need("改起來最貴的四個決定", "4. 最貴的四個決定", strict,
+         "理性終點、主受眾、軸與敘事主幹、範圍：各一句為什麼這樣定；做到一半才改這四個要回到關卡 1a。")
     need("30 秒口述邏輯鏈", "4. 30 秒口述邏輯鏈", strict, "用「起點共識 → 但是 → 所以 → 證據 → 因此」3–5 句串起整份架構，驗證章間有沒有斷層。")
     need("架構級排除清單", "4. 排除清單（Out of Scope）", False, "列出這場明確不進主線的主題（整塊刪除或僅放附件）；沒有就寫「無」。")
+    need("尚未確定與假設", "4. 尚未確定與假設", False, "還在範圍內、但現在定不了的事，各寫怎麼定（查資料／問卷問誰／做雛形）；沒有就寫「無」。")
+    need("結構追問", "4. 結構追問", strict, "逐章寫拿掉會斷什麼（斷不了就合併或移進排除清單），以及開場承諾的事在哪一章兌現。")
     in4, stops = False, []
     for no, line in enumerate(lines, 1):
         if line.startswith("## "):
@@ -906,6 +923,46 @@ def lint_brief(text):
     return errors, warnings, infos
 
 
+def outline(data):
+    """Page-by-page list for gate 1c: chapter, title, content shape and visual hero, plus page arithmetic."""
+    chapters = {c.get("id"): c for c in data.get("chapters") or [] if isinstance(c, dict)}
+    rows, n = [], 0
+    for s in data.get("slides") or []:
+        if not isinstance(s, dict):
+            continue
+        t = s.get("type", "content")
+        if s.get("appendix"):
+            no = "附件"
+        else:
+            n += 1
+            no = f"{n:02d}"
+        ch = chapters.get(s.get("chapter"), {})
+        ch_label = str(ch.get("label") or "")
+        if ch_label and (ch.get("unlisted") or s.get("unlisted")):
+            ch_label += "（不列入目錄）"
+        if t == "content":
+            title = str(s.get("title") or "")
+            shape = str(s.get("layout") or ("free" if s.get("file") else "?"))
+        else:
+            title = str(s.get("text") or s.get("title") or (data.get("meta") or {}).get("title") or "")
+            shape = t
+        title = EMPH_RE.sub(lambda m: m.group(1), title).replace("|", "／")[:40]
+        director = s.get("director") if isinstance(s.get("director"), dict) else {}
+        hero = str(director.get("hero") or "").replace("|", "／")[:48] or "—"
+        rows.append(f"| {no} | {ch_label or '—'} | {title} | {shape} | {hero} |")
+    bd = page_breakdown(data)
+    formula = (f"封面 {bd['cover']} + 目錄 {bd['toc']} + 內容 {bd['content']} + 震撼 {bd['shock']} "
+               f"+ 結尾 {bd['closing']} = {bd['total']} 頁")
+    if bd["appendix"]:
+        formula += f"（另含附件 {bd['appendix']} 頁）"
+    budget = (data.get("meta") or {}).get("pages")
+    if isinstance(budget, int) and budget > 0:
+        formula += f"；上限 {budget} 頁"
+    head = ["", "## 逐頁清單（關卡 1c）", "", "| 頁 | 章節 | 題目 | 內容形狀 | 視覺主角 |", "|---|---|---|---|---|"]
+    tail = ["", f"頁數算術：{formula}。自動目錄頁由 assemble.py 依章節插入，未列在表內。"]
+    return "\n".join(head + rows + tail)
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if len(args) != 1:
@@ -917,7 +974,8 @@ def main():
         except OSError as e:
             print(f"[ERROR] 讀不到 {args[0]}：{e}")
             sys.exit(2)
-        errors, warnings, infos = lint_brief(text)
+        errors, warnings, infos = lint_brief(text, Path(args[0]).resolve().parent)
+        data = None
     else:
         try:
             data = load(args[0])
@@ -932,6 +990,8 @@ def main():
             print(line)
         print(f"\n結果：{len(errors)} 個錯誤、{len(warnings)} 個警告、{len(infos)} 個提示。"
               + ("通過。" if not errors else "請修正錯誤後重新執行。"))
+    if data is not None and "--outline" in sys.argv:
+        print(outline(data))
     sys.exit(1 if errors else 0)
 
 
