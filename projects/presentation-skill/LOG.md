@@ -1795,3 +1795,19 @@
   - **揪出 2 項輕量微調點**：① 快速模式實測 3 輪 10 題超出 `grill.md` §四「1–2 輪 ≤5 題」承諾（因 Round 0 先花 1 輪補檔，後面快篩與關卡 1a 又拆 2 輪，建議補檔後快篩＋拍板合 1 輪 ≤3 題）；② `fragments.md` 3/4 分身把整張表單回覆含 `1A/2A` 代碼貼成 1 則碎片（建議在 `templates/fragments.md` 與 `grill.md` 補明去題號拆原子條目）。
 - **同步的檔案**：`projects/presentation-skill/{inputs/v1-replay-v410.md,STATUS.md,ROADMAP.md,LOG.md}`。
 - **下一步**：由使用者透過互動表單決定是否先落地 2 項輕量微調（v4.10.1），或直接進真實簡報 PK。
+
+
+## 2026-11-27｜`deck-architect` v4.10.1：消除快速模式題數上限矛盾 ＋ `fragments.md` 對齊 `mattpocock/skills` 原文
+
+- **背景與使用者糾正**：
+  - 使用者在審閱四案盲測回放摘要時，敏銳抓出我在報告中以「超出 `≤5 題` 承諾」檢討 Case 4 的說法違背了原則 #28（融合 `mattpocock/skills`：「不設輪次與題數上限，前沿未清空不停下」）。核對原始碼後確認是 `grill.md:187`、`contexts.md:89`、`SKILL.md:67` 殘留了舊版寫死的「`1–2 輪（≤5 題）`」，Case 4 先要齊空白模板再診斷 12 案、跑 3 輪 10 題其實才是做對了。
+  - 使用者進一步追問 Matt Pocock 怎麼更新 `fragments.md`；以 `gh api` 直查 `mattpocock/skills` `skills/in-progress/writing-fragments/SKILL.md` 原文確認三條規則（只收有機會活進最終成品的原料、自然獨立條目以 `---` 分隔、靜默追加且寫前必重讀磁碟保留使用者手動編輯），使用者經互動表單拍板兩項一併修補並重打包為 v4.10.1。
+- **本輪修改（v4.10.1）**：
+  1. **刪除快速模式寫死上限（`SKILL.md`、`references/grill.md`、`references/contexts.md`）**：移除全部「`1–2 輪（≤5 題）`」舊條文，改明訂快速模式靠「合併 1a＋1b、略過破框候選／候選比較／結構追問、合併低風險預設」縮短流程，**同樣遵循設計樹前沿、不設輪次與題數上限，沒把模板／硬限制／必守邊界問清絕不停下**。
+  2. **補齊 `fragments.md` Matt 原文三規則（`templates/fragments.md`、`references/grill.md`、`SKILL.md`）**：明訂篩選門檻（只收有機會活進成品的原料，不收純流程選項與 `1A/2A` 題號代碼）、一個獨立想法一則 `#n`（原話不改寫）、靜默追加＋每次寫前必先從磁碟重讀（避免覆蓋使用者兩輪間的手動編輯）。
+  3. **同步更正 `inputs/v1-replay-v410.md`**：將 Case 4 與第四節的判讀更正為「Case 4 實作正確，反向揪出規格書舊上限矛盾」，並記錄 v4.10.1 已完成修正。
+- **驗證與重打包**：
+  - `rg` 確認 `outputs/deck-architect/` 零殘留 `≤5 題`／`1–2 輪`；`SKILL.md` description `1020 bytes`（≤1024）；`lint.py` 驗過 `v4-alive-demo/brief.md`（0 錯 0 警）與 `v48-regression/storyboard.yaml`（含 `--outline` 0 錯）。
+  - 重新打包 `outputs/deck-architect.skill`（85 檔，372.1 KB，零 `__pycache__`，SHA-256 逐位元一致）。
+- **同步的檔案**：`projects/presentation-skill/{STATUS.md,ROADMAP.md,LOG.md,inputs/v1-replay-v410.md,outputs/deck-architect.skill}`、`outputs/deck-architect/{SKILL.md,references/{grill.md,contexts.md},templates/fragments.md}`。
+- **下一步**：主柱一（v4.10.1）與主柱二（v4.9.0）皆已就緒，待使用者提供一份真實簡報需求跑完整 Step 1a→Step 6 PK，之後再決定是否進 Phase D。

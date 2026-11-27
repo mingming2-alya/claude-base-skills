@@ -1,6 +1,6 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-27｜`deck-architect` v4.10 v1 四案盲測回放 4/4 全數命中 ✅ → 待決定微調或直進真實簡報 PK）**：
+> **最新接手點（2026-11-27｜`deck-architect` v4.10.1：v1 四案盲測 4/4 命中 ＋ 修正快速模式題數上限矛盾與碎片簿 Matt 原文規則 ✅）**：
 >
 > - **已完成 v1 四案虛構化全新上下文盲測回放（`inputs/v1-replay-v410.md`）**：
 >   - 四案完全去敏改寫為虛構情境（綠能科技新銳領導營、雲橋物流智慧排單助手、星辰電商數據平台組單章總覽、海風智造智慧工廠週進度與兩頁總覽），各派獨立全新上下文子代理（只讀 `outputs/deck-architect/` v4.10 與各自虛構檔，零歷史劇透）跑完 Round 0 → ⛔ 關卡 1a。
@@ -9,10 +9,11 @@
 >     - **Case 2（工具推廣｜標準、`pitch` 10 分 嚴格 6 頁）**：前置 4 輪 12 題（含關卡 1a 共 5 輪 15 題）；Pre-Flight 自行核實 24→7 加總與未開通 ERP 邊界；Round 0 先問心中講法並列入候選 A；嚴守 `封面 1 + 總目錄 1 + 正文 4 = 6 頁`；自動產出 `questionnaire-研發.md` (3 題)；關卡 1a 進一步優化 Ch 4 三欄分工（凸顯規則檔準備）。
 >     - **Case 3（年度成果單章｜標準、`briefing` 3–4 分 1 頁無附件）**：前置 4 輪 12 題（含關卡 1a 共 5 輪 15 題）；零劇透一眼診斷年初三欄並列與動作語言，主動問出「大簡報單章 1 頁無附件」硬限，整塊移除「客製需求」並獨立推導出與原採用版 100% 一致的 Top-Down 抽象層次軸（**戰略方向 → 商業價值 → 平台基座**），同時抓出 4,200 萬 vs 38 件口徑防禦與 7 組數字密度風險。
 >     - **Case 4（定期進度回報｜快速、`briefing` 3 分 純 2 頁總覽＋填寫規範）**：前置 2 輪 7 題（含關卡 1a 共 3 輪 10 題）；Round 0 主動先要空白模板、確認早有 5 欄風險表故不動版面；全數抓出 12 案 3 案流水帳／2 案留白／8 案 `/` 含隱藏延誤與兩檔大類排序落差；產出純 2 頁總覽（頂端摘要、4 階段、風險燈號＋支援欄＋第 2 頁底部拍板區與跨頁防重複分工），超越原 v1-4 成品。
->   - **實測抓出的 2 項小摩擦（可選擇先花數分鐘微調成 v4.10.1，或直進真實 PK 後一併收斂）**：
->     1. **快速模式超出 `≤5 題` 承諾**：Case 4 因 Round 0 先花 1 輪補檔，後面又把快篩與關卡 1a 拆 2 輪，總計 3 輪 10 題（建議快速模式明訂補檔後快篩＋拍板合 1 輪 ≤3 題，守住總計 2 輪 ≤6 題）。
->     2. **`fragments.md` 顆粒度漂移**：3/4 分身把整張表單回覆含 `1A/2A` 題號代碼整段貼成 1 則碎片（Case 1 拆成原子條目最清楚；建議在 `templates/fragments.md` 與 `grill.md` 補明「去題號代碼、依語意拆成原子條目但不改原話」）。
-> - **下一步**：由使用者拍板是否先落地上述 2 項輕量微調（v4.10.1），或直接拿一份**真實簡報需求**進行完整 Step 1a→Step 6 PK 驗證，跑完再決定進 Phase D。
+> - **已落地 v4.10.1 兩項修正並重打包**：
+>   1. **消除快速模式舊上限與原則 #28 的矛盾**（`SKILL.md`、`references/grill.md`、`references/contexts.md`）：刪除寫死的「`1–2 輪（≤5 題）`」上限；快速模式改為靠「合併 1a＋1b、略過破框候選／候選比較／結構追問、合併低風險預設」縮短流程，**同樣遵循設計樹前沿、不設輪次與題數上限，前沿清空才停**（驗證了 Case 4 跑 3 輪 10 題先要齊模板再診斷其實才是正確做法）。
+>   2. **依 `mattpocock/skills` `writing-fragments/SKILL.md` 原文補齊碎片簿三條規則**（`templates/fragments.md`、`references/grill.md`、`SKILL.md`）：① 只收「有機會活進最終簡報的原料」（不是聊天／表單回覆 log，不收純流程選項與 `1A/2A` 題號）；② 一個獨立想法各自成一則 `---` 條目，保留原話不改寫；③ 靜默追加，且**每次寫入前必先從磁碟重讀**，保留使用者在兩輪間的手動編輯。
+>   - 驗證：零殘留舊上限、`SKILL.md` description 1020 bytes（≤1024）、`brief.md` 0 錯 0 警、`v48-regression` 與 `--outline` 0 錯、重打包 `outputs/deck-architect.skill`（85 檔，372.1 KB，SHA-256 逐位元一致）。
+> - **下一步**：主柱一（v4.10.1＋v1 四案盲測 4/4 全中）與主柱二（v4.9.0 22 項全量檢修）均已完整就緒，待使用者提供一份**真實簡報需求**跑完整 Step 1a→Step 6 PK 驗證，跑完再決定是否進 Phase D。
 >
 > **前一段（2026-11-27｜`deck-architect` v4.10 主柱一深挖與架構把關 ✅，`9380c8f`）**：
 > - 依 `inputs/pillar1-review-v490.md`（7 項缺口）＋ `inputs/mattpocock-elicitation-study.md`（10 項深挖機制）落地原則 #35–#38：Round 0 先問心中講法＋`fragments.md`、1a 硬限制＋`questionnaire.md`、同一把尺比較＋空殼雛形＋結構追問＋尚未確定清單＋最貴四決定、關卡附最弱點防被動同意、Step 2 後獨立 ⛔ 關卡 1c（`lint.py --outline`）、架構變更回路與主題總表補兩類；重打包 `outputs/deck-architect.skill`（85 檔，376.4 KB，SHA-256 逐位元一致）。
@@ -75,7 +76,7 @@ _最後更新：2026-11-27_
 | **Phase B 預研** | **動態技術路線研究與定案**：實查 14 個 GitHub Repo（`inputs/motion-research.md`），定案 **方案 1｜分層混合** | ✅ 定案 |
 | **Phase B / B.2 / B.3** | **反寫靜態工藝與原則 #26 ＋ 60fps 動態引擎 ＋ 視覺指引規格與原語（v4.3）**：`v4-alive-demo` 8 頁靜態＋7 項動態實測全過 | ✅ |
 | **Phase C.1** | **真實旗艦標竿對照 ＋ v4.4-spec 規格與 Grill v2 全面升級**：三段式舞台光譜、設計樹 Grill v2（融合 `mattpocock/skills`）、原則 #27–#30、9 份核心規格反寫並重打包 | ✅ |
-| **Phase C.2** | **v4.4→v4.10 全系統升級、兩大主柱終審、全量檢修與 v1 四案盲測回放**：主柱一（Round 0 心中講法與碎片簿、1a 硬限制與短問卷、同一把尺比較、結構追問、防被動同意、獨立關卡 1c、架構變更回路、v1 四案盲測 4/4 全中）＋主柱二 22 項檢修（WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]` 作用域與 `G` 縮圖保真、`speaker-view` 去重、活頁列印、平衡換圖、`BEAT_MS` 與三配方／圖鑑校正、4 套件與模組極性／縮放）＋17 項動態行動實測 | ✅ 盲測回放過關 → 下一步：微調拍板或真實簡報 PK |
+| **Phase C.2** | **v4.4→v4.10.1 全系統升級、兩大主柱終審、全量檢修與 v1 四案盲測回放**：主柱一（Round 0 心中講法與碎片簿、1a 硬限制與短問卷、同一把尺比較、結構追問、防被動同意、獨立關卡 1c、架構變更回路、移除快速模式題數舊上限、碎片簿對齊 Matt 原文三規則、v1 四案盲測 4/4 全中）＋主柱二 22 項檢修（WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]` 作用域與 `G` 縮圖保真、`speaker-view` 去重、活頁列印、平衡換圖、`BEAT_MS` 與三配方／圖鑑校正、4 套件與模組極性／縮放）＋17 項動態行動實測 | ✅ 盲測回放與 v4.10.1 過關 → 下一步：真實簡報 PK |
 | **Phase D** | **多元風格庫全面成形**：補齊其餘 8 款「靜態×動態一體」Style DNA（各含淺深規則與風格動態套件並上架 `style-library.html`）、整理插畫 15 種畫風配方表、外觀帳本 | 未開始（等真實簡報 PK 後決定） |
 | **Phase E** | **交付、修改閉環與記憶**：成品按 `E` 改字回寫、畫面上點選留言修改、文字可編輯 PPTX 匯出、品味記憶與獨立評審、評估搬進 `skills/` 正式安裝（註：雙螢幕講者模式 `S` 鍵已提前於 v4.5 完成） | 未開始 |
 
@@ -93,7 +94,7 @@ _最後更新：2026-11-27_
 | **主柱邊界：每個決定等它需要的資訊到齊才做**（呈現層決定延到 Step 3a；Step 2 只寫 `hero`；說服載體回頭限制風格） | 11-26 | 原則 #32、`SKILL.md`、`references/{grill.md,samples.md,contexts.md,modules-catalog.md}`、`templates/{brief.md,storyboard.yaml}` |
 | **故事種子先於敘事候選**（v4.10 整合為素材碎片簿標 ⭐ 重點碎片；發散題不標「推薦」防錨定） | 11-26 / 11-27 | 原則 #33、#35、`references/{grill.md,structure.md}`、`templates/{brief.md,fragments.md}`、`CLAUDE.md` |
 | **每個建議都要附理由**（使用者補充） | 11-26 | 原則 #34、`SKILL.md`、`references/{grill.md,samples.md,contexts.md,structure.md}` |
-| **主柱一深挖與架構把關（參考 `mattpocock/skills`）**：先問心中講法＋碎片簿、1a 硬限制＋問卷、同一把尺比候選＋空殼雛形＋結構追問、關卡 1a/1b/1c 附最弱點防被動同意、最貴四決定＋架構變更回路 | 11-27 | 原則 #35–#38、`SKILL.md`、`references/{grill.md,structure.md,contexts.md}`、`templates/{fragments.md,questionnaire.md}`、`scripts/lint.py` |
+| **主柱一深挖與架構把關（參考 `mattpocock/skills`）**：先問心中講法＋碎片簿（只收活進成品的原料、一則一獨立想法、靜默追加且寫前重讀磁碟）、1a 硬限制＋問卷、同一把尺比候選＋空殼雛形＋結構追問、關卡 1a/1b/1c 附最弱點防被動同意、最貴四決定＋架構變更回路、標準／快速模式皆不設題數上限（前沿清空才停） | 11-27 | 原則 #28、#35–#38、`SKILL.md`、`references/{grill.md,structure.md,contexts.md}`、`templates/{fragments.md,questionnaire.md}`、`scripts/lint.py` |
 | **主題類型總表是唯一來源**；`stage_fit` 只標常用場合、不壓暗；`style-library.html` 每卡標示適配主題與對齊原語 | 11-26 / 11-27 | `references/contexts.md` 第二節、`styles/index.json`、`assets/style-library.html` |
 | **可檢查產出＋關卡拍板**（取代「不能檢查的規則不寫」）；真實簡報 PK 只用在開發階段 | 11-26 | `ROADMAP.md` 專案原則、`scripts/lint.py`（brief＋自由畫布 HTML 檢查＋`--outline`） |
 | **生動度稽核分開計數＋風格契合** | 11-26 | `scripts/check.mjs` |
@@ -108,8 +109,8 @@ _最後更新：2026-11-27_
 
 | 路徑 | 內容 |
 |---|---|
-| `outputs/deck-architect/` | **v4.10 完整版 Skill 原始碼（85 檔）**：主柱一深挖顧問流程（Round 0 心中講法與 `fragments.md`、1a 硬限制與 `questionnaire.md`、同一把尺比較、結構追問、關卡最弱點、獨立關卡 1c `--outline`、架構變更回路）＋主柱二三層按需引擎（WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]` 作用域、活頁 `beforeprint` 列印、`boot()` 與 `meta.mode` 零權重串接）＋4 套風格動態套件＋`templates/deck.css` 三語音＋`style-library.html` 雙底達標＋17 項動態行動實測＋雙門檻 Liveliness 稽核 |
-| `outputs/deck-architect.skill` | v4.10 打包檔（376.4 KB，85 檔，零 `__pycache__`，SHA-256 逐位元一致） |
+| `outputs/deck-architect/` | **v4.10.1 完整版 Skill 原始碼（85 檔）**：主柱一深挖顧問流程（Round 0 心中講法與 `fragments.md`、1a 硬限制與 `questionnaire.md`、同一把尺比較、結構追問、關卡最弱點、獨立關卡 1c `--outline`、架構變更回路、標準／快速模式皆不設題數上限）＋主柱二三層按需引擎（WAAPI 防鎖死、`isStill`/`isReducedMotion` 正交、`[data-slide-scope]` 作用域、活頁 `beforeprint` 列印、`boot()` 與 `meta.mode` 零權重串接）＋4 套風格動態套件＋`templates/deck.css` 三語音＋`style-library.html` 雙底達標＋17 項動態行動實測＋雙門檻 Liveliness 稽核 |
+| `outputs/deck-architect.skill` | v4.10.1 打包檔（372.1 KB，85 檔，零 `__pycache__`，SHA-256 逐位元一致） |
 | `outputs/examples/v48-regression/` | v4.8–v4.9 引擎回歸測試簡報（4 套套件 11 原語、`unlisted`、聚光復原、`templates/deck.css`；9 頁全過，最低 `5.12:1`）。改底盤或腳本後先跑這份 |
 | `outputs/examples/v4-alive-demo/{brief.md,fragments.md}` | 示範用 brief 與素材碎片簿（依既有虛構範例事後補寫，示範格式與 v4.10 brief lint，不是主柱一實測紀錄） |
 | `outputs/examples/v45-modular-demo/` | v4.5/v4.6 三層引擎與全部新／升級模組虛構技術示範（6 頁，最低對比 `4.84:1`） |
@@ -119,7 +120,7 @@ _最後更新：2026-11-27_
 | `outputs/examples/v4-demo/` | Phase A 初版虛構端到端範例（8 頁，最低 `4.81:1`；`samples/` 舊版獨立樣張 `--sheet` 相容通過） |
 | `outputs/examples/{example,annual-section,layout-catalogue,progress-overview,test4}/` | v3 時代舊範例（如 `theme: editorial` 等舊欄位），只保留參考，不代表現行流程 |
 | `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–38 條（被取代的舊條目已加註） |
-| `inputs/v1-replay-v410.md` | v4.10 主柱一 v1 四案虛構化全新上下文盲測回放報告（4/4 命中正確架構、輪／題數統計與 2 項輕量微調建議） |
+| `inputs/v1-replay-v410.md` | v4.10 主柱一 v1 四案虛構化全新上下文盲測回放報告（4/4 命中正確架構、輪／題數統計與 v4.10.1 兩項修正紀錄） |
 | `inputs/pillar1-review-v490.md`、`inputs/mattpocock-elicitation-study.md` | v4.9.0 主柱一第一性原理複查（7 項缺口）與 `mattpocock/skills` 引導深挖十機制研究（已於 v4.10 落地） |
 | `inputs/pillar2-audit-v482.md` | v4.8.2 主柱二（視覺引導／靜態／動態／模組化注入）全歷史與程式碼＋Chrome CDP 深度稽核報告（22 項已於 v4.9.0 全數修補收官） |
 | `inputs/external-audit-c2bfaf8.md`、`inputs/external-audit-c2bfaf8-review.md` | v4.8 外部唯讀稽核報告與逐條評估（13 項有效項目已於 v4.8.1 全數修補） |
