@@ -4,23 +4,23 @@
 
 ## 自動靜態檢查：全部通過
 
-接著請逐張看截圖，確認美感、去小字程度、斷行與主標題階層符合預期。
+接著請逐張看截圖（含步進分鏡條），確認美感、去贅字程度、斷行與主標題階層符合預期。
 
-## 生動度與反單調體檢（Liveliness Audit · `stage_mode=keynote`）
-- 視覺／圖表／互動頁佔比：**5/5（100%）**（標準 ≥ 75%）
-- 動態與互動原語多樣性：**5 種**（interactive-module、data-focus-plan、data-draw、data-count、data-step；標準 ≥ 4 種）
-- 風格契合（`apple` 招牌動態：split-mask、spotlight-sweep、depth-deck、colorize-wipe）：用到 **0/4**
-- ⚠️ [WARN] 選定風格 apple 的招牌動態一個都沒用到（split-mask、spotlight-sweep、depth-deck、colorize-wipe）；主柱二要的是這款風格的動態極致，Polish Pass 先從招牌動態補，不要疊不屬於這款風格的效果
+## 視覺圖解密度觀測（Liveliness Telemetry · `stage_mode=keynote`）
+- 視覺／圖表／互動頁佔比：**5/5（100%）**（參考基準 ≥ 75%）
+- 已啟用動態與互動原語（不設湊種類配額）：**5 種**（interactive-module、data-focus-plan、data-draw、data-count、data-step）
+- 風格動態觀測（`apple` 招牌原語：split-mask、spotlight-sweep、depth-deck、colorize-wipe）：用到 **0/4**
+- ✅ 達標：視覺圖解佔比與連續頁節奏符合場合基準。
 
 ## 動態互動檢核（`--motion`）
 - ✅ 連按打斷測試（4 次／180ms）：通過（精準落於第 3 頁 步進 2，無殘留 clone、壓暗與鎖死）
 - ✅ WAAPI fill:forwards 防鎖死檢核（iris 回翻重進（第 2 頁））：通過（零黑幕／零裁剪歸零／零殘留動畫）
 - ✅ 低耗電靜態凍結（B 鍵模式）：通過（開關與還原正常）
 - ✅ 視覺指引聚光壓暗／因果演變（第 2 頁）：通過（演繹期間明確聚焦，結束 100% 復原零殘留）
-- ✅ 引導線與描繪原語檢核（6 條 SVG 描線／0 處方向揭露）：通過（零退化 SVG 縮放）
+- ✅ 引導線與描繪原語檢核（6 條 SVG 描線／0 處方向揭露）：通過（零退化 SVG 縮放／零無效容器描線）
 - ✅ 單頁明暗極性 data-surface（dark／light／split／photo）：通過（變數與舞台外殼極性同步切換）
 - ✅ 導航模式（divider-only｜實測 minimal-side／divider-only）與自動隱藏底控膠囊：通過（頁碼 06 / 07、浮現與自動收合正常）
-- ✅ 講者點擊步進 data-step（第 3 頁共 3 步）：通過（逐層揭曉／換幕退場／回翻落終態／靜態全展開）
+- ✅ 講者點擊步進 data-step 全場檢核（第 3 頁（3 步）、第 7 頁（1 步））：通過（逐層／巢狀隔離／回翻落終態／靜態全展開；已輸出分鏡條 filmstrip-s03.jpg、filmstrip-s07.jpg）
 - ✅ 多媒體與原生輪播原語（外連影片（第 1 頁）離頁停播歸零、實測音檔（第 4 頁）不誤翻頁且離頁歸零、活流程輪播（第 5 頁 vertical）切換不誤翻頁、3D 照片輪播（第 6 頁）切換不誤翻頁）：通過
 - ✅ Layer 1 講者臨場工具（總覽矩陣 G（含縮圖樣式保真）、畫筆標註 A 與雷射筆 L、雙螢幕講者同步 S）：通過（快捷鍵鎖定與 Esc 層級退出正常）
 - ✅ 閱讀期靜止檢核（反永動干擾／畫完就安靜）：通過

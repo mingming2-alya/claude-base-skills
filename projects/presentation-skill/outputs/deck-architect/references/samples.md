@@ -1,73 +1,60 @@
-# 視覺關卡（Gate 2 · 主柱 2 排版與呈現）：選風格與呈現規格 → 補齊分鏡 → 單風格極致樣張
+# 視覺關卡指南（Gate 2a 活體比稿 → Gate 2b 定版活範本確認）
 
-> **為什麼採 3a → 3b？**
-> 過去一次畫 3 款不同風格的 6–9 張樣張，不但分散火力、丟掉 2/3 心血，還容易每張流於平庸。
-> 現行流程以「**根據不同內容主題，選擇最合適的靜態 × 動態風格極致**」為原則：
-> 1. **Step 3a（主題配對 × 融合圖鑑快選 × 呈現規格）**：先依內容主題與氣質推薦風格，讓使用者在 1920×1080 融合活體圖鑑一次體驗「靜態美感上限＋專屬動態物理」，挑中 **1 款風格**，同時確認明暗、去框比例與導航；接著由 Agent 依這款風格補齊每頁分鏡。
-> 2. **Step 3b（單風格集中精雕 2–3 張極致樣張＋3 組 OKLCH 配色）**：100% 火力對標 `assets/style-library.html` 靜態上限與該風格 `motion_dna` 畫出高工藝真實頁面。
-> 3. **無縫沿用進 Step 4**：確認後的這 2–3 張樣張**直接保留為成品正式頁面**，並作為 Step 4 分批子代理的「活範本（Live Style Anchor）」。
->
-> **為什麼呈現決定都在這裡才做**：明暗、去框比例、導航、氛圍效果、版型配方與轉場，都要同時知道場合和風格才能決定（原則 #9、#28、#31）。主柱一只交來內容、場合與說服載體，所有呈現決定在選定風格這一刻一次做完，不會問兩次，也不會被後面推翻。
+> **v5.0 第一性原理改革：為什麼「拿真實關鍵頁畫 3 風格活體比稿」勝過「看假範例盲選」？**
+> 真實高難度簡報實測證明：使用者看通用假範例圖鑑（`style-library.html`）時，根本無從想像該風格套在自己「高密戰術漏斗／多組數據／教學範例」上長什麼樣，極易選錯風格導致首稿崩盤。
+> 因此 v5.0 採 **「Gate 1b 文字預確認 3 個方向 → Gate 2a 同題真實內容 3 子代理並行活體比稿 → Gate 2b 定版 `deck.css` 活範本 1 輪確認沒走鐘」**：既不浪費算力畫 9 張廢稿（只畫最關鍵 1 頁 × 3 款），又能讓使用者親眼看到**自己的真實內容在靜態×動態下的極致結合與混搭可能**！
 
 ---
 
-## Step 3a｜依內容主題選風格，並確認呈現規格（⛔ 關卡 2a）
+## 一、Gate 2a｜最關鍵 1 頁真實內容 × 3 風格並行活體比稿（⛔ 關卡 2a）
 
-1. **讀輸入**：`brief.md` 第 1 節（主題類型與氣質）、第 2 節（`stage_mode`、播放方式與播放環境）、第 3 節（承重母題）、第 5 節（各章說服載體與招牌亮點頁）；`styles/index.json` 中 **`status: "ready"`** 的風格（目前 4 款：`workday`、`counsel`、`apple`、`illustration`；其餘 8 款於 Phase D 上架）。
-2. **推薦風格（依 `contexts.md` 第二節〈主題類型總表〉）**：
-   - **主題優先**：照總表找推薦風格；氣質明顯不同時改用備選。
-   - **說服載體回頭限制**：對照第 5 節的說服載體與候選風格的 `motion_dna.avoid_motions`（例：需要程式碼逐行 → 不推薦禁用 `code-stage` 的 `illustration`；需要照片牆 → 留意 `workday` 禁用 `coverflow`）。衝突時換備選風格，或改用該風格的原生做法，並告訴使用者為什麼。
-   - **場合只校準、不淘汰**：`stage_fit` 只是參考。
-3. **展示互動式融合圖鑑** `assets/style-library.html`（可加 `?stage=briefing|pitch|keynote` 標出常用風格，不會壓暗其他風格；每張皆為 1920×1080 等比活體舞台，支援淺／深切換、3 拍語意重播、直接互動與全螢幕放大）。
-4. **用一張互動表單請使用者拍板**（題目互不依賴，推薦項放第一標「（推薦）」）：
-   - **風格**：最貼合「主題 × 說服載體」的那款放第一，說明欄寫出推薦理由（例：「主題是策略提案、聽眾是決策主管，counsel 的色塊即圖表最快讓人看懂差距；第 2 章的現場試算也在它的推薦模組裡」）；選 `illustration` 時同一張表單一併點選畫風。
-   - **呈現規格**：依「`stage_mode` × 推薦風格」給出一組預設（明暗策略：單一淺底／單一深底／局部反轉／光暗雙極；去框比例；導航模式）並說明理由，使用者可整組接受或改單一開關。播放環境是事實依據，例如暗場大螢幕偏深底、列印或寄送偏淺底。
-   - 若使用者改選別的風格導致呈現預設不再成立，下一輪表單只重問受影響的那幾個開關。
-5. **拍板後，同一刻定案**：該風格的 `motion_dna` 與專屬 `motion-*` 套件、氛圍效果（`ambient-fx` 等，依風格推薦與 `stage_mode` 預算，見 `modules-catalog.md` 第三節）。把 `style`、`mode`、`nav_mode` 寫進 `storyboard.yaml` 的 `meta`。
+> **前置條件**：使用者已在 Gate 1b 表單簽核 `brief.md` 與 `storyboard.yaml`（含逐頁 `slide_plan`），並在最後一題確認了想看的 3 個風格方向（若使用者已明確鎖定單一風格，則改派 1 位 Builder 直接畫該風格）。
 
-## Step 3a 之後｜依選定風格補齊分鏡（Agent 內部工作，不設關卡）
+### 1. 挑對比稿靶心頁（1 頁定生死）
+- 優先選 `storyboard.yaml` 標記 `signature: true`、或**全場結構密度最高、最難排的那 1 頁真實內容頁**（而非空洞的封面頁）——只要這 1 頁能排得優雅通透、動效從容不破梗，全場其餘頁面自然迎刃而解。
 
-Step 2 只寫了每頁的視覺主角 `hero`。風格定案後，由 Agent 一次補齊每頁的 `director`：
+### 2. 並行派發 3 位乾淨上下文 Builder 子代理
+為 Gate 1b 確認的 3 款風格（從 `styles/index.json` 已就緒之 `counsel`、`workday`、`apple`、`illustration` 挑選，或依使用者指定），在 `decks/<name>/samples/opt-{a,b,c}/` 各自建立迷你單頁預覽工作區，**並行派 3 位乾淨 Builder 子代理**，每位只讀：
+1. 負責的那 1 款風格憲法 `styles/<id>.md`（善用該風格的 `airy` 單核留白或 `structured` 高密 Bento／畫廊雙密度語法）與 `styles/color-system.md`；
+2. `references/visual-guidance.md` 與 `references/motion-system.md`（全風格統一從容慢板：`800–1,200ms` 描線生長、`220–320ms` 交錯、`data-step` 防破梗步進）；
+3. 該關鍵頁的 `slide_plan`（`job`、`reveal`、`zones ≤4`、`visual_encoding`、`anchors`）與 `fragments.md` 原話；
+4. 1 支最貼近該頁 `job` 的 `references/recipes/*.md` 工藝參考。
 
-- **`archetype`**：依該風格的版面語法（`styles/<id>.md` 第 4 節；`illustration` 依 A／B／C 三種融合版面）挑最適合這頁內容形狀與 `hero` 的做法，有對應時引用 `references/recipes/`。配方是工藝基準線，不是硬模板：風格的版面語法優先。
-- **`module`**：沿用 Step 2 從說服載體帶來的內容模組；若 Step 3a 因該風格的 `avoid_motions` 改用風格原生做法，同步清除或替換衝突的 `director.module`；只在該風格推薦時才加氛圍或裝飾類模組。
-- **`choreo`**：依該風格的 `motion_dna`（物理個性、招牌原語、禁用動態）與 `references/visual-guidance.md` 的動線原型寫轉場與 3 拍語意順序。
-- **`surface`**：依 3a 拍板的明暗策略安排逐頁極性（`keynote` 光暗雙極時避免連續 >5 頁同極性同構圖）。
+每位 Builder 產出可獨立開啟、**支援按 `→` 現場試播步進與從容慢板動效**的單頁 `deck.html`（由 `assemble.py` 組裝），並通過：
+```bash
+node <skill>/scripts/check.mjs decks/<name>/samples/opt-a/deck.html --jpg --motion
+```
+接著派 **1 位乾淨只讀 Critic 子代理**一次檢視 A/B/C 三張截圖（與 `filmstrip-s01.jpg` 分鏡條），確認零解釋贅字、零溢出、三套風格視覺個性截然不同（若有明顯瑕疵最多自修 1 輪）。
 
-補完跑一次 `python3 <skill>/scripts/lint.py decks/<name>/storyboard.yaml`，再進 3b。
+### 3. 同步驗證 3 組 OKLCH 主題配色
+依 `styles/color-system.md`（支援單一主焦點色＋可選第二語意主色，亮底保持 ≥75% 溫潤中性紙面），跑腳本驗證三組配色（貼題／沉穩／外卡）：
+```bash
+python3 <skill>/scripts/oklch.py --palette --bg '<底色>' --focus '<貼題>,<沉穩>,<外卡>' [--alert '<警示色>']
+```
 
----
+### 4. ⛔ Gate 2a 表單：展示活體比稿 ＋ 給出「結合與混搭建議」
+向使用者說明本關目的與驗收重點，提供 3 份活體預覽（及磁碟 `assets/style-library.html` 備查），**每套必附兩句顧問解析**：
+- **內容結合亮點**：這套風格如何把您的 `slide_plan` 轉成視覺（例：「方案 A `counsel` 用溫潤畫廊紙面與三階字重把收斂漏斗排成無壓迫雜誌頁；方案 B `workday` 用左右因果 Bento 突顯分工與狀態膠囊；方案 C `apple` 用亮舞台微光艙體強化關鍵倍率」）；
+- **跨風格混搭建議**：點出如何取長補短（例：「推薦以 A `counsel` 的溫潤紙面與三階襯線字重為主體，混搭 B `workday` 的雙語意進度膠囊，兼顧高階策略感與狀態辨識度」）。
 
-## Step 3b｜用選定風格集中精雕 2–3 張極致樣張 ＋ 3 組 OKLCH 配色（⛔ 關卡 2b）
-
-使用者在 3a 選定風格後，**只針對這 1 款風格**集中 100% 火力製作樣張（絕不超過 3 頁）：
-
-1. **讀入對應風格憲法、專屬動態套件與黃金工藝範本**：
-   - 從 `templates/deck.css` 建立這份簡報的 `deck.css`，換上選定風格的字體與配色；它含配方依賴的畫布基礎排版（`.slide.canvas`、`.hd`、`.title`、`.sub`），少了它配方會跑版；
-   - 讀 `styles/<selected>.md`、`styles/index.json` 中該風格的 `motion_dna`（招牌原語與 `avoid_motions` 禁忌）與 `styles/color-system.md`；
-   - 依招牌頁補好的 `director.archetype`，讀入 1–2 支對應的 **`references/recipes/*.md`** 與 **`references/modules/style-motion-kits.md`** 作為工藝基準線；
-   - **極致上限防退化**：對標 `assets/style-library.html` 的靜態美感與空間分群（雙欄底部基線齊平、一般卡片 ≤2 層文字、3 拍語意順序、畫完即靜止反永動）。**不要做出「三張平庸白框配三個幾何矩形 SVG」或「用橢圓色塊假裝真實產品／插畫」的降級畫面**——需實物／插畫質感時，優先用無字 AI 底圖融真文字或高完成度資料視覺化（無生圖工具時依 `styles/illustration.md` 規則 12 的程式版佔位＋`IMAGE_UPGRADE.md`）。
-2. **直接寫成 `slides/` 片段格式（2–3 張最有代表性的真實頁面）**：
-   - 樣張直接寫成 `<style>...</style><section class="slide canvas">...</section>` 片段放在 `samples/`，**不另寫獨立 `<html>/<body>` 樣板**——`assemble.py --sheet` 會自動套上 `shell.css`、`deck.css`、按需模組與 `storyboard.yaml` 導航產生 `.preview/` 供 `check.mjs --sheet` 實測，拍板後無需改寫就能直接移入 `slides/`。
-   - **第 1 張：封面**（展現字體聲音、承重母題與舞台第一印象）；
-   - **第 2 張：核心招牌亮點頁（`signature: true`）**（直接兌現 Step 1b 拍板的最強說服畫面，自然寄生該風格專屬動態原語）；
-   - **第 3 張（選填，湊滿 2–3 張）：異構圖或異極性頁**（例如 `keynote` 示範亮棚 vs 暗場反差，或 `briefing` 示範左欄風險↓拍板＋右欄健康總覽 Bento 看板）。
-3. **驗證 3 組 OKLCH 主題配色（貼題／沉穩／外卡）**：
-   ```bash
-   python3 <skill>/scripts/oklch.py --palette --bg '<底色>' --focus '<貼題>,<沉穩>,<外卡>' [--alert '<警示色>']
-   ```
-   主樣張套用「貼題」配色，同時把三組配色寫進 `samples/manifest.json` 的 `palettes` 陣列（每組含 `name`、`role`、`bg`、`bg2`、`fg`、`focus`、`alert`、`note`），`assemble.py --sheet` 會自動在 `samples/sheet.html` 上方渲染三欄色票對照卡；每組配色都用一句話說明它和這份簡報主題的關聯（例：「貼題綠：呼應主題裡的永續目標」）。
-4. **組裝樣張並跑像素品管**：
-   ```bash
-   python3 <skill>/scripts/assemble.py --sheet decks/<name>/samples --title "<簡報標題>｜選定風格真實樣張"
-   node <skill>/scripts/check.mjs --sheet decks/<name>/samples
-   ```
-5. **親自打開 `samples/sheet.jpg` 驗收**（對比全部通過、主標題最大、去小字不回潮、視覺張力對標 `style-library.html` 水準），再用互動表單請使用者確認**「就用這組風格與配色進入完整生成」**或指定微調，**停下來等回覆**。
+用互動表單請使用者拍板：
+1. **選定風格（單選 A / B / C 或指定混搭組合）**；
+2. **主題配色（貼題／沉穩／外卡）與呈現規格**（`mode: light|dark`、光暗極性節奏、`nav_mode`）。
 
 ---
 
-## 交接給 Step 4（零浪費活範本機制）
+## 二、Gate 2b｜合成 `deck.css` 與定版活範本「沒走鐘」確認（⛔ 關卡 2b）
 
-使用者拍板 Step 3b 後：
-- 這 2–3 張已通過像素品管的片段樣張**直接移入 `decks/<name>/slides/` 作為正式頁面**（無需重寫，也不會有殘留 `<html>/<body>` 全域樣式外洩）；
-- 同時把這 2–3 張樣張的 HTML 路徑寫入 Step 4 分批子代理的提示詞中作為 **Live Style Anchor（活範本）**，讓後面第 4–20 頁的版面呼吸、字級階層、圖解精細度與動態手感與前 3 頁一致。
+> **為什麼無論單選或混搭都必走這 1 輪？**
+> 單選時套入正式雙極色票與導航殼層、或混搭兩套風格元素時，若直接盲展開 15 頁，一旦字重、色塊面積或步進節奏「走鐘」，全場都要重改。先花 **1 輪** 鎖死定版活範本，後續全場組裝才能一次到位！
+
+1. **建立定版 `deck.css` 與更新 `storyboard.yaml`**：
+   - 從 `templates/deck.css` 建立 `decks/<name>/deck.css`，寫入拍板的字體堆疊、經驗證的淺深雙極 OKLCH 變數（`--light-*` / `--dark-*`，含可選 `--*-accent-2`）與從容慢板參數；
+   - 更新 `storyboard.yaml` 的 `meta`（`style`、`mode`、`palette`、`nav_mode`）與逐頁 `surface`／`director`。
+2. **派乾淨 Builder 子代理合成定版活範本（`1–2` 張真實頁）**：
+   - 若全場主頁僅 **1–2 頁**：直接完成主頁定版片段放入 `slides/`；
+   - 若全場 **≥3 頁**：合成 **第 1 張（該關鍵招牌頁定版）＋ 第 2 張（`keynote` 補反極性封面或大扉頁；`briefing`/`pitch` 補另一種代表構圖頁）**放入 `slides/`；
+   - 組裝預覽並通過 `check.mjs --jpg --motion`（確認 0 錯誤、步進分鏡條正常）＋ **1 輪只讀 Critic 複核**。
+3. **⛔ Gate 2b 表單確認（「沒走鐘」簽核）**：
+   - 展示定版活範本（靜態截圖、步進分鏡條與可點擊 `deck.html`），請使用者確認：**① 字重層次與留白呼吸、② 雙語意色與底紙面積比例、③ 按 `→` 試播的從容慢板動效節奏** 皆符合預期、完全沒走鐘。
+   - 使用者點頭同意後，這 `1–2` 張 `slides/*.html` 即刻鎖定為 **Live Style Anchor（定版活範本）**，原封不動保留進正式簡報，並作為 Gate 3 所有分批 Builder 子代理的硬標竿。

@@ -1,46 +1,53 @@
-/* @fonts family=Noto+Sans+TC:wght@400;500;700;900&family=Archivo:wght@700;800;900&family=Noto+Serif+TC:wght@600;700;900 */
+/* @fonts family=Noto+Sans+TC:wght@400;500;600;700;800&family=Archivo:wght@600;700;800&family=Noto+Serif+TC:wght@600;700 */
 /*
- * deck.css 起始範本（deck-architect）
- * - Step 3b 畫樣張前從這份開始：第一段換成選定風格的字體（styles/<id>.md 第 2 節），
- *   第二段換成 oklch.py --palette 驗過的配色（styles/color-system.md）。
- * - 第三段是自由畫布的基礎排版：references/recipes/ 的配方假設這些 class 已存在
- *   （.slide.canvas、.hd、.title、.sub、.foot-note）。風格需要時可以覆寫，但不要刪掉，
- *   否則配方貼進來會變成標題縮在左上角、沒有邊距。
- * - 第一行的 @fonts 註解會被 assemble.py 讀成 Google Fonts 連結；離線時由底盤的系統字體頂替。
+ * deck.css 起始範本（deck-architect v5.0）
+ * - Gate 2a 畫活體比稿與 Gate 2b 合成定版 deck.css 時從這份開始：
+ *   第一段換成選定風格的字體聲音（styles/<id>.md），第二段換成 oklch.py --palette 驗過的配色（styles/color-system.md）。
+ * - 支援主焦點色（--accent）與可選第二語意主色（--accent-2，用於「機制×成果」或「正常×風險」正交維度分工）。
+ * - 預設掛載「全風格統一從容慢板」敘事動效節奏（--stagger-base: 240; cubic-bezier(0.22, 1, 0.36, 1)）。
+ * - 注意：.slide 必須維持底盤 shell.css 的 position: absolute，切勿在 deck.css 覆寫為 relative/static。
  */
 
-/* 1. 字體（三種聲音預設：無襯線正文 × 幾何數字 × 襯線原話；換成選定風格的字體聲音） */
+/* 1. 字體與全風格統一從容慢板參數 */
 :root {
   --font-display: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-body: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-label: "Noto Sans TC", "PingFang TC", sans-serif;
   --font-number: "Archivo", "Noto Sans TC", "PingFang TC", sans-serif;
   --font-quote: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+
+  --enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  --stagger-base: 240;
+  --morph-ms: 780;
 }
 
-/* 2. 淺深雙底配色（使用 oklch.py --palette 驗過的 #hex，對比皆 >= 5.9:1；也可手寫 oklch()） */
+/* 2. 淺深雙底配色（使用 oklch.py --palette 驗過的 #hex，對比皆 >= 4.5:1；亮底保持 >=75% 溫潤中性紙面） */
 :root {
-  --light-bg: #F5F4F0;
-  --light-bg-2: #FCFBF9;
-  --light-fg: #161A21;
-  --light-fg-2: #3D434F;
-  --light-fg-3: #545B68;
-  --light-line: rgba(22, 26, 33, 0.16);
-  --light-line-2: rgba(22, 26, 33, 0.08);
+  --light-bg: #F5F3EE;
+  --light-bg-2: #FCFBF8;
+  --light-fg: #181C23;
+  --light-fg-2: #3F4652;
+  --light-fg-3: #575F6D;
+  --light-line: rgba(24, 28, 35, 0.14);
+  --light-line-2: rgba(24, 28, 35, 0.07);
   --light-accent: #0E6B4F;
   --light-accent-text: #0B5B42;
   --light-accent-ink: #F7F6F2;
+  --light-accent-2: #1E4E79;
+  --light-accent-2-soft: rgba(30, 78, 121, 0.10);
 
   --dark-bg: #13161E;
   --dark-bg-2: #1B202C;
   --dark-fg: #F2F1EC;
   --dark-fg-2: #C7CDD8;
   --dark-fg-3: #959EAD;
-  --dark-line: rgba(242, 241, 236, 0.18);
-  --dark-line-2: rgba(242, 241, 236, 0.09);
+  --dark-line: rgba(242, 241, 236, 0.16);
+  --dark-line-2: rgba(242, 241, 236, 0.08);
   --dark-accent: #4AD49A;
   --dark-accent-text: #6CE4B2;
   --dark-accent-ink: #10151C;
+  --dark-accent-2: #6FB1F5;
+  --dark-accent-2-soft: rgba(111, 177, 245, 0.14);
 }
 
 /* 3. 自由畫布基礎排版（配方依賴） */
@@ -65,18 +72,18 @@ html[data-nav-mode="top-bar"] .slide.canvas[data-kind="content"]:not([data-nav])
 }
 .hd .title,
 h2.title {
-  font: 900 64px/1.12 var(--font-display);
+  font: 700 62px/1.14 var(--font-display);
   letter-spacing: 0;
   color: var(--fg);
 }
 .hd .sub,
 p.sub,
 p.lead {
-  font: 600 26px/1.4 var(--font-body);
+  font: 500 25px/1.42 var(--font-body);
   color: var(--fg-2);
   max-width: 1200px;
 }
 .foot-note {
-  font: 500 18px/1.3 var(--font-body);
+  font: 400 18px/1.35 var(--font-body);
   color: var(--fg-3);
 }

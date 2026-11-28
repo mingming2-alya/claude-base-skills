@@ -394,6 +394,11 @@ async function auditCurrentSlide(driver, shotPath, shotType = 'png') {
       warnings.push(`偵測到禁用紫色主調 --accent (${accentVal}，OKLCH H 280–335, C >= 0.04)`);
     }
 
+    // 0b. Deck-mode slide stacking contract (#stage > .slide must keep position: absolute)
+    if (sl.parentElement && sl.parentElement.id === 'stage' && slCs.position !== 'absolute') {
+      issues.push(`.slide 定位被覆寫為 position: ${slCs.position}（必須維持 absolute，否則多頁會垂直堆疊破版）`);
+    }
+
     // 1. Duplicate IDs inside SVGs of the active slide
     const seenIds = new Set();
     const dupIds = new Set();
@@ -679,7 +684,7 @@ async function runSheetMode(driver, samplesDir) {
   return failed > 0 ? 1 : 0;
 }
 
-async function runMotionAudit(driver, filePath) {
+async function runMotionAudit(driver, filePath, outDir = null) {
   const results = [];
   const failures = [];
   const warnings = [];
@@ -898,7 +903,7 @@ async function runMotionAudit(driver, filePath) {
         const pops = [...svg.querySelectorAll('[data-pop]')];
         if (draws.length === 1 && pops.length >= 1) {
           const dDel = parseFloat(draws[0].dataset.delay || '280') || 0;
-          const dDur = parseFloat(draws[0].dataset.dur || '880') || 880;
+          const dDur = parseFloat(draws[0].dataset.dur || '980') || 980;
           const dArr = dDel + dDur;
           for (const p of pops) {
             const pDel = parseFloat(p.dataset.delay || '320') || 0;
@@ -939,7 +944,7 @@ async function runMotionAudit(driver, filePath) {
       }
       if (!Number.isFinite(minStart)) minStart = 0;
       for (const el of sls[i].querySelectorAll('[data-transform-at]')) {
-        maxEnd = Math.max(maxEnd, (parseFloat(el.dataset.transformAt) || 720) + 800);
+        maxEnd = Math.max(maxEnd, (parseFloat(el.dataset.transformAt) || 1400) + 950);
       }
       out.push({ idx: i, hasPlan: Boolean(plan), hasTransform, minStart, maxEnd });
     }
@@ -987,7 +992,7 @@ async function runMotionAudit(driver, filePath) {
     }
   }
 
-  // 7. Phase B.3 SVG connector integrity (no zero-bbox SVG <line data-grow> anti-pattern; all [data-draw] valid)
+  // 7. Phase B.3 SVG connector integrity (no zero-bbox SVG <line data-grow> or <g data-draw> anti-pattern; all [data-draw] valid)
   const connAudit = await driver.evaluate(() => {
     const bad = [];
     let drawCount = 0;
@@ -999,8 +1004,12 @@ async function runMotionAudit(driver, filePath) {
       }
       for (const el of sl.querySelectorAll('[data-draw]')) {
         drawCount++;
-        if (typeof el.getTotalLength === 'function' && el.getTotalLength() <= 0) {
-          bad.push(`第 ${i + 1} 頁 [data-draw] 路徑長度為 0`);
+        if (el.getAttribute('data-draw') !== 'ring') {
+          if (typeof el.getTotalLength !== 'function') {
+            bad.push(`第 ${i + 1} 頁對非幾何路徑元素 <${el.tagName.toLowerCase()}> 誤用 data-draw（無 getTotalLength，請改掛在 <path>／<line>／<polyline>／<circle> 上）`);
+          } else if (el.getTotalLength() <= 0) {
+            bad.push(`第 ${i + 1} 頁 [data-draw] 路徑長度為 0`);
+          }
         }
       }
       wipeCount += sl.querySelectorAll('[data-wipe]').length;
@@ -1010,7 +1019,7 @@ async function runMotionAudit(driver, filePath) {
   if (connAudit.bad.length) {
     failures.push(...connAudit.bad);
   } else {
-    results.push(`引導線與描繪原語檢核（${connAudit.drawCount} 條 SVG 描線／${connAudit.wipeCount} 處方向揭露）：通過（零退化 SVG 縮放）`);
+    results.push(`引導線與描繪原語檢核（${connAudit.drawCount} 條 SVG 描線／${connAudit.wipeCount} 處方向揭露）：通過（零退化 SVG 縮放／零無效容器描線）`);
   }
 
   // 8. v4.4 Per-slide polarity (data-surface="dark|light|split|photo") & stage chrome sync
@@ -1106,77 +1115,166 @@ async function runMotionAudit(driver, filePath) {
     failures.push(`導航與底控列異常：${navBarCheck.reason}`);
   }
 
-  // 10. v4.4 Dual-track presenter-paced data-step (forward reveal, swap hide, backward final landing, static expand)
-  const stepTarget = await driver.evaluate(() => {
+  // 10. v5.0 Full-deck data-step audit (all step slides, nested step isolation, backward landing, static expand + filmstrip-sXX.jpg)
+  const stepTargets = await driver.evaluate(() => {
     const sls = window.__deck.slides;
+    const out = [];
     for (let i = 0; i < sls.length; i++) {
-      if (sls[i].dataset.appendix === '1') continue;
       if (sls[i].querySelector('[data-step], [data-step-only], [data-step-hide]')) {
-        const nextMain = sls.findIndex((s, j) => j > i && s.dataset.appendix !== '1');
-        return { idx: i, nextMain };
+        const isApp = sls[i].dataset.appendix === '1';
+        const nextMain = isApp ? -1 : sls.findIndex((s, j) => j > i && s.dataset.appendix !== '1');
+        out.push({ idx: i, isApp, nextMain });
       }
     }
-    return null;
+    return out;
   });
-  if (stepTarget) {
-    await driver.evaluate(i => window.__deck.go(i, true, { step: 0 }), stepTarget.idx);
-    await driver.wait(80);
-    const s0 = await driver.evaluate(i => {
-      const sl = window.__deck.slides[i];
-      const step1 = sl.querySelector('[data-step="1"], [data-step-only="1"]');
-      return {
-        idx: window.__deck.index,
-        stepIndex: window.__deck.stepIndex,
-        stepTotal: window.__deck.stepTotal,
-        step1Hidden: step1 ? step1.dataset.stepHidden === '1' : false,
-      };
-    }, stepTarget.idx);
+  if (stepTargets.length) {
+    await driver.addTempStyle('#hint, #toast, #ctrl-bar { display: none !important; }', '__check_filmstrip_clean');
+    const passedStepSlides = [];
+    const filmstripsWritten = [];
+    let crossBoundaryChecked = false;
+    for (const st of stepTargets) {
+      await driver.evaluate(i => window.__deck.go(i, true, { step: 0 }), st.idx);
+      await driver.wait(120);
+      const s0 = await driver.evaluate(i => {
+        const sl = window.__deck.slides[i];
+        const step1 = sl.querySelector('[data-step="1"], [data-step-only="1"]');
+        const leakedAt0 = [...sl.querySelectorAll('[data-step], [data-step-only]')].filter(el => {
+          const req = Math.max(parseInt(el.dataset.step || '0', 10) || 0, parseInt(el.dataset.stepOnly || '0', 10) || 0);
+          return req > 0 && el.dataset.stepHidden !== '1';
+        }).length;
+        return {
+          idx: window.__deck.index,
+          stepIndex: window.__deck.stepIndex,
+          stepTotal: window.__deck.stepTotal,
+          step1Hidden: step1 ? step1.dataset.stepHidden === '1' : true,
+          leakedAt0,
+        };
+      }, st.idx);
 
-    for (let k = 1; k <= s0.stepTotal; k++) {
-      await driver.evaluate(() => window.__deck.step(1));
-      await driver.wait(280);
+      const frames = [];
+      if (outDir && s0.stepTotal > 0) {
+        const b0 = await driver.screenshot({ type: 'jpeg', quality: 86 });
+        frames.push({ label: `S${String(st.idx + 1).padStart(2, '0')} · Step 0/${s0.stepTotal}`, b64: b0.toString('base64') });
+      }
+
+      const midStep = Math.max(1, Math.ceil(s0.stepTotal / 2));
+      let nestedLeakCount = s0.leakedAt0;
+      for (let k = 1; k <= s0.stepTotal; k++) {
+        await driver.evaluate(() => window.__deck.step(1));
+        if (outDir && s0.stepTotal === 1 && k === 1) {
+          await driver.wait(380);
+          const bMid = await driver.screenshot({ type: 'jpeg', quality: 86 });
+          frames.push({ label: `S${String(st.idx + 1).padStart(2, '0')} · Mid (Reveal)`, b64: bMid.toString('base64') });
+          await driver.wait(640);
+          const bEnd = await driver.screenshot({ type: 'jpeg', quality: 86 });
+          frames.push({ label: `S${String(st.idx + 1).padStart(2, '0')} · End (Step 1/1)`, b64: bEnd.toString('base64') });
+        } else if (outDir && k === midStep && midStep < s0.stepTotal) {
+          await driver.wait(920);
+          const bMid = await driver.screenshot({ type: 'jpeg', quality: 86 });
+          frames.push({ label: `S${String(st.idx + 1).padStart(2, '0')} · Mid (Step ${k}/${s0.stepTotal})`, b64: bMid.toString('base64') });
+        } else if (outDir && k === s0.stepTotal) {
+          await driver.wait(950);
+          const bEnd = await driver.screenshot({ type: 'jpeg', quality: 86 });
+          frames.push({ label: `S${String(st.idx + 1).padStart(2, '0')} · End (Step ${k}/${s0.stepTotal})`, b64: bEnd.toString('base64') });
+        } else {
+          await driver.wait(260);
+        }
+        const leakK = await driver.evaluate(({ i, curK }) => {
+          const sl = window.__deck.slides[i];
+          return [...sl.querySelectorAll('[data-step], [data-step-only]')].filter(el => {
+            const sAttr = parseInt(el.dataset.step || '0', 10) || 0;
+            const oAttr = el.dataset.stepOnly !== undefined ? parseInt(el.dataset.stepOnly, 10) : -1;
+            if (sAttr > curK && el.dataset.stepHidden !== '1') return true;
+            if (oAttr >= 0 && oAttr !== curK && el.dataset.stepHidden !== '1') return true;
+            return false;
+          }).length;
+        }, { i: st.idx, curK: k });
+        nestedLeakCount += leakK;
+      }
+
+      const sEnd = await driver.evaluate(i => {
+        const sl = window.__deck.slides[i];
+        const step1 = sl.querySelector('[data-step="1"]');
+        const only0 = sl.querySelector('[data-step-only="0"]');
+        return {
+          idx: window.__deck.index,
+          stepIndex: window.__deck.stepIndex,
+          step1Shown: step1 ? step1.dataset.stepHidden === '0' : true,
+          only0Hidden: only0 ? only0.dataset.stepHidden === '1' : true,
+        };
+      }, st.idx);
+
+      let backLandingOk = true;
+      let stepBackOk = true;
+      if (!st.isApp && st.nextMain >= 0 && !crossBoundaryChecked) {
+        crossBoundaryChecked = true;
+        await driver.evaluate(() => window.__deck.step(1));
+        await driver.wait(420);
+        const afterAdvance = await driver.evaluate(() => window.__deck.index);
+        await driver.evaluate(() => window.__deck.step(-1));
+        await driver.wait(420);
+        const afterBack = await driver.evaluate(() => ({ idx: window.__deck.index, stepIndex: window.__deck.stepIndex, stepTotal: window.__deck.stepTotal }));
+        backLandingOk = afterAdvance === st.nextMain && afterBack.idx === st.idx && afterBack.stepIndex === afterBack.stepTotal;
+        await driver.evaluate(() => window.__deck.step(-1));
+        await driver.wait(260);
+        const afterStepBack = await driver.evaluate(() => window.__deck.stepIndex);
+        stepBackOk = afterStepBack === Math.max(0, s0.stepTotal - 1);
+      }
+
+      const stillExpandOk = await driver.evaluate(i => {
+        window.__deck.go(i, true, { step: 0 });
+        window.__deck.setStill(true);
+        const expanded = window.__deck.stepIndex === window.__deck.stepTotal;
+        window.__deck.setStill(false);
+        return expanded;
+      }, st.idx);
+
+      if (outDir && frames.length === 3) {
+        const stripDataUrl = await driver.evaluate(async items => {
+          const fw = 640, fh = 360, pad = 8, bar = 28;
+          const cv = document.createElement('canvas');
+          cv.width = fw * 3 + pad * 4;
+          cv.height = fh + bar + pad * 2;
+          const cx = cv.getContext('2d');
+          cx.fillStyle = '#141518';
+          cx.fillRect(0, 0, cv.width, cv.height);
+          cx.font = '600 14px system-ui, -apple-system, sans-serif';
+          cx.textBaseline = 'middle';
+          for (let j = 0; j < items.length; j++) {
+            const x = pad + j * (fw + pad);
+            cx.fillStyle = '#d4d7dd';
+            cx.fillText(items[j].label, x + 6, pad + bar / 2);
+            const img = new Image();
+            await new Promise((res, rej) => {
+              img.onload = res;
+              img.onerror = rej;
+              img.src = 'data:image/jpeg;base64,' + items[j].b64;
+            });
+            cx.drawImage(img, x, pad + bar, fw, fh);
+            cx.strokeStyle = 'rgba(255,255,255,0.16)';
+            cx.lineWidth = 1;
+            cx.strokeRect(x + 0.5, pad + bar + 0.5, fw - 1, fh - 1);
+          }
+          return cv.toDataURL('image/jpeg', 0.86);
+        }, frames).catch(() => null);
+        if (stripDataUrl && stripDataUrl.includes(',')) {
+          const fname = `filmstrip-s${String(st.idx + 1).padStart(2, '0')}.jpg`;
+          fs.writeFileSync(path.join(outDir, fname), Buffer.from(stripDataUrl.split(',')[1], 'base64'));
+          filmstripsWritten.push(fname);
+        }
+      }
+
+      if (s0.stepTotal > 0 && s0.stepIndex === 0 && s0.step1Hidden && nestedLeakCount === 0 && sEnd.idx === st.idx && sEnd.stepIndex === s0.stepTotal && sEnd.step1Shown && sEnd.only0Hidden && backLandingOk && stepBackOk && stillExpandOk) {
+        passedStepSlides.push(`第 ${st.idx + 1} 頁（${s0.stepTotal} 步）`);
+      } else {
+        failures.push(`第 ${st.idx + 1} 頁 data-step 步進異常：s0=${JSON.stringify(s0)}, sEnd=${JSON.stringify(sEnd)}, nestedLeaks=${nestedLeakCount}, backLanding=${backLandingOk}, stepBack=${stepBackOk}, stillExpand=${stillExpandOk}`);
+      }
     }
-    const sEnd = await driver.evaluate(i => {
-      const sl = window.__deck.slides[i];
-      const step1 = sl.querySelector('[data-step="1"]');
-      const only0 = sl.querySelector('[data-step-only="0"]');
-      return {
-        idx: window.__deck.index,
-        stepIndex: window.__deck.stepIndex,
-        step1Shown: step1 ? step1.dataset.stepHidden === '0' : true,
-        only0Hidden: only0 ? only0.dataset.stepHidden === '1' : true,
-      };
-    }, stepTarget.idx);
-
-    let backLandingOk = true;
-    let stepBackOk = true;
-    if (stepTarget.nextMain >= 0) {
-      await driver.evaluate(() => window.__deck.step(1));
-      await driver.wait(420);
-      const afterAdvance = await driver.evaluate(() => window.__deck.index);
-      await driver.evaluate(() => window.__deck.step(-1));
-      await driver.wait(420);
-      const afterBack = await driver.evaluate(() => ({ idx: window.__deck.index, stepIndex: window.__deck.stepIndex, stepTotal: window.__deck.stepTotal }));
-      backLandingOk = afterAdvance === stepTarget.nextMain && afterBack.idx === stepTarget.idx && afterBack.stepIndex === afterBack.stepTotal;
-      await driver.evaluate(() => window.__deck.step(-1));
-      await driver.wait(260);
-      const afterStepBack = await driver.evaluate(() => window.__deck.stepIndex);
-      stepBackOk = afterStepBack === Math.max(0, s0.stepTotal - 1);
-    }
-
-    // Verify still mode expands to final step cleanly
-    const stillExpandOk = await driver.evaluate(i => {
-      window.__deck.go(i, true, { step: 0 });
-      window.__deck.setStill(true);
-      const expanded = window.__deck.stepIndex === window.__deck.stepTotal;
-      window.__deck.setStill(false);
-      return expanded;
-    }, stepTarget.idx);
-
-    if (s0.stepTotal > 0 && s0.stepIndex === 0 && s0.step1Hidden && sEnd.idx === stepTarget.idx && sEnd.stepIndex === s0.stepTotal && sEnd.step1Shown && sEnd.only0Hidden && backLandingOk && stepBackOk && stillExpandOk) {
-      results.push(`講者點擊步進 data-step（第 ${stepTarget.idx + 1} 頁共 ${s0.stepTotal} 步）：通過（逐層揭曉／換幕退場／回翻落終態／靜態全展開）`);
-    } else {
-      failures.push(`data-step 步進異常：s0=${JSON.stringify(s0)}, sEnd=${JSON.stringify(sEnd)}, backLanding=${backLandingOk}, stepBack=${stepBackOk}, stillExpand=${stillExpandOk}`);
+    await driver.removeTempStyle('__check_filmstrip_clean');
+    if (passedStepSlides.length === stepTargets.length) {
+      const stripNote = filmstripsWritten.length ? `；已輸出分鏡條 ${filmstripsWritten.join('、')}` : '';
+      results.push(`講者點擊步進 data-step 全場檢核（${passedStepSlides.join('、')}）：通過（逐層／巢狀隔離／回翻落終態／靜態全展開${stripNote}）`);
     }
   }
 
@@ -1807,7 +1905,7 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
   const jsErrs = driver.getErrors();
   let motionReport = null;
   if (opts.motion) {
-    motionReport = await runMotionAudit(driver, filePath);
+    motionReport = await runMotionAudit(driver, filePath, outDir);
   }
 
   const lines = [
@@ -1827,46 +1925,38 @@ async function runDeckOrSingleMode(driver, targetFile, opts) {
     }
     lines.push('');
   } else if (!jsErrs.length) {
-    lines.push('## 自動靜態檢查：全部通過', '', '接著請逐張看截圖，確認美感、去小字程度、斷行與主標題階層符合預期。', '');
+    lines.push('## 自動靜態檢查：全部通過', '', '接著請逐張看截圖（含步進分鏡條），確認美感、去贅字程度、斷行與主標題階層符合預期。', '');
   }
   if (liveliness && liveliness.totalContent > 0) {
     const mode = liveliness.stageMode || 'pitch';
     const minVis = mode === 'briefing' ? 40 : (mode === 'keynote' ? 75 : 55);
-    const minPrim = mode === 'briefing' ? 1 : (mode === 'keynote' ? 4 : 2);
     const maxStreakAllow = mode === 'briefing' ? 3 : 2;
     const liveWarns = [];
     if (liveliness.visualRatio < minVis) {
       liveWarns.push(`視覺／圖表／互動內容頁佔比 ${liveliness.visualRatio}%（${mode} 建議 ≥ ${minVis}%）`);
     }
-    if (liveliness.primitives.length < minPrim) {
-      liveWarns.push(`動態與互動原語僅 ${liveliness.primitives.length} 種（${mode} 建議 ≥ ${minPrim} 種，避免全場只剩單調淡入）`);
-    }
     if (liveliness.maxFlatStreak > maxStreakAllow) {
       liveWarns.push(`出現連續 ${liveliness.maxFlatStreak} 頁純文字無圖解頁面`);
     }
-    // Style fit: pillar 2 asks for the chosen style's own dynamic extreme, not for any motion.
     const dna = loadStyleDna(liveliness.style);
     let fitLine;
     if (!dna || dna.status !== 'ready' || !dna.signature.length) {
       fitLine = `- 風格契合：略過（\`meta.style\`=${liveliness.style || '未設定'}，不是已就緒風格）`;
     } else {
       const usedSig = dna.signature.filter(id => liveliness.primitives.includes(id));
-      fitLine = `- 風格契合（\`${liveliness.style}\` 招牌動態：${dna.signature.join('、')}）：用到 **${usedSig.length}/${dna.signature.length}**${usedSig.length ? `（${usedSig.join('、')}）` : ''}`;
-      if (!usedSig.length && mode !== 'briefing') {
-        liveWarns.push(`選定風格 ${liveliness.style} 的招牌動態一個都沒用到（${dna.signature.join('、')}）；主柱二要的是這款風格的動態極致，Polish Pass 先從招牌動態補，不要疊不屬於這款風格的效果`);
-      }
+      fitLine = `- 風格動態觀測（\`${liveliness.style}\` 招牌原語：${dna.signature.join('、')}）：用到 **${usedSig.length}/${dna.signature.length}**${usedSig.length ? `（${usedSig.join('、')}）` : ''}`;
     }
-    lines.push(`## 生動度與反單調體檢（Liveliness Audit · \`stage_mode=${mode}\`）`);
-    lines.push(`- 視覺／圖表／互動頁佔比：**${liveliness.visualCount}/${liveliness.totalContent}（${liveliness.visualRatio}%）**（標準 ≥ ${minVis}%）`);
-    lines.push(`- 動態與互動原語多樣性：**${liveliness.primitives.length} 種**（${liveliness.primitives.join('、') || '無'}；標準 ≥ ${minPrim} 種）`);
+    lines.push(`## 視覺圖解密度觀測（Liveliness Telemetry · \`stage_mode=${mode}\`）`);
+    lines.push(`- 視覺／圖表／互動頁佔比：**${liveliness.visualCount}/${liveliness.totalContent}（${liveliness.visualRatio}%）**（參考基準 ≥ ${minVis}%）`);
+    lines.push(`- 已啟用動態與互動原語（不設湊種類配額）：**${liveliness.primitives.length} 種**（${liveliness.primitives.join('、') || '基礎從容揭露'}）`);
     lines.push(fitLine);
     if (liveWarns.length) {
       for (const lw of liveWarns) lines.push(`- ⚠️ [WARN] ${lw}`);
       if (liveliness.polishCandidates.length) {
-        lines.push(`- 建議於 Polish Pass 優先升級視覺之頁面：第 ${liveliness.polishCandidates.join('、')} 頁`);
+        lines.push(`- 建議單輪 Critic 優先檢視可圖解化之頁面：第 ${liveliness.polishCandidates.join('、')} 頁`);
       }
     } else {
-      lines.push('- ✅ 達標：視覺豐富度與節奏變化符合此場合標準。');
+      lines.push('- ✅ 達標：視覺圖解佔比與連續頁節奏符合場合基準。');
     }
     lines.push('');
   }

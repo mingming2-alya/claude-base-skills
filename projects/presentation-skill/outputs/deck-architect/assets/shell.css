@@ -246,6 +246,10 @@ html.noscale #stage { transform: none !important; }
 }
 
 /* ---------------------------------------------------------------- slide container (GPU-isolated) */
+#stage > .slide {
+  position: absolute;
+  inset: 0;
+}
 .slide {
   position: absolute;
   inset: 0;

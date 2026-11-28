@@ -2,15 +2,14 @@
 """Lint a deck-architect storyboard (or brief) against narrative, structure, constraint, and pacing rules.
 
 Usage:
-  python3 lint.py path/to/storyboard.yaml [--json] [--outline]   # --outline: page list for gate 1c
-  python3 lint.py path/to/brief.md [--json]      # Step 1b: checks the consultant work left traces
+  python3 lint.py path/to/storyboard.yaml [--json] [--outline]   # --outline: page list for gate 1b
+  python3 lint.py path/to/brief.md [--json]      # Gate 1b: checks the consultant work left traces
 
 Exit code 0 = no errors (warnings allowed), 1 = errors found, 2 = could not read file.
 Every message says what is wrong AND what to do about it, so the agent can fix it directly.
 
-The brief check can only prove that each consultant step was DONE (story seeds, three
-candidates, benchmark gaps, per-chapter objections, proof media). Whether it was done WELL
-is judged by the user at gate 1b.
+The brief check proves that each consultant decision left traces (hard constraints, story seeds,
+three candidates, 30s logic chain, subtraction list, number check). Quality is judged at Gate 1a/1b.
 """
 import sys
 sys.dont_write_bytecode = True
@@ -23,11 +22,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from deck_model import (  # noqa: E402
     AXES, CELL_STATES, COMMON_FIELDS, CONTENT_MODULES, DELIVERY_MODES,
     DENSE_LAYOUTS, EMPH_RE, LAYOUT_FIELDS, LAYOUTS, NAV_MODES, TOC_MODES,
-    PRESENTER_TOOLS, RISK_LEVELS, SIMPLIFIED_CHARS, SLIDE_TYPES, STAGE_MODES,
-    SURFACES, TRANSITION_PHRASES, StoryboardError, all_slide_texts_with_notes,
-    appendix_slides, capacity_problems, char_limit_for, emphasis_count,
-    listed_chapters, load, main_slides, page_breakdown, slide_texts, toc_mode,
-    visible_len,
+    PRESENTER_TOOLS, RISK_LEVELS, SIMPLIFIED_CHARS, SLIDE_JOBS, SLIDE_TYPES,
+    STAGE_MODES, SURFACES, TRANSITION_PHRASES, StoryboardError,
+    all_slide_texts_with_notes, appendix_slides, capacity_problems,
+    char_limit_for, emphasis_count, listed_chapters, load, main_slides,
+    page_breakdown, slide_texts, toc_mode, visible_len,
 )
 
 CJK = re.compile(r"[\u3400-\u9fff]")
@@ -185,7 +184,7 @@ def lint(data, base_dir=None):
         ready = ", ".join(sorted(k for k, v in style_status.items() if v == "ready"))
         if style_status and style.lower() not in style_status:
             W("meta.style", f"「{style}」不在 styles/index.json 的風格清單裡（已就緒：{ready}）。"
-                            "Step 3a 選定的風格要用清單裡的 id，assemble.py 才找得到它的動態 DNA 與禁用清單。")
+                            "Gate 2 選定的風格要用清單裡的 id，assemble.py 才找得到它的動態 DNA 與禁用清單。")
         elif style_status and style_status[style.lower()] != "ready":
             W("meta.style", f"「{style}」還在規劃中（{style_status[style.lower()]}），沒有完整的 Style DNA 與動態套件；"
                             f"先改用已就緒的風格：{ready}。")
@@ -297,6 +296,8 @@ def lint(data, base_dir=None):
             E(where, f"type 必須是 {', '.join(sorted(SLIDE_TYPES))} 之一（目前：{t!r}）。")
             continue
         texts = slide_texts(s)
+        sp_raw = s.get("slide_plan")
+        anchor_strs = [str(x) for x in (sp_raw.get("anchors") or []) if str(x).strip()] if isinstance(sp_raw, dict) and isinstance(sp_raw.get("anchors"), list) else []
         frag_path = _find_slide_fragment(s, exp_idx_map.get(id(s)), base_dir)
         html_lines, html_em_count = [], 0
         if frag_path is not None:
@@ -304,9 +305,10 @@ def lint(data, base_dir=None):
                 html_lines, html_em_count = _extract_html_text(frag_path.read_text(encoding="utf-8"))
             except OSError:
                 pass
-        check_texts = list(texts) + html_lines
+        check_texts = list(texts) + [a for a in anchor_strs if a not in texts] + html_lines
         all_visible_joined.extend(check_texts)
         all_with_notes_joined.extend(all_slide_texts_with_notes(s))
+        all_with_notes_joined.extend(a for a in anchor_strs if a not in texts)
         all_with_notes_joined.extend(html_lines)
         is_appendix = bool(s.get("appendix"))
         is_free_file = bool(s.get("file"))
@@ -492,43 +494,69 @@ def lint(data, base_dir=None):
             if em > 1:
                 E(where, f"有 {em} 處重點。每頁最多一處，到處強調等於沒強調。保留最重要的一個，或拆頁。")
 
-            chars = sum(visible_len(x) for x in texts) - visible_len(title)
-            if is_free_file and base_dir is not None and not is_appendix and layout not in DENSE_LAYOUTS:
-                frag_path = None
-                if s.get("file"):
-                    cand = (Path(base_dir) / s["file"]).resolve()
-                    if cand.is_file():
-                        frag_path = cand
+            # ---- v5.0 structured slide_plan validation
+            sp_job = ""
+            if sp_raw is not None:
+                if not isinstance(sp_raw, dict):
+                    E(f"{where}.slide_plan", "slide_plan 必須是 mapping（含 job／reveal／zones／visual_encoding／anchors）。")
                 else:
-                    sdir = Path(base_dir) / "slides"
-                    if sdir.is_dir():
-                        sid = s.get("id")
-                        if sid and (sdir / f"{sid}.html").is_file():
-                            frag_path = sdir / f"{sid}.html"
-                        else:
-                            for pat in (f"{n:02d}.html", f"{n:02d}-*.html"):
-                                ms = sorted(sdir.glob(pat))
-                                if ms:
-                                    frag_path = ms[0]
-                                    break
-                if frag_path is not None:
-                    try:
-                        frag_raw = frag_path.read_text(encoding="utf-8")
-                        frag_txt = re.sub(r"<(style|script|svg|nav)\b[^>]*>.*?</\1>", " ", frag_raw, flags=re.S | re.I)
-                        frag_txt = re.sub(r"<!--.*?-->", " ", frag_txt, flags=re.S)
-                        frag_txt = re.sub(
-                            r"<([a-z0-9-]+)\b[^>]*\b(?:data-role=[\"']source[\"']|aria-hidden=[\"']true[\"'])[^>]*>.*?</\1>",
-                            " ", frag_txt, flags=re.S | re.I,
-                        )
-                        frag_txt = re.sub(r"<[^>]+>", " ", frag_txt)
-                        frag_txt = _html.unescape(frag_txt)
-                        html_chars = max(0, len(re.sub(r"\s+", "", frag_txt)) - len(re.sub(r"\s+", "", title)))
-                        if html_chars > chars:
-                            chars = html_chars
-                    except Exception:
-                        pass
-            if chars > char_limit and not is_appendix and layout not in DENSE_LAYOUTS:
-                W(where, f"內容約 {chars} 字，超過「{delivery_label}」建議上限 {char_limit} 字（{delivery_note}）。")
+                    sp_job = str(sp_raw.get("job") or "").strip().lower()
+                    if not sp_job:
+                        W(f"{where}.slide_plan.job", f"缺少 job（認知任務，可用：{', '.join(sorted(SLIDE_JOBS))}）。")
+                    elif sp_job not in SLIDE_JOBS:
+                        E(f"{where}.slide_plan.job", f"必須是 {', '.join(sorted(SLIDE_JOBS))} 之一（目前：{sp_job!r}）。")
+                    sp_rev = str(sp_raw.get("reveal") or "").strip().lower()
+                    if sp_rev and not (sp_rev == "0-step" or sp_rev.startswith("step")):
+                        W(f"{where}.slide_plan.reveal", f"reveal 建議寫 0-step 或 step(N)（目前：{sp_rev!r}）。")
+                    sp_zones = sp_raw.get("zones")
+                    if isinstance(sp_zones, list) and len(sp_zones) > 4:
+                        W(f"{where}.slide_plan.zones", f"zones 切了 {len(sp_zones)} 個分區，建議 ≤ 4 個空間分區以免視覺碎裂。")
+                    elif sp_zones is not None and not sp_zones:
+                        W(f"{where}.slide_plan.zones", "zones 為空，建議寫明 ≤ 4 個空間分區與視線順序 1→2→3。")
+                    sp_ve = str(sp_raw.get("visual_encoding") or "").strip()
+                    if not sp_ve and layout not in DENSE_LAYOUTS and layout != "quote" and sp_job != "scaffold" and not is_appendix:
+                        W(f"{where}.slide_plan.visual_encoding", "建議寫明用哪種幾何／圖解直接取代哪段解釋文字。")
+                    if "anchors" in sp_raw and sp_raw.get("anchors") is not None and not isinstance(sp_raw.get("anchors"), list):
+                        E(f"{where}.slide_plan.anchors", "anchors 必須是字串清單（list）。")
+
+            chars = sum(visible_len(x) for x in texts) - visible_len(title)
+            html_chars = 0
+            has_code_stage = False
+            if frag_path is not None and not is_appendix and layout not in DENSE_LAYOUTS:
+                try:
+                    frag_raw = frag_path.read_text(encoding="utf-8")
+                    has_code_stage = bool(re.search(r'\bdata-code-stage\b|class=["\'][^"\']*\bcode-stage\b|<pre\b', frag_raw, re.I))
+                    frag_txt = re.sub(r"<(style|script|svg|nav)\b[^>]*>.*?</\1>", " ", frag_raw, flags=re.S | re.I)
+                    frag_txt = re.sub(r"<!--.*?-->", " ", frag_txt, flags=re.S)
+                    frag_txt = re.sub(
+                        r"<([a-z0-9-]+)\b[^>]*\b(?:data-role=[\"']source[\"']|aria-hidden=[\"']true[\"'])[^>]*>.*?</\1>",
+                        " ", frag_txt, flags=re.S | re.I,
+                    )
+                    frag_txt = re.sub(r"<[^>]+>", " ", frag_txt)
+                    frag_txt = _html.unescape(frag_txt)
+                    html_chars = max(0, len(re.sub(r"\s+", "", frag_txt)) - len(re.sub(r"\s+", "", title)))
+                    if is_free_file and html_chars > chars:
+                        chars = html_chars
+                except Exception:
+                    pass
+
+            eff_char_limit = max(char_limit, 240) if sp_job == "scaffold" else char_limit
+            exempt_anchor_drift = (
+                is_appendix
+                or layout in DENSE_LAYOUTS
+                or layout == "quote"
+                or sp_job == "scaffold"
+                or has_code_stage
+                or delivery == "read"
+            )
+            if anchor_strs and html_chars > 0 and not exempt_anchor_drift:
+                anchor_chars = sum(len(re.sub(r"\s+", "", visible_len_str)) for visible_len_str in (EMPH_RE.sub(r"\1", a) for a in anchor_strs))
+                drift_cap = max(75, int(anchor_chars * 1.65) + 38)
+                if html_chars > drift_cap:
+                    W(where, f"自由編排頁（{frag_path.name}）可見文字約 {html_chars} 字，明顯超出 slide_plan.anchors 錨點（{anchor_chars} 字）；"
+                             "請由單輪 Critic 複核是否混入可改畫成圖或移入 notes 的解釋贅字。")
+            elif chars > eff_char_limit and not is_appendix and layout not in DENSE_LAYOUTS and not has_code_stage:
+                W(where, f"內容約 {chars} 字，超過「{delivery_label}」建議上限 {eff_char_limit} 字（{delivery_note}）。")
 
         elif t == "shock":
             text = str(s.get("text") or "")
@@ -574,7 +602,7 @@ def lint(data, base_dir=None):
         if b - a < 4:
             E(f"slides[{b}]", f"與上一個震撼頁（第 {a} 頁）距離太近。兩個震撼頁之間至少隔 3 頁。")
 
-    # ---- constraints: limitations & must_include
+    # ---- constraints: limitations & must_include (allow caveats in notes or appendix without forcing canvas bloat)
     joined_notes = "\n".join(all_with_notes_joined)
     joined_vis = "\n".join(all_visible_joined)
     for lim in constraints.get("limitations") or []:
@@ -582,7 +610,10 @@ def lint(data, base_dir=None):
             W("constraints.limitations", f"限制／不承諾「{lim}」尚未出現在任何頁的內容或講者備註（notes）裡，小心過度宣稱。")
     for req in constraints.get("must_include") or []:
         if not _matches_any(req, joined_vis):
-            W("constraints.must_include", f"必放項目「{req}」尚未出現在任何投影片的可見內容裡。")
+            if _matches_any(req, joined_notes):
+                I("constraints.must_include", f"必放項目／口徑「{req}」已記錄於講者備註（notes），未佔主頁畫布；若現場需投影展示可放入主頁或 appendix。")
+            else:
+                W("constraints.must_include", f"必放項目「{req}」尚未出現在任何投影片的可見內容或講者備註（notes）裡。")
 
     # ---- page arithmetic breakdown
     bd = page_breakdown(data)
@@ -627,34 +658,37 @@ def lint(data, base_dir=None):
         if not lo <= n_content <= hi:
             W("meta.minutes", f"{minutes:g} 分鐘配 {n_content} 頁內容，比例不尋常（上台講約每分鐘 0.4–1 頁；圖解密集的頁面可以更少）。")
 
-    # ---- signature page hint for Gate 2 samples
+    # ---- signature page hint for Gate 2a samples
     if n_main >= 4 and signatures == 0:
-        I("slides", "尚未標註招牌頁（signature: true）。在最重要的一頁加上 signature: true，Step 3b 樣張才會優先挑中它。")
+        I("slides", "尚未標註招牌頁（signature: true）。在最關鍵的一頁加上 signature: true，Gate 2a 真實活體比稿才會鎖定它。")
 
-    # ---- v4.6 per-slide director spec soft check (pitch/keynote only; briefing stays frictionless)
+    # ---- per-slide slide_plan / director soft check
     content_main = [
         (n, s) for n, s in enumerate(slides, 1)
         if isinstance(s, dict) and not s.get("appendix") and s.get("type", "content") == "content"
     ]
     style_chosen = bool(meta.get("style"))
-    dir_count = 0
+    plan_or_dir_count = 0
     missing_arch = []
     for n, s in content_main:
+        sp = s.get("slide_plan")
         d = s.get("director")
+        if isinstance(sp, dict):
+            plan_or_dir_count += 1
         if d is None:
             continue
         if not isinstance(d, dict):
-            W(f"slides[{n}].director", "director 應為 mapping（Step 2 寫 hero／module；Step 3a 選定風格後補 archetype／choreo）。")
+            W(f"slides[{n}].director", "director 應為 mapping（Gate 1b 寫 slide_plan 或 hero；Gate 2b 定版後補 archetype／choreo）。")
         else:
-            dir_count += 1
-            if not d.get("hero"):
-                W(f"slides[{n}].director", "缺少 hero（這頁最吸睛的視覺主角是什麼，對應 brief 的說服載體）。")
+            plan_or_dir_count += 1
+            if not d.get("hero") and not isinstance(sp, dict):
+                W(f"slides[{n}].director", "缺少 hero（這頁最吸睛的視覺主角是什麼）。")
             if style_chosen and not d.get("archetype"):
                 missing_arch.append(n)
-    if stage_mode in ("pitch", "keynote") and len(content_main) >= 4 and dir_count == 0:
-        I("slides.director", f"stage_mode={stage_mode} 目前尚未填寫逐頁 director.hero（這頁的視覺主角）；建議至少替關鍵頁補齊，避免 Step 4 退回純文字卡片。archetype／choreo 等 Step 3a 選定風格後再補。")
+    if stage_mode in ("pitch", "keynote") and len(content_main) >= 4 and plan_or_dir_count == 0:
+        I("slides.slide_plan", f"stage_mode={stage_mode} 目前尚未填寫逐頁 slide_plan（或 director.hero）；建議在 Gate 1b 補齊，避免 Builder 退回純文字卡片。")
     if style_chosen and missing_arch:
-        I("slides.director", f"已選定風格（style={meta.get('style')}），但第 {', '.join(str(x) for x in missing_arch[:6])} 頁的 director 尚未補齊 archetype（構圖原型），建議於 Step 3a 補上以確保相鄰節奏多樣。")
+        I("slides.director", f"已選定風格（style={meta.get('style')}），第 {', '.join(str(x) for x in missing_arch[:6])} 頁可於 Gate 2b 補上 director.archetype 以確保相鄰構圖多樣。")
 
     # ---- Post-Step 3a keynote bipolar surface rhythm check (<= 5 consecutive same-surface slides)
     if style_chosen and stage_mode == "keynote" and len(content_main) >= 6:
@@ -713,12 +747,12 @@ def lint(data, base_dir=None):
     return errors, warnings, infos
 
 
-# ----------------------------------------------------------------------------- brief.md (Step 1b gate)
+# ----------------------------------------------------------------------------- brief.md (Gate 1b)
 BRIEF_PLACEHOLDER = re.compile(r"<[^<>\n]{0,200}>")
 # "- **欄位**：值", also "- **欄位**（說明）：值" and "- **欄位：** 值"
 BRIEF_FIELD = re.compile(r"^\s*[-*]\s*\*\*(.+?)\*\*\s*(?:[（(][^）)\n]{0,120}[）)]\s*)?[：:]\s*(.*)$")
 BRIEF_FIELD_INNER = re.compile(r"^\s*[-*]\s*\*\*([^*\n]+?)[：:]\*\*\s*(.*)$")
-# Presentation decisions belong to Step 3a (after the style is chosen), never to the brief.
+# Presentation decisions belong to Gate 2 (after the style is chosen), never to the brief.
 BRIEF_PRESENTATION_TERMS = (
     "明暗極性策略", "去框化比例", "導航殼層", "nav_mode", "ambient-fx",
     "motion-workday", "motion-counsel", "motion-apple", "motion-story",
@@ -737,7 +771,7 @@ def _says_none(value):
 
 
 def lint_brief(text, base_dir=None):
-    """Check that brief.md carries every trace the consultant process must leave behind."""
+    """Check that brief.md carries every trace the consultant process must leave behind (v5 slim ~13-field & v4 legacy)."""
     errors, warnings, infos = [], [], []
     E = lambda where, msg: errors.append(f"[ERROR] {where}: {msg}")  # noqa: E731
     W = lambda where, msg: warnings.append(f"[WARN]  {where}: {msg}")  # noqa: E731
@@ -746,17 +780,24 @@ def lint_brief(text, base_dir=None):
     lines = text.splitlines()
     section = ""      # current "## " heading
     sub = ""          # current "### " heading
+    sections_seen = []
     fields = []       # (section, sub, label, value, line_no)
-    chapters = []     # (title, line_no) of ### blocks inside section 5
+    chapters = []     # (title, line_no) of ### blocks inside legacy section 5
     bullets_by_section = {}
+    stops = []
     for no, line in enumerate(lines, 1):
         if line.startswith("## "):
             section, sub = line[3:].strip(), ""
+            sections_seen.append(section)
             continue
         if line.startswith("### "):
             sub = line[4:].strip()
             if section.startswith("5.") and not sub.startswith(("招牌亮點頁", "內容減法清單")):
                 chapters.append((sub, no))
+            continue
+        m_num = re.match(r"^\s*\d+\.\s+(.*)$", line)
+        if m_num and section.startswith(("3.", "4.")):
+            stops.append((m_num.group(1).strip(), no))
             continue
         m = BRIEF_FIELD.match(line) or BRIEF_FIELD_INNER.match(line)
         if m:
@@ -764,18 +805,23 @@ def lint_brief(text, base_dir=None):
         elif re.match(r"^\s*[-*]\s+\S", line):
             bullets_by_section.setdefault((section, sub), []).append((line.strip()[1:].strip(), no))
 
-    def find(prefix, sec=None, sb=None):
+    has_legacy_sec5 = any(s.startswith("5.") and "逐章" in s for s in sections_seen) or len(chapters) > 0
+
+    def find_any(prefixes, sec=None, sb=None):
+        if isinstance(prefixes, str):
+            prefixes = (prefixes,)
         for s, b, label, value, no in fields:
-            if label.startswith(prefix) and (sec is None or s.startswith(sec)) and (sb is None or b == sb):
+            if any(label.startswith(p) for p in prefixes) and (sec is None or s.startswith(sec)) and (sb is None or b == sb):
                 return value, no
         return None, None
 
     reported = set()
 
-    def need(prefix, where, strict, hint, sec=None):
-        value, no = find(prefix, sec)
+    def need(prefixes, where, strict, hint, sec=None):
+        label_name = prefixes if isinstance(prefixes, str) else prefixes[0]
+        value, no = find_any(prefixes, sec)
         if no is None:
-            (E if strict else W)(where, f"找不到「{prefix}」欄位。{hint}")
+            (E if strict else W)(where, f"找不到「{label_name}」欄位。{hint}")
             return None
         if _unfilled(value):
             reported.add(no)
@@ -783,137 +829,182 @@ def lint_brief(text, base_dir=None):
             return None
         return value
 
-    # ---- mode
-    mode_val, mode_no = find("製作模式")
+    # ---- 1. mode
+    mode_val, mode_no = find_any("製作模式")
     fast = False
     if mode_no is None or _unfilled(mode_val) or (("標準" in mode_val) == ("快速" in mode_val)):
         if mode_no:
             reported.add(mode_no)
-        E("1. 製作模式", "請寫明「標準」或「快速」。快速模式會放寬重點碎片、候選數、候選比較、結構追問與反方質疑的檢查。")
+        E("1. 製作模式", "請寫明「標準」或「快速」。快速模式會放寬重點碎片、候選數、候選比較與反方質疑的檢查。")
     else:
         fast = "快速" in mode_val
     strict = not fast
 
-    # ---- section 1–2: situation, benchmark, occasion
-    need("理性終點", "1. 理性終點", True, "聽完之後對方要相信什麼、做出什麼決定。")
-    need("體感預期", "1. 體感預期", strict, "演完燈亮那一刻，希望台下心裡冒出的那句話。")
-    need("對象起點", "1. 對象起點", True, "誰會聽、在意什麼、有什麼疑慮。")
-    need("使用者心中的講法", "1. 心中的講法", True,
-         "Round 0 先問使用者心裡現在想怎麼講（先講什麼、後講什麼、一定要講的事）；還沒想法就寫「無」。"
-         "先讓使用者說，再端出 Agent 的版本，候選才不會只是 Agent 的作文。")
-    need("架構硬限制與決策人", "1. 架構硬限制", True,
-         "誰上台、誰能否決結構、指定的章節或不能動的模板、整塊不能談的主題、議程位置、會後是否寄出；沒有就寫「無」。"
-         "這些會決定骨架，要在提候選前問；使用者答不出的，做一份問卷給那個人（templates/questionnaire.md）。")
-    need("主題類型與氣質", "1. 主題類型與氣質", True, "對照 contexts.md〈主題類型總表〉；Step 3a 靠它推薦風格。")
-    need("標竿必答維度與處置", "1. 標竿盲點", strict, "列出這類標竿必答的維度，逐項寫「已補齊」或「刻意略過（理由）」。")
+    # ---- 2–6. situation, hard constraints, goals, audience, occasion
+    combined_goal, _ = find_any("理性終點與體感預期")
+    if combined_goal is not None:
+        need("理性終點與體感預期", "1. 理性終點與體感預期", True, "寫明聽完要相信／決定什麼（理性終點），以及演完燈亮台下心裡冒出的話（體感預期）。")
+    else:
+        need("理性終點", "1. 理性終點", True, "聽完之後對方要相信什麼、做出什麼決定。")
+        need("體感預期", "1. 體感預期", strict, "演完燈亮那一刻，希望台下心裡冒出的那句話。")
+
+    combined_aud, _ = find_any("對象起點（主受眾 vs 次受眾）與標竿")
+    if combined_aud is not None:
+        need("對象起點（主受眾 vs 次受眾）與標竿", "1. 對象起點與標竿處置", True, "寫明主／次受眾疑慮，以及這類標竿必答維度的處置。")
+    else:
+        need("對象起點", "1. 對象起點", True, "誰會聽、在意什麼、有什麼疑慮。")
+        need("標竿必答維度與處置", "1. 標竿盲點", strict, "列出這類標竿必答的維度，逐項寫「已補齊」或「刻意略過（理由）」。")
+
+    combined_hard, _ = find_any("架構硬限制與使用者心中的講法")
+    if combined_hard is not None:
+        need("架構硬限制與使用者心中的講法", "1. 架構硬限制與心中的講法", True,
+             "寫明決策人／不可動模板／舊稿診斷與使用者想怎麼講；沒有就寫「無」。")
+    else:
+        need("使用者心中的講法", "1. 心中的講法", True, "Round 0 先問使用者心裡現在想怎麼講；還沒想法就寫「無」。")
+        need("架構硬限制與決策人", "1. 架構硬限制", True, "誰上台、誰能否決結構、指定的章節或不能動的模板；沒有就寫「無」。")
+
     need("時長與頁數算術", "1. 時長與頁數", True, "寫明分鐘數與頁數上限（含／不含封面與目錄）。")
-    sm = need("舞台光譜", "2. stage_mode", True, "briefing／pitch／keynote 三選一。")
+
     stage = ""
-    if sm is not None:
-        hits = [k for k in ("briefing", "pitch", "keynote") if re.search(rf"(?<![a-z-]){k}(?![a-z-])", sm.lower())]
-        if len(hits) != 1:
-            E("2. stage_mode", f"要三選一（目前：{sm}）。")
-        else:
-            stage = hits[0]
-    dv = need("播放方式", "2. delivery", True, "talk／discuss／read／auto 四選一。")
-    if dv is not None:
-        hits = [k for k in ("talk", "discuss", "read", "auto") if re.search(rf"(?<![a-z-]){k}(?![a-z-])", dv.lower())]
-        if len(hits) != 1:
-            E("2. delivery", f"要四選一（目前：{dv}）。")
-    need("播放環境", "2. 播放環境", strict, "亮室會議室／暗場大螢幕／線上分享／列印或寄送；Step 3a 依它校準明暗。")
+    combined_occ, occ_no = find_any("主題類型、舞台光譜與播放方式")
+    if occ_no is not None:
+        occ_val = need("主題類型、舞台光譜與播放方式", "1. 主題類型與場合", True,
+                       "寫明主題類型與氣質、stage_mode（briefing／pitch／keynote）、delivery（talk／discuss／read／auto）與播放環境。")
+        if occ_val is not None:
+            sm_hits = [k for k in ("briefing", "pitch", "keynote") if re.search(rf"(?<![a-z-]){k}(?![a-z-])", occ_val.lower())]
+            dv_hits = [k for k in ("talk", "discuss", "read", "auto") if re.search(rf"(?<![a-z-]){k}(?![a-z-])", occ_val.lower())]
+            if len(sm_hits) != 1:
+                E("1. stage_mode", f"舞台光譜要 briefing／pitch／keynote 三選一（目前：{occ_val}）。")
+            else:
+                stage = sm_hits[0]
+            if len(dv_hits) != 1:
+                E("1. delivery", f"播放方式要 talk／discuss／read／auto 四選一（目前：{occ_val}）。")
+    else:
+        need("主題類型與氣質", "1. 主題類型與氣質", True, "對照 contexts.md〈主題類型總表〉；Gate 1b／2a 靠它推薦風格。")
+        sm = need("舞台光譜", "2. stage_mode", True, "briefing／pitch／keynote 三選一。")
+        if sm is not None:
+            hits = [k for k in ("briefing", "pitch", "keynote") if re.search(rf"(?<![a-z-]){k}(?![a-z-])", sm.lower())]
+            if len(hits) != 1:
+                E("2. stage_mode", f"要三選一（目前：{sm}）。")
+            else:
+                stage = hits[0]
+        dv = need("播放方式", "2. delivery", True, "talk／discuss／read／auto 四選一。")
+        if dv is not None:
+            hits = [k for k in ("talk", "discuss", "read", "auto") if re.search(rf"(?<![a-z-]){k}(?![a-z-])", dv.lower())]
+            if len(hits) != 1:
+                E("2. delivery", f"要四選一（目前：{dv}）。")
+        need("播放環境", "2. 播放環境", strict, "亮室會議室／暗場大螢幕／線上分享／列印或寄送；Gate 2 依它校準明暗。")
 
-    # ---- section 3: fragments and the highlighted ones (= story seeds)
-    need("素材碎片簿", "3. 素材碎片簿", strict, "從使用者第一句話開始，把原話逐則收進 fragments.md（templates/fragments.md），這裡寫檔名與則數。")
+    # ---- 7–8. fragments & core message
+    combined_frag, frag_no = find_any("素材碎片簿與重點碎片")
+    if frag_no is not None:
+        seed = need("素材碎片簿與重點碎片", "2. 素材碎片與故事種子 ⭐", strict,
+                    "記錄 fragments.md 則數，並標出使用者最想讓聽眾記住的 1–3 則重點碎片（⭐）。")
+    else:
+        need("素材碎片簿", "3. 素材碎片簿", strict, "從使用者第一句話開始收進 fragments.md，這裡寫檔名與則數。")
+        seed = need("重點碎片 1", "3. 重點碎片", strict, "標出最想讓聽眾記住的 1–3 則（⭐）。")
     if base_dir is not None and not (Path(base_dir) / "fragments.md").is_file():
-        W("3. 素材碎片簿", f"{Path(base_dir).name}/ 裡找不到 fragments.md。使用者的原話是第一手來源，Step 4 也會讀它。")
-    seed = need("重點碎片 1", "3. 重點碎片", strict,
-                "請使用者在素材碎片簿標出最想讓聽眾記住的 1–3 則（⭐），敘事候選要圍繞它們長出來。")
+        W("素材碎片簿", f"{Path(base_dir).name}/ 裡找不到 fragments.md。使用者的原話是第一手來源，Builder 也會讀它。")
     if seed is not None and _says_none(seed) and strict and stage != "briefing":
-        W("3. 重點碎片", "寫的是「無」。標準模式建議再試一次：把碎片簿目前收到的碎片列給使用者，請他標出最想講的一則，或當場補一則。")
-    need("一句話核心訊息", "3. 一句話核心訊息", True, "若聽眾只記得一句話，是哪一句。")
+        W("重點碎片", "寫的是「無」。標準模式建議把碎片簿列給使用者標出最想講的一則，或當場補一則。")
+    need("一句話核心訊息", "一句話核心訊息", True, "若聽眾只記得一句話，是哪一句。")
 
-    # ---- section 4: candidates (Design It Twice) and the choice
-    need("候選 A", "4. 候選 A", strict, "穩健守正版：軸與方向、章節停靠點、用到的碎片；使用者心中的講法或既有框架放這裡。")
-    b = need("候選 B", "4. 候選 B", strict, "聽眾痛點／反方逆推版。")
-    c = need("候選 C", "4. 候選 C（破框）", strict, "破框敘事版：打破了哪個慣例。")
+    # ---- 9–11. candidates (Design It Twice), spine & Out of Scope
+    need("候選 A", "候選 A", strict, "穩健守正版（含使用者心中的講法或既有框架補強）：軸與方向、章節停靠點、用到的碎片。")
+    b = need("候選 B", "候選 B", strict, "聽眾痛點／反方逆推版。")
+    c = need("候選 C", "候選 C（破框）", strict, "破框敘事版：打破了哪個慣例。")
     if strict and c is not None and _says_none(c):
-        E("4. 候選 C（破框）", "標準模式一定要給至少 1 個破框敘事候選（DESIGN-IT-TWICE），不能略過。")
+        E("候選 C（破框）", "標準模式一定要給至少 1 個破框敘事候選（DESIGN-IT-TWICE），不能略過。")
     if strict and b is not None and _says_none(b):
-        E("4. 候選 B", "標準模式要給三個本質不同的候選，不能略過。")
-    need("候選比較", "4. 候選比較", strict,
-         "三個候選用同一把尺比：主受眾第一個問題在第幾章被回答、每章證據就緒度、時間與頁數、前提假設、用到的碎片。")
-    need("選定與理由", "4. 選定與理由", True, "選了哪個或怎麼混搭，以及為什麼它能把聽眾帶到終點。")
-    need("最弱的一點與最沒把握的假設", "4. 最弱的一點", strict,
-         "寫出推薦方案最容易被挑戰的地方與最沒把握的假設，以及使用者在關卡 1a 怎麼判斷（防被動同意）。")
-    need("改起來最貴的四個決定", "4. 最貴的四個決定", strict,
-         "理性終點、主受眾、軸與敘事主幹、範圍：各一句為什麼這樣定；做到一半才改這四個要回到關卡 1a。")
-    need("30 秒口述邏輯鏈", "4. 30 秒口述邏輯鏈", strict, "用「起點共識 → 但是 → 所以 → 證據 → 因此」3–5 句串起整份架構，驗證章間有沒有斷層。")
-    need("架構級排除清單", "4. 排除清單（Out of Scope）", False, "列出這場明確不進主線的主題（整塊刪除或僅放附件）；沒有就寫「無」。")
-    need("尚未確定與假設", "4. 尚未確定與假設", False, "還在範圍內、但現在定不了的事，各寫怎麼定（查資料／問卷問誰／做雛形）；沒有就寫「無」。")
-    need("結構追問", "4. 結構追問", strict, "逐章寫拿掉會斷什麼（斷不了就合併或移進排除清單），以及開場承諾的事在哪一章兌現。")
-    in4, stops = False, []
-    for no, line in enumerate(lines, 1):
-        if line.startswith("## "):
-            in4 = line[3:].strip().startswith("4.")
-            continue
-        m = re.match(r"^\s*\d+\.\s+(.*)$", line)
-        if in4 and m:
-            stops.append((m.group(1), no))
-    if len([t for t, _ in stops if not _unfilled(t)]) < 2:
+        E("候選 B", "標準模式要給三個本質不同的候選，不能略過。")
+
+    if find_any("候選比較")[1] is not None or has_legacy_sec5:
+        need("候選比較", "候選比較", strict,
+             "三個候選用同一把尺比：主受眾第一個問題在第幾章被回答、每章證據就緒度、時間與頁數、前提假設。")
+
+    combined_sel, sel_no = find_any("選定方案、最弱假設與 30 秒口述邏輯鏈")
+    if sel_no is not None:
+        need("選定方案、最弱假設與 30 秒口述邏輯鏈", "3. 選定方案與 30 秒邏輯鏈", True,
+             "寫明選定與理由、最易被挑戰的假設，以及「起點共識 → 但是 → 所以 → 證據 → 因此」30 秒邏輯鏈。")
+    else:
+        need("選定與理由", "4. 選定與理由", True, "選了哪個或怎麼混搭，以及為什麼它能把聽眾帶到終點。")
+        need("最弱的一點與最沒把握的假設", "4. 最弱的一點", strict, "寫出推薦方案最容易被挑戰的地方與最沒把握的假設。")
+        if has_legacy_sec5:
+            need("改起來最貴的四個決定", "4. 最貴的四個決定", strict, "理性終點、主受眾、軸與敘事主幹、範圍：各一句為什麼這樣定。")
+            need("結構追問", "4. 結構追問", strict, "逐章寫拿掉會斷什麼，以及開場承諾在哪一章兌現。")
+        need("30 秒口述邏輯鏈", "4. 30 秒口述邏輯鏈", strict, "用「起點共識 → 但是 → 所以 → 證據 → 因此」3–5 句串起整份架構。")
+
+    need("架構級排除清單", "排除清單（Out of Scope）", False, "列出這場明確不進主線的主題（整塊刪除或僅放附件）；沒有就寫「無」。")
+
+    valid_stops = [t for t, _ in stops if not _unfilled(t)]
+    if len(valid_stops) < 2:
         for t, n in stops:
             if _unfilled(t):
                 reported.add(n)
-        E("4. 章節", "第 4 節的章節停靠點至少要 2 個（每個寫章名、分鐘數、預估頁數與這章唯一要記住的一件事）。")
+        E("章節停靠點", "架構章節停靠點至少要 2 個（每個寫章名、分鐘數、預估頁數與唯一記憶點）。")
 
-    # ---- section 5: per-chapter depth
-    if len(chapters) < 2:
-        E("5. 逐章內容", f"只找到 {len(chapters)} 章。每一章一個「### 章名」小節，架構至少要 2 個停靠點。")
-    for title, no in chapters:
-        where = f"5. {title}"
-        if _unfilled(title):
-            reported.add(no)
-            E(f"{where}（第 {no} 行）", "章名還沒填。")
-        for prefix, strict_field, hint in (
-            ("唯一記憶點", True, "這章講完，聽眾只帶走的那一件事。"),
-            ("反方質疑與回應", strict, "最挑剔的聽眾會怎麼挑戰，以及我們怎麼回應或交代邊界。"),
-            ("說服載體", strict, "用什麼證明這章的論點（白話描述）；Step 3a 會拿它回頭篩風格。"),
-        ):
-            value, vno = find(prefix, "5.", title)
-            if vno is None:
-                (E if strict_field else W)(where, f"缺少「{prefix}」。{hint}")
-            elif _unfilled(value):
-                reported.add(vno)
-                (E if strict_field else W)(f"{where}（第 {vno} 行）", f"「{prefix}」還沒填。{hint}")
+    # ---- legacy section 5: validated ONLY when present (v5 puts per-slide specs directly in storyboard.yaml slide_plan)
+    if has_legacy_sec5:
+        if len(chapters) < 2:
+            E("5. 逐章內容", f"只找到 {len(chapters)} 章。每一章一個「### 章名」小節，架構至少要 2 個停靠點。")
+        for title, no in chapters:
+            where = f"5. {title}"
+            if _unfilled(title):
+                reported.add(no)
+                E(f"{where}（第 {no} 行）", "章名還沒填。")
+            for prefix, strict_field, hint in (
+                ("唯一記憶點", True, "這章講完，聽眾只帶走的那一件事。"),
+                ("反方質疑與回應", strict, "最挑剔的聽眾會怎麼挑戰，以及我們怎麼回應或交代邊界。"),
+                ("說服載體", strict, "用什麼證明這章的論點（白話描述）。"),
+            ):
+                value, vno = find_any(prefix, "5.", title)
+                if vno is None:
+                    (E if strict_field else W)(where, f"缺少「{prefix}」。{hint}")
+                elif _unfilled(value):
+                    reported.add(vno)
+                    (E if strict_field else W)(f"{where}（第 {vno} 行）", f"「{prefix}」還沒填。{hint}")
+        hl, hl_no = find_any("亮點頁 1", "5.")
+        if stage in ("pitch", "keynote") and (hl_no is None or _unfilled(hl) or _says_none(hl)):
+            if hl_no:
+                reported.add(hl_no)
+            W("5. 招牌亮點頁", f"stage_mode={stage} 建議至少拍板 1 個招牌亮點頁，用白話描述畫面與互動。")
 
-    hl, hl_no = find("亮點頁 1", "5.")
-    if stage in ("pitch", "keynote") and (hl_no is None or _unfilled(hl) or _says_none(hl)):
-        if hl_no:
-            reported.add(hl_no)
-        W("5. 招牌亮點頁", f"stage_mode={stage} 建議至少拍板 1 個招牌亮點頁（pitch 1–2、keynote 2–3），用白話描述畫面與互動。")
+    # ---- 12. content subtraction list (field in v5 OR subsection bullets in v4)
+    red_val, red_no = find_any("內容減法清單")
+    if red_no is not None:
+        if _unfilled(red_val):
+            reported.add(red_no)
+            W(f"內容減法清單（第 {red_no} 行）", "還沒填。列出移進 notes／appendix 的長段落；真的沒有就寫「無」。")
+    else:
+        reduction = [(t, n) for (s, sb), items in bullets_by_section.items()
+                     if sb.startswith("內容減法清單") for t, n in items]
+        if not reduction or all(_unfilled(t) for t, _ in reduction):
+            for _, n in reduction:
+                reported.add(n)
+            W("內容減法清單", "還沒填。列出要移進 notes 的長段落；真的沒有就寫「無」。")
 
-    reduction = [(t, n) for (s, sb), items in bullets_by_section.items()
-                 if s.startswith("5.") and sb.startswith("內容減法清單") for t, n in items]
-    if not reduction or all(_unfilled(t) for t, _ in reduction):
-        for _, n in reduction:
-            reported.add(n)
-        W("5. 內容減法清單", "還沒填。列出要移進 notes 的長段落；真的沒有就寫「無」。")
+    # ---- 13. number / fact check (field in v5 OR section 6 bullets in v4)
+    num_val, num_no = find_any(("關鍵數字與事實查核", "證據與關鍵數字查核"))
+    if num_no is not None:
+        if _unfilled(num_val):
+            reported.add(num_no)
+            E(f"數字查核（第 {num_no} 行）", "還沒填。逐項寫出處、口徑與查核結果；沒有數據就寫「無：目前沒有可確認的數據」。")
+    else:
+        facts = [(t, n) for (s, sb), items in bullets_by_section.items() if ("數字" in s or s.startswith("6.")) for t, n in items]
+        facts += [(v, n) for s, sb, label, v, n in fields if ("數字" in s or s.startswith("6."))]
+        if not facts or all(_unfilled(t) for t, _ in facts):
+            for _, n in facts:
+                reported.add(n)
+            E("數字查核", "還沒填。逐項寫出處、口徑與查核結果；沒有數據就寫「無：目前沒有可確認的數據」。")
 
-    # ---- section 6: number check
-    facts = [(t, n) for (s, sb), items in bullets_by_section.items() if s.startswith("6.") for t, n in items]
-    facts += [(v, n) for s, sb, label, v, n in fields if s.startswith("6.")]
-    if not facts or all(_unfilled(t) for t, _ in facts):
-        for _, n in facts:
-            reported.add(n)
-        E("6. 數字查核", "還沒填。逐項寫出處、口徑與查核結果；沒有數據就寫「無：目前沒有可確認的數據」。")
-
-    # ---- section 8: constraints
-    need("限制與不承諾", "8. limitations", strict, "做不到、有限制、不能承諾的邊界；沒有就寫「無」。")
+    # ---- 14. constraints (limitations / forbidden / must_include)
+    need(("限制、地雷與必放", "限制與不承諾"), "constraints（limitations）", strict, "做不到、有限制、不能承諾的邊界；沒有就寫「無」。")
 
     # ---- pillar boundary: presentation decisions do not belong in the brief
     leaked = sorted({t for t in BRIEF_PRESENTATION_TERMS if t in text})
     if leaked:
         W("主柱邊界", f"brief 出現呈現層決定（{', '.join(leaked)}）。明暗、去框比例、導航、氛圍與風格動態要等 "
-                     "Step 3a 選定風格後才決定，寫進 storyboard.yaml；brief 只記內容、場合與說服載體。")
+                     "Gate 2 選定風格後才決定，寫進 storyboard.yaml；brief 只記內容、場合與邊界。")
 
     # ---- anything else still holding a template placeholder
     leftovers = [no for no, line in enumerate(lines, 1)
@@ -923,13 +1014,14 @@ def lint_brief(text, base_dir=None):
         shown = "、".join(str(n) for n in leftovers[:12]) + ("…" if len(leftovers) > 12 else "")
         W("未填欄位", f"還有 {len(leftovers)} 行留著 <…> 範本文字（第 {shown} 行）。換成實際內容，不適用就寫「無」。")
 
-    I("brief", f"製作模式：{'快速' if fast else '標準'}；找到 {len(chapters)} 章。"
+    ch_count = len(chapters) if has_legacy_sec5 else len(valid_stops)
+    I("brief", f"製作模式：{'快速' if fast else '標準'}；找到 {ch_count} 個章節停靠點。"
                "lint 只檢查顧問流程有沒有留下產出；內容好不好，由使用者在關卡 1b 判斷。")
     return errors, warnings, infos
 
 
 def outline(data):
-    """Page-by-page list for gate 1c: chapter, title, content shape and visual hero, plus page arithmetic."""
+    """Page-by-page list for Gate 1b: chapter, title, content shape / job, and visual encoding / hero, plus page arithmetic."""
     chapters = {c.get("id"): c for c in data.get("chapters") or [] if isinstance(c, dict)}
     rows, n = [], 0
     for s in data.get("slides") or []:
@@ -945,16 +1037,21 @@ def outline(data):
         ch_label = str(ch.get("label") or "")
         if ch_label and (ch.get("unlisted") or s.get("unlisted")):
             ch_label += "（不列入目錄）"
+        sp = s.get("slide_plan") if isinstance(s.get("slide_plan"), dict) else {}
         if t == "content":
             title = str(s.get("title") or "")
-            shape = str(s.get("layout") or ("free" if s.get("file") else "?"))
+            base_shape = str(s.get("layout") or ("free" if s.get("file") else "?"))
+            job_tag = str(sp.get("job") or "").strip()
+            rev_tag = str(sp.get("reveal") or "").strip()
+            meta_tags = " · ".join(x for x in (job_tag, rev_tag) if x)
+            shape = f"{base_shape} ({meta_tags})" if meta_tags else base_shape
         else:
             title = str(s.get("text") or s.get("title") or (data.get("meta") or {}).get("title") or "")
             shape = t
         title = EMPH_RE.sub(lambda m: m.group(1), title).replace("|", "／")[:40]
         director = s.get("director") if isinstance(s.get("director"), dict) else {}
-        hero = str(director.get("hero") or "").replace("|", "／")[:48] or "—"
-        rows.append(f"| {no} | {ch_label or '—'} | {title} | {shape} | {hero} |")
+        vis = str(sp.get("visual_encoding") or director.get("hero") or "").replace("|", "／")[:52] or "—"
+        rows.append(f"| {no} | {ch_label or '—'} | {title} | {shape} | {vis} |")
     bd = page_breakdown(data)
     formula = (f"封面 {bd['cover']} + 目錄 {bd['toc']} + 內容 {bd['content']} + 震撼 {bd['shock']} "
                f"+ 結尾 {bd['closing']} = {bd['total']} 頁")
@@ -963,7 +1060,7 @@ def outline(data):
     budget = (data.get("meta") or {}).get("pages")
     if isinstance(budget, int) and budget > 0:
         formula += f"；上限 {budget} 頁"
-    head = ["", "## 逐頁清單（關卡 1c）", "", "| 頁 | 章節 | 題目 | 內容形狀 | 視覺主角 |", "|---|---|---|---|---|"]
+    head = ["", "## 逐頁清單（關卡 1b）", "", "| 頁 | 章節 | 題目 | 形狀／任務・步進 | 視覺轉譯／主角 |", "|---|---|---|---|---|"]
     tail = ["", f"頁數算術：{formula}。目錄頁由 assemble.py 依章數自動插入（使用者明確要或不要目錄時，用 meta.toc 指定），未列在表內。"]
     return "\n".join(head + rows + tail)
 

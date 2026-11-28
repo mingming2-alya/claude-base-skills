@@ -51,19 +51,21 @@
 - **前後對比**：左右兩台裝置／介面並排，舊版壓暗、新版發光。
 - **圖表**：極簡單條發光長條或光線趨勢，直接標 2–3 個關鍵值，無格線無圖例。
 - **震撼頁**：允許全頁淨空只留一句白／墨大字與漸層關鍵字，不放裝置。
+- **雙密度適配（`airy` 單核聚光舞台 × `structured` 發表會總結 Bento Grid）**：發表揭曉頁採 `airy` 單核發光主視覺；當面對高密戰術總覽或技術架構頁（如 Gate 2a 比稿）時，切換為 Apple Keynote 經典 **Summary Bento Grid**（3–4 個圓角 `28px` 微光毛玻璃艙體，每個艙體以巨數／迷你圖解為主體、標籤限 ≤2 層字，支援 `mode: light` 亮舞台與 `mode: dark` 暗舞台）。
 
-## 5. 動效個性（Phase B 參數）
+## 5. 動效節奏（全風格統一從容慢板標配）
 
-- **性格**：`spring`（Apple Keynote 可打斷解析彈簧，臨界阻尼零過度回彈，靈感自 MIT `emilkowalski/skills` apple-design）。由暗漸亮，標題先落位、主視覺隨後浮現，裝置內折線與長條以 `data-draw`／`data-grow` 依序就位。
+- **性格**：`spring`（Apple Keynote 可打斷解析彈簧，臨界阻尼零過度回彈，全風格統一從容慢板標配）。標題先落位、主視覺與圖解隨後以呼吸節奏從容浮現。
 - **CSS 變數**：
   ```css
   --motion-mode: spring;
-  --spring-response: 0.56;
+  --enter-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring-response: 0.72;
   --spring-bounce: 0;
-  --stagger-base: 55;
+  --stagger-base: 240;
   --morph-ms: 780;
   ```
-- **建議動態標記**：跨頁核心指標加 `data-morph`；裝置內趨勢線加 `data-draw`；分批長條加 `data-grow="x"`；可選擇於背景掛 `data-fx="soft-aurora"` 微光呼吸。
+- **建議動態標記**：跨頁核心指標加 `data-morph`；艙體內趨勢線加 `data-draw`（`~980ms`）；分批長條加 `data-grow="x"`（`~920ms`）；Bento 艙體加 `data-stagger="240"` 或搭配 `data-step` 逐拍點亮。
 
 ## 6. 鐵律與禁忌（`check.mjs` 把關）
 

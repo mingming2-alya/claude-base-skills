@@ -68,7 +68,7 @@ COMMON_FIELDS = {
     "appendix", "id", "role", "variant", "series", "signature", "file",
     "component", "summary", "key", "slot", "visual", "data", "items",
     "points", "text", "sub", "surface", "nav", "transition", "director",
-    "unlisted",
+    "slide_plan", "unlisted",
 }
 
 STAGE_MODES = {"briefing", "pitch", "keynote"}
@@ -125,6 +125,7 @@ LAYOUT_FIELDS = {
 CELL_STATES = {"done", "doing", "target", "na"}
 RISK_LEVELS = {"red": 3, "yellow": 2, "green": 1}
 SLIDE_TYPES = {"cover", "content", "shock", "closing"}
+SLIDE_JOBS = {"magnitude", "delta", "mechanism", "triage", "demo", "resonance", "scaffold"}
 
 EMPH_RE = re.compile(r"==(.+?)==")
 
@@ -175,8 +176,13 @@ _NON_TEXT_KEYS = {
     "appendix", "role", "variant", "series", "bar", "signature", "file",
     "component", "slot", "visual", "scene_layout", "art_style", "state",
     "risk", "progress", "order", "stagger", "continued", "surface", "nav",
-    "transition", "director", "unlisted",
+    "transition", "director", "slide_plan", "unlisted",
 }
+
+_BODY_COPY_KEYS = (
+    "summary", "items", "points", "stats", "pillars", "rows", "key", "text",
+    "left", "right", "events", "stages", "groups", "data", "lead", "support",
+)
 
 
 def slide_texts(s):
@@ -196,6 +202,9 @@ def slide_texts(s):
                 walk(x)
 
     walk({k: v for k, v in s.items() if k not in ("notes",)})
+    sp = s.get("slide_plan") if isinstance(s, dict) else None
+    if isinstance(sp, dict) and sp.get("anchors") and not any(s.get(k) for k in _BODY_COPY_KEYS):
+        walk(sp["anchors"])
     return out
 
 

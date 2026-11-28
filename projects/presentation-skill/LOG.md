@@ -1853,3 +1853,21 @@
 - **驗證**：5 份範例 storyboard lint 與改版前一致；示範 brief 0 錯 0 警；四份回放 brief lint 結果不變；兩種新欄位寫法舊版報 2 個假錯誤、新版通過；`v48-regression` 副本 `meta.toc` 預設／agenda／per-chapter 分別為 9／10／11 頁，與 lint 頁數算術一致，非法值報錯；重打包 `outputs/deck-architect.skill`（85 檔，379.5 KB，零 `__pycache__`，解壓後與原始碼逐檔一致）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,references/{grill.md,structure.md,contexts.md,presentation-rules.md},scripts/{lint.py,deck_model.py},templates/storyboard.yaml}`、`outputs/deck-architect.skill`、`inputs/presentation-principles.md`、`STATUS.md`、`ROADMAP.md`、`LOG.md`。
 - **下一步**：使用者提供一份近期真的要講的簡報需求，從 Step 1a 跑到成品（真實 PK）；真實資料不進公開 repo。
+
+## 2026-11-28｜`deck-architect` v5.0：真實高密度商務簡報端到端壓測獨立審計 × `/grill-me` 第一性原理淨負複雜度重構
+
+- **背景與獨立實證審查（100% 去敏紀錄，真實壓測資料不進公開 repo）**：
+  - 使用者以一份真實高難度商務匯報需求（需在 1–2 頁極窄篇幅內向高階主管同時講清全年戰術大幅收斂、跨組矩陣分工、已落地實證與下階段閉環，歷經 20 輪迭代打磨至滿意定稿）對 `v4.10.2` 完成端到端壓測，並提供三份前序演進審計報告進行零歷史包袱的第三方第一性原理審查。
+  - **定量實證推翻前序報告過度擬合補丁**：直接拿使用者最滿意的黃金定稿頁與技能內建 `references/recipes/bento-causal.md` 實測前序報告擬寫入 `check.mjs` 的三條幾何／像素公式（「`16–20px` 規則佔比 `> 35%`」「有邊框背景容器巢狀 `> 1` 層」「右 1/3 與左 1/3 深色像素比」），證實黃金定稿頁實際為 `59%–80%`、容器深度 `2–3` 層、右左深色比僅 `1.20× / 1.13×`——若照單全收會直接誤殺黃金定稿與內建配方！同時揪出三份前序報告漏看的根因：`lint.py` 強制 `must_include` 出現在主頁可見文字（逼上游塞字）、`counsel.md` 表面死禁令（全頁 `900` 字重、零圓角、零陰影、禁第二語意色）導致生硬方框、以及主代理一肩扛顧問＋手寫 HTML 造成上下文注意力退化。
+- **5 輪 `/grill-me` 全設計樹收斂拍板（原則 #41–#46）**：
+  1. **透明 5 道關卡 ＋ 雙互動鐵律**：Round 0 亮出全程 5 關路線圖；每次進關第一句話先說明「本關目的與使用者只需確認哪幾點」；每關結束必透過互動表單取得明確同意才推進。合併原 `1b + 1c` 為單一 `Gate 1b`，並在 `Gate 1b` 表單最後一題先以文字確認擬拿最關鍵 1 頁試畫的 3 個風格方向（保留磁碟 `style-library.html` 選看）；`Gate 2a` 派 3 位乾淨 Builder 並行畫出該關鍵 1 頁真實活體比稿＋混搭建議；無論單選或混搭，`Gate 2b` 必花 1 輪確認合成的 `deck.css` 與定版活範本（1–2 頁）沒走鐘才展開全場。
+  2. **去重契約 ＋ 7 類 `slide_plan` ＋ 軟性控字**：`templates/brief.md` 瘦身至 ~14 個承重欄（`lint_brief` 100% 向後相容舊版 v4 brief）；`storyboard.yaml` 導入結構化 `slide_plan`（新增第 7 類 `scaffold` 供教學演練／正反範例／步驟清單）；`lint.py` 允許補充口徑與 `limitations` 放 `notes`/`appendix`，非豁免頁超出 `anchors` 僅發軟性 `[WARN]` 交單輪 Critic 語意複核，不設死硬字數 `[ERROR]`。
+  3. **Style Library 精修（保留 4 `ready` ＋ 8 `planned` 共 12 款）**：解鎖 `counsel.md` 表面死禁令，建立三階字重呼吸、溫潤畫廊紙面微層次、雙語意主色分工、75–20–5 面積平衡與 4 款風格共通之 `airy`／`structured` 雙密度語法。
+  4. **全風格統一「從容慢板」敘事動效 × 步進脫鉤**：描線／生長 `860–980ms`、群組交錯 `220–260ms`、因果演變舊態停頓 `≥600ms`、曲線 `cubic-bezier(0.22, 1, 0.36, 1)`，操控互動維持 `~200ms` 即時跟手；`talk`/`discuss` 單頁具 ≥3 個依序推導區塊即開 `data-step`（≤5 拍）防破梗。
+  5. **100% 子代理職能隔離 × 純工程 `check.mjs` × 乾淨收尾在 HTML**：廢除 `≤6 頁主代理手寫`；修復 `assemble.py` `_scope_selector_list` 註解內逗號 Bug、`runtime.js` 首頁微任務搶跑漏接 `deck:slideenter`（同時消除 JS 註解內字面結束標籤被 HTML5 解析器提前截斷的陷阱）、`data-step` 巢狀隔離與 `revealDelay (340ms)` 同步、`shell.css` `#stage > .slide` 絕對定位提權；`check.mjs` 新增 `.slide` 定位與 `<g data-draw>` 硬擋、刪除湊原語配額、測遍全場每一頁 `data-step` 並輸出 `check/filmstrip-sXX.jpg` 分鏡條；交付乾淨收尾在 HTML 與 PDF，可編輯 PPTX 轉檔引導開啟新對話獨立處理。
+- **瘦身成效與全量驗證**：
+  - 核心常駐文件（`SKILL.md`＋`grill.md`＋`samples.md`＋`visual-guidance.md`＋`motion-system.md`）由 `104,365 bytes` 降至 `49,051 bytes`（**−53.0%**），全參考庫總量由 `179.3 KB` 降至 `118.8 KB`（**−33.7%**），`SKILL.md` frontmatter `description` 為 `678 / 1024 bytes`。
+  - v5.0 專項單元與無頭瀏覽器契約測試全數通過；全 5 份 v4 回歸範例（`v48-regression`、`v45-modular-demo`、`v44-keynote-demo`、`v4-alive-demo`、`v4-demo`）＋ `v4-demo/samples --sheet` 全部 0 錯誤通過並產出步進分鏡條。
+  - 重打包 `outputs/deck-architect.skill`（85 檔，**350.8 KB**，零 `__pycache__`，解壓後與原始碼 SHA-256 逐位元一致）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/{shell.css,runtime.js,modules/motion/*-kit.js},scripts/{assemble.py,deck_model.py,lint.py,check.mjs},styles/{index.json,color-system.md,counsel.md,workday.md,apple.md,illustration.md},templates/{brief.md,storyboard.yaml,deck.css},references/{grill.md,samples.md,visual-guidance.md,motion-system.md,content-shapes.md,contexts.md,presentation-rules.md,modules/style-motion-kits.md}}`、`outputs/deck-architect.skill`、`outputs/examples/{v48-regression,v45-modular-demo,v44-keynote-demo,v4-alive-demo,v4-demo}/`、`inputs/presentation-principles.md`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：以真實簡報需求驗證 v5.0 首稿體驗，或推進 Phase D／Phase E。

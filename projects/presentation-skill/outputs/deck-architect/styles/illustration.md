@@ -76,17 +76,17 @@
 
 > 帶有歷史固定色盤的畫風（岩畫、埃及、漢畫像石、瑪雅、梵谷、吶喊），三組主題配色主要調整強調色與輔助飾色。
 
-## 6. 動效個性與專屬動態模組（`motion-story` · 按需注入，未用到 0 KB）
+## 6. 動效節奏與專屬動態模組（`motion-story` · 全風格統一從容慢板標配）
 
-- **動態個性**：**手感敘事（Tactile Bounce）**——溫潤彈性過衝回正、主角先落定、配角與標籤慢半拍跟上（Disney follow-through）；**禁止將 `steps(5)` 用於整頁位移動畫**（依 `references/motion-system.md` 採流暢 GPU 曲線配精準節拍）。
+- **動態個性**：**手感敘事（Tactile Bounce）**——在全風格統一從容慢板（`800–1,200ms` 描繪、`240–280ms` 交錯）基礎上保留溫潤微過衝回正，主角先落定、配角與題箋慢半拍跟上（Disney follow-through）；高資訊頁採版面 **C（內容住進場景 3–4 個站點）** 維持清晰視線動線。**禁止將 `steps(5)` 用於整頁位移動畫**。
 - **CSS 變數**：
   ```css
   --motion-mode: spring;
-  --enter-easing: cubic-bezier(0.34, 1.38, 0.64, 1);
-  --stagger-base: 90;
+  --enter-easing: cubic-bezier(0.24, 1.14, 0.42, 1);
+  --stagger-base: 260;
   --morph-ms: 780;
   ```
-- **建議動態標記**：站點標籤加 `.rv`／`data-beat` 單向落位；實線引導用 SVG `<path data-draw>`，**虛線引導針用 HTML `data-wipe="down"`**（搭配觸及物件單次 `data-ripple`）；畫面內裝置數字可承接前頁 `data-morph` 飛入著陸。
+- **建議動態標記**：站點標籤加 `.rv`／`data-beat` 單向從容落位；實線路徑用 SVG `<path data-draw>`（`~980ms`），**虛線引導針用 HTML `data-wipe="down"`**（`~860ms`）；多站點推導可搭配 `data-step` 逐站走訪。
 - **綁定原語**（用法見 `references/modules/style-motion-kits.md`）：
   - `[data-popup-fold]`：立體書 3D 翻折立起舞台＋標籤主從延遲彈跳（適合三幕故事、知識概念場景化）。
   - `[data-chat-replay]`：對話氣泡實況劇院，含輸入脈動「…」（適合還原真實用戶痛點、客服／團隊情境）。

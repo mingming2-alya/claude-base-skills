@@ -180,15 +180,27 @@
       }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
       if (detail.dir < 0 || isReduced()) {
         sl.querySelectorAll('[data-ruler-progress]').forEach(el => el._rpInit && el._rpInit.stop());
         return;
       }
-      sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
-        if (el._rpInit && stepOf(el, sl) === detail.step) el._rpInit.play();
-      });
+      const targetStep = detail.step;
+      const runStep = () => {
+        if (deck.slides[deck.index] !== sl || deck.stepIndex !== targetStep || isReduced()) return;
+        sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
+          if (el._rpInit && stepOf(el, sl) === targetStep) el._rpInit.play();
+        });
+      };
+      const delay = detail.revealDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); runStep(); }, delay);
+        enterTimers.add(id);
+      } else {
+        runStep();
+      }
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       clearEnterTimers();

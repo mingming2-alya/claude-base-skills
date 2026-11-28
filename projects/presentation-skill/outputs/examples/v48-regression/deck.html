@@ -254,6 +254,10 @@ html.noscale #stage { transform: none !important; }
 }
 
 /* ---------------------------------------------------------------- slide container (GPU-isolated) */
+#stage > .slide {
+  position: absolute;
+  inset: 0;
+}
 .slide {
   position: absolute;
   inset: 0;
@@ -2514,10 +2518,10 @@ p.lead {
   function slideMotion(sl) {
     const cs = getComputedStyle(sl);
     const mode = (sl.dataset.motionMode || cs.getPropertyValue('--motion-mode') || 'spring').trim();
-    const staggerBase = parseFloat(cs.getPropertyValue('--stagger-base')) || 46;
-    const morphMs = parseFloat(cs.getPropertyValue('--morph-ms')) || 680;
+    const staggerBase = parseFloat(cs.getPropertyValue('--stagger-base')) || 240;
+    const morphMs = parseFloat(cs.getPropertyValue('--morph-ms')) || 780;
     const rawEase = cs.getPropertyValue('--enter-easing').trim();
-    const ease = rawEase || (mode === 'crisp' ? EASE_CRISP : EASE_SPRING);
+    const ease = rawEase || EASE_SPRING;
     return { mode, staggerBase, morphMs, ease };
   }
 
@@ -2589,12 +2593,15 @@ p.lead {
 
       if (!wasVis && nowVis) {
         el.dataset.stepHidden = '0';
+        const fromT = stepFromTransform(el);
+        const stepDur = fromT === 'none' ? 420 : 580;
+        const revealDelay = fromT === 'none' ? 120 : 340;
         const anim = trackAnim(el.animate(
-          [{ opacity: 0, transform: stepFromTransform(el) }, { opacity: 1, transform: 'none' }],
-          { duration: 480, easing: cfg.ease, fill: 'backwards' }
+          [{ opacity: 0, transform: fromT }, { opacity: 1, transform: 'none' }],
+          { duration: stepDur, easing: cfg.ease, fill: 'backwards' }
         ));
         stepAnims.set(el, anim);
-        if (dir >= 0) triggerSubtreePrimitives(el, sl, 40, token);
+        if (dir >= 0) triggerSubtreePrimitives(el, sl, revealDelay, token, k);
         else snapSubtreeFinal(el);
       } else if (wasVis && !nowVis) {
         const anim = trackAnim(el.animate(
@@ -2614,7 +2621,7 @@ p.lead {
     updateCtrlBar();
     if (!silent) {
       stage.dispatchEvent(new CustomEvent('deck:stepchange', {
-        detail: { index: cur, slide: sl, step: curStep, totalSteps: maxS, dir },
+        detail: { index: cur, slide: sl, step: curStep, totalSteps: maxS, dir, revealDelay: dir >= 0 ? 340 : 0 },
       }));
     }
   }
@@ -2769,25 +2776,27 @@ p.lead {
   }
 
   // Reusable primitive animators (run at slide entry for step-0, or on step reveal for deferred step-k)
-  function runPrimitives(root, sl, baseDelay, token, morphedIds, skipDeferred) {
+  function runPrimitives(root, sl, baseDelay, token, morphedIds, skipDeferred, activeStep = 0) {
     const cfg = slideMotion(sl);
     const q = sel => {
       const list = [];
       if (root !== sl && root.matches && root.matches(sel)) list.push(root);
       root.querySelectorAll(sel).forEach(el => list.push(el));
-      return skipDeferred ? list.filter(el => deferredStepOf(el, sl) === 0) : list;
+      return skipDeferred
+        ? list.filter(el => deferredStepOf(el, sl) === 0)
+        : list.filter(el => deferredStepOf(el, sl) <= activeStep);
     };
 
     // 0. Live Causal State Transformation ([data-transform-at="ms"]) — works at slide entry & inside data-step
     q('[data-transform-at]').forEach(el => {
-      const ms = parseFloat(el.dataset.transformAt) || 1200;
+      const ms = parseFloat(el.dataset.transformAt) || 1400;
       el.classList.remove('transforming');
       el.classList.add('pre-transform');
       later(() => {
         if (token !== navToken || isReducedMotion()) { el.classList.remove('pre-transform', 'transforming'); return; }
         el.classList.remove('pre-transform');
         el.classList.add('transforming');
-        later(() => { el.classList.remove('transforming'); }, 840);
+        later(() => { el.classList.remove('transforming'); }, 900);
       }, baseDelay + ms);
     });
 
@@ -2795,15 +2804,15 @@ p.lead {
     const staggeredSet = new Set();
     q('[data-stagger]').forEach(group => {
       const stepMs = parseFloat(group.getAttribute('data-stagger')) || cfg.staggerBase;
-      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 140 : 40, sl);
+      const gDelay = baseDelay + beatDelay(group, skipDeferred ? 160 : 40, sl);
       const items = [...group.children].filter(el => el.nodeType === 1);
       items.forEach((el, i) => {
         staggeredSet.add(el);
         if (morphedIds && el.dataset.morph && morphedIds.has(el.dataset.morph)) return;
-        const d = gDelay + Math.round(stepMs * Math.pow(i, 0.82));
+        const d = gDelay + Math.round(stepMs * Math.pow(i, 0.85));
         trackAnim(el.animate(
           [{ opacity: 0, transform: 'translate3d(0,16px,0)' }, { opacity: 1, transform: 'none' }],
-          { duration: 560, delay: d, easing: cfg.ease, fill: 'backwards' }
+          { duration: 680, delay: d, easing: cfg.ease, fill: 'backwards' }
         ));
       });
     });
@@ -2829,7 +2838,7 @@ p.lead {
         : 'translate3d(0,18px,0)';
       trackAnim(el.animate(
         [{ opacity: 0, transform: fromT }, { opacity: 1, transform: 'none' }],
-        { duration: 600, delay: d, easing: cfg.ease, fill: 'backwards' }
+        { duration: 720, delay: d, easing: cfg.ease, fill: 'backwards' }
       ));
     });
 
@@ -2856,7 +2865,7 @@ p.lead {
       const hasComma = numRaw.includes(',');
       const dec = numRaw.includes('.') ? numRaw.split('.')[1].length : 0;
       const target = parseFloat(numRaw.replace(/,/g, ''));
-      const dur = parseFloat(el.dataset.dur) || 820;
+      const dur = parseFloat(el.dataset.dur) || 960;
       const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60, sl);
       const fmt = v => {
         let s = dec > 0 ? v.toFixed(dec) : String(Math.round(v));
@@ -2887,19 +2896,19 @@ p.lead {
     // 5. True SVG stroke draw & progress rings ([data-draw])
     q('[data-draw]').forEach(el => {
       const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 80, sl);
-      const dur = parseFloat(el.dataset.dur) || 880;
+      const dur = parseFloat(el.dataset.dur) || 980;
       if (el.getAttribute('data-draw') === 'ring') {
         const circ = parseFloat(el.dataset.circ || '0');
         const fin = parseFloat(el.dataset.ringFinal || '0');
         if (!circ) return;
         trackAnim(el.animate(
           [{ strokeDashoffset: circ }, { strokeDashoffset: fin }],
-          { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }
+          { duration: dur, delay, easing: EASE_SPRING, fill: 'backwards' }
         ));
       } else if (el.dataset.drawDashed) {
         trackAnim(el.animate(
           [{ opacity: 0 }, { opacity: 1 }],
-          { duration: Math.min(480, dur), delay, easing: EASE_CRISP, fill: 'backwards' }
+          { duration: Math.min(560, dur), delay, easing: EASE_SPRING, fill: 'backwards' }
         ));
       } else {
         el.style.strokeDasharray = '1';
@@ -2916,21 +2925,21 @@ p.lead {
     // 6. Directional bar growth ([data-grow="x|x-left|y|y-down"])
     q('[data-grow]').forEach((el, idx) => {
       const dir = (el.getAttribute('data-grow') || 'x').toLowerCase();
-      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 65, sl);
-      const dur = parseFloat(el.dataset.dur) || 720;
+      const delay = baseDelay + beatDelay(el, (skipDeferred ? 220 : 60) + idx * 120, sl);
+      const dur = parseFloat(el.dataset.dur) || 920;
       if (el instanceof SVGElement) el.style.transformBox = 'fill-box';
       if (dir === 'x-left') {
         el.style.transformOrigin = 'right center';
-        trackAnim(el.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }));
+        trackAnim(el.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: dur, delay, easing: EASE_SPRING, fill: 'backwards' }));
       } else if (dir === 'y') {
         el.style.transformOrigin = 'center bottom';
-        trackAnim(el.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }));
+        trackAnim(el.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: dur, delay, easing: EASE_SPRING, fill: 'backwards' }));
       } else if (dir === 'y-down') {
         el.style.transformOrigin = 'center top';
-        trackAnim(el.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }));
+        trackAnim(el.animate([{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }], { duration: dur, delay, easing: EASE_SPRING, fill: 'backwards' }));
       } else {
         el.style.transformOrigin = 'left center';
-        trackAnim(el.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }));
+        trackAnim(el.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: dur, delay, easing: EASE_SPRING, fill: 'backwards' }));
       }
     });
 
@@ -2938,21 +2947,21 @@ p.lead {
     q('[data-wipe]').forEach(el => {
       const dir = (el.getAttribute('data-wipe') || 'right').toLowerCase();
       const delay = baseDelay + beatDelay(el, skipDeferred ? 280 : 60, sl);
-      const dur = parseFloat(el.dataset.dur) || 540;
+      const dur = parseFloat(el.dataset.dur) || 860;
       const fromClip = dir === 'left' ? 'inset(0 0 0 100%)'
         : dir === 'down' ? 'inset(0 0 100% 0)'
         : dir === 'up' ? 'inset(100% 0 0 0)'
         : 'inset(0 100% 0 0)';
       trackAnim(el.animate(
         [{ clipPath: fromClip }, { clipPath: 'inset(0 0 0 0)' }],
-        { duration: dur, delay, easing: EASE_CRISP, fill: 'backwards' }
+        { duration: dur, delay, easing: EASE_SPRING, fill: 'backwards' }
       ));
     });
 
     // 8. Endpoint dot / arrowhead / badge crisp pop ([data-pop])
     q('[data-pop]').forEach(el => {
       const delay = baseDelay + beatDelay(el, skipDeferred ? 320 : 120, sl);
-      const dur = parseFloat(el.dataset.dur) || 340;
+      const dur = parseFloat(el.dataset.dur) || 440;
       if (el instanceof SVGElement) {
         el.style.transformBox = 'fill-box';
         el.style.transformOrigin = 'center center';
@@ -3025,9 +3034,9 @@ p.lead {
     });
   }
 
-  function triggerSubtreePrimitives(el, sl, delay, token) {
+  function triggerSubtreePrimitives(el, sl, delay, token, activeStep = Infinity) {
     if (!el || isReducedMotion()) { snapSubtreeFinal(el); return; }
-    runPrimitives(el, sl, delay, token, null, false);
+    runPrimitives(el, sl, delay, token, null, false, activeStep);
   }
 
   function animateSlideContent(sl, baseDelay, token, morphedIds) {
@@ -3751,8 +3760,14 @@ p.lead {
     get lowPower() { return lowPower; },
   };
 
-  // Fallback auto-boot if runtime.js is loaded without an explicit trailing window.__deck.boot() call
-  Promise.resolve().then(() => { if (!booted) boot(); });
+  // Fallback auto-boot if runtime.js is loaded standalone without assemble.py's trailing boot() call.
+  // Must NOT use a microtask (Promise.resolve), which browsers drain between consecutive script blocks
+  // before subsequent module_js and slide_js scripts have registered their stage event listeners.
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { if (!booted) boot(); }, { once: true });
+  } else {
+    setTimeout(() => { if (!booted) boot(); }, 0);
+  }
 })();
 </script>
 <script>/* deck-architect v4.5 Layer 1 Presenter Chrome: grid-overview (G key)
@@ -4712,15 +4727,27 @@ p.lead {
       }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
       if (detail.dir < 0 || isReduced()) {
         sl.querySelectorAll('[data-ruler-progress]').forEach(el => el._rpInit && el._rpInit.stop());
         return;
       }
-      sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
-        if (el._rpInit && stepOf(el, sl) === detail.step) el._rpInit.play();
-      });
+      const targetStep = detail.step;
+      const runStep = () => {
+        if (deck.slides[deck.index] !== sl || deck.stepIndex !== targetStep || isReduced()) return;
+        sl.querySelectorAll('[data-ruler-progress]').forEach(el => {
+          if (el._rpInit && stepOf(el, sl) === targetStep) el._rpInit.play();
+        });
+      };
+      const delay = detail.revealDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); runStep(); }, delay);
+        enterTimers.add(id);
+      } else {
+        runStep();
+      }
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       clearEnterTimers();
@@ -4803,7 +4830,7 @@ p.lead {
           box.appendChild(strip);
           el.appendChild(box);
           const d = parseInt(ch, 10);
-          strips.push({ strip, targetIdx: 10 + d, delay: i * 65 });
+          strips.push({ strip, targetIdx: 10 + d, delay: i * 110 });
         } else {
           const st = document.createElement('span');
           st.className = 'odo-static';
@@ -4816,12 +4843,12 @@ p.lead {
         strip.style.transition = 'none';
         strip.style.transform = 'translateY(0)';
         strip.getBoundingClientRect();
-        strip.style.transition = `transform ${820 + delay}ms cubic-bezier(0.16, 1.04, 0.28, 1) ${delay}ms`;
+        strip.style.transition = `transform ${960 + delay}ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`;
         strip.style.transform = `translateY(-${targetIdx * 1.05}em)`;
       });
       const maxDelay = strips.length ? strips[strips.length - 1].delay : 0;
-      // Total finish time for last digit = duration (820 + maxDelay) + delay (maxDelay) + safety buffer
-      settleTimer = setTimeout(() => renderStatic(str), 820 + 2 * maxDelay + 80);
+      // Total finish time for last digit = duration (960 + maxDelay) + delay (maxDelay) + safety buffer
+      settleTimer = setTimeout(() => renderStatic(str), 960 + 2 * maxDelay + 90);
     }
 
     render(initialText, false);
@@ -4985,6 +5012,7 @@ p.lead {
       }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
       if (detail.dir < 0 || isReduced()) {
@@ -4992,8 +5020,19 @@ p.lead {
         sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.stop());
         return;
       }
-      sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) === detail.step) el._odoInit.play(); });
-      sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) === detail.step) el._rrInit.play(); });
+      const targetStep = detail.step;
+      const runStep = () => {
+        if (deck.slides[deck.index] !== sl || deck.stepIndex !== targetStep || isReduced()) return;
+        sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) === targetStep) el._odoInit.play(); });
+        sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) === targetStep) el._rrInit.play(); });
+      };
+      const delay = detail.revealDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); runStep(); }, delay);
+        enterTimers.add(id);
+      } else {
+        runStep();
+      }
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       clearEnterTimers();
@@ -5321,6 +5360,7 @@ p.lead {
       }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
       if (detail.dir < 0 || isReduced()) {
@@ -5329,9 +5369,20 @@ p.lead {
         sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
         return;
       }
-      sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) === detail.step) el._smInit.play(); });
-      sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) === detail.step) el._spInit.start(); });
-      sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) === detail.step) el._cwInit.play(); });
+      const targetStep = detail.step;
+      const runStep = () => {
+        if (deck.slides[deck.index] !== sl || deck.stepIndex !== targetStep || isReduced()) return;
+        sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) === targetStep) el._smInit.play(); });
+        sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) === targetStep) el._spInit.start(); });
+        sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) === targetStep) el._cwInit.play(); });
+      };
+      const delay = detail.revealDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); runStep(); }, delay);
+        enterTimers.add(id);
+      } else {
+        runStep();
+      }
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       clearEnterTimers();
@@ -5489,6 +5540,7 @@ p.lead {
       }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
       if (detail.dir < 0 || isReduced()) {
@@ -5496,8 +5548,19 @@ p.lead {
         sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
         return;
       }
-      sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) === detail.step) el._pfInit.play(); });
-      sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) === detail.step) el._crInit.play(); });
+      const targetStep = detail.step;
+      const runStep = () => {
+        if (deck.slides[deck.index] !== sl || deck.stepIndex !== targetStep || isReduced()) return;
+        sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) === targetStep) el._pfInit.play(); });
+        sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) === targetStep) el._crInit.play(); });
+      };
+      const delay = detail.revealDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); runStep(); }, delay);
+        enterTimers.add(id);
+      } else {
+        runStep();
+      }
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       clearEnterTimers();

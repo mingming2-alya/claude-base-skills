@@ -1,5 +1,5 @@
-# storyboard.yaml（deck-architect v4.8）：架構、章節導航、講者備註、director 分鏡與 constraints 的唯一真相來源。
-# 修改架構、導航、備註、限制與地雷一律改這裡；自由編排頁文案放在 slides/<NN>-*.html（兩邊都會由 lint.py 統一把關，再跑 assemble.py）。
+# storyboard.yaml（deck-architect v5.0）：架構、章節導航、逐頁 slide_plan 分鏡、講者備註與 constraints 的唯一真相來源。
+# Gate 1b 簽核本檔（含 slide_plan）與 brief.md；自由編排頁寫於 slides/<NN>-*.html，由 lint.py 與 check.mjs 雙軌把關後再跑 assemble.py。
 # 未寫客製檔的頁面由輕底盤元件渲染。
 
 meta:
@@ -9,16 +9,16 @@ meta:
   presenter: 王小明 · 產品部         # 封面講者（可省略）
   date: 2026.12                      # 封面日期（可省略）
   delivery: talk                     # talk（上台講）/ discuss（會議討論）/ read（自己讀）/ auto（自動播放）
-  stage_mode: pitch                  # Step 1a 拍板：briefing（匯報）/ pitch（提案）/ keynote（發表會）
-  # nav_mode: top-bar                # Step 3a 依 stage_mode × 風格定案：top-bar（頂列）/ minimal-side（右側錨點）/ divider-only（僅扉頁）
+  stage_mode: pitch                  # Gate 1a 拍板：briefing（匯報）/ pitch（提案）/ keynote（發表會）
+  # nav_mode: top-bar                # Gate 2b 依 stage_mode × 風格定案：top-bar（頂列）/ minimal-side（右側錨點）/ divider-only（僅扉頁）
   # presenter_tools: [grid, annotator, speaker]  # Layer 1 講者工具（talk/discuss 預設全開；read/auto 預設僅 grid；[] 關閉）
   # modules: [media, linked-highlight]           # 可選白名單：若投影片誤用未宣告模組，assemble.py 會印 [WARN]
-  style: counsel                     # Step 3a 選定後填入（已就緒：workday / counsel / apple / illustration）
-  mode: light                        # Step 3a 依明暗策略填入：light / dark（單頁可用 surface: dark|light|split|photo 覆寫）
-  palette: 貼題綠                    # Step 3b 選定的三組 OKLCH 配色之一（寫進 deck.css）
+  style: counsel                     # Gate 2a/2b 選定後填入（已就緒：workday / counsel / apple / illustration）
+  mode: light                        # Gate 2b 依明暗策略填入：light / dark（單頁可用 surface: dark|light|split|photo 覆寫）
+  palette: 貼題綠                    # Gate 2b 定案的 OKLCH 配色名稱（寫進 deck.css）
   minutes: 15                        # 總時長（分鐘），lint 會檢查時間預算與節奏
   pages: 12                          # 頁數上限（含封面與自動目錄，不含附件頁），可省略
-  # toc: auto                       # 目錄頁：auto（依章數自動，預設）/ none（不要目錄）/ agenda（封面後一頁目錄）/ per-chapter（每章前一頁）；使用者明確要或不要目錄時才寫
+  # toc: auto                       # 目錄頁：auto（依章數自動，預設）/ none（不要目錄）/ agenda（封面後一頁目錄）/ per-chapter（每章前一頁）
   # format: section                  # 作為大簡報一章（一頁總覽）：不需封面與頁碼
   lang: zh-Hant                      # zh-Hant 時 lint 會自動偵測誤殘留的簡體字
 
@@ -30,7 +30,7 @@ structure:
   axis_note: ""
   sensitivity: false                 # 有人際顧慮設 true（禁止價值軸並警告「你們」）
 
-# 來自 brief.md 的限制與地雷：由 lint.py 自動把關
+# 來自 brief.md 的限制與地雷：limitations 與補充口徑放 notes 或 appendix 即通過，不強迫塞入主頁畫布
 constraints:
   limitations:
     - 預估多承接 15 個客戶為試算目標，尚未計入大型客製專案
@@ -51,18 +51,14 @@ chapters:
     label: 明年的方向
     minutes: 4
 
-# 逐頁內容：
-# - type: cover / content（預設）/ shock（加 role: opener 可當開場提問）/ closing
-# - layout: 14 核心形狀（point / bullets / number / stats / steps / timeline / compare / lanes /
-#           table / quote / image / pillars / status-table）＋ 5 圖表形狀（chart-bar / chart-donut /
-#           chart-trend / chart-people / chart-map）＋ scene / free
-# - file: 指向自由編排片段（例 slides/03-chart.html）；也可依檔名 slides/03-*.html 自動對應
-# - signature: true 標記整份簡報的招牌頁（Step 3b 樣張優先挑它）
-# - surface: dark|light|split|photo 逐頁極性，Step 3a 依明暗策略補上
-# - talk 模式守原則 #26：每組最多兩層字（例：巨數＋標籤），背景與因果說明放 notes
-# - series: 同一類頁面寫相同名稱，刻意維持一致結構
-# - steps 的 detail 可用 \n 指定斷行
-# - appendix: true + id + link 可建立現場點入、按 Esc 返回的附件頁
+# 逐頁內容與 slide_plan（Gate 1b 核心分鏡契約）：
+# - slide_plan.job：7 類認知任務擇一（magnitude 量體 / delta 對比 / mechanism 機制因果 / triage 狀態拍板 /
+#                   demo 實證操演 / resonance 共鳴停頓 / scaffold 教學演練・正反範例・步驟清單）
+# - slide_plan.reveal：0-step（進頁從容自動展開）或 step(N)（≥3 依序推導防破梗，N ≤ 5）
+# - slide_plan.zones：≤4 個空間分區配比 ＋ 單向視線動線 1→2→3
+# - slide_plan.visual_encoding：寫明用哪種幾何／圖解直接取代哪段解釋文字
+# - slide_plan.anchors：畫布核心短錨點（每卡 ≤2 層字，背景與口徑說明一律放 notes）
+# - signature: true 標記最關鍵的 1 頁（Gate 2a 派 3 位乾淨 Builder 子代理拿這頁真實內容並行比稿）
 
 slides:
   - type: cover
@@ -101,11 +97,22 @@ slides:
     title: 導入時間
     signature: true
     layout: compare
-    director:                           # 極簡分鏡（briefing 僅關鍵頁填寫；pitch/keynote 建議逐頁填寫）
-      hero: 左右拖曳前後對比畫面（45 天人工導入 vs 12 天標準化陪跑）  # Step 2 寫：這頁的視覺主角，對應 brief 的說服載體
-      module: compare-slider            # Step 2 寫：說服載體需要的內容模組（無則填 none）
-      archetype: interactive-proof      # Step 3a 後補：依選定風格的版面語法挑做法，可對應 references/recipes/
-      choreo: "transition=zoom-rise; 靜態停 50% 即看懂差距，現場可拖曳"  # Step 3a 後補：依風格 motion_dna 與 visual-guidance 寫轉場與動線
+    slide_plan:                         # Gate 1b 結構化分鏡契約（Builder 與 Critic 的共同驗收依據）
+      job: delta                        # magnitude / delta / mechanism / triage / demo / resonance / scaffold
+      reveal: 0-step                    # 0-step 或 step(N)
+      zones:
+        - "1 頁首題目與核心差距摘要 (18%)"
+        - "2 左半轉型前 45 天人工時間條 (41%)"
+        - "3 右半轉型後 12 天陪跑時間條＋拖曳把 (41%)"
+      visual_encoding: "左右比例長度與拖曳分割線直接編碼 45 天 → 12 天縮減幅度，取代流程說明長文"
+      anchors:
+        - "45 天 → 12 天上線"
+        - "專員陪跑兩週"
+    director:                           # Gate 2b 選定風格後可補齊模組、原型與動效細節
+      hero: 左右拖曳前後對比畫面（45 天人工導入 vs 12 天標準化陪跑）
+      module: compare-slider
+      archetype: interactive-proof
+      choreo: "transition=zoom-rise; 靜態停 50% 即看懂差距，現場可拖曳"
     left:
       heading: 轉型前
       items: [平均 45 天上線, 客戶要自己讀文件]

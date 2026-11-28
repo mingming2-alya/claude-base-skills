@@ -1,137 +1,72 @@
-# 動態系統指南（Option 1｜分層混合架構）
+# 動態系統與三層引擎指南（Motion System — v5.0）
 
-`deck-architect` 採用**分層混合架構（Option 1）**：
-
-- **日常簡報核心（~11 KB 零外部依賴）**：內建於輕底盤 `assets/runtime.js`＋`assets/shell.css`，純原生瀏覽器 API（WAAPI + 解析彈簧 + FLIP + SVG + Canvas 2D），**雙擊 `deck.html` 即可 100% 離線流暢播放**，無需任何 CDN 或套件安裝。
-- **旗艦專案外掛介面（按需、事前徵詢）**：僅當旗艦發表會明確需要異形 `MorphSVG`、60fps 影片輸出時間軸、複雜手勢物理或 WebGL／Three.js 3D 場景時，**先徵得使用者同意**後才掛載外部函式庫（見第 7 節外掛事件契約）。
-
----
-
-## 1. 六條動態設計與 60fps 效能鐵律
-
-1. **永遠可打斷（Zero Lockout）**：連按方向鍵或快速滑動時立刻取消前一段動畫並直達目標，絕不鎖死。
-2. **純 GPU 合成器優先（鎖定 60fps、拒絕卡頓）**：
-   - 切頁與進場只動畫 `transform`、`opacity`、`clip-path`（2 個關鍵影格即可，不用 28 格 JS 取樣）；`.slide` 啟用 `contain: layout style paint`。
-   - **禁止跨頁巨幅重濾鏡**：不在大尺寸投影片放 `stdDeviation="48"` 的全頁 SVG `<feGaussianBlur>`、live `<feTurbulence>` 或動畫中疊 `backdrop-filter`——改用零耗能 CSS `radial-gradient` 光暈與高質感半透明底色。
-   - **禁止把 `steps(5)` 用在整頁移動**：改用俐落平滑曲線配精準節奏。
-   - Canvas 2D 背景層採 `480×270` 低解析度拉伸並**延遲至切頁完成後 520ms 才啟動**，絕不與切頁搶 GPU。
-3. **同一頁必須「引導視線」，不可一鍋端同時淡入**：
-   - 依 `references/visual-guidance.md` 的 3–4 個語意節拍（`data-beat="1|2|3|4"`）與聚光壓暗（`data-focus-plan`）單向帶走視線，每拍留足 **1.3–1.8 秒**與 **0.6–0.9 秒靜止閱讀窗**。
-4. **頁與頁之間要有敘事變化與連貫性**：
-   - 依兩頁關係選用 6 種 `data-transition`，前後頁有共同關鍵數字群時優先做編隊 Magic Move（但**內容語意順序永遠高於轉場花招**）。
-5. **進慢出快、絕不露黑底**：切頁時舊頁維持 `opacity: 1` 墊底，消除閃爍感。
-6. **所有動態必須有完美靜態定格**：`?still=1`、`B` 鍵省電凍結、`prefers-reduced-motion: reduce` 與 `@media print` 下精準停在最終狀態。
+> **v5.0 動態第一性原理**：
+> 1. **敘事觀看動效全風格唯一標配「從容慢板（Calm Human-Breath Tempo）」**：不再設快慢三檔旋鈕——無論 `counsel`、`workday`、`apple` 或 `illustration`，凡承載資訊推進的描線、長條生長、數字滾動與群組交錯，一律對齊人類肉眼舒適追視與呼吸節奏，拒絕「35ms 一閃而過」的廉價快切。
+> 2. **操控互動維持即時跟手（`~180–280ms`）**：點擊展開卡片、拖曳比較拉桿、調整試算滑桿與連按方向鍵快速跳頁，保持零延遲即時回饋與隨時可打斷（Zero Lockout）。
 
 ---
 
-## 2. 六種敘事切頁語法（`data-transition`）
+## 一、全風格統一「從容慢板」時間基準表（`runtime.js` 內建預設）
 
-在 `<section class="slide canvas" data-transition="...">` 指定切入該頁的運鏡（往回翻時底盤自動鏡像倒放）：
+| 動效類別 | 標準時長／拍距 | 減速曲線 | 設計目的 |
+|---|---|---|---|
+| **SVG 路徑／圓環描繪** (`[data-draw]`) | **`980 ms`**（範圍 `800–1,200ms`） | `cubic-bezier(0.22, 1, 0.36, 1)` | 讓眼睛清楚跟隨收斂漏斗、因果箭頭與趨勢線走向 |
+| **比例長條方向生長** (`[data-grow]`) | **`920 ms`**（多條自動交錯 `+120ms`） | `cubic-bezier(0.22, 1, 0.36, 1)` | 清楚感受前後幅度與佔比量體 |
+| **遮罩方向揭露** (`[data-wipe]`) | **`860 ms`** | `cubic-bezier(0.22, 1, 0.36, 1)` | 虛線引導針、橋接軌線平順展開不拉扯 |
+| **數字計數／機械滾輪** (`[data-count]` / `[data-odometer]`) | **`960 ms`**（位數交錯 `110ms`） | 柔緩減速煞停 | 關鍵指標沉穩落定，不瘋狂亂跳 |
+| **群組依序交錯** (`[data-stagger]`) | **`220–320 ms` / 項**（預設 `240ms`，單項 `680ms`） | `cubic-bezier(0.22, 1, 0.36, 1)` | 依 `1 → 2 → 3` 視線動線從容就位 |
+| **因果壓縮演變** (`[data-transform-at]`) | 預設 **`1,400 ms`** 觸發（含 **`≥ 600ms` 舊態靜止停頓**＋`900ms` 過渡） | `cubic-bezier(0.22, 1, 0.36, 1)` | 先看清舊態基線，再親眼見證收斂改變 |
+| **講者點擊步進** (`[data-step]`) | 容器浮現 **`580 ms`**；子原語延遲 **`revealDelay = 340 ms`** 才開跑 | `cubic-bezier(0.22, 1, 0.36, 1)` | 徹底消除容器還在半透明滑入時內部滾輪／描線已搶跑播完 |
+| **直接操控互動**（滑桿／切換／展開） | **`180–280 ms`** | `cubic-bezier(0.2, 0.9, 0.25, 1)` | 現場點擊與拖拉零遲滯跟手 |
 
-| `data-transition` | 體感與視覺比喻 | 適用敘事轉折 |
+---
+
+## 二、60fps 純 GPU 合成與底盤防呆鐵律
+
+1. **只動畫合成器屬性**：切頁與進場僅使用 `transform`、`opacity`、`clip-path`（搭配 SVG `stroke-dashoffset`）；嚴禁大面積動態 `backdrop-filter`、巨幅 `<feGaussianBlur>` 或把 `steps(5)` 用於整頁位移。
+2. **嚴守 `#stage > .slide { position: absolute; inset: 0; }`**：`shell.css` 已鎖定絕對疊放定位，**切勿在 `deck.css` 或單頁 `<style>` 將 `.slide` 改成 `position: relative/static`**（`check.mjs` 會直接硬擋 FAIL）。
+3. **SVG 描線必掛在幾何元素上**：`[data-draw]` 只能掛在具備 `getTotalLength()` 的 `<path>`、`<line>`、`<polyline>`、`<polygon>`、`<circle>`、`<rect>` 上（或圓環進度 `data-draw="ring"`），**嚴禁掛在 `<g data-draw>` 容器上**（`check.mjs` 硬擋 FAIL）；SVG 直線切勿誤用 `data-grow`（0 寬高 BBox 縮放會失效）。
+4. **單頁 CSS 註解安全**：`assemble.py` 支援單頁 `<style>` 自動加上 `[data-slide-scope="sNN"]` 屬性作用域（已處理註解內含逗號之情境），但仍建議保持選擇器簡潔清晰。
+5. **首頁與步進事件保證**：底盤於 `DOMContentLoaded` 統一派發首頁 `deck:slideenter`，並在每次 `data-step` 推進時派發 `deck:stepchange`（含 `detail.step` 與 `detail.revealDelay`），4 套 `motion-*` 風格套件皆自動對齊延遲，無需手寫 hack。
+6. **100% 確定性靜態終態**：HTML 原始 DOM 永遠寫最終正確狀態；`?still=1`、`B` 鍵省電模式、`prefers-reduced-motion: reduce` 與 `beforeprint` 列印事件皆自動展開至最終步進與完整數據。
+
+---
+
+## 三、六種敘事切頁語法（`data-transition`）
+
+| `data-transition` | 運鏡體感 | 適用敘事關係 |
 |---|---|---|
-| `push` | 電影鏡頭水平橫移（舊頁微視差退後） | 封面 → 正文、沿時間／流程軸前進 |
-| `zoom-rise` | 舊頁微退深景、新頁由下升起聚焦（可疊加 `data-morph`） | 痛點總覽 → 放大進入核心產品／系統解法 |
-| `iris` | 圓形光圈由焦點向外綻放（`data-iris-origin="48% 72%"`，可疊加 `data-morph`） | 深色演算法裝置 → 展開進入真實日光現場／情境故事 |
-| `shock` | 俐落黑幕頓點 → 巨字破暗而出（`type: shock` 自動啟用） | 情緒轉折或核心損益衝擊時刻 |
-| `morph` | 純 260ms 靜謐淡入＋**多元素編隊 Magic Move** 飛移變形 | 同組關鍵數字從結論頁直接變身現場互動試算頁 |
-| `sheet-up` | 舊頁微縮退後、亮色決策看板由底升起（如抽出簽核表） | 推演／試算 → 進度追蹤與主管拍板頁 |
-| `modal` | 景深縮放進入／退回（附件頁自動啟用） | 主線點入技術規格／原始數據附件 |
+| `push` | 鏡頭水平橫移（舊頁微視差退後） | 沿時間軸、流程軸順向推進 |
+| `zoom-rise` | 舊頁退深景、新頁由下升起聚焦（可配 `data-morph`） | 總覽切入核心系統／機制細節 |
+| `iris` | 圓形光圈由焦點綻放（`data-iris-origin="50% 65%"`） | 暗場核心裝置展開進入真實情境現場 |
+| `shock` | 黑幕頓點 → 主張破暗浮現（`type: shock` 預設） | 全場 0–2 次關鍵轉折或震撼金句 |
+| `morph` | 靜謐淡入 ＋ 跨頁同 `data-morph="id"` FLIP 飛行變形 | 核心數字／圖塊跨頁延續放大或進入試算 |
+| `sheet-up` | 亮色決策頁由底抽出升起 | 機制推演切入最終拍板／行動清單頁 |
 
 ---
 
-## 3. 頁內視線引導語法（Eye-Guidance Choreography — 詳見 `references/visual-guidance.md`）
+## 四、底盤宣告式原語速查表（唯一來源 SSOT）
 
-撰寫自由畫布頁前，先依 **`references/visual-guidance.md`** 選定視覺動線原型，再以宣告式屬性導演視線（嚴守一拍一主角、禁止左右跨螢幕乒乓與連續奔跑移動球）：
-
-- **聚光＋非焦點壓暗排程（`data-focus-plan` ＋ `data-focus="1|2|3"`）**：當拍主角 `.focus-active`（粗亮框＋≥20px 外光暈，群組／浮空字加 `data-focus-style="clean"`）、已演完 `.focus-visited`（`0.78–0.84`）、未出場 `.focus-dim`（`0.26–0.32`）；演畢／打斷／搶先互動瞬間歸零復原。
-- **因果現場演變（`data-transform-at="780"`）**：HTML 原 DOM 為最終態；進頁瞬間先套 `.pre-transform` 展現舊態，到點移除翻轉新態。
-- **語意節拍（`data-beat="1|2|3|4"` ＋ `data-from`）**：`BEAT_MS = {1:120, 2:1480, 3:2840, 4:4200}`（預設拍距 1360ms＝600ms 進場＋760ms 靜止閱讀窗；容器可設 `data-beat-gap="1500"` 調整全頁拍距，單一元素可配 `data-delay` 精細微調）。
-- **真描線與方向揭露**：實線用 SVG `<path data-draw>`（`pathLength="1"`）；圓環用 `data-draw="ring"`；虛線引導針／時間軌／斜刪線用 HTML `data-wipe="down|right|left|up"`；長條生長用 `data-grow="x|x-left|y|y-down"`。
-- **端點綻放與目標波紋**：`data-pop` 與線條抵達時刻精準對齊；`data-ripple` 釘住插畫物件或折線端點；`data-nudge="x"` 進場微動暗示滑桿可拖曳；`data-travel` 限單段短距過場、禁跨多站滑行。
-- **高反差單次聚光框（`data-spotlight`）**、**跨頁 Magic Move（`data-morph="id"`，MIT `open-slide`）**、**節流滾動數字（`data-count`，MIT `scrolline`）**、**延遲 Canvas 2D 氛圍層（`data-fx="ambient-dust"|"soft-aurora"`，MIT `lewislulu`）**。
-
----
-
-## 4. 現場互動試算控件（Live Figures）
-*模式取自 MIT `visual-explainer`*
-
-簡報內可嵌入即時滑桿、開關或情境切換鈕：
-1. 外層容器加 `.live-ctrl`（或 `data-interactive`）：底盤自動攔截點擊與焦點按鍵，操作控件絕不誤觸翻頁（按 `Esc` 離開焦點）。
-2. 純控制條外層加 `.live-only`：列印 PDF 或 `?hide-ctrl=1` 自動隱藏滑桿外殼，保留預設數據與圖表。
-3. 頁內 `<script>` 接收 `slide` 區域變數，寫純函式 `render(fromUser)` 在初始化與 `input` 事件更新數據並於搶先操作時解除聚光壓暗。
+| 原語屬性 | 作用 | 常用選填參數 | 靜態／列印表現 |
+|---|---|---|---|
+| `data-step="1\|2\|3"` | 講者按 `→` 累積揭曉（支援巢狀步驟嚴格隔離） | `data-step-hide="2"`、`data-step-only="0"`、`data-step-from="up\|left\|none"` | 自動展開至最大步數 |
+| `data-focus-plan="1@0-1600,2@1600-3200"` | 自動三層聚光壓暗排程，演畢或互動搶先時 100% 歸零 | 搭配子元素 `data-focus="1"`、`data-focus-style="clean"` | 全頁 `opacity: 1` |
+| `data-transform-at="1400"` | 進頁先套 `.pre-transform` 舊態，到點切換最終態 | 毫秒數（建議 `≥1200` 留足舊態閱讀窗） | 直接顯示最終態 |
+| `data-stagger="240"` | 直接子元素依序從容滑入（子元素勿重複加 `.rv`） | 毫秒間距（建議 `220–320`） | 全部正常顯示 |
+| `data-beat="1\|2\|3\|4"` | 語意分拍進場（預設拍距 `1360ms`） | `data-from="up\|left\|right"`、`data-beat-gap` | 全部正常顯示 |
+| `data-draw` / `data-draw="ring"` | SVG 幾何路徑描繪／圓環掃描 | `data-delay`、`data-dur`（預設 `980`） | 完整繪出 |
+| `data-grow="x\|x-left\|y\|y-down"` | HTML 條圖／甘特條純 GPU 方向生長 | `data-delay`、`data-dur`（預設 `920`） | 完整展開 |
+| `data-wipe="right\|left\|down\|up"` | HTML 虛線／軌線 `clip-path` 方向揭露 | `data-delay`、`data-dur`（預設 `860`） | 完整展開 |
+| `data-count` | 數字從 0（或 `data-from`）滾動至文字終值 | `data-delay`、`data-dur`（預設 `960`） | 顯示最終數值 |
+| `data-pop` / `data-ripple` | 線條終點圓點綻放／目標點單次雙圈波紋 | `data-delay`（對齊 `data-draw` 抵達時刻） | `pop` 顯示／`ripple` 隱藏 |
+| `data-morph="key"` | 前後頁同 `key` 元素跨頁 FLIP 平滑變形 | `--morph-ms`（預設 `780`） | 各自正常顯示 |
+| `.live-ctrl` ＋ `.live-only` | 現場互動控件防誤翻隔離＋列印自動隱藏控制列 | 頁內 `<script>` 監聽 `input` 即時重算 | 隱藏 `.live-only` 外殼 |
 
 ---
 
-## 5. v4.5 三層按需引擎架構（Layer 0 輕底盤 ＋ Layer 1 講者工具 ＋ Layer 2 按需內容模組）
+## 五、三層按需引擎與外掛生命週期契約
 
-v4.5 輕底盤引擎將**核心基礎設施**、**講者臨場工具**與**內容說服模組**徹底解耦：`assemble.py` 會依 `delivery`／`meta.presenter_tools` 掛載 Layer 1，並細粒度掃描投影片 HTML，**僅將實際用到的 Layer 2 模組（甚至單一特效與單一元件 CSS）注入 `deck.html`，未用到即 0 KB 零負擔**，並寫入 `window.DECK.modules` 與 `window.DECK.presenterTools`。
-
-### 5.1 核心雙軌擴充（常駐於 `shell.css` ＋ `runtime.js`）
-1. **單頁明暗極性（`data-surface="dark|light|split|photo"`）**：
-   - 可寫在 `<section class="slide canvas" data-surface="light">` 或 `storyboard.yaml` 單頁 `surface:` 欄位。
-   - 底盤依 `--light-*`／`--dark-*`（`deck.css` 可覆寫，未定則自動退回高對比安全預設）切換底色與文字變數，並同步更新 `#stage[data-active-surface]` 讓導航與外殼自動反差。
-2. **導航模式（`meta.nav_mode`：`top-bar` / `minimal-side` / `divider-only`）與自動隱藏底控膠囊**：
-   - `meta.stage_mode: keynote` 預設 `divider-only`；單頁可用 `data-nav="minimal-side|top-bar|divider-only|inline|none"` 覆寫。
-   - 所有模式統一內建 **2px 極細進度條**與**自動隱藏懸浮底控膠囊 `#ctrl-bar`**（滑鼠移近視窗底邊 96px 浮現，顯示頁碼、步進狀態與 `N/B/F` 快捷鈕，2.2 秒無操作自動淡出；`?still=1`、列印與 `?hide-ctrl=1` 完全隱藏）。
-3. **講者可控點擊步進（`data-step` / `data-step-hide` / `data-step-only`）**：
-   - 與預設 `0-step` 自動視覺指引雙軌並行。`data-step="1|2|3"` 累積揭曉，`data-step-hide="2"` 指定步數退場，`data-step-only="0|1"` 單步獨顯（支援單頁多層換幕）；可配 `data-step-from="up|down|left|right|scale|none"`。
-   - 步進區塊內部的 `data-draw`、`data-wipe`、`data-count`、`data-pop` 會延遲至該步點擊才觸發。
-   - 尾步後按 `→` 翻下頁；往回翻進前頁時自動落於該頁終態（step N），步進中按 `←` 逐層回退；`?still=1`、`B` 鍵與列印自動展開最終態並隱藏已退場圖層。
-
-### 5.2 三層細粒度按需自動注入架構（v4.5 升級，完整對照見 `references/modules-catalog.md`）
-
-- **Layer 1 講者臨場工具（`assets/presenter/`）**：`grid`（`G` 16:9 總覽）、`annotator`（`A` 畫筆／`L` 雷射／`C` 清除）、`speaker`（`S` 雙螢幕講者同步）；依 `delivery` 自動載入或由 `meta.presenter_tools` 覆寫。
-- **Layer 2 內容說服模組（掃描 HTML 細粒度注入，未用到 0 KB）**：
-  - `components/*`（單檔注入 `status-table`／`pillars`／`toc`／`cmp-fallback`／`device-frame`）
-  - `ambient-fx/*`（單特效注入 6 種讀色票 Canvas：`ambient-dust`／`soft-aurora`／`constellation`／`data-stream`／`orbit-ring`／`confetti-burst`）
-  - `live-controls`（滑桿／`[data-segmented]`／`[data-toggle]`／`[data-presets]`／`[data-reset]`）、`fit`（含 `data-fit="box"` 與 `?noscale=1`）
-  - `media`（影片 `data-start`/`data-end`/`data-rate`/全螢幕 ＋ 音檔/`[data-sound-ab]` 同步 A/B 切換）
-  - `flow-carousel`（`vertical|horizontal|stepper|chat` 4 模式）、`coverflow`（3D 輪播＋燈箱＋`[data-marquee]`）
-  - `linked-highlight`（`[data-ref]` 文圖雙向聯動）、`compare-slider`（`[data-compare-slider]` 前後拉桿）、`code-stage`（`[data-code-stage]` 步進程式碼聚焦＋`[data-typewriter]`）、`visual-flair`（`[data-zoomable]` 燈箱＋`[data-tilt]`≤5°＋`[data-spotlight-hover]`）。
-  - **風格綁定動態原語（`assets/modules/motion/*`，v4.7 與 `styles/index.json` 一體掛勾）**：
-    - `motion-workday`：`[data-ruler-progress]`、`[data-bento-expand]`
-    - `motion-counsel`：`[data-rank-race]`、`[data-odometer]`、`[data-rack-focus]`
-    - `motion-apple`：`[data-split-mask]`、`[data-spotlight-sweep]`、`[data-depth-deck]`、`[data-colorize-wipe]`
-    - `motion-story`：`[data-popup-fold]`、`[data-chat-replay]`
-
-### 5.3 靜態上限 × 動態上限融合原則與迪士尼物理守則（消除塑膠感、嚴禁降級畫面）
-
-0. **先立 1920×1080 靜態美感上限，再賦予動態呼吸（融合第一鐵律）**：每一頁即使凍結於 `?still=1`，也必須保有該風格的最高靜態視覺工藝（現代 6 格 Bento、麥肯錫色塊即圖表、微光實景裝置、真實無字 AI 黏土／攝影底圖融真字）。**嚴禁為了套用動效而把畫面降級成簡陋 UI 控制條、空白方塊或 Emoji 卡片**——動態原語必須直接「寄生」在風格原生視覺結構（甘特條、圓環、巨型色塊柱、裝置內曲線、底圖光掃與真實場景物件）上。
-1. **主從延遲（Follow-Through）**：主標題／主視覺先到，細節標籤、目標線與陰影慢 120–220ms 跟上，絕不齊步同時淡入。
-2. **節奏不對稱（Timing Asymmetry）**：進場快切慢煞（強調抵達感）、退場乾脆迅速；不同通道（位移 vs 透明 vs 縮放）錯開曲線。
-3. **依風格決定過衝（Overshoot & Settle）**：`workday` 零過衝俐落煞停；`counsel` 僅數字滾輪帶極微煞停感；`apple` 與 `illustration` 適度加入物理彈性回正。
-4. **風格綁定、絕不混搭失控**：永遠從 `styles/index.json` 查詢該風格的 `motion_dna`（推薦原語與禁忌清單），讓動態服務主題與風格而非炫技。
-
-> 撰寫各模組詳細 HTML 語法與場合預算上限時，請按需查閱 `references/modules-catalog.md` 與 `references/modules/` 子手冊（含 `style-motion-kits.md`）。
-
----
-
-## 6. 雙重靜態保險與快捷鍵
-
-| 機制 | 觸發方式 | 行為 |
-|---|---|---|
-| **靜態檢核模式** | 網址加 `?still=1`（`check.mjs` 自動啟用） | 跳過動畫與 Canvas FX，數字／圖表／SVG 精準定格最終態 |
-| **低耗電凍結開關** | 播放中按 `B` 鍵 | 切換 `body.low-power`，凍結動態與微塵 |
-| **系統減少動態** | `prefers-reduced-motion: reduce` | 改用極簡純淡入淡出 |
-| **列印／輸出 PDF** | 按 `P` 鍵或 `check.mjs --pdf` | 全頁展開 `1920×1080`、隱藏 `.live-only`、保留完整靜態數據與圖表 |
-
----
-
-## 7. 旗艦專案外掛事件契約（按需啟用）
-
-若使用者明確同意導入外部動效庫（如 GSAP、Motion、Three.js），監聽 `#stage` 生命週期事件並尊重靜態旗標：
-
-```js
-const stage = window.__deck.stage;
-stage.addEventListener('deck:slideenter', ({ detail }) => {
-  if (detail.staticMode) return;
-  // 僅啟動目前頁面動畫
-});
-stage.addEventListener('deck:slideleave', ({ detail }) => {
-  // 立即清理上一頁時間軸／WebGL rAF
-});
-stage.addEventListener('deck:lowpower', ({ detail }) => {
-  // detail.lowPower === true 時暫停或定格
-});
-```
+- **Layer 0 常駐輕底盤（`shell.css` + `runtime.js`）**：1920×1080 等比舞台、單頁 `data-surface="light|dark|split|photo"`、三種 `nav_mode`、雙軌節拍、Overlay `Esc` 優先級佇列。
+- **Layer 1 講者工具（`assets/presenter/`，依 `delivery` 自動載入）**：`grid`（`G`）、`annotator`（`A`/`L`/`C`）、`speaker`（`S` 雙螢幕講者台）。
+- **Layer 2 細粒度按需模組（掃描 HTML 自動注入，未用到 0 KB）**：`components/*`、`ambient-fx/*`、`live-controls`、`fit`、`media`、`flow-carousel`、`coverflow`、`linked-highlight`、`compare-slider`、`code-stage`、`visual-flair`，以及 **4 套風格綁定動態套件 `motion-{workday,counsel,apple,story}`**（詳細語法見 `references/modules-catalog.md` 與 `references/modules/style-motion-kits.md`）。
+- **外部動效庫事件契約（僅旗艦專案徵得同意後啟用）**：監聽 `window.__deck.stage` 之 `deck:slideenter`（檢查 `detail.staticMode`）、`deck:stepchange`（讀取 `detail.step` 與 `detail.revealDelay`）、`deck:slideleave`（清理計時器與 rAF）與 `deck:lowpower`。

@@ -58,7 +58,7 @@
           box.appendChild(strip);
           el.appendChild(box);
           const d = parseInt(ch, 10);
-          strips.push({ strip, targetIdx: 10 + d, delay: i * 65 });
+          strips.push({ strip, targetIdx: 10 + d, delay: i * 110 });
         } else {
           const st = document.createElement('span');
           st.className = 'odo-static';
@@ -71,12 +71,12 @@
         strip.style.transition = 'none';
         strip.style.transform = 'translateY(0)';
         strip.getBoundingClientRect();
-        strip.style.transition = `transform ${820 + delay}ms cubic-bezier(0.16, 1.04, 0.28, 1) ${delay}ms`;
+        strip.style.transition = `transform ${960 + delay}ms cubic-bezier(0.22, 1, 0.36, 1) ${delay}ms`;
         strip.style.transform = `translateY(-${targetIdx * 1.05}em)`;
       });
       const maxDelay = strips.length ? strips[strips.length - 1].delay : 0;
-      // Total finish time for last digit = duration (820 + maxDelay) + delay (maxDelay) + safety buffer
-      settleTimer = setTimeout(() => renderStatic(str), 820 + 2 * maxDelay + 80);
+      // Total finish time for last digit = duration (960 + maxDelay) + delay (maxDelay) + safety buffer
+      settleTimer = setTimeout(() => renderStatic(str), 960 + 2 * maxDelay + 90);
     }
 
     render(initialText, false);
@@ -240,6 +240,7 @@
       }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
       if (detail.dir < 0 || isReduced()) {
@@ -247,8 +248,19 @@
         sl.querySelectorAll('[data-rank-race]').forEach(el => el._rrInit && el._rrInit.stop());
         return;
       }
-      sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) === detail.step) el._odoInit.play(); });
-      sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) === detail.step) el._rrInit.play(); });
+      const targetStep = detail.step;
+      const runStep = () => {
+        if (deck.slides[deck.index] !== sl || deck.stepIndex !== targetStep || isReduced()) return;
+        sl.querySelectorAll('[data-odometer]').forEach(el => { if (el._odoInit && stepOf(el, sl) === targetStep) el._odoInit.play(); });
+        sl.querySelectorAll('[data-rank-race]').forEach(el => { if (el._rrInit && stepOf(el, sl) === targetStep) el._rrInit.play(); });
+      };
+      const delay = detail.revealDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); runStep(); }, delay);
+        enterTimers.add(id);
+      } else {
+        runStep();
+      }
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       clearEnterTimers();

@@ -1,13 +1,13 @@
 {
-  "version": "4.7",
-  "note": "風格 × 動態一體化資料庫。全部 12 款風格皆支援淺／深雙底（用色鎖規則不鎖色碼）並各自綁定專屬動態 DNA（Motion DNA）；目前已就緒 4 款完整 Style & Motion DNA（counsel／apple／illustration／workday），其餘 8 款已預定動態個性，將於 Phase D 補齊完整憲法。主題→風格的推薦以 references/contexts.md〈主題類型總表〉為唯一來源；best_for 只描述各風格擅長的題材，stage_fit 只是常用場合的參考，不拿來排除風格。assemble.py 會依實際用到的動態原語按需細粒度注入對應模組（未用到 0 KB）。",
+  "version": "5.0",
+  "note": "風格 × 動態一體化資料庫（v5.0）。完整保留 4 款已就緒（ready：workday／counsel／apple／illustration）＋ 8 款規劃中（planned）共 12 款風格架構，全部支援淺／深雙底、airy／structured 雙密度語法，並共享「全風格統一從容慢板」敘事動效基準（800–1200ms 描繪生長、220–320ms 群組交錯、~200ms 即時操控回應）。assemble.py 依實際用到的動態原語按需細粒度注入對應模組（未用到 0 KB）。",
   "motion_library": {
     "kits": {
       "motion-workday": {
         "style": "workday",
         "css": "modules/motion/workday-kit.css",
         "js": "modules/motion/workday-kit.js",
-        "physics": "crisp-snap (zero overshoot, fast settle, clear focus hierarchy)",
+        "physics": "calm-precision (zero overshoot, calm human-breath stagger, ~200ms direct controls)",
         "primitives": [
           { "id": "ruler-progress", "attr": "data-ruler-progress", "label": "刻度尺阻尼推進＋目標達標亮燈" },
           { "id": "bento-expand", "attr": "data-bento-expand", "label": "看板卡片點擊展開＋同排壓暗聚焦" }
@@ -17,10 +17,10 @@
         "style": "counsel",
         "css": "modules/motion/counsel-kit.css",
         "js": "modules/motion/counsel-kit.js",
-        "physics": "editorial-weight (authoritative acceleration, crisp brake, evidence first)",
+        "physics": "editorial-weight (calm authoritative glide, smooth settle, evidence & causality first)",
         "primitives": [
           { "id": "rank-race", "attr": "data-rank-race", "label": "FLIP 排名攀升超車交換" },
-          { "id": "odometer", "attr": "data-odometer", "label": "機械滾輪數字逐位精準煞停" },
+          { "id": "odometer", "attr": "data-odometer", "label": "機械滾輪數字從容煞停" },
           { "id": "rack-focus", "attr": "data-rack-focus", "label": "推鏡景深聚焦（非焦點微柔焦退後）" }
         ]
       },
@@ -28,7 +28,7 @@
         "style": "apple",
         "css": "modules/motion/apple-kit.css",
         "js": "modules/motion/apple-kit.js",
-        "physics": "cinema-spring (dramatic anticipation, elastic settle, optical light follow-through)",
+        "physics": "cinema-spring (calm anticipation, smooth spring settle, optical light follow-through)",
         "primitives": [
           { "id": "split-mask", "attr": "data-split-mask", "label": "文字裁切遮罩逐行拉起" },
           { "id": "spotlight-sweep", "attr": "data-spotlight-sweep", "label": "單次聚光掃字顯影（掃完即靜止，游標可探照）" },
@@ -40,7 +40,7 @@
         "style": "illustration",
         "css": "modules/motion/story-kit.css",
         "js": "modules/motion/story-kit.js",
-        "physics": "tactile-bounce (warm overshoot & settle, primary-to-secondary follow-through)",
+        "physics": "tactile-bounce (calm warm settle, primary-to-secondary follow-through)",
         "primitives": [
           { "id": "popup-fold", "attr": "data-popup-fold", "label": "立體書 3D 翻折立起＋主從彈性落位" },
           { "id": "chat-replay", "attr": "data-chat-replay", "label": "對話氣泡實況劇院（含輸入脈動）" }
@@ -73,8 +73,8 @@
       "signature": "現代便當格狀態卡＋雙語意色甘特與圓環進度＋掃讀式 A/B 拍板卡",
       "motion_dna": {
         "kit": "motion-workday",
-        "personality": "俐落精準（Crisp Snap）",
-        "easing": "cubic-bezier(0.2, 0.9, 0.25, 1)",
+        "personality": "從容俐落（Calm Snap）",
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
         "disney_focus": ["staging", "timing-asymmetry"],
         "signature_motions": ["ruler-progress", "bento-expand"],
         "recommended_modules": ["components", "linked-highlight", "compare-slider", "visual-flair(zoomable)"],
@@ -86,18 +86,18 @@
       "name": "顧問報告",
       "status": "ready",
       "spec": "styles/counsel.md",
-      "mood": ["大膽", "理性", "有說服力", "數據主導"],
+      "mood": ["溫潤理性", "畫廊秩序", "有說服力", "數據主導"],
       "formality": "high",
       "default_mode": "light",
       "modes": ["light", "dark"],
       "stage_fit": ["briefing", "pitch"],
-      "best_for": ["策略提案", "決策會議", "高階報告", "專案評估", "商業比較", "前後成效對照"],
+      "best_for": ["策略提案", "決策會議", "高階報告", "年度戰術成果", "商業比較", "前後成效對照"],
       "avoid_for": ["慶典活動", "感性故事分享", "兒童或家庭日"],
-      "signature": "色塊就是圖表、巨大數字、單一焦點色＋中性灰、虛線目標線與斜線差距標註",
+      "signature": "溫潤畫廊紙面層次、三階字重對比、比例圖表與收斂漏斗、雙語意主色分工（airy／structured 雙密度）",
       "motion_dna": {
         "kit": "motion-counsel",
         "personality": "權威定焦（Editorial Weight）",
-        "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
         "disney_focus": ["staging", "slow-in-slow-out", "secondary-action"],
         "signature_motions": ["rank-race", "odometer", "rack-focus"],
         "recommended_modules": ["live-controls", "linked-highlight", "compare-slider", "components"],

@@ -137,6 +137,7 @@
       }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
       if (detail.dir < 0 || isReduced()) {
@@ -144,8 +145,19 @@
         sl.querySelectorAll('[data-chat-replay]').forEach(el => el._crInit && el._crInit.showAll());
         return;
       }
-      sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) === detail.step) el._pfInit.play(); });
-      sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) === detail.step) el._crInit.play(); });
+      const targetStep = detail.step;
+      const runStep = () => {
+        if (deck.slides[deck.index] !== sl || deck.stepIndex !== targetStep || isReduced()) return;
+        sl.querySelectorAll('[data-popup-fold]').forEach(el => { if (el._pfInit && stepOf(el, sl) === targetStep) el._pfInit.play(); });
+        sl.querySelectorAll('[data-chat-replay]').forEach(el => { if (el._crInit && stepOf(el, sl) === targetStep) el._crInit.play(); });
+      };
+      const delay = detail.revealDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); runStep(); }, delay);
+        enterTimers.add(id);
+      } else {
+        runStep();
+      }
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       clearEnterTimers();

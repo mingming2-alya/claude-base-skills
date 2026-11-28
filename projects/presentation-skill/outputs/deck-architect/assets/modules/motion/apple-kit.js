@@ -308,6 +308,7 @@
       }
     });
     deck.stage.addEventListener('deck:stepchange', ({ detail }) => {
+      clearEnterTimers();
       const sl = detail.slide;
       if (!sl || detail.step <= 0) return;
       if (detail.dir < 0 || isReduced()) {
@@ -316,9 +317,20 @@
         sl.querySelectorAll('[data-colorize-wipe]').forEach(el => el._cwInit && el._cwInit.setFinal());
         return;
       }
-      sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) === detail.step) el._smInit.play(); });
-      sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) === detail.step) el._spInit.start(); });
-      sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) === detail.step) el._cwInit.play(); });
+      const targetStep = detail.step;
+      const runStep = () => {
+        if (deck.slides[deck.index] !== sl || deck.stepIndex !== targetStep || isReduced()) return;
+        sl.querySelectorAll('[data-split-mask]').forEach(el => { if (el._smInit && stepOf(el, sl) === targetStep) el._smInit.play(); });
+        sl.querySelectorAll('[data-spotlight-sweep]').forEach(el => { if (el._spInit && stepOf(el, sl) === targetStep) el._spInit.start(); });
+        sl.querySelectorAll('[data-colorize-wipe]').forEach(el => { if (el._cwInit && stepOf(el, sl) === targetStep) el._cwInit.play(); });
+      };
+      const delay = detail.revealDelay || 0;
+      if (delay > 0) {
+        const id = setTimeout(() => { enterTimers.delete(id); runStep(); }, delay);
+        enterTimers.add(id);
+      } else {
+        runStep();
+      }
     });
     deck.stage.addEventListener('deck:slideleave', ({ detail }) => {
       clearEnterTimers();

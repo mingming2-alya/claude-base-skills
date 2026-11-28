@@ -441,8 +441,26 @@ def _scope_selector_list(sel_text, slide_id):
     and prevents bare selectors (.card, h2) from leaking across parallel-authored slides.
     """
     scope_sel = f'[data-slide-scope="{slide_id}"]'
+    lead_prefix = []
+    pos = 0
+    while pos < len(sel_text):
+        ws_m = re.match(r"\s+", sel_text[pos:])
+        if ws_m:
+            lead_prefix.append(ws_m.group(0))
+            pos += ws_m.end()
+            continue
+        if sel_text.startswith("/*", pos):
+            end_c = sel_text.find("*/", pos + 2)
+            end_c = len(sel_text) if end_c == -1 else end_c + 2
+            lead_prefix.append(sel_text[pos:end_c])
+            pos = end_c
+            continue
+        break
+    prefix_str = "".join(lead_prefix)
+    clean_sel = re.sub(r"/\*.*?\*/", " ", sel_text[pos:], flags=re.S)
+
     parts, buf, depth_p, depth_b = [], [], 0, 0
-    for ch in sel_text:
+    for ch in clean_sel:
         if ch == "(":
             depth_p += 1
         elif ch == ")":
@@ -460,7 +478,6 @@ def _scope_selector_list(sel_text, slide_id):
 
     out, seen_norm = [], set()
     for raw_sel in parts:
-        lead = raw_sel[:len(raw_sel) - len(raw_sel.lstrip())]
         s = raw_sel.strip()
         if not s:
             continue
@@ -479,8 +496,8 @@ def _scope_selector_list(sel_text, slide_id):
                 s = f"{scope_sel} {s}"
         if s not in seen_norm:
             seen_norm.add(s)
-            out.append(lead + s if not out else s)
-    return ", ".join(out) if out else sel_text
+            out.append(s)
+    return (prefix_str + ", ".join(out)) if out else sel_text
 
 
 KEYFRAMES_DEF_RE = re.compile(r"(@(?:-\w+-)?keyframes\s+)([A-Za-z_][\w-]*)", re.I)
