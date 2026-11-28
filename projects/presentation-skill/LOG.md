@@ -1871,3 +1871,25 @@
   - 重打包 `outputs/deck-architect.skill`（85 檔，**350.8 KB**，零 `__pycache__`，解壓後與原始碼 SHA-256 逐位元一致）。
 - **同步的檔案**：`outputs/deck-architect/{SKILL.md,assets/{shell.css,runtime.js,modules/motion/*-kit.js},scripts/{assemble.py,deck_model.py,lint.py,check.mjs},styles/{index.json,color-system.md,counsel.md,workday.md,apple.md,illustration.md},templates/{brief.md,storyboard.yaml,deck.css},references/{grill.md,samples.md,visual-guidance.md,motion-system.md,content-shapes.md,contexts.md,presentation-rules.md,modules/style-motion-kits.md}}`、`outputs/deck-architect.skill`、`outputs/examples/{v48-regression,v45-modular-demo,v44-keynote-demo,v4-alive-demo,v4-demo}/`、`inputs/presentation-principles.md`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
 - **下一步**：以真實簡報需求驗證 v5.0 首稿體驗，或推進 Phase D／Phase E。
+
+## 2026-11-28｜`deck-architect` v5.1：前兩步（Round 0 → Gate 1b）零減輪上下文 100% 隔離升級
+
+- **背景與問題拆解**：
+  - 使用者追問：「前兩步驟會不會因為用戶的相關附件資料或是進行太多輪導致對話上下文過多？這點在不減少對話輪數的前提下，有沒有機會調整？」
+  - 經第一性原理拆解：純人類顧問對談即使深聊 10–15 輪，問答文字僅佔 `~6K–10K tokens`；真正讓前兩步上下文暴漲並稀釋顧問注意力的是三件由主代理親手執行的重活：
+    1. **直讀原始附件（`30K–120K+ tokens`）**：在主對話直接展開舊 PPTX、PDF、試算表或多份計畫書，第 1 輪就把雜訊永遠鎖死在上下文；
+    2. **`fragments.md` 每輪全文重讀與覆寫（`O(R²)` 歷史副本）**：每輪 `view_file`＋`write_to_file` 會在工具歷史留下十多份不斷變長的碎片簿全文副本；
+    3. **Gate 1b 契約起草與 `lint.py` 除錯迴圈（`25K–45K tokens`）**：主代理額外載入 `content-shapes.md`、`presentation-rules.md` 與雙範本並反覆修 YAML 格式。
+- **使用者拍板（互動表單兩題定案，原則 #47）**：
+  1. **範圍**：三項分流機制全部實作並升級為 **v5.1**（不刪減任何一輪對話）。
+  2. **附件觸發門檻**：**只要有附件就 100% 派偵察子代理**（無論檔案大小、單檔或多檔、任何格式，含中途補傳檔案，主代理一律禁止直讀原始附件）。
+- **本輪修改（v5.1）**：
+  1. **新增 `templates/pre-flight.md` 與 100% 原始附件隔離契約**：定義五節結構化偵察摘要；明訂偵察官子代理（Pre-Flight Recon Subagent）於 Round 0 僅回傳第 1–3 節客觀事實摘要（`≤600 tokens`），第 4 節「舊稿／計畫結構診斷」強制延後至使用者在 Round 0 說完「心中的講法」後才動用，完整守住原則 #40 防錨定護欄。中途若需查核原始檔細節，同樣派輕量查詢子代理回報。
+  2. **新增 `scripts/fragments.py`（標準庫零外部相依）並更新 `templates/fragments.md`**：提供 `add`／`star`／`list` 三個原子子指令；`add` 每次先從磁碟重讀最新內容（100% 保留使用者在兩輪間的手動編輯、自動剝離範本 `<...>` 佔位符與替換 `--title`、自動遞增 `#N`），終端僅輸出 1 行確認（`~15 tokens`），徹底消滅 `O(R²)` 歷史副本膨脹。
+  3. **導入 Gate 1b「契約起草子代理（Contract Scribe Subagent）」與嚴格角色分流載入表（`SKILL.md`、`references/grill.md`）**：主代理在 Step 1 僅載入 `SKILL.md`＋`grill.md`＋`contexts.md`＋`structure.md`（合計 `49.5 KB`），專注多輪顧問追問與減法對焦；收斂後交由乾淨上下文 Contract Scribe 子代理讀取 `pre-flight.md`、`fragments.md`、`content-shapes.md`、`presentation-rules.md` 與範本，起草 `brief.md`（~14 欄）與 `storyboard.yaml`（`slide_plan`）並跑過 `lint.py` 除錯至 0 錯，僅回傳 `--outline` 逐頁清單與軟提醒摘要（`≤500 tokens`）給主代理簽核。
+- **驗證與重打包**：
+  - `v5.1` 專項單測（`test_v51.py`）全數通過：新檔建立與 `--title`、範本佔位符剝離、磁碟手動編輯保留、冪等標星 `⭐` 與缺號提醒、`list` 單行摘要、`pre-flight.md` 防錨定結構，以及 `SKILL.md` frontmatter `description` 長度檢核（`718 / 1024 UTF-8 bytes`）；`v5.0` 全套單元與瀏覽器契約測試同步重跑零回歸通過。
+  - 重新打包 `outputs/deck-architect.skill`（**87 檔，356.1 KB**，零 `__pycache__`，解壓後與原始碼 SHA-256 逐位元一致）。
+- **同步的檔案**：`outputs/deck-architect/{SKILL.md,references/grill.md,scripts/fragments.py,templates/{pre-flight.md,fragments.md}}`、`outputs/deck-architect.skill`、`inputs/presentation-principles.md`、`ROADMAP.md`、`STATUS.md`、`LOG.md`。
+- **下一步**：以真實簡報需求實測 v5.1「多輪深聊零膨脹 × Draft 1 一稿驚豔」完整體驗，或推進 Phase D／Phase E。
+

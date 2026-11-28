@@ -1,6 +1,18 @@
 # 狀態：presentation-skill（deck-architect）
 
-> **最新接手點（2026-11-28｜`deck-architect` v5.0：真實高密度商務簡報端到端壓測 × `/grill-me` 第一性原理淨負複雜度重構 ✅）**：
+> **最新接手點（2026-11-28｜`deck-architect` v5.1：前兩步 Round 0 → Gate 1b 零減輪上下文 100% 隔離升級 ✅）**：
+>
+> - **背景**：使用者檢視 v5.0 後追問「前兩步（Round 0 → Gate 1a → Gate 1b）會不會因為使用者附件資料或進行太多輪導致對話上下文過多？能否在**不減少任何對話輪數**的前提下調整？」。經拆解確認：10 輪純顧問文字對話僅佔 ~6K–10K tokens，真正撐爆主對話的是三件重活（直讀原始附件 30K–120K+ tokens、每輪重讀覆寫 `fragments.md` 的 `O(R²)` 歷史副本、Gate 1b 載入形狀規則與範本手寫長 YAML 並跑 `lint.py` 迴圈）。使用者經互動表單拍板**三項全上＋100% 原始附件絕對隔離（無論檔案大小或格式）**，正式升級為 **v5.1（原則 #47）**：
+> - **v5.1 三大隔離落地（顧問對話輪數 0 刪減）**：
+>   1. **100% 原始附件絕對隔離（Pre-Flight Recon Subagent ＋ `templates/pre-flight.md`）**：只要使用者提供任何既有檔案或附件（**無論檔案大小或格式**，含中途補檔），主代理**嚴禁直接讀取原始附件**；一律派乾淨只讀偵察官子代理讀完全部附件寫入 `decks/<name>/pre-flight.md` 並以 `fragments.py add` 寫入初始原話種子，Round 0 僅回傳第 1–3 節客觀事實摘要（≤600 tokens），第 4 節舊稿結構診斷延後至使用者說完「心中的講法」後才動用（守住原則 #40 防錨定）。
+>   2. **`scripts/fragments.py` 零重讀原子 CLI（`add` / `star` / `list`）**：取代主對話每輪 `view_file`＋整檔覆寫 `fragments.md`；腳本在磁碟端自動重讀最新內容（100% 保留使用者手動編輯、自動清除範本 `<...>` 佔位符並遞增 `#N`），終端僅回傳 1 行確認（~15 tokens），徹底消滅多輪 `O(R²)` 全文歷史副本。
+>   3. **Gate 1b 契約起草子代理（Contract Scribe Subagent）**：主代理完成多輪細節減法對焦後，將已拍板決策包交給乾淨上下文 Contract Scribe 子代理讀取 `pre-flight.md`、`fragments.md`、`content-shapes.md`、`presentation-rules.md` 與範本，起草去重版 `brief.md`（~14 欄）與 `storyboard.yaml`（`slide_plan`）並自修 `lint.py` 至 0 錯，僅回傳 `--outline` 逐頁清單與軟提醒摘要（≤500 tokens）給主代理送簽。
+> - **驗證**：
+>   - `v5.1` 專項單測全過（`scripts/fragments.py` 新檔建立、範本佔位符剝離、磁碟手動編輯保留、冪等標星 `⭐` 與缺號提醒、`list` 單行摘要；`templates/pre-flight.md` 五節結構與第 4 節防錨定護欄；`SKILL.md` frontmatter `description` 為 `718 / 1024 UTF-8 bytes`），且 `v5.0` 全套單元與無頭瀏覽器契約測試零回歸通過。
+>   - 重打包 `outputs/deck-architect.skill`（**87 檔，356.1 KB**，零 `__pycache__`，解壓後與原始碼 SHA-256 逐位元一致）。
+> - **下一步**：拿下一份真實簡報需求驗證 v5.1「多輪深聊零膨脹 × Draft 1 首稿即驚豔」體驗，或推進 Phase D（其餘 8 款風格）／Phase E（獨立原生可編輯 PPTX 轉換技能）。
+>
+> **前一段（2026-11-28｜`deck-architect` v5.0：真實高密度商務簡報端到端壓測 × `/grill-me` 第一性原理淨負複雜度重構 ✅）**：
 >
 > - **背景（去敏摘要）**：以一份高難度真實高階主管商務簡報（需在極少頁數內同時講清「全年戰術大幅收斂、跨組矩陣分工、多領域落地實證與下年度閉環路線」）完成首輪完整端到端實戰壓測，對照三份前序審計報告進行零包袱獨立實證審查（量測證實第三份前序報告擬加的字級區間、套框層數與右左色塊佔比三條機械公式會誤殺使用者最滿意的黃金定稿頁與內建配方），並透過 **5 輪 `/grill-me` 互動表單**清空全部設計樹分支，正式升級為 **v5.0（原則 #41–#46）**：
 > - **v5.0 六大改造落地**：
@@ -22,7 +34,7 @@
 > - **v4.10.2 改了什麼**（原則 #39–#40）：
 >   1. 推薦的不是使用者的版本時，選架構那一題附「你的版本＋補掉最弱點」選項、寫出使用者版本好在哪；推薦依據的前提還沒驗證，就先問或寫成條件句（`references/grill.md` 節點群 B 第 8 項、`references/structure.md`、`SKILL.md` Step 1a 第 4 步）。
 >   2. Round 0 用一題複選事實題問架構硬限制（誰上台、誰能要求改結構、頁數上限含不含封面與目錄、指定模板或章節、會後寄不寄），標準與快速模式都問；節點群 A 第 5a 項改為追問其餘（`grill.md`、`contexts.md`、`SKILL.md`）。
->   3. Round 0 只給事實，結構診斷與 Agent 的看法等使用者說完心中的講法再端出（`grill.md` 原則 4 與 Round 0、`SKILL.md`）。
+>   3. Round 0 只給事實，結構診斷與 Agent 的看法等使用者說完心中的講法再給（`grill.md` 原則 4 與 Round 0、`SKILL.md`）。
 >   4. `lint.py` 的 brief 欄位比對接受 `**欄位**（說明）：` 與 `**欄位：**` 兩種寫法；storyboard 新增 `meta.toc`（`auto`／`none`／`agenda`／`per-chapter`）覆寫自動目錄，`lint.py` 驗證值並在頁數算術與 `--outline` 跟著算（`scripts/{deck_model.py,lint.py}`、`templates/storyboard.yaml`、`references/presentation-rules.md`）。
 > - **驗證**：
 >   - 5 份範例 storyboard lint 與改版前一致；`v4-alive-demo/brief.md` 0 錯 0 警；四份回放 brief 的 lint 結果與改版前一致。
@@ -111,7 +123,7 @@ _最後更新：2026-11-28_
    - 每個段落結束就同步：`STATUS.md`、`LOG.md`、commit、push。
    - Stop hook 會檢查有沒有沒推的變更。
    - **所有要問使用者的問題一律用互動表單（AskUserQuestion）**。每題能單獨看懂，題目互不依賴，一題最多 4 個選項；收斂型決策題把推薦選項放第一個標「（推薦）」並寫理由，發散型腦力激盪題（如故事種子）不標「（推薦）」避免錨定。
-4. 驗證腳本：`scripts/lint.py` 可檢查 `storyboard.yaml`（含 `slide_plan`、自由畫布 `slides/*.html` 約束與軟漂移提醒）與 `brief.md`（相容 v5 去重 ~14 欄與 v4 舊版）；`scripts/check.mjs` 支援 Playwright 與系統 Chromium CDP 自動退路，嚴守純物理／工程邊界（像素 WCAG、溢出、`<18px`、JS 錯誤、`#stage > .slide` 定位、禁 `<g data-draw>`、測遍全場 `data-step` 並輸出 `check/filmstrip-sXX.jpg` 分鏡條）。改動底盤或腳本後，先跑 `outputs/examples/v48-regression/`。執行 `lint.py`/`assemble.py` 若遇 pyenv 缺 PyYAML，改用 `/usr/bin/python3`。
+4. 驗證腳本：`scripts/fragments.py`（標準庫零相依）支援 `add`/`star`/`list` 原子操作 `fragments.md`；`scripts/lint.py` 可檢查 `storyboard.yaml`（含 `slide_plan`、自由畫布 `slides/*.html` 約束與軟漂移提醒）與 `brief.md`（相容 v5 去重 ~14 欄與 v4 舊版）；`scripts/check.mjs` 支援 Playwright 與系統 Chromium CDP 自動退路，嚴守純物理／工程邊界（像素 WCAG、溢出、`<18px`、JS 錯誤、`#stage > .slide` 定位、禁 `<g data-draw>`、測遍全場 `data-step` 並輸出 `check/filmstrip-sXX.jpg` 分鏡條）。改動底盤或腳本後，先跑 `outputs/examples/v48-regression/`。執行 `lint.py`/`assemble.py` 若遇 pyenv 缺 PyYAML，改用 `/usr/bin/python3`。
 
 ## 階段與進度
 
@@ -123,7 +135,7 @@ _最後更新：2026-11-28_
 | **Phase B 預研** | **動態技術路線研究與定案**：實查 14 個 GitHub Repo（`inputs/motion-research.md`），定案 **方案 1｜分層混合** | ✅ 定案 |
 | **Phase B / B.2 / B.3** | **反寫靜態工藝與原則 #26 ＋ 60fps 動態引擎 ＋ 視覺指引規格與原語（v4.3）**：`v4-alive-demo` 8 頁靜態＋7 項動態實測全過 | ✅ |
 | **Phase C.1** | **真實旗艦標竿對照 ＋ v4.4-spec 規格與 Grill v2 全面升級**：三段式舞台光譜、設計樹 Grill v2（融合 `mattpocock/skills`）、原則 #27–#30、9 份核心規格反寫並重打包 | ✅ |
-| **Phase C.2 / v5.0** | **v4.4→v5.0 真實高密度商務壓測與第一性原理淨負複雜度重構**：完成三層按需引擎與 v1 四案盲測 4/4 命中，並經首輪真實端到端壓測與 `/grill-me` 升級至 **v5.0**（透明 5 關、去重 `brief`＋`slide_plan`、關鍵 1 頁 3 風格活體比稿＋1 輪防走鐘、解鎖 4 款雙密度 Style DNA、全風格從容慢板、100% 子代理隔離、4 大底盤 Bug 修復、純工程 `check.mjs`＋步進分鏡條＋單輪有界 Critic、核心常駐文件瘦身 −53%） | ✅ v5.0 收官 → 下一步：下輪真實簡報實測／Phase D／Phase E |
+| **Phase C.2 / v5.1** | **v4.4→v5.1 真實高密度商務壓測與第一性原理淨負複雜度重構**：完成三層按需引擎與 v1 四案盲測 4/4 命中，並經首輪真實端到端壓測與 `/grill-me` 升級至 **v5.0/v5.1**（透明 5 關、前兩步零減輪上下文 100% 隔離：`pre-flight.md`＋`fragments.py`＋Contract Scribe 子代理、去重 `brief`＋`slide_plan`、關鍵 1 頁 3 風格活體比稿＋1 輪防走鐘、解鎖 4 款雙密度 Style DNA、全風格從容慢板、100% Builder 子代理隔離、4 大底盤 Bug 修復、純工程 `check.mjs`＋步進分鏡條＋單輪有界 Critic、核心常駐文件瘦身 −53%） | ✅ v5.1 收官 → 下一步：下輪真實簡報實測／Phase D／Phase E |
 | **Phase D** | **多元風格庫全面成形**：補齊其餘 8 款「靜態×動態一體」Style DNA（各含淺深規則與風格動態套件並上架 `style-library.html`）、整理插畫 15 種畫風配方表、外觀帳本 | 未開始 |
 | **Phase E** | **交付、修改閉環與記憶**：成品按 `E` 改字回寫、畫面上點選留言修改、獨立的「`deck.html` → 原生文字與圖塊可編輯 PPTX」轉換技能、品味記憶、評估搬進 `skills/` 正式安裝（雙螢幕講者模式 `S` 已於 v4.5 完成，單輪有界 Critic 已於 v5.0 完成） | 未開始 |
 
@@ -145,6 +157,7 @@ _最後更新：2026-11-28_
 | **主題類型總表是唯一來源**；`stage_fit` 只標常用場合、不壓暗；`style-library.html` 每卡標示適配主題與對齊原語 | 11-26 / 11-27 | `references/contexts.md` 第二節、`styles/index.json`、`assets/style-library.html` |
 | **可檢查產出＋關卡拍板**（取代「不能檢查的規則不寫」）；真實簡報 PK 只用在開發階段 | 11-26 | `ROADMAP.md` 專案原則、`scripts/lint.py`（brief＋自由畫布 HTML 檢查＋`--outline`） |
 | **v5.0 淨負複雜度重構定案**：透明 5 關雙互動鐵律、去重 `brief`（~14 欄）＋7 類 `slide_plan`（含 `scaffold`）＋`notes`/`appendix` 放行與軟提醒、關鍵 1 頁 3 風格活體比稿＋1 輪防走鐘、解鎖 4 款雙密度 Style DNA（保留 12 款架構）、全風格統一從容慢板×正交 `data-step`、100% 子代理隔離＋純工程 `check.mjs`（含 `filmstrip-sXX.jpg`）＋單輪 Critic、乾淨收尾在 HTML | 11-28 | 原則 #41–#46、`SKILL.md`、`references/*`、`styles/*`、`scripts/*`、`assets/*` |
+| **v5.1 前兩步零減輪上下文 100% 隔離定案**：不刪減任何顧問對話輪數；無論檔案大小或格式一律派偵察官子代理讀取附件寫 `pre-flight.md`（Round 0 僅回 ≤600 tokens 客觀事實，第 4 節結構診斷延後防錨定）；`scripts/fragments.py` 磁碟原子追加消滅 `O(R²)` 重讀副本；Gate 1b 由 Contract Scribe 子代理寫 `brief.md`＋`storyboard.yaml` 並跑完 `lint.py` | 11-28 | 原則 #47、`SKILL.md`、`references/grill.md`、`scripts/fragments.py`、`templates/{pre-flight.md,fragments.md}` |
 | **預設零等待全自動產出＋可選 `IMAGE_UPGRADE.md`** | 11-23 | 原則 #25、`scripts/assemble.py` |
 | **四大靜態視覺工藝標準＋原則 #26（含四項合法豁免）＋靜態×動態融合第一鐵律** | 11-23 / 11-28 | 原則 #26、#42、`references/{presentation-rules.md,motion-system.md,visual-guidance.md}` |
 | **視覺指引（主柱二核心）＋ Phase B.3 六大 Takeaway 固化** | 11-23 / 11-26 | `assets/runtime.js`、`assets/modules/motion/*.{css,js}`、`references/visual-guidance.md`、`scripts/check.mjs` |
@@ -155,8 +168,8 @@ _最後更新：2026-11-28_
 
 | 路徑 | 內容 |
 |---|---|
-| `outputs/deck-architect/` | **v5.0 完整版 Skill 原始碼（85 檔）**：透明 5 關雙互動鐵律、去重 `brief.md`（~14 欄）＋`storyboard.yaml` 7 類 `slide_plan`、關鍵 1 頁 3 風格並行活體比稿＋定版活範本 1 輪防走鐘、解鎖 `counsel` 等 4 款雙密度 Style DNA（保留 8 款規劃中共 12 款）、全風格統一從容慢板動效、100% Builder 子代理職能隔離、4 大底盤真 Bug 修復、純工程 `check.mjs`（測遍全場 `data-step` 並輸出 `filmstrip-sXX.jpg` 分鏡條）＋單輪有界 Critic、核心常駐文件瘦身 −53% |
-| `outputs/deck-architect.skill` | **v5.0 打包檔（350.8 KB，85 檔，零 `__pycache__`，解壓後與原始碼 SHA-256 逐位元一致）** |
+| `outputs/deck-architect/` | **v5.1 完整版 Skill 原始碼（87 檔）**：透明 5 關雙互動鐵律、前兩步零減輪上下文 100% 隔離（`pre-flight.md` 偵察子代理＋`scripts/fragments.py` 原子 CLI＋Gate 1b Contract Scribe 子代理）、去重 `brief.md`（~14 欄）＋`storyboard.yaml` 7 類 `slide_plan`、關鍵 1 頁 3 風格並行活體比稿＋定版活範本 1 輪防走鐘、解鎖 `counsel` 等 4 款雙密度 Style DNA（保留 8 款規劃中共 12 款）、全風格統一從容慢板動效、100% Builder 子代理職能隔離、4 大底盤真 Bug 修復、純工程 `check.mjs`（測遍全場 `data-step` 並輸出 `filmstrip-sXX.jpg` 分鏡條）＋單輪有界 Critic |
+| `outputs/deck-architect.skill` | **v5.1 打包檔（356.1 KB，87 檔，零 `__pycache__`，解壓後與原始碼 SHA-256 逐位元一致）** |
 | `outputs/examples/v48-regression/` | 引擎回歸測試簡報（4 套套件 11 原語、`unlisted`、聚光復原、`templates/deck.css`；9 頁全過，最低 `5.12:1`，含 `filmstrip-s05.jpg`）。改底盤或腳本後先跑這份 |
 | `outputs/examples/v4-alive-demo/{brief.md,fragments.md}` | 示範用 brief 與素材碎片簿（驗證 v5 `lint_brief` 對 v4 舊版 brief 100% 向後相容，0 錯 0 警） |
 | `outputs/examples/v45-modular-demo/` | 三層引擎與模組虛構技術示範（6 頁，最低對比 `4.84:1`，含 `filmstrip-s04.jpg`） |
@@ -165,7 +178,7 @@ _最後更新：2026-11-28_
 | `outputs/examples/v4-visual-benchmark/` | 靜態美感上限重練標竿・去小字極致留白版（6 頁全通過） |
 | `outputs/examples/v4-demo/` | Phase A 初版虛構端到端範例（8 頁，最低 `4.81:1`；`samples/` `--sheet` 相容通過） |
 | `outputs/examples/{example,annual-section,layout-catalogue,progress-overview,test4}/` | v3 時代舊範例（如 `theme: editorial` 等舊欄位），只保留參考，不代表現行流程 |
-| `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–46 條（含 2026-11-28 v5.0 六條第一性原理定案） |
+| `inputs/presentation-principles.md` | 使用者的簡報原則，第 1–47 條（含 2026-11-28 v5.0 六條第一性原理定案與 v5.1 前兩步零減輪上下文隔離定案） |
 | `inputs/v1-replay-v410.md` | v4.10 主柱一 v1 四案虛構化全新上下文盲測回放報告（4/4 命中正確架構、輪／題數統計與 v4.10.1 兩項修正紀錄） |
 | `inputs/v410-replay-run2.md`、`inputs/replay-v1-cases/` | 第二組回放報告（4/4 命中，另找到 4 項待修），以及可重跑的虛構回歸測試組：情境、扮演設定、每輪表單與 brief，重跑方法見該資料夾 `README.md` |
 | `inputs/pillar1-review-v490.md`、`inputs/mattpocock-elicitation-study.md` | v4.9.0 主柱一第一性原理複查（7 項缺口）與 `mattpocock/skills` 引導深挖十機制研究（已於 v4.10 落地） |
